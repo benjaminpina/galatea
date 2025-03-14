@@ -24,6 +24,7 @@ type SubstratePercentage struct {
 // MixedSubstrate represents a mixture of different substrates with their percentages
 type MixedSubstrate struct {
 	ID         string
+	Name       string
 	Color      string
 	Substrates []SubstratePercentage
 }
