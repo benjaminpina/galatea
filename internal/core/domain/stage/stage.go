@@ -7,8 +7,8 @@ import (
 	"github.com/benjaminpina/galatea/internal/core/domain/substrate"
 )
 
-// CellContent represents the content of a cell in the Stage grid
-type CellContent struct {
+// Cell represents the content of a cell in the Stage grid
+type Cell struct {
 	Substrate      *substrate.Substrate
 	MixedSubstrate *substrate.MixedSubstrate
 }
@@ -21,7 +21,7 @@ type Stage struct {
 	SubstrateSet *substrate.SubstrateSet
 	Width        int
 	Height       int
-	Grid         [][]*CellContent
+	Grid         [][]*Cell
 }
 
 // Common errors
@@ -41,9 +41,9 @@ func NewStage(id, name string, width, height int, substrateSet *substrate.Substr
 	}
 
 	// Create the grid
-	grid := make([][]*CellContent, height)
+	grid := make([][]*Cell, height)
 	for i := range grid {
-		grid[i] = make([]*CellContent, width)
+		grid[i] = make([]*Cell, width)
 		// Initialize with empty cells
 		for j := range grid[i] {
 			grid[i][j] = nil
@@ -68,9 +68,9 @@ func (s *Stage) Resize(newWidth, newHeight int) error {
 	}
 
 	// Create a new grid with the new dimensions
-	newGrid := make([][]*CellContent, newHeight)
+	newGrid := make([][]*Cell, newHeight)
 	for i := range newGrid {
-		newGrid[i] = make([]*CellContent, newWidth)
+		newGrid[i] = make([]*Cell, newWidth)
 		// Copy existing content where possible
 		for j := range newGrid[i] {
 			if i < s.Height && j < s.Width {
@@ -119,7 +119,7 @@ func (s *Stage) PlaceSubstrate(x, y int, subID string) error {
 	}
 
 	// Place the substrate
-	s.Grid[y][x] = &CellContent{
+	s.Grid[y][x] = &Cell{
 		Substrate:      sub,
 		MixedSubstrate: nil,
 	}
@@ -152,7 +152,7 @@ func (s *Stage) PlaceMixedSubstrate(x, y int, mixedSubID string) error {
 	}
 
 	// Place the mixed substrate
-	s.Grid[y][x] = &CellContent{
+	s.Grid[y][x] = &Cell{
 		Substrate:      nil,
 		MixedSubstrate: mixedSub,
 	}
@@ -176,8 +176,8 @@ func (s *Stage) ClearCell(x, y int) error {
 	return nil
 }
 
-// GetCellContent returns the content of a cell
-func (s *Stage) GetCellContent(x, y int) (*CellContent, error) {
+// GetCell returns the content of a cell
+func (s *Stage) GetCell(x, y int) (*Cell, error) {
 	// Check if position is valid
 	if !s.IsValidPosition(x, y) {
 		return nil, ErrInvalidPosition
