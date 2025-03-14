@@ -1,26 +1,27 @@
 # Galatea Makefile
 # Variables for configuration
 BINARY_NAME = galatea
-CLI_BINARY = cli
+CLI_BINARY = galateac
+GUI_BINARY = galatea
 BUILD_DIR = build/bin
-FRONTEND_DIR = frontend
+FRONTEND_DIR = cmd/gui/frontend
 DIST_DIR = $(FRONTEND_DIR)/dist
 WAILS_FLAGS = --tags webkit2_41
 GO_FILES = $(shell find . -name "*.go" -type f -not -path "./vendor/*")
 COVERAGE_FILE = coverage.out
 
-.PHONY: run build-wails cli build-cli all test coverage clean lint fmt help
+.PHONY: run build-wails cli build-cli build-gui all test coverage clean lint fmt help
 
 # Default target
 .DEFAULT_GOAL := help
 
 # Development
 run: ## Run the application in development mode
-	wails dev $(WAILS_FLAGS)
+	cd cmd/gui && wails dev $(WAILS_FLAGS)
 
 # Build targets
 build-wails: ## Build the Wails application
-	wails build $(WAILS_FLAGS)
+	cd cmd/gui && wails build $(WAILS_FLAGS)
 
 cli: ## Run the CLI application
 	go run cmd/cli/main.go
@@ -29,7 +30,11 @@ build-cli: ## Build the CLI binary
 	@mkdir -p $(BUILD_DIR)
 	go build -o $(BUILD_DIR)/$(CLI_BINARY) cmd/cli/main.go
 
-all: build-wails build-cli ## Build both Wails and CLI applications
+build-gui: ## Build the GUI binary
+	@mkdir -p $(BUILD_DIR)
+	cd cmd/gui && wails build $(WAILS_FLAGS) -o ../../$(BUILD_DIR)/$(GUI_BINARY)
+
+all: build-cli build-gui ## Build both CLI and GUI applications
 
 # Testing and code quality
 test: ## Run tests

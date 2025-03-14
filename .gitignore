@@ -1,6 +1,7 @@
 build/bin
 node_modules
-frontend/dist
+cmd/gui/frontend/dist
+cmd/gui/frontend/node_modules
 
 # Dependency directories
 __pycache__/
@@ -64,3 +65,9 @@ yarn-error.log*
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# Go specific
+*.exe
+*.test
+*.prof
+coverage.out
