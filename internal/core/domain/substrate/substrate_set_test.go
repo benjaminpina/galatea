@@ -942,3 +942,175 @@ func TestSubstrateSet_UpdateMixedSubstrate(t *testing.T) {
 		})
 	}
 }
+
+func TestSubstrateSet_GetSubstrates(t *testing.T) {
+	// Create test substrates
+	sub1 := Substrate{ID: "sub1", Name: "Substrate 1", Color: "red"}
+	sub2 := Substrate{ID: "sub2", Name: "Substrate 2", Color: "blue"}
+	
+	tests := []struct {
+		name            string
+		ss              *SubstrateSet
+		expectedCount   int
+		expectedSubIDs  []string
+	}{
+		{
+			name: "get substrates from empty set",
+			ss: &SubstrateSet{
+				ID:   "set1",
+				Name: "Empty Set",
+				Substrates: []Substrate{},
+				MixedSubstrates: []MixedSubstrate{},
+			},
+			expectedCount: 0,
+			expectedSubIDs: []string{},
+		},
+		{
+			name: "get substrates from set with substrates",
+			ss: &SubstrateSet{
+				ID:   "set1",
+				Name: "Set with Substrates",
+				Substrates: []Substrate{
+					sub1,
+					sub2,
+				},
+				MixedSubstrates: []MixedSubstrate{},
+			},
+			expectedCount: 2,
+			expectedSubIDs: []string{"sub1", "sub2"},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Get substrates
+			substrates := tt.ss.GetSubstrates()
+			
+			// Check count
+			if len(substrates) != tt.expectedCount {
+				t.Errorf("expected %d substrates, got %d", tt.expectedCount, len(substrates))
+			}
+			
+			// Check IDs
+			for i, expectedID := range tt.expectedSubIDs {
+				if i < len(substrates) && substrates[i].ID != expectedID {
+					t.Errorf("expected substrate ID %s at index %d, got %s", 
+						expectedID, i, substrates[i].ID)
+				}
+			}
+			
+			// Verify that the returned slice is a copy by modifying it
+			if len(substrates) > 0 {
+				// Store original name
+				originalName := substrates[0].Name
+				
+				// Modify the returned substrate
+				substrates[0].Name = "Modified Name"
+				
+				// Get substrates again and verify the original is unchanged
+				newSubstrates := tt.ss.GetSubstrates()
+				if len(newSubstrates) > 0 && newSubstrates[0].Name != originalName {
+					t.Errorf("GetSubstrates did not return a copy: original substrate was modified")
+				}
+			}
+		})
+	}
+}
+
+func TestSubstrateSet_GetMixedSubstrates(t *testing.T) {
+	// Create test substrates
+	sub1 := Substrate{ID: "sub1", Name: "Substrate 1", Color: "red"}
+	sub2 := Substrate{ID: "sub2", Name: "Substrate 2", Color: "blue"}
+	
+	// Create test mixed substrates
+	mix1 := MixedSubstrate{
+		ID:    "mix1",
+		Name:  "Mix 1",
+		Color: "brown",
+		Substrates: []SubstratePercentage{
+			{Substrate: sub1, Percentage: 60},
+			{Substrate: sub2, Percentage: 40},
+		},
+	}
+	
+	mix2 := MixedSubstrate{
+		ID:    "mix2",
+		Name:  "Mix 2",
+		Color: "dark brown",
+		Substrates: []SubstratePercentage{
+			{Substrate: sub1, Percentage: 30},
+			{Substrate: sub2, Percentage: 70},
+		},
+	}
+
+	tests := []struct {
+		name                 string
+		ss                   *SubstrateSet
+		expectedCount        int
+		expectedMixedSubIDs  []string
+	}{
+		{
+			name: "get mixed substrates from empty set",
+			ss: &SubstrateSet{
+				ID:   "set1",
+				Name: "Empty Set",
+				Substrates: []Substrate{},
+				MixedSubstrates: []MixedSubstrate{},
+			},
+			expectedCount: 0,
+			expectedMixedSubIDs: []string{},
+		},
+		{
+			name: "get mixed substrates from set with mixed substrates",
+			ss: &SubstrateSet{
+				ID:   "set1",
+				Name: "Set with Mixed Substrates",
+				Substrates: []Substrate{
+					sub1,
+					sub2,
+				},
+				MixedSubstrates: []MixedSubstrate{
+					mix1,
+					mix2,
+				},
+			},
+			expectedCount: 2,
+			expectedMixedSubIDs: []string{"mix1", "mix2"},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Get mixed substrates
+			mixedSubstrates := tt.ss.GetMixedSubstrates()
+			
+			// Check count
+			if len(mixedSubstrates) != tt.expectedCount {
+				t.Errorf("expected %d mixed substrates, got %d", tt.expectedCount, len(mixedSubstrates))
+			}
+			
+			// Check IDs
+			for i, expectedID := range tt.expectedMixedSubIDs {
+				if i < len(mixedSubstrates) && mixedSubstrates[i].ID != expectedID {
+					t.Errorf("expected mixed substrate ID %s at index %d, got %s", 
+						expectedID, i, mixedSubstrates[i].ID)
+				}
+			}
+			
+			// Verify that the returned slice is a copy by modifying it
+			if len(mixedSubstrates) > 0 {
+				// Store original name
+				originalName := mixedSubstrates[0].Name
+				
+				// Modify the returned mixed substrate
+				mixedSubstrates[0].Name = "Modified Mix Name"
+				
+				// Get mixed substrates again and verify the original is unchanged
+				newMixedSubstrates := tt.ss.GetMixedSubstrates()
+				if len(newMixedSubstrates) > 0 && newMixedSubstrates[0].Name != originalName {
+					t.Errorf("GetMixedSubstrates did not return a copy: original mixed substrate was modified")
+				}
+			}
+		})
+	}
+}
