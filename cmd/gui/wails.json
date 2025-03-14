@@ -6,6 +6,7 @@
   "frontend:build": "npm run build",
   "frontend:dev:watcher": "npm run dev",
   "frontend:dev:serverUrl": "auto",
+  "build:dir": "../../build",
   "author": {
     "name": "Benjamín Piña Altamirano",
     "email": "benjamin.pina@gmail.com"
