@@ -401,6 +401,222 @@
                 }
             }
         },
+        "/api/v1/substrate-sets": {
+            "get": {
+                "description": "Obtiene una lista de todos los conjuntos de sustratos",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "substrate-sets"
+                ],
+                "summary": "Listar todos los conjuntos de sustratos",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/substrate.SubstrateSetResponse"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/substrate.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Crea un nuevo conjunto de sustratos con los datos proporcionados",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "substrate-sets"
+                ],
+                "summary": "Crear un nuevo conjunto de sustratos",
+                "parameters": [
+                    {
+                        "description": "Datos del conjunto de sustratos",
+                        "name": "substrate",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/substrate.SubstrateSetRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/substrate.SubstrateSetResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/substrate.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/substrate.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/substrate-sets/{id}": {
+            "get": {
+                "description": "Obtiene un conjunto de sustratos por su ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "substrate-sets"
+                ],
+                "summary": "Obtener un conjunto de sustratos por ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID del conjunto de sustratos",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/substrate.SubstrateSetResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/substrate.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/substrate.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Actualiza un conjunto de sustratos existente con los datos proporcionados",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "substrate-sets"
+                ],
+                "summary": "Actualizar un conjunto de sustratos",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID del conjunto de sustratos",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Datos actualizados del conjunto de sustratos",
+                        "name": "substrate",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/substrate.SubstrateSetRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/substrate.SubstrateSetResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/substrate.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/substrate.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/substrate.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Elimina un conjunto de sustratos por su ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "substrate-sets"
+                ],
+                "summary": "Eliminar un conjunto de sustratos",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID del conjunto de sustratos",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/substrate.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/substrate.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/substrates": {
             "get": {
                 "description": "Get a list of all substrates",
@@ -718,6 +934,44 @@
                 },
                 "name": {
                     "type": "string"
+                }
+            }
+        },
+        "substrate.SubstrateSetRequest": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "example": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Arena y Tierra"
+                }
+            }
+        },
+        "substrate.SubstrateSetResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "example": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+                },
+                "mixed_substrates": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/substrate.MixedSubstrateResponse"
+                    }
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Arena y Tierra"
+                },
+                "substrates": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/substrate.SubstrateResponse"
+                    }
                 }
             }
         }
