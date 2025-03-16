@@ -23,7 +23,7 @@ func LoadConfig() (*Config, error) {
 	config := &Config{
 		DatabaseType: getEnv("DATABASE_TYPE", "sqlite"),
 		PostgresURL:  getEnv("POSTGRES_URL", "postgres://postgres:postgres@localhost:5432/products?sslmode=disable"),
-		SQLiteFile:   getEnv("SQLITE_FILE", "products.db"),
+		SQLiteFile:   getEnv("SQLITE_FILE", "galatea.db"),
 		ServerPort:   getEnv("SERVER_PORT", "8080"),
 	}
 

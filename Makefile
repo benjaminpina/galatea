@@ -28,7 +28,9 @@ cli: ## Run the CLI application
 	go run cmd/cli/main.go
 
 api: ## Run the API server
-	go run cmd/api/main.go
+	@mkdir -p $(BUILD_DIR)
+	go build -o $(BUILD_DIR)/$(API_BINARY) cmd/api/main.go
+	$(BUILD_DIR)/$(API_BINARY)
 
 build-cli: ## Build the CLI binary
 	@mkdir -p $(BUILD_DIR)

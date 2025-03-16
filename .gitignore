@@ -71,3 +71,6 @@ Thumbs.db
 *.test
 *.prof
 coverage.out
+
+# SQLite database
+*.db
