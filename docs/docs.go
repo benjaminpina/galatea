@@ -241,9 +241,6 @@ const docTemplate = `{
                 "color": {
                     "type": "string"
                 },
-                "id": {
-                    "type": "string"
-                },
                 "name": {
                     "type": "string"
                 }

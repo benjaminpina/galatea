@@ -15,7 +15,6 @@ type SubstrateHandler struct {
 
 // SubstrateRequest represents the request body for substrate operations
 type SubstrateRequest struct {
-	ID    string `json:"id,omitempty"`
 	Name  string `json:"name" validate:"required"`
 	Color string `json:"color" validate:"required"`
 }
@@ -69,11 +68,8 @@ func (h *SubstrateHandler) CreateSubstrate(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(ErrorResponse{Error: "Invalid request body"})
 	}
 	
-	// Generate UUID if not provided
-	id := req.ID
-	if id == "" {
-		id = uuid.New().String()
-	}
+	// Generate UUID automatically
+	id := uuid.New().String()
 	
 	// Call service
 	sub, err := h.substrateSvc.CreateSubstrate(id, req.Name, req.Color)

@@ -9,8 +9,6 @@ definitions:
     properties:
       color:
         type: string
-      id:
-        type: string
       name:
         type: string
     required:
