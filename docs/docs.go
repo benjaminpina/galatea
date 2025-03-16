@@ -179,6 +179,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/substrate.ErrorResponse"
                         }
                     },
+                    "404": {
+                        "description": "Substrate not found",
+                        "schema": {
+                            "$ref": "#/definitions/substrate.ErrorResponse"
+                        }
+                    },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
@@ -211,6 +217,12 @@ const docTemplate = `{
                 "responses": {
                     "204": {
                         "description": "No Content"
+                    },
+                    "404": {
+                        "description": "Substrate not found",
+                        "schema": {
+                            "$ref": "#/definitions/substrate.ErrorResponse"
+                        }
                     },
                     "500": {
                         "description": "Internal server error",

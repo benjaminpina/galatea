@@ -103,6 +103,10 @@ paths:
       responses:
         "204":
           description: No Content
+        "404":
+          description: Substrate not found
+          schema:
+            $ref: '#/definitions/substrate.ErrorResponse'
         "500":
           description: Internal server error
           schema:
@@ -159,6 +163,10 @@ paths:
             $ref: '#/definitions/substrate.SubstrateResponse'
         "400":
           description: Invalid request body
+          schema:
+            $ref: '#/definitions/substrate.ErrorResponse'
+        "404":
+          description: Substrate not found
           schema:
             $ref: '#/definitions/substrate.ErrorResponse'
         "500":

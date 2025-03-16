@@ -116,6 +116,7 @@ func (h *SubstrateHandler) GetSubstrate(c *fiber.Ctx) error {
 // @Param substrate body SubstrateRequest true "Updated substrate information"
 // @Success 200 {object} SubstrateResponse
 // @Failure 400 {object} ErrorResponse "Invalid request body"
+// @Failure 404 {object} ErrorResponse "Substrate not found"
 // @Failure 500 {object} ErrorResponse "Internal server error"
 // @Router /api/v1/substrates/{id} [put]
 func (h *SubstrateHandler) UpdateSubstrate(c *fiber.Ctx) error {
@@ -128,6 +129,10 @@ func (h *SubstrateHandler) UpdateSubstrate(c *fiber.Ctx) error {
 	
 	sub, err := h.substrateSvc.UpdateSubstrate(id, req.Name, req.Color)
 	if err != nil {
+		// Check if the error is because the substrate was not found
+		if err.Error() == "substrate not found" {
+			return c.Status(fiber.StatusNotFound).JSON(ErrorResponse{Error: err.Error()})
+		}
 		return c.Status(fiber.StatusInternalServerError).JSON(ErrorResponse{Error: err.Error()})
 	}
 	
@@ -144,12 +149,17 @@ func (h *SubstrateHandler) UpdateSubstrate(c *fiber.Ctx) error {
 // @Produce json
 // @Param id path string true "Substrate ID"
 // @Success 204 "No Content"
+// @Failure 404 {object} ErrorResponse "Substrate not found"
 // @Failure 500 {object} ErrorResponse "Internal server error"
 // @Router /api/v1/substrates/{id} [delete]
 func (h *SubstrateHandler) DeleteSubstrate(c *fiber.Ctx) error {
 	id := c.Params("id")
 	
 	if err := h.substrateSvc.DeleteSubstrate(id); err != nil {
+		// Check if the error is because the substrate was not found
+		if err.Error() == "substrate not found" {
+			return c.Status(fiber.StatusNotFound).JSON(ErrorResponse{Error: err.Error()})
+		}
 		return c.Status(fiber.StatusInternalServerError).JSON(ErrorResponse{Error: err.Error()})
 	}
 	
