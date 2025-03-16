@@ -1,0 +1,178 @@
+basePath: /
+definitions:
+  substrate.ErrorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+  substrate.SubstrateRequest:
+    properties:
+      color:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+    required:
+    - color
+    - name
+    type: object
+  substrate.SubstrateResponse:
+    properties:
+      color:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+    type: object
+host: localhost:2000
+info:
+  contact:
+    email: support@galatea.com
+    name: API Support
+  description: API REST para la gestión de sustratos y mezclas para cultivos
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Galatea API
+  version: "1.0"
+paths:
+  /api/v1/substrates:
+    get:
+      consumes:
+      - application/json
+      description: Get a list of all substrates
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/substrate.SubstrateResponse'
+            type: array
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/substrate.ErrorResponse'
+      summary: List all substrates
+      tags:
+      - substrates
+    post:
+      consumes:
+      - application/json
+      description: Create a new substrate with the provided information
+      parameters:
+      - description: Substrate information
+        in: body
+        name: substrate
+        required: true
+        schema:
+          $ref: '#/definitions/substrate.SubstrateRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/substrate.SubstrateResponse'
+        "400":
+          description: Invalid request body
+          schema:
+            $ref: '#/definitions/substrate.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/substrate.ErrorResponse'
+      summary: Create a new substrate
+      tags:
+      - substrates
+  /api/v1/substrates/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a substrate by its ID
+      parameters:
+      - description: Substrate ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/substrate.ErrorResponse'
+      summary: Delete a substrate
+      tags:
+      - substrates
+    get:
+      consumes:
+      - application/json
+      description: Get a substrate by its ID
+      parameters:
+      - description: Substrate ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/substrate.SubstrateResponse'
+        "404":
+          description: Substrate not found
+          schema:
+            $ref: '#/definitions/substrate.ErrorResponse'
+      summary: Get a substrate by ID
+      tags:
+      - substrates
+    put:
+      consumes:
+      - application/json
+      description: Update a substrate with the provided information
+      parameters:
+      - description: Substrate ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Updated substrate information
+        in: body
+        name: substrate
+        required: true
+        schema:
+          $ref: '#/definitions/substrate.SubstrateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/substrate.SubstrateResponse'
+        "400":
+          description: Invalid request body
+          schema:
+            $ref: '#/definitions/substrate.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/substrate.ErrorResponse'
+      summary: Update a substrate
+      tags:
+      - substrates
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
