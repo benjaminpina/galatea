@@ -26,7 +26,7 @@ func (r *SubstrateRepository) Create(sub substrate.Substrate) error {
 		INSERT INTO substrates (id, name, color)
 		VALUES (?, ?, ?)
 	`
-	_, err := r.db.GetDB().Exec(query, sub.ID, sub.Name, sub.Color)
+	_, err := r.db.Exec(query, sub.ID, sub.Name, sub.Color)
 	if err != nil {
 		return fmt.Errorf("failed to create substrate: %w", err)
 	}
@@ -40,7 +40,7 @@ func (r *SubstrateRepository) GetByID(id string) (*substrate.Substrate, error) {
 		FROM substrates
 		WHERE id = ?
 	`
-	row := r.db.GetDB().QueryRow(query, id)
+	row := r.db.QueryRow(query, id)
 
 	var sub substrate.Substrate
 	err := row.Scan(&sub.ID, &sub.Name, &sub.Color)
@@ -61,7 +61,7 @@ func (r *SubstrateRepository) Update(sub substrate.Substrate) error {
 		SET name = ?, color = ?, updated_at = CURRENT_TIMESTAMP
 		WHERE id = ?
 	`
-	result, err := r.db.GetDB().Exec(query, sub.Name, sub.Color, sub.ID)
+	result, err := r.db.Exec(query, sub.Name, sub.Color, sub.ID)
 	if err != nil {
 		return fmt.Errorf("failed to update substrate: %w", err)
 	}
@@ -82,7 +82,7 @@ func (r *SubstrateRepository) Update(sub substrate.Substrate) error {
 func (r *SubstrateRepository) Delete(id string) error {
 	query := `DELETE FROM substrates WHERE id = ?`
 	
-	result, err := r.db.GetDB().Exec(query, id)
+	result, err := r.db.Exec(query, id)
 	if err != nil {
 		return fmt.Errorf("failed to delete substrate: %w", err)
 	}
@@ -106,7 +106,7 @@ func (r *SubstrateRepository) List() ([]substrate.Substrate, error) {
 		FROM substrates
 		ORDER BY name
 	`
-	rows, err := r.db.GetDB().Query(query)
+	rows, err := r.db.Query(query)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list substrates: %w", err)
 	}
@@ -133,7 +133,7 @@ func (r *SubstrateRepository) Exists(id string) (bool, error) {
 	query := `SELECT 1 FROM substrates WHERE id = ? LIMIT 1`
 	
 	var exists int
-	err := r.db.GetDB().QueryRow(query, id).Scan(&exists)
+	err := r.db.QueryRow(query, id).Scan(&exists)
 	
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {

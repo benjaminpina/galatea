@@ -75,9 +75,19 @@ func GetInstance() (*Database, error) {
 	return instance, nil
 }
 
-// GetDB returns the underlying sql.DB instance
-func (d *Database) GetDB() *sql.DB {
-	return d.db
+// Exec executes a query without returning any rows
+func (d *Database) Exec(query string, args ...interface{}) (sql.Result, error) {
+	return d.db.Exec(query, args...)
+}
+
+// Query executes a query that returns rows
+func (d *Database) Query(query string, args ...interface{}) (*sql.Rows, error) {
+	return d.db.Query(query, args...)
+}
+
+// QueryRow executes a query that is expected to return at most one row
+func (d *Database) QueryRow(query string, args ...interface{}) *sql.Row {
+	return d.db.QueryRow(query, args...)
 }
 
 // Close closes the database connection
