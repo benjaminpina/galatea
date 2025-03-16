@@ -5,6 +5,53 @@ definitions:
       error:
         type: string
     type: object
+  substrate.MixedSubstrateRequest:
+    properties:
+      color:
+        type: string
+      name:
+        type: string
+    required:
+    - color
+    - name
+    type: object
+  substrate.MixedSubstrateResponse:
+    properties:
+      color:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      substrates:
+        items:
+          $ref: '#/definitions/substrate.SubstratePercentageResponse'
+        type: array
+      total_percentage:
+        type: number
+    type: object
+  substrate.SubstratePercentageRequest:
+    properties:
+      percentage:
+        maximum: 100
+        type: number
+      substrate_id:
+        type: string
+    required:
+    - percentage
+    - substrate_id
+    type: object
+  substrate.SubstratePercentageResponse:
+    properties:
+      color:
+        type: string
+      percentage:
+        type: number
+      substrate_id:
+        type: string
+      substrate_name:
+        type: string
+    type: object
   substrate.SubstrateRequest:
     properties:
       color:
@@ -37,6 +84,261 @@ info:
   title: Galatea API
   version: "1.0"
 paths:
+  /api/v1/mixed-substrates:
+    get:
+      consumes:
+      - application/json
+      description: Get a list of all mixed substrates
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/substrate.MixedSubstrateResponse'
+            type: array
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/substrate.ErrorResponse'
+      summary: List all mixed substrates
+      tags:
+      - mixed-substrates
+    post:
+      consumes:
+      - application/json
+      description: Create a new mixed substrate with the provided information
+      parameters:
+      - description: Mixed substrate information
+        in: body
+        name: mixed_substrate
+        required: true
+        schema:
+          $ref: '#/definitions/substrate.MixedSubstrateRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/substrate.MixedSubstrateResponse'
+        "400":
+          description: Invalid request body
+          schema:
+            $ref: '#/definitions/substrate.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/substrate.ErrorResponse'
+      summary: Create a new mixed substrate
+      tags:
+      - mixed-substrates
+  /api/v1/mixed-substrates/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a mixed substrate by its ID
+      parameters:
+      - description: Mixed substrate ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "404":
+          description: Mixed substrate not found
+          schema:
+            $ref: '#/definitions/substrate.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/substrate.ErrorResponse'
+      summary: Delete a mixed substrate
+      tags:
+      - mixed-substrates
+    get:
+      consumes:
+      - application/json
+      description: Get a mixed substrate by its ID
+      parameters:
+      - description: Mixed substrate ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/substrate.MixedSubstrateResponse'
+        "404":
+          description: Mixed substrate not found
+          schema:
+            $ref: '#/definitions/substrate.ErrorResponse'
+      summary: Get a mixed substrate
+      tags:
+      - mixed-substrates
+    put:
+      consumes:
+      - application/json
+      description: Update a mixed substrate with the provided information
+      parameters:
+      - description: Mixed substrate ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Updated mixed substrate information
+        in: body
+        name: mixed_substrate
+        required: true
+        schema:
+          $ref: '#/definitions/substrate.MixedSubstrateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/substrate.MixedSubstrateResponse'
+        "400":
+          description: Invalid request body
+          schema:
+            $ref: '#/definitions/substrate.ErrorResponse'
+        "404":
+          description: Mixed substrate not found
+          schema:
+            $ref: '#/definitions/substrate.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/substrate.ErrorResponse'
+      summary: Update a mixed substrate
+      tags:
+      - mixed-substrates
+  /api/v1/mixed-substrates/{id}/substrates:
+    post:
+      consumes:
+      - application/json
+      description: Add a substrate with a percentage to a mixed substrate
+      parameters:
+      - description: Mixed substrate ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Substrate and percentage information
+        in: body
+        name: substrate
+        required: true
+        schema:
+          $ref: '#/definitions/substrate.SubstratePercentageRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/substrate.MixedSubstrateResponse'
+        "400":
+          description: Invalid request body
+          schema:
+            $ref: '#/definitions/substrate.ErrorResponse'
+        "404":
+          description: Mixed substrate or substrate not found
+          schema:
+            $ref: '#/definitions/substrate.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/substrate.ErrorResponse'
+      summary: Add a substrate to a mixed substrate
+      tags:
+      - mixed-substrates
+  /api/v1/mixed-substrates/{id}/substrates/{substrate_id}:
+    delete:
+      consumes:
+      - application/json
+      description: Remove a substrate from a mixed substrate
+      parameters:
+      - description: Mixed substrate ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Substrate ID
+        in: path
+        name: substrate_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/substrate.MixedSubstrateResponse'
+        "404":
+          description: Mixed substrate, substrate, or substrate not in mix not found
+          schema:
+            $ref: '#/definitions/substrate.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/substrate.ErrorResponse'
+      summary: Remove a substrate from a mixed substrate
+      tags:
+      - mixed-substrates
+    put:
+      consumes:
+      - application/json
+      description: Update the percentage of a substrate in a mixed substrate
+      parameters:
+      - description: Mixed substrate ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Substrate ID
+        in: path
+        name: substrate_id
+        required: true
+        type: string
+      - description: New percentage information
+        in: body
+        name: percentage
+        required: true
+        schema:
+          $ref: '#/definitions/substrate.SubstratePercentageRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/substrate.MixedSubstrateResponse'
+        "400":
+          description: Invalid request body or percentage
+          schema:
+            $ref: '#/definitions/substrate.ErrorResponse'
+        "404":
+          description: Mixed substrate, substrate, or substrate not in mix not found
+          schema:
+            $ref: '#/definitions/substrate.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/substrate.ErrorResponse'
+      summary: Update substrate percentage
+      tags:
+      - mixed-substrates
   /api/v1/substrates:
     get:
       consumes:

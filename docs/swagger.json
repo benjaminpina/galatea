@@ -17,6 +17,390 @@
     "host": "localhost:2000",
     "basePath": "/",
     "paths": {
+        "/api/v1/mixed-substrates": {
+            "get": {
+                "description": "Get a list of all mixed substrates",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "mixed-substrates"
+                ],
+                "summary": "List all mixed substrates",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/substrate.MixedSubstrateResponse"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/substrate.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create a new mixed substrate with the provided information",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "mixed-substrates"
+                ],
+                "summary": "Create a new mixed substrate",
+                "parameters": [
+                    {
+                        "description": "Mixed substrate information",
+                        "name": "mixed_substrate",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/substrate.MixedSubstrateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/substrate.MixedSubstrateResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request body",
+                        "schema": {
+                            "$ref": "#/definitions/substrate.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/substrate.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/mixed-substrates/{id}": {
+            "get": {
+                "description": "Get a mixed substrate by its ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "mixed-substrates"
+                ],
+                "summary": "Get a mixed substrate",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Mixed substrate ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/substrate.MixedSubstrateResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Mixed substrate not found",
+                        "schema": {
+                            "$ref": "#/definitions/substrate.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Update a mixed substrate with the provided information",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "mixed-substrates"
+                ],
+                "summary": "Update a mixed substrate",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Mixed substrate ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Updated mixed substrate information",
+                        "name": "mixed_substrate",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/substrate.MixedSubstrateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/substrate.MixedSubstrateResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request body",
+                        "schema": {
+                            "$ref": "#/definitions/substrate.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Mixed substrate not found",
+                        "schema": {
+                            "$ref": "#/definitions/substrate.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/substrate.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete a mixed substrate by its ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "mixed-substrates"
+                ],
+                "summary": "Delete a mixed substrate",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Mixed substrate ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "404": {
+                        "description": "Mixed substrate not found",
+                        "schema": {
+                            "$ref": "#/definitions/substrate.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/substrate.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/mixed-substrates/{id}/substrates": {
+            "post": {
+                "description": "Add a substrate with a percentage to a mixed substrate",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "mixed-substrates"
+                ],
+                "summary": "Add a substrate to a mixed substrate",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Mixed substrate ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Substrate and percentage information",
+                        "name": "substrate",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/substrate.SubstratePercentageRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/substrate.MixedSubstrateResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request body",
+                        "schema": {
+                            "$ref": "#/definitions/substrate.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Mixed substrate or substrate not found",
+                        "schema": {
+                            "$ref": "#/definitions/substrate.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/substrate.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/mixed-substrates/{id}/substrates/{substrate_id}": {
+            "put": {
+                "description": "Update the percentage of a substrate in a mixed substrate",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "mixed-substrates"
+                ],
+                "summary": "Update substrate percentage",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Mixed substrate ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Substrate ID",
+                        "name": "substrate_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "New percentage information",
+                        "name": "percentage",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/substrate.SubstratePercentageRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/substrate.MixedSubstrateResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request body or percentage",
+                        "schema": {
+                            "$ref": "#/definitions/substrate.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Mixed substrate, substrate, or substrate not in mix not found",
+                        "schema": {
+                            "$ref": "#/definitions/substrate.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/substrate.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Remove a substrate from a mixed substrate",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "mixed-substrates"
+                ],
+                "summary": "Remove a substrate from a mixed substrate",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Mixed substrate ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Substrate ID",
+                        "name": "substrate_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/substrate.MixedSubstrateResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Mixed substrate, substrate, or substrate not in mix not found",
+                        "schema": {
+                            "$ref": "#/definitions/substrate.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/substrate.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/substrates": {
             "get": {
                 "description": "Get a list of all substrates",
@@ -233,6 +617,77 @@
             "type": "object",
             "properties": {
                 "error": {
+                    "type": "string"
+                }
+            }
+        },
+        "substrate.MixedSubstrateRequest": {
+            "type": "object",
+            "required": [
+                "color",
+                "name"
+            ],
+            "properties": {
+                "color": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "substrate.MixedSubstrateResponse": {
+            "type": "object",
+            "properties": {
+                "color": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "substrates": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/substrate.SubstratePercentageResponse"
+                    }
+                },
+                "total_percentage": {
+                    "type": "number"
+                }
+            }
+        },
+        "substrate.SubstratePercentageRequest": {
+            "type": "object",
+            "required": [
+                "percentage",
+                "substrate_id"
+            ],
+            "properties": {
+                "percentage": {
+                    "type": "number",
+                    "maximum": 100
+                },
+                "substrate_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "substrate.SubstratePercentageResponse": {
+            "type": "object",
+            "properties": {
+                "color": {
+                    "type": "string"
+                },
+                "percentage": {
+                    "type": "number"
+                },
+                "substrate_id": {
+                    "type": "string"
+                },
+                "substrate_name": {
                     "type": "string"
                 }
             }
