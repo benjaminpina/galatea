@@ -3,6 +3,7 @@
 BINARY_NAME = galatea
 CLI_BINARY = galateac
 GUI_BINARY = galatea
+API_BINARY = galatea-api
 BUILD_DIR = build/bin
 FRONTEND_DIR = cmd/gui/frontend
 DIST_DIR = $(FRONTEND_DIR)/dist
@@ -10,7 +11,7 @@ WAILS_FLAGS = --tags webkit2_41
 GO_FILES = $(shell find . -name "*.go" -type f -not -path "./vendor/*")
 COVERAGE_FILE = coverage.out
 
-.PHONY: run build-wails cli build-cli build-gui all test coverage clean lint fmt help
+.PHONY: run build-wails cli api build-cli build-gui build-api all test coverage clean lint fmt help
 
 # Default target
 .DEFAULT_GOAL := help
@@ -26,6 +27,9 @@ build-wails: ## Build the Wails application
 cli: ## Run the CLI application
 	go run cmd/cli/main.go
 
+api: ## Run the API server
+	go run cmd/api/main.go
+
 build-cli: ## Build the CLI binary
 	@mkdir -p $(BUILD_DIR)
 	go build -o $(BUILD_DIR)/$(CLI_BINARY) cmd/cli/main.go
@@ -34,14 +38,18 @@ build-gui: ## Build the GUI binary
 	@mkdir -p $(BUILD_DIR)
 	cd cmd/gui && wails build $(WAILS_FLAGS) -o ../../$(BUILD_DIR)/$(GUI_BINARY)
 
-all: build-cli build-gui ## Build both CLI and GUI applications
+build-api: ## Build the API binary
+	@mkdir -p $(BUILD_DIR)
+	go build -o $(BUILD_DIR)/$(API_BINARY) cmd/api/main.go
+
+all: build-cli build-gui build-api ## Build CLI, GUI, and API applications
 
 # Testing and code quality
 test: ## Run tests
 	go test -v ./...
 
 coverage: ## Generate test coverage report
-	go test -coverprofile=$(COVERAGE_FILE) ./internal/... ./cmd/cli/...
+	go test -coverprofile=$(COVERAGE_FILE) ./internal/... ./cmd/cli/... ./cmd/api/...
 	go tool cover -html=$(COVERAGE_FILE)
 
 lint: ## Run linters
