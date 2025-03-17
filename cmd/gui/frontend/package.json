@@ -10,7 +10,9 @@
   },
   "dependencies": {
     "element-plus": "^2.9.6",
-    "vue": "^3.2.37"
+    "konva": "^9.3.19",
+    "vue": "^3.2.37",
+    "vue-konva": "^3.2.0"
   },
   "devDependencies": {
     "@babel/types": "^7.18.10",

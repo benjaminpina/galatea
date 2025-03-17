@@ -16,17 +16,19 @@ export function DeleteSubstrate(arg1:string):Promise<void>;
 
 export function DeleteSubstrateSet(arg1:string):Promise<void>;
 
+export function FindMixedSubstratesBySubstrateID(arg1:string,arg2:number,arg3:number):Promise<substrate.MixedSubstratePaginatedResponse>;
+
 export function GetMixedSubstrate(arg1:string):Promise<substrate.MixedSubstrateResponse>;
 
 export function GetSubstrate(arg1:string):Promise<substrate.SubstrateResponse>;
 
 export function GetSubstrateSet(arg1:string):Promise<substrate.SubstrateSetResponse>;
 
-export function ListMixedSubstrates():Promise<Array<substrate.MixedSubstrateResponse>>;
+export function ListMixedSubstrates(arg1:number,arg2:number):Promise<substrate.MixedSubstratePaginatedResponse>;
 
-export function ListSubstrateSets():Promise<Array<substrate.SubstrateSetResponse>>;
+export function ListSubstrateSets(arg1:number,arg2:number):Promise<substrate.SubstrateSetPaginatedResponse>;
 
-export function ListSubstrates():Promise<Array<substrate.SubstrateResponse>>;
+export function ListSubstrates(arg1:number,arg2:number):Promise<substrate.PaginatedResponse>;
 
 export function RemoveSubstrateFromMix(arg1:string,arg2:string):Promise<substrate.MixedSubstrateResponse>;
 

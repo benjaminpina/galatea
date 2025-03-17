@@ -30,6 +30,10 @@ export function DeleteSubstrateSet(arg1) {
   return window['go']['main']['App']['DeleteSubstrateSet'](arg1);
 }
 
+export function FindMixedSubstratesBySubstrateID(arg1, arg2, arg3) {
+  return window['go']['main']['App']['FindMixedSubstratesBySubstrateID'](arg1, arg2, arg3);
+}
+
 export function GetMixedSubstrate(arg1) {
   return window['go']['main']['App']['GetMixedSubstrate'](arg1);
 }
@@ -42,16 +46,16 @@ export function GetSubstrateSet(arg1) {
   return window['go']['main']['App']['GetSubstrateSet'](arg1);
 }
 
-export function ListMixedSubstrates() {
-  return window['go']['main']['App']['ListMixedSubstrates']();
+export function ListMixedSubstrates(arg1, arg2) {
+  return window['go']['main']['App']['ListMixedSubstrates'](arg1, arg2);
 }
 
-export function ListSubstrateSets() {
-  return window['go']['main']['App']['ListSubstrateSets']();
+export function ListSubstrateSets(arg1, arg2) {
+  return window['go']['main']['App']['ListSubstrateSets'](arg1, arg2);
 }
 
-export function ListSubstrates() {
-  return window['go']['main']['App']['ListSubstrates']();
+export function ListSubstrates(arg1, arg2) {
+  return window['go']['main']['App']['ListSubstrates'](arg1, arg2);
 }
 
 export function RemoveSubstrateFromMix(arg1, arg2) {
