@@ -1,6 +1,7 @@
 package substrate
 
 import (
+	"github.com/benjaminpina/galatea/internal/core/domain/common"
 	"github.com/benjaminpina/galatea/internal/core/domain/substrate"
 )
 
@@ -11,5 +12,5 @@ type SubstrateService interface {
 	GetSubstrate(id string) (*substrate.Substrate, error)
 	UpdateSubstrate(id, name, color string) (*substrate.Substrate, error)
 	DeleteSubstrate(id string) error
-	ListSubstrates() ([]substrate.Substrate, error)
+	List(page, pageSize int) ([]substrate.Substrate, *common.PaginatedResult, error)
 }

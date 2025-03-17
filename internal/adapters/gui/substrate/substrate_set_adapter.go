@@ -1,11 +1,12 @@
 package substrate
 
 import (
+	guiCommon "github.com/benjaminpina/galatea/internal/adapters/gui/common"
 	"github.com/benjaminpina/galatea/internal/core/domain/substrate"
 	ports "github.com/benjaminpina/galatea/internal/core/ports/substrate"
 )
 
-// SubstrateSetResponse representa la respuesta de un conjunto de sustratos para la GUI
+// SubstrateSetResponse represents a substrate set response for the GUI
 type SubstrateSetResponse struct {
 	ID              string                  `json:"id"`
 	Name            string                  `json:"name"`
@@ -13,87 +14,99 @@ type SubstrateSetResponse struct {
 	MixedSubstrates []MixedSubstrateResponse `json:"mixed_substrates"`
 }
 
-// SubstrateSetRequest representa una solicitud para crear o actualizar un conjunto de sustratos desde la GUI
+// SubstrateSetRequest represents a request to create or update a substrate set from the GUI
 type SubstrateSetRequest struct {
 	ID   string `json:"id"`
 	Name string `json:"name"`
 }
 
-// SubstrateSetAdapter es un adaptador para exponer operaciones de conjuntos de sustratos a la GUI
+// SubstrateSetPaginatedResponse represents a paginated response of substrate sets for the GUI
+type SubstrateSetPaginatedResponse struct {
+	Data       []SubstrateSetResponse      `json:"data"`
+	Pagination guiCommon.PaginationResponse `json:"pagination"`
+}
+
+// SubstrateSetAdapter is an adapter to expose substrate set operations to the GUI
 type SubstrateSetAdapter struct {
 	service ports.SubstrateSetService
 }
 
-// NewSubstrateSetAdapter crea un nuevo adaptador de conjuntos de sustratos
+// NewSubstrateSetAdapter creates a new substrate set adapter
 func NewSubstrateSetAdapter(service ports.SubstrateSetService) *SubstrateSetAdapter {
 	return &SubstrateSetAdapter{
 		service: service,
 	}
 }
 
-// CreateSubstrateSet crea un nuevo conjunto de sustratos
+// CreateSubstrateSet creates a new substrate set
 func (a *SubstrateSetAdapter) CreateSubstrateSet(req SubstrateSetRequest) (*SubstrateSetResponse, error) {
-	// Crear el conjunto de sustratos usando el servicio
+	// Create the substrate set using the service
 	set, err := a.service.CreateSubstrateSet(req.ID, req.Name)
 	if err != nil {
 		return nil, err
 	}
 
-	// Convertir a respuesta
+	// Convert to response
 	resp := mapSubstrateSetToResponse(*set)
 	return &resp, nil
 }
 
-// GetSubstrateSet obtiene un conjunto de sustratos por ID
+// GetSubstrateSet gets a substrate set by ID
 func (a *SubstrateSetAdapter) GetSubstrateSet(id string) (*SubstrateSetResponse, error) {
-	// Obtener el conjunto de sustratos usando el servicio
+	// Get the substrate set using the service
 	set, err := a.service.GetSubstrateSet(id)
 	if err != nil {
 		return nil, err
 	}
 
-	// Convertir a respuesta
+	// Convert to response
 	resp := mapSubstrateSetToResponse(*set)
 	return &resp, nil
 }
 
-// UpdateSubstrateSet actualiza un conjunto de sustratos existente
+// UpdateSubstrateSet updates an existing substrate set
 func (a *SubstrateSetAdapter) UpdateSubstrateSet(id string, req SubstrateSetRequest) (*SubstrateSetResponse, error) {
-	// Actualizar el conjunto de sustratos usando el servicio
+	// Update the substrate set using the service
 	set, err := a.service.UpdateSubstrateSet(id, req.Name)
 	if err != nil {
 		return nil, err
 	}
 
-	// Convertir a respuesta
+	// Convert to response
 	resp := mapSubstrateSetToResponse(*set)
 	return &resp, nil
 }
 
-// DeleteSubstrateSet elimina un conjunto de sustratos por ID
+// DeleteSubstrateSet deletes a substrate set by ID
 func (a *SubstrateSetAdapter) DeleteSubstrateSet(id string) error {
-	// Eliminar el conjunto de sustratos usando el servicio
+	// Delete the substrate set using the service
 	return a.service.DeleteSubstrateSet(id)
 }
 
-// ListSubstrateSets obtiene todos los conjuntos de sustratos
-func (a *SubstrateSetAdapter) ListSubstrateSets() ([]SubstrateSetResponse, error) {
-	// Obtener todos los conjuntos de sustratos usando el servicio
-	sets, err := a.service.ListSubstrateSets()
+// List gets a paginated list of substrate sets
+func (a *SubstrateSetAdapter) List(page, pageSize int) (*SubstrateSetPaginatedResponse, error) {
+	// Get paginated substrate sets using the service
+	sets, pagination, err := a.service.List(page, pageSize)
 	if err != nil {
 		return nil, err
 	}
 
-	// Convertir a respuestas
+	// Convert to responses
 	resp := make([]SubstrateSetResponse, len(sets))
 	for i, set := range sets {
 		resp[i] = mapSubstrateSetToResponse(set)
 	}
 
-	return resp, nil
+	// Create paginated response
+	paginatedResp := &SubstrateSetPaginatedResponse{
+		Data:       resp,
+		Pagination: guiCommon.MapPaginationInfo(pagination),
+	}
+
+	return paginatedResp, nil
 }
 
-// mapSubstrateSetToResponse convierte un SubstrateSet a una respuesta
+// mapSubstrateSetToResponse converts a SubstrateSet to a response
 func mapSubstrateSetToResponse(set substrate.SubstrateSet) SubstrateSetResponse {
 	resp := SubstrateSetResponse{
 		ID:              set.ID,
@@ -102,7 +115,7 @@ func mapSubstrateSetToResponse(set substrate.SubstrateSet) SubstrateSetResponse 
 		MixedSubstrates: make([]MixedSubstrateResponse, len(set.MixedSubstrates)),
 	}
 
-	// Mapear sustratos
+	// Map substrates
 	for i, sub := range set.Substrates {
 		resp.Substrates[i] = SubstrateResponse{
 			ID:    sub.ID,
@@ -111,7 +124,7 @@ func mapSubstrateSetToResponse(set substrate.SubstrateSet) SubstrateSetResponse 
 		}
 	}
 
-	// Mapear sustratos mixtos
+	// Map mixed substrates
 	for i, mixedSub := range set.MixedSubstrates {
 		mixedResp := MixedSubstrateResponse{
 			ID:         mixedSub.ID,
@@ -120,7 +133,7 @@ func mapSubstrateSetToResponse(set substrate.SubstrateSet) SubstrateSetResponse 
 			Substrates: make([]SubstratePercentageResponse, len(mixedSub.Substrates)),
 		}
 
-		// Mapear sustratos en el sustrato mixto
+		// Map substrates in the mixed substrate
 		for j, subPercentage := range mixedSub.Substrates {
 			mixedResp.Substrates[j] = SubstratePercentageResponse{
 				SubstrateID:   subPercentage.Substrate.ID,

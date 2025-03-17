@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/benjaminpina/galatea/internal/core/domain/common"
 	"github.com/benjaminpina/galatea/internal/core/domain/substrate"
 )
 
@@ -99,16 +100,73 @@ func (r *SubstrateRepository) Delete(id string) error {
 	return nil
 }
 
-// List returns all substrates
-func (r *SubstrateRepository) List() ([]substrate.Substrate, error) {
+// List returns a paginated list of substrates
+func (r *SubstrateRepository) List(params common.PaginationParams) ([]substrate.Substrate, int, error) {
+	// Get total count
+	var totalCount int
+	countQuery := `SELECT COUNT(*) FROM substrates`
+	err := r.db.QueryRow(countQuery).Scan(&totalCount)
+	if err != nil {
+		return nil, 0, fmt.Errorf("failed to count substrates: %w", err)
+	}
+
+	// Get paginated data
 	query := `
 		SELECT id, name, color
 		FROM substrates
 		ORDER BY name
+		LIMIT ? OFFSET ?
 	`
-	rows, err := r.db.Query(query)
+	offset := (params.Page - 1) * params.PageSize
+	rows, err := r.db.Query(query, params.PageSize, offset)
 	if err != nil {
-		return nil, fmt.Errorf("failed to list substrates: %w", err)
+		return nil, 0, fmt.Errorf("failed to list substrates: %w", err)
+	}
+	defer rows.Close()
+
+	var substrates []substrate.Substrate
+	for rows.Next() {
+		var sub substrate.Substrate
+		err := rows.Scan(&sub.ID, &sub.Name, &sub.Color)
+		if err != nil {
+			return nil, 0, fmt.Errorf("failed to scan substrate: %w", err)
+		}
+		substrates = append(substrates, sub)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, 0, fmt.Errorf("error iterating substrate rows: %w", err)
+	}
+
+	return substrates, totalCount, nil
+}
+
+// ListPaginated returns a paginated list of substrates
+func (r *SubstrateRepository) ListPaginated(params common.PaginationParams) ([]substrate.Substrate, int, error) {
+	// Get total count
+	countQuery := `SELECT COUNT(*) FROM substrates`
+	var totalCount int
+	err := r.db.QueryRow(countQuery).Scan(&totalCount)
+	if err != nil {
+		return nil, 0, fmt.Errorf("failed to count substrates: %w", err)
+	}
+
+	// Calculate offset
+	offset := (params.Page - 1) * params.PageSize
+	if offset < 0 {
+		offset = 0
+	}
+
+	// Get paginated data
+	query := `
+		SELECT id, name, color
+		FROM substrates
+		ORDER BY name
+		LIMIT ? OFFSET ?
+	`
+	rows, err := r.db.Query(query, params.PageSize, offset)
+	if err != nil {
+		return nil, 0, fmt.Errorf("failed to list substrates: %w", err)
 	}
 	defer rows.Close()
 
@@ -116,16 +174,16 @@ func (r *SubstrateRepository) List() ([]substrate.Substrate, error) {
 	for rows.Next() {
 		var sub substrate.Substrate
 		if err := rows.Scan(&sub.ID, &sub.Name, &sub.Color); err != nil {
-			return nil, fmt.Errorf("failed to scan substrate: %w", err)
+			return nil, 0, fmt.Errorf("failed to scan substrate: %w", err)
 		}
 		substrates = append(substrates, sub)
 	}
 
 	if err := rows.Err(); err != nil {
-		return nil, fmt.Errorf("error iterating substrate rows: %w", err)
+		return nil, 0, fmt.Errorf("error iterating substrate rows: %w", err)
 	}
 
-	return substrates, nil
+	return substrates, totalCount, nil
 }
 
 // Exists checks if a substrate exists by ID

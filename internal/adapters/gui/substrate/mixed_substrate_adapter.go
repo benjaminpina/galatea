@@ -1,11 +1,12 @@
 package substrate
 
 import (
+	guiCommon "github.com/benjaminpina/galatea/internal/adapters/gui/common"
 	"github.com/benjaminpina/galatea/internal/core/domain/substrate"
 	ports "github.com/benjaminpina/galatea/internal/core/ports/substrate"
 )
 
-// MixedSubstrateResponse representa la respuesta de un sustrato mixto para la GUI
+// MixedSubstrateResponse represents a mixed substrate response for the GUI
 type MixedSubstrateResponse struct {
 	ID         string                       `json:"id"`
 	Name       string                       `json:"name"`
@@ -13,14 +14,14 @@ type MixedSubstrateResponse struct {
 	Substrates []SubstratePercentageResponse `json:"substrates"`
 }
 
-// MixedSubstrateRequest representa una solicitud para crear o actualizar un sustrato mixto desde la GUI
+// MixedSubstrateRequest represents a request to create or update a mixed substrate from the GUI
 type MixedSubstrateRequest struct {
 	ID    string `json:"id"`
 	Name  string `json:"name"`
 	Color string `json:"color"`
 }
 
-// SubstratePercentageResponse representa la respuesta de un sustrato con porcentaje para la GUI
+// SubstratePercentageResponse represents a substrate with percentage response for the GUI
 type SubstratePercentageResponse struct {
 	SubstrateID   string  `json:"substrate_id"`
 	SubstrateName string  `json:"substrate_name"`
@@ -28,144 +29,179 @@ type SubstratePercentageResponse struct {
 	Percentage    float64 `json:"percentage"`
 }
 
-// SubstratePercentageRequest representa una solicitud para agregar o actualizar un sustrato con porcentaje desde la GUI
+// SubstratePercentageRequest represents a request to add or update a substrate with percentage from the GUI
 type SubstratePercentageRequest struct {
 	SubstrateID string  `json:"substrate_id"`
 	Percentage  float64 `json:"percentage"`
 }
 
-// MixedSubstrateAdapter es un adaptador para exponer operaciones de sustratos mixtos a la GUI
+// MixedSubstratePaginatedResponse represents a paginated response of mixed substrates for the GUI
+type MixedSubstratePaginatedResponse struct {
+	Data       []MixedSubstrateResponse      `json:"data"`
+	Pagination guiCommon.PaginationResponse  `json:"pagination"`
+}
+
+// MixedSubstrateAdapter is an adapter to expose mixed substrate operations to the GUI
 type MixedSubstrateAdapter struct {
 	service ports.MixedSubstrateService
 }
 
-// NewMixedSubstrateAdapter crea un nuevo adaptador de sustratos mixtos
+// NewMixedSubstrateAdapter creates a new mixed substrate adapter
 func NewMixedSubstrateAdapter(service ports.MixedSubstrateService) *MixedSubstrateAdapter {
 	return &MixedSubstrateAdapter{
 		service: service,
 	}
 }
 
-// CreateMixedSubstrate crea un nuevo sustrato mixto
+// CreateMixedSubstrate creates a new mixed substrate
 func (a *MixedSubstrateAdapter) CreateMixedSubstrate(req MixedSubstrateRequest) (*MixedSubstrateResponse, error) {
-	// Crear el sustrato mixto usando el servicio
+	// Create the mixed substrate using the service
 	mixedSub, err := a.service.CreateMixedSubstrate(req.ID, req.Name, req.Color)
 	if err != nil {
 		return nil, err
 	}
 
-	// Convertir a respuesta
+	// Convert to response
 	resp := mapMixedSubstrateToResponse(*mixedSub)
 	return &resp, nil
 }
 
-// GetMixedSubstrate obtiene un sustrato mixto por ID
+// GetMixedSubstrate gets a mixed substrate by ID
 func (a *MixedSubstrateAdapter) GetMixedSubstrate(id string) (*MixedSubstrateResponse, error) {
-	// Obtener el sustrato mixto usando el servicio
+	// Get the mixed substrate using the service
 	mixedSub, err := a.service.GetMixedSubstrate(id)
 	if err != nil {
 		return nil, err
 	}
 
-	// Convertir a respuesta
+	// Convert to response
 	resp := mapMixedSubstrateToResponse(*mixedSub)
 	return &resp, nil
 }
 
-// UpdateMixedSubstrate actualiza un sustrato mixto existente
+// UpdateMixedSubstrate updates an existing mixed substrate
 func (a *MixedSubstrateAdapter) UpdateMixedSubstrate(id string, req MixedSubstrateRequest) (*MixedSubstrateResponse, error) {
-	// Actualizar el sustrato mixto usando el servicio
+	// Update the mixed substrate using the service
 	mixedSub, err := a.service.UpdateMixedSubstrate(id, req.Name, req.Color)
 	if err != nil {
 		return nil, err
 	}
 
-	// Convertir a respuesta
+	// Convert to response
 	resp := mapMixedSubstrateToResponse(*mixedSub)
 	return &resp, nil
 }
 
-// DeleteMixedSubstrate elimina un sustrato mixto por ID
+// DeleteMixedSubstrate deletes a mixed substrate by ID
 func (a *MixedSubstrateAdapter) DeleteMixedSubstrate(id string) error {
-	// Eliminar el sustrato mixto usando el servicio
+	// Delete the mixed substrate using the service
 	return a.service.DeleteMixedSubstrate(id)
 }
 
-// ListMixedSubstrates obtiene todos los sustratos mixtos
-func (a *MixedSubstrateAdapter) ListMixedSubstrates() ([]MixedSubstrateResponse, error) {
-	// Obtener todos los sustratos mixtos usando el servicio
-	mixedSubs, err := a.service.ListMixedSubstrates()
+// List gets a paginated list of mixed substrates
+func (a *MixedSubstrateAdapter) List(page, pageSize int) (*MixedSubstratePaginatedResponse, error) {
+	// Get paginated mixed substrates using the service
+	mixedSubs, pagination, err := a.service.List(page, pageSize)
 	if err != nil {
 		return nil, err
 	}
 
-	// Convertir a respuestas
+	// Convert to responses
 	resp := make([]MixedSubstrateResponse, len(mixedSubs))
 	for i, mixedSub := range mixedSubs {
 		resp[i] = mapMixedSubstrateToResponse(mixedSub)
 	}
 
-	return resp, nil
+	// Create paginated response
+	paginatedResp := &MixedSubstratePaginatedResponse{
+		Data:       resp,
+		Pagination: guiCommon.MapPaginationInfo(pagination),
+	}
+
+	return paginatedResp, nil
 }
 
-// AddSubstrateToMix agrega un sustrato a un sustrato mixto
+// FindBySubstrateID gets a paginated list of mixed substrates that contain a specific substrate
+func (a *MixedSubstrateAdapter) FindBySubstrateID(substrateID string, page, pageSize int) (*MixedSubstratePaginatedResponse, error) {
+	// Get paginated mixed substrates using the service
+	mixedSubs, pagination, err := a.service.FindBySubstrateID(substrateID, page, pageSize)
+	if err != nil {
+		return nil, err
+	}
+
+	// Convert to responses
+	resp := make([]MixedSubstrateResponse, len(mixedSubs))
+	for i, mixedSub := range mixedSubs {
+		resp[i] = mapMixedSubstrateToResponse(mixedSub)
+	}
+
+	// Create paginated response
+	paginatedResp := &MixedSubstratePaginatedResponse{
+		Data:       resp,
+		Pagination: guiCommon.MapPaginationInfo(pagination),
+	}
+
+	return paginatedResp, nil
+}
+
+// AddSubstrateToMix adds a substrate to a mixed substrate
 func (a *MixedSubstrateAdapter) AddSubstrateToMix(mixedSubstrateID string, req SubstratePercentageRequest) (*MixedSubstrateResponse, error) {
-	// Agregar el sustrato al sustrato mixto usando el servicio
+	// Add the substrate to the mixed substrate using the service
 	err := a.service.AddSubstrateToMix(mixedSubstrateID, req.SubstrateID, req.Percentage)
 	if err != nil {
 		return nil, err
 	}
 
-	// Obtener el sustrato mixto actualizado
+	// Get the updated mixed substrate
 	mixedSub, err := a.service.GetMixedSubstrate(mixedSubstrateID)
 	if err != nil {
 		return nil, err
 	}
 
-	// Convertir a respuesta
+	// Convert to response
 	resp := mapMixedSubstrateToResponse(*mixedSub)
 	return &resp, nil
 }
 
-// RemoveSubstrateFromMix elimina un sustrato de un sustrato mixto
+// RemoveSubstrateFromMix removes a substrate from a mixed substrate
 func (a *MixedSubstrateAdapter) RemoveSubstrateFromMix(mixedSubstrateID string, substrateID string) (*MixedSubstrateResponse, error) {
-	// Eliminar el sustrato del sustrato mixto usando el servicio
+	// Remove the substrate from the mixed substrate using the service
 	err := a.service.RemoveSubstrateFromMix(mixedSubstrateID, substrateID)
 	if err != nil {
 		return nil, err
 	}
 
-	// Obtener el sustrato mixto actualizado
+	// Get the updated mixed substrate
 	mixedSub, err := a.service.GetMixedSubstrate(mixedSubstrateID)
 	if err != nil {
 		return nil, err
 	}
 
-	// Convertir a respuesta
+	// Convert to response
 	resp := mapMixedSubstrateToResponse(*mixedSub)
 	return &resp, nil
 }
 
-// UpdateSubstratePercentage actualiza el porcentaje de un sustrato en un sustrato mixto
+// UpdateSubstratePercentage updates the percentage of a substrate in a mixed substrate
 func (a *MixedSubstrateAdapter) UpdateSubstratePercentage(mixedSubstrateID string, req SubstratePercentageRequest) (*MixedSubstrateResponse, error) {
-	// Actualizar el porcentaje del sustrato en el sustrato mixto usando el servicio
+	// Update the percentage of the substrate in the mixed substrate using the service
 	err := a.service.UpdateSubstratePercentage(mixedSubstrateID, req.SubstrateID, req.Percentage)
 	if err != nil {
 		return nil, err
 	}
 
-	// Obtener el sustrato mixto actualizado
+	// Get the updated mixed substrate
 	mixedSub, err := a.service.GetMixedSubstrate(mixedSubstrateID)
 	if err != nil {
 		return nil, err
 	}
 
-	// Convertir a respuesta
+	// Convert to response
 	resp := mapMixedSubstrateToResponse(*mixedSub)
 	return &resp, nil
 }
 
-// mapMixedSubstrateToResponse convierte un MixedSubstrate a una respuesta
+// mapMixedSubstrateToResponse converts a MixedSubstrate to a response
 func mapMixedSubstrateToResponse(mixedSub substrate.MixedSubstrate) MixedSubstrateResponse {
 	resp := MixedSubstrateResponse{
 		ID:         mixedSub.ID,
@@ -174,7 +210,7 @@ func mapMixedSubstrateToResponse(mixedSub substrate.MixedSubstrate) MixedSubstra
 		Substrates: make([]SubstratePercentageResponse, len(mixedSub.Substrates)),
 	}
 
-	// Mapear sustratos en el sustrato mixto
+	// Map substrates in the mixed substrate
 	for i, subPercentage := range mixedSub.Substrates {
 		resp.Substrates[i] = SubstratePercentageResponse{
 			SubstrateID:   subPercentage.Substrate.ID,

@@ -1,6 +1,7 @@
 package mocks
 
 import (
+	"github.com/benjaminpina/galatea/internal/core/domain/common"
 	"github.com/benjaminpina/galatea/internal/core/domain/substrate"
 	"github.com/stretchr/testify/mock"
 )
@@ -43,13 +44,22 @@ func (m *MockMixedSubstrateService) DeleteMixedSubstrate(id string) error {
 	return args.Error(0)
 }
 
-// ListMixedSubstrates implementa la interfaz MixedSubstrateService
-func (m *MockMixedSubstrateService) ListMixedSubstrates() ([]substrate.MixedSubstrate, error) {
-	args := m.Called()
+// List implementa la interfaz MixedSubstrateService
+func (m *MockMixedSubstrateService) List(page, pageSize int) ([]substrate.MixedSubstrate, *common.PaginatedResult, error) {
+	args := m.Called(page, pageSize)
 	if args.Get(0) == nil {
-		return nil, args.Error(1)
+		return nil, nil, args.Error(2)
 	}
-	return args.Get(0).([]substrate.MixedSubstrate), args.Error(1)
+	return args.Get(0).([]substrate.MixedSubstrate), args.Get(1).(*common.PaginatedResult), args.Error(2)
+}
+
+// FindBySubstrateID implementa la interfaz MixedSubstrateService
+func (m *MockMixedSubstrateService) FindBySubstrateID(substrateID string, page, pageSize int) ([]substrate.MixedSubstrate, *common.PaginatedResult, error) {
+	args := m.Called(substrateID, page, pageSize)
+	if args.Get(0) == nil {
+		return nil, nil, args.Error(2)
+	}
+	return args.Get(0).([]substrate.MixedSubstrate), args.Get(1).(*common.PaginatedResult), args.Error(2)
 }
 
 // AddSubstrateToMix implementa la interfaz MixedSubstrateService

@@ -59,9 +59,9 @@ func (a *App) DeleteSubstrate(id string) error {
 	return a.substrateAdapter.DeleteSubstrate(id)
 }
 
-// ListSubstrates obtiene todos los sustratos
-func (a *App) ListSubstrates() ([]guiadapters.SubstrateResponse, error) {
-	return a.substrateAdapter.ListSubstrates()
+// ListSubstrates obtiene una lista paginada de sustratos
+func (a *App) ListSubstrates(page, pageSize int) (*guiadapters.PaginatedResponse, error) {
+	return a.substrateAdapter.List(page, pageSize)
 }
 
 // MixedSubstrate CRUD Operations
@@ -86,9 +86,14 @@ func (a *App) DeleteMixedSubstrate(id string) error {
 	return a.mixedSubstrateAdapter.DeleteMixedSubstrate(id)
 }
 
-// ListMixedSubstrates obtiene todos los sustratos mixtos
-func (a *App) ListMixedSubstrates() ([]guiadapters.MixedSubstrateResponse, error) {
-	return a.mixedSubstrateAdapter.ListMixedSubstrates()
+// ListMixedSubstrates obtiene una lista paginada de sustratos mixtos
+func (a *App) ListMixedSubstrates(page, pageSize int) (*guiadapters.MixedSubstratePaginatedResponse, error) {
+	return a.mixedSubstrateAdapter.List(page, pageSize)
+}
+
+// FindMixedSubstratesBySubstrateID obtiene una lista paginada de sustratos mixtos que contienen un sustrato específico
+func (a *App) FindMixedSubstratesBySubstrateID(substrateID string, page, pageSize int) (*guiadapters.MixedSubstratePaginatedResponse, error) {
+	return a.mixedSubstrateAdapter.FindBySubstrateID(substrateID, page, pageSize)
 }
 
 // AddSubstrateToMix agrega un sustrato a un sustrato mixto
@@ -128,7 +133,7 @@ func (a *App) DeleteSubstrateSet(id string) error {
 	return a.substrateSetAdapter.DeleteSubstrateSet(id)
 }
 
-// ListSubstrateSets obtiene todos los conjuntos de sustratos
-func (a *App) ListSubstrateSets() ([]guiadapters.SubstrateSetResponse, error) {
-	return a.substrateSetAdapter.ListSubstrateSets()
+// ListSubstrateSets obtiene una lista paginada de conjuntos de sustratos
+func (a *App) ListSubstrateSets(page, pageSize int) (*guiadapters.SubstrateSetPaginatedResponse, error) {
+	return a.substrateSetAdapter.List(page, pageSize)
 }

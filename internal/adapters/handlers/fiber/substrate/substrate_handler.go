@@ -3,7 +3,8 @@ package substrate
 import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
-	
+
+	handlerCommon "github.com/benjaminpina/galatea/internal/adapters/handlers/fiber/common"
 	"github.com/benjaminpina/galatea/internal/core/domain/substrate"
 	substratePort "github.com/benjaminpina/galatea/internal/core/ports/substrate"
 )
@@ -14,21 +15,31 @@ type SubstrateHandler struct {
 }
 
 // SubstrateRequest represents the request body for substrate operations
+// @Description Request model for creating or updating a substrate
 type SubstrateRequest struct {
-	Name  string `json:"name" validate:"required"`
-	Color string `json:"color" validate:"required"`
+	Name  string `json:"name" validate:"required" example:"Arena" description:"Name of the substrate"`
+	Color string `json:"color" validate:"required" example:"#F5DEB3" description:"Color of the substrate in hex format"`
 }
 
 // SubstrateResponse represents the response body for substrate operations
+// @Description Response model for substrate operations
 type SubstrateResponse struct {
-	ID    string `json:"id"`
-	Name  string `json:"name"`
-	Color string `json:"color"`
+	ID    string `json:"id" example:"3fa85f64-5717-4562-b3fc-2c963f66afa6" description:"Unique identifier of the substrate"`
+	Name  string `json:"name" example:"Arena" description:"Name of the substrate"`
+	Color string `json:"color" example:"#F5DEB3" description:"Color of the substrate in hex format"`
 }
 
 // ErrorResponse represents an error response
+// @Description Standard error response format
 type ErrorResponse struct {
-	Error string `json:"error"`
+	Error string `json:"error" example:"substrate not found" description:"Error message"`
+}
+
+// PaginatedResponse represents a paginated response
+// @Description Paginated list of substrates
+type PaginatedResponse struct {
+	Data       []SubstrateResponse               `json:"data" description:"List of substrates"`
+	Pagination handlerCommon.SwaggerPaginationInfo  `json:"pagination" description:"Pagination information"`
 }
 
 // NewSubstrateHandler creates a new substrate handler
@@ -166,31 +177,39 @@ func (h *SubstrateHandler) DeleteSubstrate(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusNoContent).Send(nil)
 }
 
-// ListSubstrates handles retrieving all substrates
+// ListSubstrates handles retrieving all substrates with pagination
 // @Summary List all substrates
-// @Description Get a list of all substrates
+// @Description Get a paginated list of all substrates
 // @Tags substrates
 // @Accept json
 // @Produce json
-// @Success 200 {array} SubstrateResponse
+// @Param page query int false "Page number (default: 1, values less than 1 will be set to 1)"
+// @Param page_size query int false "Page size (default: 10, values less than 1 will be set to 10)"
+// @Success 200 {object} PaginatedResponse
 // @Failure 500 {object} ErrorResponse "Internal server error"
 // @Router /api/v1/substrates [get]
 func (h *SubstrateHandler) ListSubstrates(c *fiber.Ctx) error {
-	subs, err := h.substrateSvc.ListSubstrates()
+	page, pageSize := handlerCommon.GetPaginationParams(c)
+	
+	subs, pagination, err := h.substrateSvc.List(page, pageSize)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(ErrorResponse{Error: err.Error()})
 	}
 	
 	resp := make([]SubstrateResponse, len(subs))
 	for i, sub := range subs {
-		resp[i] = SubstrateResponse{
-			ID:    sub.ID,
-			Name:  sub.Name,
-			Color: sub.Color,
-		}
+		resp[i] = mapSubstrateToResponse(&sub)
 	}
 	
-	return c.Status(fiber.StatusOK).JSON(resp)
+	return c.Status(fiber.StatusOK).JSON(PaginatedResponse{
+		Data: resp,
+		Pagination: handlerCommon.SwaggerPaginationInfo{
+			Page:       pagination.Page,
+			PageSize:   pagination.PageSize,
+			TotalCount: pagination.TotalCount,
+			TotalPages: pagination.TotalPages,
+		},
+	})
 }
 
 // Helper function to map domain model to response

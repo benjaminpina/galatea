@@ -1,6 +1,7 @@
 package substrate
 
 import (
+	"github.com/benjaminpina/galatea/internal/adapters/handlers/fiber/common"
 	"github.com/benjaminpina/galatea/internal/core/domain/substrate"
 	ports "github.com/benjaminpina/galatea/internal/core/ports/substrate"
 	"github.com/gofiber/fiber/v2"
@@ -8,17 +9,26 @@ import (
 )
 
 // SubstrateSetRequest representa una solicitud para crear o actualizar un conjunto de sustratos
+// @Description Modelo de solicitud para crear o actualizar un conjunto de sustratos
 type SubstrateSetRequest struct {
-	ID   string `json:"id" example:"3fa85f64-5717-4562-b3fc-2c963f66afa6"`
-	Name string `json:"name" example:"Arena y Tierra"`
+	ID   string `json:"id" example:"3fa85f64-5717-4562-b3fc-2c963f66afa6" description:"Identificador único del conjunto de sustratos (opcional para creación)"`
+	Name string `json:"name" example:"Arena y Tierra" description:"Nombre del conjunto de sustratos"`
 }
 
 // SubstrateSetResponse representa la respuesta de un conjunto de sustratos
+// @Description Modelo de respuesta para operaciones con conjuntos de sustratos
 type SubstrateSetResponse struct {
-	ID              string                  `json:"id" example:"3fa85f64-5717-4562-b3fc-2c963f66afa6"`
-	Name            string                  `json:"name" example:"Arena y Tierra"`
-	Substrates      []SubstrateResponse     `json:"substrates"`
-	MixedSubstrates []MixedSubstrateResponse `json:"mixed_substrates"`
+	ID              string                  `json:"id" example:"3fa85f64-5717-4562-b3fc-2c963f66afa6" description:"Identificador único del conjunto de sustratos"`
+	Name            string                  `json:"name" example:"Arena y Tierra" description:"Nombre del conjunto de sustratos"`
+	Substrates      []SubstrateResponse     `json:"substrates" description:"Lista de sustratos en el conjunto"`
+	MixedSubstrates []MixedSubstrateResponse `json:"mixed_substrates" description:"Lista de sustratos mezclados en el conjunto"`
+}
+
+// SubstrateSetPaginatedResponse represents a paginated response for substrate sets
+// @Description Respuesta paginada de conjuntos de sustratos
+type SubstrateSetPaginatedResponse struct {
+	Data       []SubstrateSetResponse     `json:"data" description:"Lista de conjuntos de sustratos"`
+	Pagination common.PaginationResponse  `json:"pagination" description:"Información de paginación"`
 }
 
 // SubstrateSetHandler maneja las solicitudes relacionadas con conjuntos de sustratos
@@ -171,27 +181,35 @@ func (h *SubstrateSetHandler) DeleteSubstrateSet(c *fiber.Ctx) error {
 
 // ListSubstrateSets godoc
 // @Summary Listar todos los conjuntos de sustratos
-// @Description Obtiene una lista de todos los conjuntos de sustratos
+// @Description Obtiene una lista paginada de todos los conjuntos de sustratos
 // @Tags substrate-sets
 // @Accept json
 // @Produce json
-// @Success 200 {array} SubstrateSetResponse
+// @Param page query int false "Número de página (default: 1, valores menores a 1 se establecerán a 1)"
+// @Param page_size query int false "Tamaño de página (default: 10, valores menores a 1 se establecerán a 10)"
+// @Success 200 {object} SubstrateSetPaginatedResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /api/v1/substrate-sets [get]
 func (h *SubstrateSetHandler) ListSubstrateSets(c *fiber.Ctx) error {
-	// Obtener todos los conjuntos de sustratos
-	sets, err := h.service.ListSubstrateSets()
+	// Get pagination parameters
+	page, pageSize := common.GetPaginationParams(c)
+	
+	// Get paginated substrate sets
+	sets, pagination, err := h.service.List(page, pageSize)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(ErrorResponse{Error: err.Error()})
 	}
 
-	// Convertir a respuesta
+	// Map to response
 	resp := make([]SubstrateSetResponse, len(sets))
 	for i, set := range sets {
 		resp[i] = mapSubstrateSetToResponse(set)
 	}
 
-	return c.Status(fiber.StatusOK).JSON(resp)
+	return c.JSON(SubstrateSetPaginatedResponse{
+		Data:       resp,
+		Pagination: common.MapPaginationToResponse(pagination),
+	})
 }
 
 // mapSubstrateSetToResponse convierte un SubstrateSet a una respuesta

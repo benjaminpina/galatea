@@ -4,6 +4,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 	
+	handlerCommon "github.com/benjaminpina/galatea/internal/adapters/handlers/fiber/common"
 	"github.com/benjaminpina/galatea/internal/core/domain/substrate"
 	substratePort "github.com/benjaminpina/galatea/internal/core/ports/substrate"
 )
@@ -35,11 +36,26 @@ type SubstratePercentageResponse struct {
 
 // MixedSubstrateResponse represents the response body for mixed substrate operations
 type MixedSubstrateResponse struct {
-	ID         string                       `json:"id"`
-	Name       string                       `json:"name"`
-	Color      string                       `json:"color"`
-	Substrates []SubstratePercentageResponse `json:"substrates"`
-	TotalPercentage float64                 `json:"total_percentage"`
+	ID              string                       `json:"id"`
+	Name            string                       `json:"name"`
+	Color           string                       `json:"color"`
+	Substrates      []SubstratePercentageResponse `json:"substrates"`
+	TotalPercentage float64                      `json:"total_percentage"`
+}
+
+// PaginationInfo represents pagination information for Swagger documentation
+type PaginationInfo struct {
+	Page       int `json:"page" example:"1" description:"Current page number"`
+	PageSize   int `json:"page_size" example:"10" description:"Number of items per page"`
+	TotalCount int `json:"total_count" example:"100" description:"Total number of items"`
+	TotalPages int `json:"total_pages" example:"10" description:"Total number of pages"`
+}
+
+// MixedSubstratePaginatedResponse represents a paginated response for mixed substrates
+// @Description Paginated list of mixed substrates
+type MixedSubstratePaginatedResponse struct {
+	Data       []MixedSubstrateResponse `json:"data" description:"List of mixed substrates"`
+	Pagination PaginationInfo `json:"pagination" description:"Pagination information"`
 }
 
 // NewMixedSubstrateHandler creates a new mixed substrate handler
@@ -203,17 +219,21 @@ func (h *MixedSubstrateHandler) DeleteMixedSubstrate(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusNoContent).Send(nil)
 }
 
-// ListMixedSubstrates handles listing all mixed substrates
+// ListMixedSubstrates handles listing all mixed substrates with pagination
 // @Summary List all mixed substrates
-// @Description Get a list of all mixed substrates
+// @Description Get a paginated list of all mixed substrates
 // @Tags mixed-substrates
 // @Accept json
 // @Produce json
-// @Success 200 {array} MixedSubstrateResponse
+// @Param page query int false "Page number (default: 1, values less than 1 will be set to 1)"
+// @Param page_size query int false "Page size (default: 10, values less than 1 will be set to 10)"
+// @Success 200 {object} MixedSubstratePaginatedResponse
 // @Failure 500 {object} ErrorResponse "Internal server error"
 // @Router /api/v1/mixed-substrates [get]
 func (h *MixedSubstrateHandler) ListMixedSubstrates(c *fiber.Ctx) error {
-	mixedSubs, err := h.mixedSubstrateSvc.ListMixedSubstrates()
+	page, pageSize := handlerCommon.GetPaginationParams(c)
+	
+	mixedSubs, pagination, err := h.mixedSubstrateSvc.List(page, pageSize)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(ErrorResponse{Error: err.Error()})
 	}
@@ -225,7 +245,15 @@ func (h *MixedSubstrateHandler) ListMixedSubstrates(c *fiber.Ctx) error {
 		resp[i] = mapMixedSubstrateToResponse(&msCopy)
 	}
 	
-	return c.Status(fiber.StatusOK).JSON(resp)
+	return c.JSON(MixedSubstratePaginatedResponse{
+		Data: resp,
+		Pagination: PaginationInfo{
+			Page:       pagination.Page,
+			PageSize:   pagination.PageSize,
+			TotalCount: pagination.TotalCount,
+			TotalPages: pagination.TotalPages,
+		},
+	})
 }
 
 // AddSubstrateToMix handles adding a substrate to a mixed substrate

@@ -1,6 +1,7 @@
 package substrate
 
 import (
+	"github.com/benjaminpina/galatea/internal/core/domain/common"
 	"github.com/benjaminpina/galatea/internal/core/domain/substrate"
 )
 
@@ -18,8 +19,8 @@ type SubstrateRepository interface {
 	// Delete a substrate by ID
 	Delete(id string) error
 	
-	// List all substrates
-	List() ([]substrate.Substrate, error)
+	// List substrates with pagination
+	List(params common.PaginationParams) ([]substrate.Substrate, int, error)
 	
 	// Check if a substrate exists by ID
 	Exists(id string) (bool, error)

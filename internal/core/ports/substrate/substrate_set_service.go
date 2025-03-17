@@ -1,6 +1,7 @@
 package substrate
 
 import (
+	"github.com/benjaminpina/galatea/internal/core/domain/common"
 	"github.com/benjaminpina/galatea/internal/core/domain/substrate"
 )
 
@@ -11,5 +12,13 @@ type SubstrateSetService interface {
 	GetSubstrateSet(id string) (*substrate.SubstrateSet, error)
 	UpdateSubstrateSet(id, name string) (*substrate.SubstrateSet, error)
 	DeleteSubstrateSet(id string) error
-	ListSubstrateSets() ([]substrate.SubstrateSet, error)
+	List(page, pageSize int) ([]substrate.SubstrateSet, *common.PaginatedResult, error)
+	
+	// Substrate operations within sets
+	AddSubstrateToSet(setID, substrateID string) error
+	RemoveSubstrateFromSet(setID, substrateID string) error
+	
+	// Mixed substrate operations within sets
+	AddMixedSubstrateToSet(setID, mixedSubstrateID string) error
+	RemoveMixedSubstrateFromSet(setID, mixedSubstrateID string) error
 }

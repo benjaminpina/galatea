@@ -2,7 +2,9 @@ package substrate
 
 import (
 	"errors"
+	"math"
 
+	"github.com/benjaminpina/galatea/internal/core/domain/common"
 	"github.com/benjaminpina/galatea/internal/core/domain/substrate"
 	substratePort "github.com/benjaminpina/galatea/internal/core/ports/substrate"
 )
@@ -91,9 +93,76 @@ func (s *MixedSubstrateServiceImpl) DeleteMixedSubstrate(id string) error {
 	return s.mixedRepository.Delete(id)
 }
 
-// ListMixedSubstrates returns all mixed substrates
-func (s *MixedSubstrateServiceImpl) ListMixedSubstrates() ([]substrate.MixedSubstrate, error) {
-	return s.mixedRepository.List()
+// List returns a paginated list of mixed substrates
+func (s *MixedSubstrateServiceImpl) List(page, pageSize int) ([]substrate.MixedSubstrate, *common.PaginatedResult, error) {
+	// Validate pagination parameters
+	if page < 1 {
+		page = 1
+	}
+	if pageSize < 1 {
+		pageSize = 10
+	}
+
+	// Create pagination params
+	params := common.PaginationParams{
+		Page:     page,
+		PageSize: pageSize,
+	}
+
+	// Get paginated mixed substrates
+	mixedSubstrates, totalCount, err := s.mixedRepository.List(params)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	// Calculate total pages
+	totalPages := int(math.Ceil(float64(totalCount) / float64(pageSize)))
+
+	// Create paginated result
+	paginatedResult := &common.PaginatedResult{
+		TotalCount: totalCount,
+		TotalPages: totalPages,
+		Page:       page,
+		PageSize:   pageSize,
+	}
+
+	return mixedSubstrates, paginatedResult, nil
+}
+
+// FindBySubstrateID returns a paginated list of mixed substrates that contain a specific substrate
+func (s *MixedSubstrateServiceImpl) FindBySubstrateID(substrateID string, page, pageSize int) ([]substrate.MixedSubstrate, *common.PaginatedResult, error) {
+	// Validate pagination parameters
+	if page < 1 {
+		page = 1
+	}
+	if pageSize < 1 {
+		pageSize = 10
+	}
+
+	// Create pagination params
+	params := common.PaginationParams{
+		Page:     page,
+		PageSize: pageSize,
+	}
+
+	// Get paginated mixed substrates containing the specified substrate
+	mixedSubstrates, totalCount, err := s.mixedRepository.FindBySubstrateID(substrateID, params)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	// Calculate total pages
+	totalPages := int(math.Ceil(float64(totalCount) / float64(pageSize)))
+
+	// Create paginated result
+	paginatedResult := &common.PaginatedResult{
+		TotalCount: totalCount,
+		TotalPages: totalPages,
+		Page:       page,
+		PageSize:   pageSize,
+	}
+
+	return mixedSubstrates, paginatedResult, nil
 }
 
 // AddSubstrateToMix adds a substrate to a mixed substrate

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/benjaminpina/galatea/internal/core/domain/common"
 	"github.com/benjaminpina/galatea/internal/core/domain/substrate"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
@@ -38,9 +39,14 @@ func (m *MockSubstrateSetRepository) Delete(id string) error {
 	return args.Error(0)
 }
 
-func (m *MockSubstrateSetRepository) List() ([]substrate.SubstrateSet, error) {
-	args := m.Called()
-	return args.Get(0).([]substrate.SubstrateSet), args.Error(1)
+func (m *MockSubstrateSetRepository) List(params common.PaginationParams) ([]substrate.SubstrateSet, int, error) {
+	args := m.Called(params)
+	return args.Get(0).([]substrate.SubstrateSet), args.Int(1), args.Error(2)
+}
+
+func (m *MockSubstrateSetRepository) ListPaginated(params common.PaginationParams) ([]substrate.SubstrateSet, int, error) {
+	args := m.Called(params)
+	return args.Get(0).([]substrate.SubstrateSet), args.Int(1), args.Error(2)
 }
 
 func (m *MockSubstrateSetRepository) Exists(id string) (bool, error) {
@@ -274,15 +280,20 @@ func TestSubstrateSetService_ListSubstrateSets(t *testing.T) {
 			*substrate.NewSubstrateSet(uuid.New().String(), "Set 3"),
 		}
 
-		mockRepo.On("List").Return(expectedSets, nil).Once()
+		mockRepo.On("List", mock.MatchedBy(func(params common.PaginationParams) bool {
+			return params.Page == 1 && params.PageSize == 10
+		})).Return(expectedSets, len(expectedSets), nil).Once()
 
-		sets, err := service.ListSubstrateSets()
+		sets, paginatedResult, err := service.List(1, 10)
 		assert.NoError(t, err)
 		assert.Equal(t, len(expectedSets), len(sets))
 		for i, set := range sets {
 			assert.Equal(t, expectedSets[i].ID, set.ID)
 			assert.Equal(t, expectedSets[i].Name, set.Name)
 		}
+		assert.Equal(t, 1, paginatedResult.Page)
+		assert.Equal(t, 10, paginatedResult.PageSize)
+		assert.Equal(t, len(expectedSets), paginatedResult.TotalCount)
 
 		mockRepo.AssertExpectations(t)
 	})
@@ -291,11 +302,90 @@ func TestSubstrateSetService_ListSubstrateSets(t *testing.T) {
 		expectedErr := errors.New("repository error")
 		var emptySets []substrate.SubstrateSet
 
-		mockRepo.On("List").Return(emptySets, expectedErr).Once()
+		mockRepo.On("List", mock.MatchedBy(func(params common.PaginationParams) bool {
+			return params.Page == 1 && params.PageSize == 10
+		})).Return(emptySets, 0, expectedErr).Once()
 
-		sets, err := service.ListSubstrateSets()
+		sets, paginatedResult, err := service.List(1, 10)
 		assert.Error(t, err)
 		assert.Empty(t, sets)
+		assert.Nil(t, paginatedResult)
+
+		mockRepo.AssertExpectations(t)
+	})
+}
+
+func TestSubstrateSetService_List(t *testing.T) {
+	mockRepo := new(MockSubstrateSetRepository)
+	service := NewSubstrateSetService(mockRepo)
+
+	t.Run("List paginated substrate sets successfully", func(t *testing.T) {
+		expectedSets := []substrate.SubstrateSet{
+			*substrate.NewSubstrateSet(uuid.New().String(), "Set 1"),
+			*substrate.NewSubstrateSet(uuid.New().String(), "Set 2"),
+			*substrate.NewSubstrateSet(uuid.New().String(), "Set 3"),
+		}
+		totalCount := 10
+		page := 1
+		pageSize := 3
+
+		mockRepo.On("List", mock.MatchedBy(func(params common.PaginationParams) bool {
+			return params.Page == page && params.PageSize == pageSize
+		})).Return(expectedSets, totalCount, nil).Once()
+
+		sets, paginatedResult, err := service.List(page, pageSize)
+		assert.NoError(t, err)
+		assert.Equal(t, len(expectedSets), len(sets))
+		for i, set := range sets {
+			assert.Equal(t, expectedSets[i].ID, set.ID)
+			assert.Equal(t, expectedSets[i].Name, set.Name)
+		}
+		assert.Equal(t, totalCount, paginatedResult.TotalCount)
+		assert.Equal(t, 4, paginatedResult.TotalPages) // Ceiling of 10/3 = 4
+		assert.Equal(t, page, paginatedResult.Page)
+		assert.Equal(t, pageSize, paginatedResult.PageSize)
+
+		mockRepo.AssertExpectations(t)
+	})
+
+	t.Run("List paginated with default parameters", func(t *testing.T) {
+		expectedSets := []substrate.SubstrateSet{
+			*substrate.NewSubstrateSet(uuid.New().String(), "Set 1"),
+			*substrate.NewSubstrateSet(uuid.New().String(), "Set 2"),
+		}
+		totalCount := 2
+		defaultPage := 1
+		defaultPageSize := 10
+
+		mockRepo.On("List", mock.MatchedBy(func(params common.PaginationParams) bool {
+			return params.Page == defaultPage && params.PageSize == defaultPageSize
+		})).Return(expectedSets, totalCount, nil).Once()
+
+		sets, paginatedResult, err := service.List(0, 0)
+		assert.NoError(t, err)
+		assert.Equal(t, len(expectedSets), len(sets))
+		assert.Equal(t, totalCount, paginatedResult.TotalCount)
+		assert.Equal(t, 1, paginatedResult.TotalPages) // Ceiling of 2/10 = 1
+		assert.Equal(t, defaultPage, paginatedResult.Page)
+		assert.Equal(t, defaultPageSize, paginatedResult.PageSize)
+
+		mockRepo.AssertExpectations(t)
+	})
+
+	t.Run("List paginated with repository error", func(t *testing.T) {
+		expectedErr := errors.New("repository error")
+		var emptySets []substrate.SubstrateSet
+		page := 1
+		pageSize := 10
+
+		mockRepo.On("List", mock.MatchedBy(func(params common.PaginationParams) bool {
+			return params.Page == page && params.PageSize == pageSize
+		})).Return(emptySets, 0, expectedErr).Once()
+
+		sets, paginatedResult, err := service.List(page, pageSize)
+		assert.Error(t, err)
+		assert.Empty(t, sets)
+		assert.Nil(t, paginatedResult)
 
 		mockRepo.AssertExpectations(t)
 	})

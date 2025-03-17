@@ -3,6 +3,7 @@ package sqlite
 import (
 	"testing"
 
+	"github.com/benjaminpina/galatea/internal/core/domain/common"
 	"github.com/benjaminpina/galatea/internal/core/domain/substrate"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
@@ -124,7 +125,7 @@ func TestSubstrateSetRepository_Delete(t *testing.T) {
 func TestSubstrateSetRepository_List(t *testing.T) {
 	repo := setupSubstrateSetRepository(t)
 
-	// Crear varios conjuntos de sustratos para prueba
+	// Crear varios conjuntos de prueba
 	sets := []substrate.SubstrateSet{
 		*substrate.NewSubstrateSet(uuid.New().String(), "Set 1"),
 		*substrate.NewSubstrateSet(uuid.New().String(), "Set 2"),
@@ -137,10 +138,17 @@ func TestSubstrateSetRepository_List(t *testing.T) {
 		assert.NoError(t, err)
 	}
 
+	// Create pagination parameters
+	params := common.PaginationParams{
+		Page:     1,
+		PageSize: 10,
+	}
+
 	// Listar todos los conjuntos
-	retrieved, err := repo.List()
+	retrieved, totalCount, err := repo.List(params)
 	assert.NoError(t, err)
 	assert.GreaterOrEqual(t, len(retrieved), len(sets))
+	assert.GreaterOrEqual(t, totalCount, len(sets))
 
 	// Verificar que los conjuntos creados estén en la lista
 	setMap := make(map[string]bool)
@@ -151,6 +159,20 @@ func TestSubstrateSetRepository_List(t *testing.T) {
 	for _, set := range sets {
 		assert.True(t, setMap[set.ID])
 	}
+	
+	// Test pagination
+	params.PageSize = 2
+	retrieved, totalCount, err = repo.List(params)
+	assert.NoError(t, err)
+	assert.Len(t, retrieved, 2)
+	assert.GreaterOrEqual(t, totalCount, len(sets))
+	
+	// Test second page
+	params.Page = 2
+	retrieved, totalCount, err = repo.List(params)
+	assert.NoError(t, err)
+	assert.GreaterOrEqual(t, len(retrieved), 1)
+	assert.GreaterOrEqual(t, totalCount, len(sets))
 }
 
 func TestSubstrateSetRepository_Exists(t *testing.T) {

@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/benjaminpina/galatea/internal/core/domain/common"
 	"github.com/benjaminpina/galatea/internal/core/domain/substrate"
 )
 
@@ -164,17 +165,32 @@ func (r *SubstrateSetRepository) Delete(id string) error {
 	return nil
 }
 
-// List returns all substrate sets
-func (r *SubstrateSetRepository) List() ([]substrate.SubstrateSet, error) {
+// List returns a paginated list of substrate sets
+func (r *SubstrateSetRepository) List(params common.PaginationParams) ([]substrate.SubstrateSet, int, error) {
 	// Initialize the table if it doesn't exist
 	if err := r.Initialize(); err != nil {
-		return nil, fmt.Errorf("failed to initialize substrate_sets table: %w", err)
+		return nil, 0, fmt.Errorf("failed to initialize substrate_sets table: %w", err)
 	}
 
-	query := `SELECT id, name, substrates, mixed_substrates FROM substrate_sets`
-	rows, err := r.db.Query(query)
+	// Get total count
+	var totalCount int
+	countQuery := `SELECT COUNT(*) FROM substrate_sets`
+	err := r.db.QueryRow(countQuery).Scan(&totalCount)
 	if err != nil {
-		return nil, fmt.Errorf("failed to query substrate sets: %w", err)
+		return nil, 0, fmt.Errorf("failed to count substrate sets: %w", err)
+	}
+
+	// Get paginated data
+	query := `
+		SELECT id, name, substrates, mixed_substrates
+		FROM substrate_sets
+		ORDER BY name
+		LIMIT ? OFFSET ?
+	`
+	offset := (params.Page - 1) * params.PageSize
+	rows, err := r.db.Query(query, params.PageSize, offset)
+	if err != nil {
+		return nil, 0, fmt.Errorf("failed to list substrate sets: %w", err)
 	}
 	defer rows.Close()
 
@@ -185,20 +201,88 @@ func (r *SubstrateSetRepository) List() ([]substrate.SubstrateSet, error) {
 
 		err := rows.Scan(&set.ID, &set.Name, &substratesJSON, &mixedSubstratesJSON)
 		if err != nil {
-			return nil, fmt.Errorf("failed to scan substrate set: %w", err)
+			return nil, 0, fmt.Errorf("failed to scan substrate set: %w", err)
 		}
 
 		// Deserialize the substrates from JSON
 		var substrates []substrate.Substrate
 		if err := json.Unmarshal([]byte(substratesJSON), &substrates); err != nil {
-			return nil, fmt.Errorf("failed to unmarshal substrates: %w", err)
+			return nil, 0, fmt.Errorf("failed to unmarshal substrates: %w", err)
 		}
 		set.Substrates = substrates
 
 		// Deserialize the mixed substrates from JSON
 		var mixedSubstrates []substrate.MixedSubstrate
 		if err := json.Unmarshal([]byte(mixedSubstratesJSON), &mixedSubstrates); err != nil {
-			return nil, fmt.Errorf("failed to unmarshal mixed substrates: %w", err)
+			return nil, 0, fmt.Errorf("failed to unmarshal mixed substrates: %w", err)
+		}
+		set.MixedSubstrates = mixedSubstrates
+
+		substrateSets = append(substrateSets, set)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, 0, fmt.Errorf("error iterating substrate set rows: %w", err)
+	}
+
+	return substrateSets, totalCount, nil
+}
+
+// ListPaginated returns a paginated list of substrate sets
+func (r *SubstrateSetRepository) ListPaginated(params common.PaginationParams) ([]substrate.SubstrateSet, int, error) {
+	// Initialize the table if it doesn't exist
+	if err := r.Initialize(); err != nil {
+		return nil, 0, fmt.Errorf("failed to initialize substrate_sets table: %w", err)
+	}
+
+	// Get total count
+	countQuery := `SELECT COUNT(*) FROM substrate_sets`
+	var totalCount int
+	err := r.db.QueryRow(countQuery).Scan(&totalCount)
+	if err != nil {
+		return nil, 0, fmt.Errorf("failed to count substrate sets: %w", err)
+	}
+
+	// Calculate offset
+	offset := (params.Page - 1) * params.PageSize
+	if offset < 0 {
+		offset = 0
+	}
+
+	// Get paginated data
+	query := `
+		SELECT id, name, substrates, mixed_substrates 
+		FROM substrate_sets
+		ORDER BY name
+		LIMIT ? OFFSET ?
+	`
+	rows, err := r.db.Query(query, params.PageSize, offset)
+	if err != nil {
+		return nil, 0, fmt.Errorf("failed to query substrate sets: %w", err)
+	}
+	defer rows.Close()
+
+	var substrateSets []substrate.SubstrateSet
+	for rows.Next() {
+		var set substrate.SubstrateSet
+		var substratesJSON, mixedSubstratesJSON string
+
+		err := rows.Scan(&set.ID, &set.Name, &substratesJSON, &mixedSubstratesJSON)
+		if err != nil {
+			return nil, 0, fmt.Errorf("failed to scan substrate set: %w", err)
+		}
+
+		// Deserialize the substrates from JSON
+		var substrates []substrate.Substrate
+		if err := json.Unmarshal([]byte(substratesJSON), &substrates); err != nil {
+			return nil, 0, fmt.Errorf("failed to unmarshal substrates: %w", err)
+		}
+		set.Substrates = substrates
+
+		// Deserialize the mixed substrates from JSON
+		var mixedSubstrates []substrate.MixedSubstrate
+		if err := json.Unmarshal([]byte(mixedSubstratesJSON), &mixedSubstrates); err != nil {
+			return nil, 0, fmt.Errorf("failed to unmarshal mixed substrates: %w", err)
 		}
 		set.MixedSubstrates = mixedSubstrates
 
@@ -206,10 +290,10 @@ func (r *SubstrateSetRepository) List() ([]substrate.SubstrateSet, error) {
 	}
 
 	if err := rows.Err(); err != nil {
-		return nil, fmt.Errorf("error iterating substrate sets rows: %w", err)
+		return nil, 0, fmt.Errorf("error iterating substrate sets rows: %w", err)
 	}
 
-	return substrateSets, nil
+	return substrateSets, totalCount, nil
 }
 
 // Exists checks if a substrate set exists by ID

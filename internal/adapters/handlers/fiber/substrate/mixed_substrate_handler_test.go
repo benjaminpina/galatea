@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"github.com/benjaminpina/galatea/internal/adapters/handlers/fiber/substrate/mocks"
+	"github.com/benjaminpina/galatea/internal/core/domain/common"
 	"github.com/benjaminpina/galatea/internal/core/domain/substrate"
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
@@ -397,8 +398,16 @@ func TestMixedSubstrateHandler_ListMixedSubstrates(t *testing.T) {
 		mixedSub2.ID = uuid.New().String()
 		mixedSub2.Name = "Another Mixed Substrate"
 
-		mockSvc.On("ListMixedSubstrates").
-			Return([]substrate.MixedSubstrate{*mixedSub1, *mixedSub2}, nil).Once()
+		// Crear objeto de paginación
+		pagination := &common.PaginatedResult{
+			Page:       1,
+			PageSize:   10,
+			TotalCount: 2,
+			TotalPages: 1,
+		}
+
+		mockSvc.On("List", 1, 10).
+			Return([]substrate.MixedSubstrate{*mixedSub1, *mixedSub2}, pagination, nil).Once()
 
 		// Crear request
 		req := httptest.NewRequest(http.MethodGet, "/api/v1/mixed-substrates", nil)
@@ -411,13 +420,16 @@ func TestMixedSubstrateHandler_ListMixedSubstrates(t *testing.T) {
 		assert.Equal(t, http.StatusOK, resp.StatusCode, "Expected status 200 OK")
 
 		// Verificar cuerpo de la respuesta
-		var respBody []MixedSubstrateResponse
+		var respBody MixedSubstratePaginatedResponse
 		err = json.NewDecoder(resp.Body).Decode(&respBody)
 		require.NoError(t, err, "Failed to decode response body")
 
-		assert.Len(t, respBody, 2, "Expected 2 mixed substrates in the response")
-		assert.Equal(t, mixedSub1.ID, respBody[0].ID, "First mixed substrate ID does not match")
-		assert.Equal(t, mixedSub2.ID, respBody[1].ID, "Second mixed substrate ID does not match")
+		assert.Len(t, respBody.Data, 2, "Expected 2 mixed substrates in the response")
+		assert.Equal(t, mixedSub1.ID, respBody.Data[0].ID, "First mixed substrate ID does not match")
+		assert.Equal(t, mixedSub2.ID, respBody.Data[1].ID, "Second mixed substrate ID does not match")
+		assert.Equal(t, 1, respBody.Pagination.Page, "Page number does not match")
+		assert.Equal(t, 10, respBody.Pagination.PageSize, "Page size does not match")
+		assert.Equal(t, 2, respBody.Pagination.TotalCount, "Total count does not match")
 
 		// Verificar que se llamó al servicio como se esperaba
 		mockSvc.AssertExpectations(t)
@@ -426,8 +438,8 @@ func TestMixedSubstrateHandler_ListMixedSubstrates(t *testing.T) {
 	// Caso 2: Error al listar
 	t.Run("Listing error", func(t *testing.T) {
 		// Configurar expectativas del mock
-		mockSvc.On("ListMixedSubstrates").
-			Return(nil, errors.New("listing error")).Once()
+		mockSvc.On("List", 1, 10).
+			Return(nil, nil, errors.New("listing error")).Once()
 
 		// Crear request
 		req := httptest.NewRequest(http.MethodGet, "/api/v1/mixed-substrates", nil)

@@ -74,3 +74,4 @@ coverage.out
 
 # SQLite database
 *.db
+galatea_api

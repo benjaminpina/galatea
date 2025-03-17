@@ -40,6 +40,9 @@ func InitializeAPI() (*Application, error) {
 	mixedSubstrateRepository := ProvideMixedSubstrateRepository(database)
 	mixedSubstrateServiceImpl := ProvideMixedSubstrateService(mixedSubstrateRepository, substrateServiceImpl)
 	mixedSubstrateHandler := ProvideMixedSubstrateHandler(mixedSubstrateServiceImpl)
+	substrateSetRepository := ProvideSubstrateSetRepository(database)
+	substrateSetService := ProvideSubstrateSetService(substrateSetRepository)
+	substrateSetHandler := ProvideSubstrateSetHandler(substrateSetService)
 	application := &Application{
 		App:                app,
 		Config:             config,
@@ -50,6 +53,9 @@ func InitializeAPI() (*Application, error) {
 		MixedSubstrateRepo: mixedSubstrateRepository,
 		MixedSubstrateSvc:  mixedSubstrateServiceImpl,
 		MixedSubstrateHdlr: mixedSubstrateHandler,
+		SubstrateSetRepo:   substrateSetRepository,
+		SubstrateSetSvc:    substrateSetService,
+		SubstrateSetHdlr:   substrateSetHandler,
 	}
 	return application, nil
 }
@@ -63,18 +69,19 @@ var DatabaseSet = wire.NewSet(
 
 // RepositorySet is the provider set for repositories
 var RepositorySet = wire.NewSet(
-	ProvideSubstrateRepository, wire.Bind(new(substrate.SubstrateRepository), new(*sqlite.SubstrateRepository)), ProvideMixedSubstrateRepository, wire.Bind(new(substrate.MixedSubstrateRepository), new(*sqlite.MixedSubstrateRepository)),
+	ProvideSubstrateRepository, wire.Bind(new(substrate.SubstrateRepository), new(*sqlite.SubstrateRepository)), ProvideMixedSubstrateRepository, wire.Bind(new(substrate.MixedSubstrateRepository), new(*sqlite.MixedSubstrateRepository)), ProvideSubstrateSetRepository, wire.Bind(new(substrate.SubstrateSetRepository), new(*sqlite.SubstrateSetRepository)),
 )
 
 // ServiceSet is the provider set for services
 var ServiceSet = wire.NewSet(
-	ProvideSubstrateService, wire.Bind(new(substrate.SubstrateService), new(*substrate2.SubstrateServiceImpl)), ProvideMixedSubstrateService, wire.Bind(new(substrate.MixedSubstrateService), new(*substrate2.MixedSubstrateServiceImpl)),
+	ProvideSubstrateService, wire.Bind(new(substrate.SubstrateService), new(*substrate2.SubstrateServiceImpl)), ProvideMixedSubstrateService, wire.Bind(new(substrate.MixedSubstrateService), new(*substrate2.MixedSubstrateServiceImpl)), ProvideSubstrateSetService, wire.Bind(new(substrate.SubstrateSetService), new(*substrate2.SubstrateSetService)),
 )
 
 // HandlerSet is the provider set for handlers
 var HandlerSet = wire.NewSet(
 	ProvideSubstrateHandler,
 	ProvideMixedSubstrateHandler,
+	ProvideSubstrateSetHandler,
 )
 
 // AppSet is the provider set for the Fiber application
@@ -93,6 +100,9 @@ type Application struct {
 	MixedSubstrateRepo substrate.MixedSubstrateRepository
 	MixedSubstrateSvc  substrate.MixedSubstrateService
 	MixedSubstrateHdlr *substrate3.MixedSubstrateHandler
+	SubstrateSetRepo   substrate.SubstrateSetRepository
+	SubstrateSetSvc    substrate.SubstrateSetService
+	SubstrateSetHdlr   *substrate3.SubstrateSetHandler
 }
 
 // ProvideConfig provides the application configuration
@@ -121,6 +131,11 @@ func ProvideMixedSubstrateRepository(db *sqlite.Database) *sqlite.MixedSubstrate
 	return sqlite.NewMixedSubstrateRepository(db)
 }
 
+// ProvideSubstrateSetRepository provides the substrate set repository
+func ProvideSubstrateSetRepository(db *sqlite.Database) *sqlite.SubstrateSetRepository {
+	return sqlite.NewSubstrateSetRepository(db)
+}
+
 // ProvideSubstrateService provides the substrate service
 func ProvideSubstrateService(repo substrate.SubstrateRepository) *substrate2.SubstrateServiceImpl {
 	return substrate2.NewSubstrateService(repo)
@@ -131,6 +146,11 @@ func ProvideMixedSubstrateService(repo substrate.MixedSubstrateRepository, subst
 	return substrate2.NewMixedSubstrateService(repo, substrateSvc)
 }
 
+// ProvideSubstrateSetService provides the substrate set service
+func ProvideSubstrateSetService(repo substrate.SubstrateSetRepository) *substrate2.SubstrateSetService {
+	return substrate2.NewSubstrateSetService(repo)
+}
+
 // ProvideSubstrateHandler provides the substrate handler
 func ProvideSubstrateHandler(svc substrate.SubstrateService) *substrate3.SubstrateHandler {
 	return substrate3.NewSubstrateHandler(svc)
@@ -139,6 +159,11 @@ func ProvideSubstrateHandler(svc substrate.SubstrateService) *substrate3.Substra
 // ProvideMixedSubstrateHandler provides the mixed substrate handler
 func ProvideMixedSubstrateHandler(svc substrate.MixedSubstrateService) *substrate3.MixedSubstrateHandler {
 	return substrate3.NewMixedSubstrateHandler(svc)
+}
+
+// ProvideSubstrateSetHandler provides the substrate set handler
+func ProvideSubstrateSetHandler(svc substrate.SubstrateSetService) *substrate3.SubstrateSetHandler {
+	return substrate3.NewSubstrateSetHandler(svc)
 }
 
 // ProvideFiberApp provides the Fiber application
@@ -167,6 +192,7 @@ func SetupAPI(app *Application) error {
 
 	app.SubstrateHdlr.RegisterRoutes(app.App)
 	app.MixedSubstrateHdlr.RegisterRoutes(app.App)
+	app.SubstrateSetHdlr.RegisterRoutes(app.App)
 
 	app.App.Get("/health", func(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusOK).JSON(fiber.Map{

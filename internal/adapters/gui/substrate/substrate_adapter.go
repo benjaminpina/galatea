@@ -1,44 +1,51 @@
 package substrate
 
 import (
+	guiCommon "github.com/benjaminpina/galatea/internal/adapters/gui/common"
 	ports "github.com/benjaminpina/galatea/internal/core/ports/substrate"
 )
 
-// SubstrateResponse representa la respuesta de un sustrato para la GUI
+// SubstrateResponse represents a substrate response for the GUI
 type SubstrateResponse struct {
 	ID    string `json:"id"`
 	Name  string `json:"name"`
 	Color string `json:"color"`
 }
 
-// SubstrateRequest representa una solicitud para crear o actualizar un sustrato desde la GUI
+// SubstrateRequest represents a request to create or update a substrate from the GUI
 type SubstrateRequest struct {
 	ID    string `json:"id"`
 	Name  string `json:"name"`
 	Color string `json:"color"`
 }
 
-// SubstrateAdapter es un adaptador para exponer operaciones de sustratos a la GUI
+// PaginatedResponse represents a paginated response for the GUI
+type PaginatedResponse struct {
+	Data       []SubstrateResponse      `json:"data"`
+	Pagination guiCommon.PaginationResponse `json:"pagination"`
+}
+
+// SubstrateAdapter is an adapter to expose substrate operations to the GUI
 type SubstrateAdapter struct {
 	service ports.SubstrateService
 }
 
-// NewSubstrateAdapter crea un nuevo adaptador de sustratos
+// NewSubstrateAdapter creates a new substrate adapter
 func NewSubstrateAdapter(service ports.SubstrateService) *SubstrateAdapter {
 	return &SubstrateAdapter{
 		service: service,
 	}
 }
 
-// CreateSubstrate crea un nuevo sustrato
+// CreateSubstrate creates a new substrate
 func (a *SubstrateAdapter) CreateSubstrate(req SubstrateRequest) (*SubstrateResponse, error) {
-	// Crear el sustrato usando el servicio
+	// Create the substrate using the service
 	sub, err := a.service.CreateSubstrate(req.ID, req.Name, req.Color)
 	if err != nil {
 		return nil, err
 	}
 
-	// Convertir a respuesta
+	// Convert to response
 	resp := &SubstrateResponse{
 		ID:    sub.ID,
 		Name:  sub.Name,
@@ -48,15 +55,15 @@ func (a *SubstrateAdapter) CreateSubstrate(req SubstrateRequest) (*SubstrateResp
 	return resp, nil
 }
 
-// GetSubstrate obtiene un sustrato por ID
+// GetSubstrate gets a substrate by ID
 func (a *SubstrateAdapter) GetSubstrate(id string) (*SubstrateResponse, error) {
-	// Obtener el sustrato usando el servicio
+	// Get the substrate using the service
 	sub, err := a.service.GetSubstrate(id)
 	if err != nil {
 		return nil, err
 	}
 
-	// Convertir a respuesta
+	// Convert to response
 	resp := &SubstrateResponse{
 		ID:    sub.ID,
 		Name:  sub.Name,
@@ -66,15 +73,15 @@ func (a *SubstrateAdapter) GetSubstrate(id string) (*SubstrateResponse, error) {
 	return resp, nil
 }
 
-// UpdateSubstrate actualiza un sustrato existente
+// UpdateSubstrate updates an existing substrate
 func (a *SubstrateAdapter) UpdateSubstrate(id string, req SubstrateRequest) (*SubstrateResponse, error) {
-	// Actualizar el sustrato usando el servicio
+	// Update the substrate using the service
 	sub, err := a.service.UpdateSubstrate(id, req.Name, req.Color)
 	if err != nil {
 		return nil, err
 	}
 
-	// Convertir a respuesta
+	// Convert to response
 	resp := &SubstrateResponse{
 		ID:    sub.ID,
 		Name:  sub.Name,
@@ -84,21 +91,21 @@ func (a *SubstrateAdapter) UpdateSubstrate(id string, req SubstrateRequest) (*Su
 	return resp, nil
 }
 
-// DeleteSubstrate elimina un sustrato por ID
+// DeleteSubstrate deletes a substrate by ID
 func (a *SubstrateAdapter) DeleteSubstrate(id string) error {
-	// Eliminar el sustrato usando el servicio
+	// Delete the substrate using the service
 	return a.service.DeleteSubstrate(id)
 }
 
-// ListSubstrates obtiene todos los sustratos
-func (a *SubstrateAdapter) ListSubstrates() ([]SubstrateResponse, error) {
-	// Obtener todos los sustratos usando el servicio
-	subs, err := a.service.ListSubstrates()
+// List gets a paginated list of substrates
+func (a *SubstrateAdapter) List(page, pageSize int) (*PaginatedResponse, error) {
+	// Get paginated substrates using the service
+	subs, pagination, err := a.service.List(page, pageSize)
 	if err != nil {
 		return nil, err
 	}
 
-	// Convertir a respuestas
+	// Convert to responses
 	resp := make([]SubstrateResponse, len(subs))
 	for i, sub := range subs {
 		resp[i] = SubstrateResponse{
@@ -108,5 +115,11 @@ func (a *SubstrateAdapter) ListSubstrates() ([]SubstrateResponse, error) {
 		}
 	}
 
-	return resp, nil
+	// Create paginated response
+	paginatedResp := &PaginatedResponse{
+		Data:       resp,
+		Pagination: guiCommon.MapPaginationInfo(pagination),
+	}
+
+	return paginatedResp, nil
 }

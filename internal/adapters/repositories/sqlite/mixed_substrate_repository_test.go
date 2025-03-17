@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"testing"
 
+	"github.com/benjaminpina/galatea/internal/core/domain/common"
 	"github.com/benjaminpina/galatea/internal/core/domain/substrate"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
@@ -165,10 +166,17 @@ func TestMixedSubstrateRepository_Delete(t *testing.T) {
 func TestMixedSubstrateRepository_List(t *testing.T) {
 	repo := setupMixedSubstrateRepository(t)
 	
+	// Create pagination parameters
+	params := common.PaginationParams{
+		Page:     1,
+		PageSize: 10,
+	}
+	
 	// Caso 1: No hay sustratos mixtos
-	mixedSubs, err := repo.List()
+	mixedSubs, totalCount, err := repo.List(params)
 	require.NoError(t, err, "Failed to list mixed substrates")
 	assert.Empty(t, mixedSubs, "Expected empty list of mixed substrates")
+	assert.Equal(t, 0, totalCount, "Expected total count to be 0")
 	
 	// Crear varios sustratos mixtos
 	mixedSub1 := createTestMixedSubstrate()
@@ -185,9 +193,10 @@ func TestMixedSubstrateRepository_List(t *testing.T) {
 	require.NoError(t, err, "Failed to create mixed substrate 3")
 	
 	// Caso 2: Hay sustratos mixtos
-	mixedSubs, err = repo.List()
+	mixedSubs, totalCount, err = repo.List(params)
 	require.NoError(t, err, "Failed to list mixed substrates")
 	assert.Len(t, mixedSubs, 3, "Expected 3 mixed substrates")
+	assert.Equal(t, 3, totalCount, "Expected total count to be 3")
 	
 	// Verificar que los IDs de los sustratos mixtos están en la lista
 	ids := make([]string, len(mixedSubs))
@@ -198,6 +207,20 @@ func TestMixedSubstrateRepository_List(t *testing.T) {
 	assert.Contains(t, ids, mixedSub1.ID, "Mixed substrate 1 not found in list")
 	assert.Contains(t, ids, mixedSub2.ID, "Mixed substrate 2 not found in list")
 	assert.Contains(t, ids, mixedSub3.ID, "Mixed substrate 3 not found in list")
+	
+	// Caso 3: Prueba de paginación
+	params.PageSize = 2
+	mixedSubs, totalCount, err = repo.List(params)
+	require.NoError(t, err, "Failed to list mixed substrates with pagination")
+	assert.Len(t, mixedSubs, 2, "Expected 2 mixed substrates with pagination")
+	assert.Equal(t, 3, totalCount, "Expected total count to be 3 with pagination")
+	
+	// Página 2
+	params.Page = 2
+	mixedSubs, totalCount, err = repo.List(params)
+	require.NoError(t, err, "Failed to list mixed substrates on page 2")
+	assert.Len(t, mixedSubs, 1, "Expected 1 mixed substrate on page 2")
+	assert.Equal(t, 3, totalCount, "Expected total count to be 3 on page 2")
 }
 
 // TestMixedSubstrateRepository_Exists prueba la verificación de existencia de un sustrato mixto
@@ -226,11 +249,17 @@ func TestMixedSubstrateRepository_Exists(t *testing.T) {
 func TestMixedSubstrateRepository_FindBySubstrateID(t *testing.T) {
 	repo := setupMixedSubstrateRepository(t)
 	
+	// Create pagination parameters
+	params := common.PaginationParams{
+		Page:     1,
+		PageSize: 10,
+	}
+	
 	// Crear varios sustratos mixtos con diferentes sustratos
 	substrateID1 := uuid.New().String()
 	substrateID2 := uuid.New().String()
+	substrateID3 := uuid.New().String()
 	
-	// Sustrato mixto 1: contiene sustrato 1
 	mixedSub1 := substrate.MixedSubstrate{
 		ID:    uuid.New().String(),
 		Name:  "Mixed Substrate 1",
@@ -247,7 +276,6 @@ func TestMixedSubstrateRepository_FindBySubstrateID(t *testing.T) {
 		},
 	}
 	
-	// Sustrato mixto 2: contiene sustrato 2
 	mixedSub2 := substrate.MixedSubstrate{
 		ID:    uuid.New().String(),
 		Name:  "Mixed Substrate 2",
@@ -255,16 +283,15 @@ func TestMixedSubstrateRepository_FindBySubstrateID(t *testing.T) {
 		Substrates: []substrate.SubstratePercentage{
 			{
 				Substrate: substrate.Substrate{
-					ID:    substrateID2,
-					Name:  "Substrate 2",
-					Color: "#FFFF00",
+					ID:    substrateID3,
+					Name:  "Substrate 3",
+					Color: "#0000FF",
 				},
 				Percentage: 100.0,
 			},
 		},
 	}
 	
-	// Sustrato mixto 3: contiene sustrato 1 y 2
 	mixedSub3 := substrate.MixedSubstrate{
 		ID:    uuid.New().String(),
 		Name:  "Mixed Substrate 3",
@@ -300,9 +327,10 @@ func TestMixedSubstrateRepository_FindBySubstrateID(t *testing.T) {
 	require.NoError(t, err, "Failed to create mixed substrate 3")
 	
 	// Caso 1: Buscar sustratos mixtos que contienen el sustrato 1
-	mixedSubs, err := repo.FindBySubstrateID(substrateID1)
+	mixedSubs, totalCount, err := repo.FindBySubstrateID(substrateID1, params)
 	require.NoError(t, err, "Failed to find mixed substrates by substrate ID")
 	assert.Len(t, mixedSubs, 2, "Expected 2 mixed substrates containing substrate 1")
+	assert.Equal(t, 2, totalCount, "Expected total count to be 2")
 	
 	// Verificar que los IDs de los sustratos mixtos están en la lista
 	ids := make([]string, len(mixedSubs))
@@ -314,21 +342,23 @@ func TestMixedSubstrateRepository_FindBySubstrateID(t *testing.T) {
 	assert.Contains(t, ids, mixedSub3.ID, "Mixed substrate 3 not found in list")
 	
 	// Caso 2: Buscar sustratos mixtos que contienen el sustrato 2
-	mixedSubs, err = repo.FindBySubstrateID(substrateID2)
+	mixedSubs, totalCount, err = repo.FindBySubstrateID(substrateID2, params)
 	require.NoError(t, err, "Failed to find mixed substrates by substrate ID")
-	assert.Len(t, mixedSubs, 2, "Expected 2 mixed substrates containing substrate 2")
+	assert.Len(t, mixedSubs, 1, "Expected 1 mixed substrate containing substrate 2")
+	assert.Equal(t, 1, totalCount, "Expected total count to be 1")
+	assert.Equal(t, mixedSub3.ID, mixedSubs[0].ID, "Mixed substrate 3 not found in list")
 	
-	// Verificar que los IDs de los sustratos mixtos están en la lista
-	ids = make([]string, len(mixedSubs))
-	for i, mixedSub := range mixedSubs {
-		ids[i] = mixedSub.ID
-	}
-	
-	assert.Contains(t, ids, mixedSub2.ID, "Mixed substrate 2 not found in list")
-	assert.Contains(t, ids, mixedSub3.ID, "Mixed substrate 3 not found in list")
-	
-	// Caso 3: Buscar sustratos mixtos que contienen un sustrato que no existe
-	mixedSubs, err = repo.FindBySubstrateID(uuid.New().String())
+	// Caso 3: Buscar sustratos mixtos que contienen el sustrato 3
+	mixedSubs, totalCount, err = repo.FindBySubstrateID(substrateID3, params)
 	require.NoError(t, err, "Failed to find mixed substrates by substrate ID")
-	assert.Empty(t, mixedSubs, "Expected empty list of mixed substrates")
+	assert.Len(t, mixedSubs, 1, "Expected 1 mixed substrate containing substrate 3")
+	assert.Equal(t, 1, totalCount, "Expected total count to be 1")
+	assert.Equal(t, mixedSub2.ID, mixedSubs[0].ID, "Mixed substrate 2 not found in list")
+	
+	// Caso 4: Buscar sustratos mixtos que contienen un sustrato que no existe
+	nonExistentSubstrateID := uuid.New().String()
+	mixedSubs, totalCount, err = repo.FindBySubstrateID(nonExistentSubstrateID, params)
+	require.NoError(t, err, "Failed to find mixed substrates by substrate ID")
+	assert.Empty(t, mixedSubs, "Expected no mixed substrates containing non-existent substrate")
+	assert.Equal(t, 0, totalCount, "Expected total count to be 0")
 }
