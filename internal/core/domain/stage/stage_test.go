@@ -40,6 +40,7 @@ func TestNewStage(t *testing.T) {
 		width         int
 		height        int
 		substrateSet  *substrate.SubstrateSet
+		defaultSubID  string
 		expectedError error
 	}{
 		{
@@ -49,6 +50,7 @@ func TestNewStage(t *testing.T) {
 			width:         10,
 			height:        10,
 			substrateSet:  createTestSubstrateSet(),
+			defaultSubID:  "sub1",
 			expectedError: nil,
 		},
 		{
@@ -58,6 +60,7 @@ func TestNewStage(t *testing.T) {
 			width:         0,
 			height:        10,
 			substrateSet:  createTestSubstrateSet(),
+			defaultSubID:  "sub1",
 			expectedError: ErrInvalidDimensions,
 		},
 		{
@@ -67,6 +70,7 @@ func TestNewStage(t *testing.T) {
 			width:         10,
 			height:        0,
 			substrateSet:  createTestSubstrateSet(),
+			defaultSubID:  "sub1",
 			expectedError: ErrInvalidDimensions,
 		},
 		{
@@ -76,13 +80,24 @@ func TestNewStage(t *testing.T) {
 			width:         -5,
 			height:        -5,
 			substrateSet:  createTestSubstrateSet(),
+			defaultSubID:  "sub1",
 			expectedError: ErrInvalidDimensions,
+		},
+		{
+			name:          "Default substrate not in set",
+			id:            "stage5",
+			stageName:     "Test Stage",
+			width:         10,
+			height:        10,
+			substrateSet:  createTestSubstrateSet(),
+			defaultSubID:  "unknown",
+			expectedError: ErrDefaultSubNotInSet,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			stage, err := NewStage(tt.id, tt.stageName, tt.width, tt.height, tt.substrateSet)
+			stage, err := NewStage(tt.id, tt.stageName, tt.width, tt.height, tt.substrateSet, tt.defaultSubID)
 			
 			if tt.expectedError != nil {
 				assert.Equal(t, tt.expectedError, err)
@@ -92,16 +107,19 @@ func TestNewStage(t *testing.T) {
 				assert.NotNil(t, stage)
 				assert.Equal(t, tt.id, stage.ID)
 				assert.Equal(t, tt.stageName, stage.Name)
-				assert.Equal(t, tt.width, stage.Width)
-				assert.Equal(t, tt.height, stage.Height)
+				assert.Equal(t, tt.width, stage.Width())
+				assert.Equal(t, tt.height, stage.Height())
 				assert.Equal(t, tt.substrateSet, stage.SubstrateSet)
 				assert.Len(t, stage.Grid, tt.height)
 				
-				// Check that all cells are initialized to nil
+				// Check that all cells are initialized with the default substrate
 				for i := 0; i < tt.height; i++ {
 					assert.Len(t, stage.Grid[i], tt.width)
 					for j := 0; j < tt.width; j++ {
-						assert.Nil(t, stage.Grid[i][j])
+						assert.NotNil(t, stage.Grid[i][j])
+						assert.NotNil(t, stage.Grid[i][j].Substrate)
+						assert.Equal(t, tt.defaultSubID, stage.Grid[i][j].Substrate.ID)
+						assert.Nil(t, stage.Grid[i][j].MixedSubstrate)
 					}
 				}
 			}
@@ -112,7 +130,7 @@ func TestNewStage(t *testing.T) {
 func TestStageResize(t *testing.T) {
 	// Create a stage with some content
 	set := createTestSubstrateSet()
-	stage, _ := NewStage("stage1", "Test Stage", 3, 3, set)
+	stage, _ := NewStage("stage1", "Test Stage", 3, 3, set, "sub1")
 	
 	// Place some substrates
 	stage.PlaceSubstrate(0, 0, "sub1")
@@ -159,8 +177,8 @@ func TestStageResize(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// Create a copy of the original grid to compare after resize
-			originalWidth := stage.Width
-			originalHeight := stage.Height
+			originalWidth := stage.Width()
+			originalHeight := stage.Height()
 			originalGrid := make([][]*Cell, originalHeight)
 			for i := range originalGrid {
 				originalGrid[i] = make([]*Cell, originalWidth)
@@ -172,12 +190,12 @@ func TestStageResize(t *testing.T) {
 			if tt.expectedError != nil {
 				assert.Equal(t, tt.expectedError, err)
 				// Dimensions should remain unchanged
-				assert.Equal(t, originalWidth, stage.Width)
-				assert.Equal(t, originalHeight, stage.Height)
+				assert.Equal(t, originalWidth, stage.Width())
+				assert.Equal(t, originalHeight, stage.Height())
 			} else {
 				assert.NoError(t, err)
-				assert.Equal(t, tt.newWidth, stage.Width)
-				assert.Equal(t, tt.newHeight, stage.Height)
+				assert.Equal(t, tt.newWidth, stage.Width())
+				assert.Equal(t, tt.newHeight, stage.Height())
 				assert.Len(t, stage.Grid, tt.newHeight)
 				
 				for i := 0; i < tt.newHeight; i++ {
@@ -191,6 +209,20 @@ func TestStageResize(t *testing.T) {
 							assert.Equal(t, originalGrid[i][j], stage.Grid[i][j])
 						}
 					}
+					
+					// Check that new cells are initialized with default substrate
+					if tt.newHeight > originalHeight || tt.newWidth > originalWidth {
+						for i := 0; i < tt.newHeight; i++ {
+							for j := 0; j < tt.newWidth; j++ {
+								if i >= originalHeight || j >= originalWidth {
+									assert.NotNil(t, stage.Grid[i][j])
+									assert.NotNil(t, stage.Grid[i][j].Substrate)
+									assert.Equal(t, "sub1", stage.Grid[i][j].Substrate.ID)
+									assert.Nil(t, stage.Grid[i][j].MixedSubstrate)
+								}
+							}
+						}
+					}
 				}
 			}
 		})
@@ -198,7 +230,7 @@ func TestStageResize(t *testing.T) {
 }
 
 func TestIsValidPosition(t *testing.T) {
-	stage, _ := NewStage("stage1", "Test Stage", 5, 5, createTestSubstrateSet())
+	stage, _ := NewStage("stage1", "Test Stage", 5, 5, createTestSubstrateSet(), "sub1")
 	
 	tests := []struct {
 		name     string
@@ -260,7 +292,7 @@ func TestIsValidPosition(t *testing.T) {
 
 func TestPlaceSubstrate(t *testing.T) {
 	set := createTestSubstrateSet()
-	stage, _ := NewStage("stage1", "Test Stage", 5, 5, set)
+	stage, _ := NewStage("stage1", "Test Stage", 5, 5, set, "sub1")
 	
 	tests := []struct {
 		name          string
@@ -291,11 +323,11 @@ func TestPlaceSubstrate(t *testing.T) {
 			expectedError: ErrSubstrateNotInSet,
 		},
 		{
-			name:          "Cell already has content",
+			name:          "Replace existing content",
 			x:             2,
 			y:             2,
 			substrateID:   "sub2",
-			expectedError: ErrCellAlreadyHasContent,
+			expectedError: nil,
 		},
 	}
 
@@ -318,7 +350,7 @@ func TestPlaceSubstrate(t *testing.T) {
 
 func TestPlaceMixedSubstrate(t *testing.T) {
 	set := createTestSubstrateSet()
-	stage, _ := NewStage("stage1", "Test Stage", 5, 5, set)
+	stage, _ := NewStage("stage1", "Test Stage", 5, 5, set, "sub1")
 	
 	tests := []struct {
 		name          string
@@ -349,11 +381,11 @@ func TestPlaceMixedSubstrate(t *testing.T) {
 			expectedError: ErrMixedSubstrateNotInSet,
 		},
 		{
-			name:          "Cell already has content",
+			name:          "Replace existing content",
 			x:             2,
 			y:             2,
 			mixedSubID:    "mix1",
-			expectedError: ErrCellAlreadyHasContent,
+			expectedError: nil,
 		},
 	}
 
@@ -376,10 +408,10 @@ func TestPlaceMixedSubstrate(t *testing.T) {
 
 func TestClearCell(t *testing.T) {
 	set := createTestSubstrateSet()
-	stage, _ := NewStage("stage1", "Test Stage", 5, 5, set)
+	stage, _ := NewStage("stage1", "Test Stage", 5, 5, set, "sub1")
 	
 	// Place some content
-	stage.PlaceSubstrate(1, 1, "sub1")
+	stage.PlaceSubstrate(1, 1, "sub2")
 	stage.PlaceMixedSubstrate(2, 2, "mix1")
 	
 	tests := []struct {
@@ -406,12 +438,6 @@ func TestClearCell(t *testing.T) {
 			y:             2,
 			expectedError: ErrInvalidPosition,
 		},
-		{
-			name:          "Cell has no content",
-			x:             3,
-			y:             3,
-			expectedError: ErrCellHasNoContent,
-		},
 	}
 
 	for _, tt := range tests {
@@ -420,9 +446,12 @@ func TestClearCell(t *testing.T) {
 			assert.Equal(t, tt.expectedError, err)
 			
 			if err == nil {
-				// Verify the cell was cleared
+				// Verify the cell was cleared and replaced with default substrate
 				cell, _ := stage.GetCell(tt.x, tt.y)
-				assert.Nil(t, cell)
+				assert.NotNil(t, cell)
+				assert.NotNil(t, cell.Substrate)
+				assert.Equal(t, "sub1", cell.Substrate.ID)
+				assert.Nil(t, cell.MixedSubstrate)
 			}
 		})
 	}
@@ -430,10 +459,10 @@ func TestClearCell(t *testing.T) {
 
 func TestGetCell(t *testing.T) {
 	set := createTestSubstrateSet()
-	stage, _ := NewStage("stage1", "Test Stage", 5, 5, set)
+	stage, _ := NewStage("stage1", "Test Stage", 5, 5, set, "sub1")
 	
 	// Place some content
-	stage.PlaceSubstrate(1, 1, "sub1")
+	stage.PlaceSubstrate(1, 1, "sub2")
 	stage.PlaceMixedSubstrate(2, 2, "mix1")
 	
 	tests := []struct {
@@ -441,44 +470,48 @@ func TestGetCell(t *testing.T) {
 		x             int
 		y             int
 		expectedError error
-		expectedCell  bool
-		isSubstrate   bool
-		isMixed       bool
-		expectedID    string
+		checkContent  bool
+		expectSub     bool
+		subID         string
+		expectMixed   bool
+		mixedID       string
 	}{
+		{
+			name:          "Get cell with default substrate",
+			x:             0,
+			y:             0,
+			expectedError: nil,
+			checkContent:  true,
+			expectSub:     true,
+			subID:         "sub1",
+			expectMixed:   false,
+		},
 		{
 			name:          "Get cell with substrate",
 			x:             1,
 			y:             1,
 			expectedError: nil,
-			expectedCell:  true,
-			isSubstrate:   true,
-			isMixed:       false,
-			expectedID:    "sub1",
+			checkContent:  true,
+			expectSub:     true,
+			subID:         "sub2",
+			expectMixed:   false,
 		},
 		{
 			name:          "Get cell with mixed substrate",
 			x:             2,
 			y:             2,
 			expectedError: nil,
-			expectedCell:  true,
-			isSubstrate:   false,
-			isMixed:       true,
-			expectedID:    "mix1",
-		},
-		{
-			name:          "Get empty cell",
-			x:             3,
-			y:             3,
-			expectedError: nil,
-			expectedCell:  false,
+			checkContent:  true,
+			expectSub:     false,
+			expectMixed:   true,
+			mixedID:       "mix1",
 		},
 		{
 			name:          "Invalid position",
 			x:             -1,
 			y:             2,
 			expectedError: ErrInvalidPosition,
-			expectedCell:  false,
+			checkContent:  false,
 		},
 	}
 
@@ -487,20 +520,20 @@ func TestGetCell(t *testing.T) {
 			cell, err := stage.GetCell(tt.x, tt.y)
 			assert.Equal(t, tt.expectedError, err)
 			
-			if tt.expectedCell {
+			if tt.checkContent {
 				assert.NotNil(t, cell)
-				if tt.isSubstrate {
+				
+				if tt.expectSub {
 					assert.NotNil(t, cell.Substrate)
+					assert.Equal(t, tt.subID, cell.Substrate.ID)
 					assert.Nil(t, cell.MixedSubstrate)
-					assert.Equal(t, tt.expectedID, cell.Substrate.ID)
 				}
-				if tt.isMixed {
+				
+				if tt.expectMixed {
 					assert.Nil(t, cell.Substrate)
 					assert.NotNil(t, cell.MixedSubstrate)
-					assert.Equal(t, tt.expectedID, cell.MixedSubstrate.ID)
+					assert.Equal(t, tt.mixedID, cell.MixedSubstrate.ID)
 				}
-			} else if err == nil {
-				assert.Nil(t, cell)
 			}
 		})
 	}
@@ -508,24 +541,22 @@ func TestGetCell(t *testing.T) {
 
 func TestString(t *testing.T) {
 	set := createTestSubstrateSet()
-	stage, _ := NewStage("stage1", "Test Stage", 3, 3, set)
-	
-	// Empty stage
-	emptyStageStr := stage.String()
-	assert.Contains(t, emptyStageStr, "Stage stage1 (Test Stage) - 3x3")
-	assert.Contains(t, emptyStageStr, "[ ]")
+	stage, _ := NewStage("stage1", "Test Stage", 3, 2, set, "sub1")
 	
 	// Place some content
-	stage.PlaceSubstrate(0, 0, "sub1")
-	stage.PlaceSubstrate(1, 1, "sub2")
-	stage.PlaceMixedSubstrate(2, 2, "mix1")
+	stage.PlaceSubstrate(0, 0, "sub2")
+	stage.PlaceMixedSubstrate(1, 1, "mix1")
 	
-	// Stage with content
-	stageWithContentStr := stage.String()
-	assert.Contains(t, stageWithContentStr, "Stage stage1 (Test Stage) - 3x3")
-	assert.Contains(t, stageWithContentStr, "[S:sub1]")
-	assert.Contains(t, stageWithContentStr, "[S:sub2]")
-	assert.Contains(t, stageWithContentStr, "[M:mix1]")
+	// Expected format:
+	// Stage stage1 (Test Stage) - 3x2
+	// [S:sub2][S:sub1][S:sub1]
+	// [S:sub1][M:mix1][S:sub1]
+	
+	result := stage.String()
+	
+	assert.Contains(t, result, "Stage stage1 (Test Stage) - 3x2")
+	assert.Contains(t, result, "[S:sub2]")
+	assert.Contains(t, result, "[M:mix1]")
 }
 
 // Helper function for min value (Go 1.21+ has this in the standard library)

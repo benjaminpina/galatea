@@ -19,9 +19,10 @@ type Stage struct {
 	Name         string
 	Comment      string
 	SubstrateSet *substrate.SubstrateSet
-	Width        int
-	Height       int
+	width        int
+	height       int
 	Grid         [][]*Cell
+	defaultSub   *substrate.Substrate
 }
 
 // Common errors
@@ -29,24 +30,40 @@ var (
 	ErrInvalidPosition        = errors.New("invalid position")
 	ErrSubstrateNotInSet      = errors.New("substrate not in set")
 	ErrMixedSubstrateNotInSet = errors.New("mixed substrate not in set")
-	ErrCellAlreadyHasContent  = errors.New("cell already has content")
 	ErrCellHasNoContent       = errors.New("cell has no content")
 	ErrInvalidDimensions      = errors.New("invalid dimensions")
+	ErrDefaultSubNotInSet     = errors.New("default substrate not in set")
 )
 
-// NewStage creates a new Stage with the specified dimensions and substrate set
-func NewStage(id, name string, width, height int, substrateSet *substrate.SubstrateSet) (*Stage, error) {
+// NewStage creates a new Stage with the specified dimensions, substrate set, and default substrate
+func NewStage(id, name string, width, height int, substrateSet *substrate.SubstrateSet, defaultSubID string) (*Stage, error) {
 	if width <= 0 || height <= 0 {
 		return nil, ErrInvalidDimensions
+	}
+
+	// Check if the default substrate exists in the set
+	subs := substrateSet.GetSubstrates()
+	var defaultSub *substrate.Substrate
+	for i := range subs {
+		if subs[i].ID == defaultSubID {
+			defaultSub = &subs[i]
+			break
+		}
+	}
+	if defaultSub == nil {
+		return nil, ErrDefaultSubNotInSet
 	}
 
 	// Create the grid
 	grid := make([][]*Cell, height)
 	for i := range grid {
 		grid[i] = make([]*Cell, width)
-		// Initialize with empty cells
+		// Initialize with default substrate
 		for j := range grid[i] {
-			grid[i][j] = nil
+			grid[i][j] = &Cell{
+				Substrate:      defaultSub,
+				MixedSubstrate: nil,
+			}
 		}
 	}
 
@@ -55,10 +72,21 @@ func NewStage(id, name string, width, height int, substrateSet *substrate.Substr
 		Name:         name,
 		Comment:      "",
 		SubstrateSet: substrateSet,
-		Width:        width,
-		Height:       height,
+		width:        width,
+		height:       height,
 		Grid:         grid,
+		defaultSub:   defaultSub,
 	}, nil
+}
+
+// Width returns the width of the Stage
+func (s *Stage) Width() int {
+	return s.width
+}
+
+// Height returns the height of the Stage
+func (s *Stage) Height() int {
+	return s.height
 }
 
 // Resize changes the dimensions of the Stage
@@ -73,24 +101,28 @@ func (s *Stage) Resize(newWidth, newHeight int) error {
 		newGrid[i] = make([]*Cell, newWidth)
 		// Copy existing content where possible
 		for j := range newGrid[i] {
-			if i < s.Height && j < s.Width {
+			if i < s.height && j < s.width {
 				newGrid[i][j] = s.Grid[i][j]
 			} else {
-				newGrid[i][j] = nil
+				// Initialize new cells with default substrate
+				newGrid[i][j] = &Cell{
+					Substrate:      s.defaultSub,
+					MixedSubstrate: nil,
+				}
 			}
 		}
 	}
 
 	// Update the Stage
-	s.Width = newWidth
-	s.Height = newHeight
+	s.width = newWidth
+	s.height = newHeight
 	s.Grid = newGrid
 	return nil
 }
 
 // IsValidPosition checks if a position is within the grid boundaries
 func (s *Stage) IsValidPosition(x, y int) bool {
-	return x >= 0 && x < s.Width && y >= 0 && y < s.Height
+	return x >= 0 && x < s.width && y >= 0 && y < s.height
 }
 
 // PlaceSubstrate places a substrate at the specified position
@@ -113,12 +145,7 @@ func (s *Stage) PlaceSubstrate(x, y int, subID string) error {
 		return ErrSubstrateNotInSet
 	}
 
-	// Check if the cell is empty
-	if s.Grid[y][x] != nil {
-		return ErrCellAlreadyHasContent
-	}
-
-	// Place the substrate
+	// Place the substrate (replacing any existing content)
 	s.Grid[y][x] = &Cell{
 		Substrate:      sub,
 		MixedSubstrate: nil,
@@ -146,12 +173,7 @@ func (s *Stage) PlaceMixedSubstrate(x, y int, mixedSubID string) error {
 		return ErrMixedSubstrateNotInSet
 	}
 
-	// Check if the cell is empty
-	if s.Grid[y][x] != nil {
-		return ErrCellAlreadyHasContent
-	}
-
-	// Place the mixed substrate
+	// Place the mixed substrate (replacing any existing content)
 	s.Grid[y][x] = &Cell{
 		Substrate:      nil,
 		MixedSubstrate: mixedSub,
@@ -159,20 +181,18 @@ func (s *Stage) PlaceMixedSubstrate(x, y int, mixedSubID string) error {
 	return nil
 }
 
-// ClearCell removes any content from the specified cell
+// ClearCell removes any content from the specified cell and replaces it with the default substrate
 func (s *Stage) ClearCell(x, y int) error {
 	// Check if position is valid
 	if !s.IsValidPosition(x, y) {
 		return ErrInvalidPosition
 	}
 
-	// Check if the cell has content
-	if s.Grid[y][x] == nil {
-		return ErrCellHasNoContent
+	// Replace with default substrate
+	s.Grid[y][x] = &Cell{
+		Substrate:      s.defaultSub,
+		MixedSubstrate: nil,
 	}
-
-	// Clear the cell
-	s.Grid[y][x] = nil
 	return nil
 }
 
@@ -188,9 +208,9 @@ func (s *Stage) GetCell(x, y int) (*Cell, error) {
 
 // String returns a string representation of the Stage
 func (s *Stage) String() string {
-	result := fmt.Sprintf("Stage %s (%s) - %dx%d\n", s.ID, s.Name, s.Width, s.Height)
-	for y := 0; y < s.Height; y++ {
-		for x := 0; x < s.Width; x++ {
+	result := fmt.Sprintf("Stage %s (%s) - %dx%d\n", s.ID, s.Name, s.width, s.height)
+	for y := 0; y < s.height; y++ {
+		for x := 0; x < s.width; x++ {
 			cell := s.Grid[y][x]
 			if cell == nil {
 				result += "[ ]"
