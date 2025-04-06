@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@tanstack/vue-query": "^5.71.10",
     "@types/vue-router": "^2.0.0",
     "element-plus": "^2.9.6",
     "konva": "^9.3.19",
