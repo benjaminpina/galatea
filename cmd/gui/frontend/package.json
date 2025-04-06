@@ -9,10 +9,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@types/vue-router": "^2.0.0",
     "element-plus": "^2.9.6",
     "konva": "^9.3.19",
     "vue": "^3.2.37",
-    "vue-konva": "^3.2.0"
+    "vue-konva": "^3.2.0",
+    "vue-router": "^4.5.0"
   },
   "devDependencies": {
     "@babel/types": "^7.18.10",
