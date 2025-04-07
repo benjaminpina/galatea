@@ -28,3 +28,23 @@ body {
 .el-menu--horizontal > .el-menu-item:nth-child(1) {
     width: 15em;
 }
+
+.fixed-menu {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+}
+
+.fixed-sub-menu {
+    position: fixed;
+    top: 40px;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+}
+
+.page-content {
+    margin-top: 100px;
+}

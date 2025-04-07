@@ -12,7 +12,7 @@ const handleSelect = (index: string) => {
 </script>
 
 <template>
-    <el-menu mode="horizontal" :default-active="activeIndex" @select="handleSelect">
+    <el-menu class="fixed-sub-menu" mode="horizontal" :default-active="activeIndex" @select="handleSelect">
         <el-menu-item>Environments</el-menu-item>
         <el-menu-item index="projects">
             <Icon icon="mdi:category" height="1.5em" /> Projects

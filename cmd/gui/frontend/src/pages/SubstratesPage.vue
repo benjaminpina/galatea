@@ -3,9 +3,11 @@ import SubstratesToolbar from '../components/SubstratesToolbar.vue'
 </script>
 
 <template>
-  <SubstratesToolbar />
-  <el-row>
-    <el-col :span="2">Information Panel</el-col>
-    <el-col :span="10">Substrates</el-col>
-  </el-row>
+  <div class="page-content">
+    <SubstratesToolbar />
+    <el-row>
+      <el-col :span="2">Information Panel</el-col>
+      <el-col :span="10">Substrates</el-col>
+    </el-row>
+  </div>
 </template> 
