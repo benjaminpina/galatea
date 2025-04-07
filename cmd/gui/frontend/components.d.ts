@@ -8,12 +8,16 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    AgentsToolbar: typeof import('./src/components/AgentsToolbar.vue')['default']
     ElCol: typeof import('element-plus/es')['ElCol']
     ElMenu: typeof import('element-plus/es')['ElMenu']
     ElMenuItem: typeof import('element-plus/es')['ElMenuItem']
     ElRow: typeof import('element-plus/es')['ElRow']
+    EnvironmentsToolbar: typeof import('./src/components/EnvironmentsToolbar.vue')['default']
     MainToolbar: typeof import('./src/components/MainToolbar.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    StagesToolbar: typeof import('./src/components/StagesToolbar.vue')['default']
+    SubstratesToolbar: typeof import('./src/components/SubstratesToolbar.vue')['default']
   }
 }
