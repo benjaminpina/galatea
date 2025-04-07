@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
-const activeIndex = ref<string>('home')
+const activeIndex = ref<string>('projects')
 
 const handleSelect = (index: string) => {
     activeIndex.value = index
@@ -14,8 +14,8 @@ const handleSelect = (index: string) => {
 <template>
     <el-menu mode="horizontal" :default-active="activeIndex" @select="handleSelect">
         <el-menu-item>Galatea</el-menu-item>
-        <el-menu-item index="home">
-            <Icon icon="mdi:home" height="1.5em" /> Home
+        <el-menu-item index="projects">
+            <Icon icon="mdi:category" height="1.5em" /> Projects
         </el-menu-item>
         <el-menu-item index="environments">
             <Icon icon="mdi:nature-people" height="1.5em" /> Environments

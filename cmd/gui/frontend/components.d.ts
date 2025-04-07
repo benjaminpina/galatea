@@ -15,6 +15,7 @@ declare module 'vue' {
     ElRow: typeof import('element-plus/es')['ElRow']
     EnvironmentsToolbar: typeof import('./src/components/EnvironmentsToolbar.vue')['default']
     MainToolbar: typeof import('./src/components/MainToolbar.vue')['default']
+    ProjectsToolbar: typeof import('./src/components/ProjectsToolbar.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     StagesToolbar: typeof import('./src/components/StagesToolbar.vue')['default']
