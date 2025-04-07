@@ -1,7 +1,7 @@
 import {createApp} from 'vue'
 import ElementPlus from 'element-plus'
-import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import 'element-plus/dist/index.css'
+import { Icon } from '@iconify/vue';
 import VueKonva from 'vue-konva';
 import App from './App.vue'
 import pinia from './stores'
@@ -17,9 +17,7 @@ app.use(ElementPlus)
 app.use(VueKonva)
 app.use(router)
 
-// Register ElementPlus icons
-for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
-    app.component(key, component)
-}
+// Register Iconify icons
+app.component('Icon', Icon)
 
 app.mount('#app')
