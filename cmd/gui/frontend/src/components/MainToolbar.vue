@@ -1,18 +1,18 @@
 <script setup lang="ts">
-import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useNavStore } from '../stores/navStore'
 
+const navStore = useNavStore()
 const router = useRouter()
-const activePage = ref<string>('projects')
 
 const handleSelect = (index: string) => {
-    activePage.value = index
+    navStore.activePage = index
     router.push({ name: index })
 }
 </script>
 
 <template>
-    <el-menu class="fixed-menu" mode="horizontal" :default-active="activePage" @select="handleSelect">
+    <el-menu class="fixed-menu" mode="horizontal" :default-active="navStore.activePage" @select="handleSelect">
         <el-menu-item>Galatea</el-menu-item>
         <el-menu-item index="projects">
             <Icon icon="mdi:category" height="1.5em" /> Projects
