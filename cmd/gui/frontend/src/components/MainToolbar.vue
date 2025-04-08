@@ -3,16 +3,16 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
-const activeIndex = ref<string>('projects')
+const activePage = ref<string>('projects')
 
 const handleSelect = (index: string) => {
-    activeIndex.value = index
+    activePage.value = index
     router.push({ name: index })
 }
 </script>
 
 <template>
-    <el-menu class="fixed-menu" mode="horizontal" :default-active="activeIndex" @select="handleSelect">
+    <el-menu class="fixed-menu" mode="horizontal" :default-active="activePage" @select="handleSelect">
         <el-menu-item>Galatea</el-menu-item>
         <el-menu-item index="projects">
             <Icon icon="mdi:category" height="1.5em" /> Projects

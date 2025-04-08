@@ -8,17 +8,20 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
-    AgentsToolbar: typeof import('./src/components/AgentsToolbar.vue')['default']
-    ElCol: typeof import('element-plus/es')['ElCol']
+    AgentsMenu: typeof import('./src/components/AgentsMenu.vue')['default']
+    ElAside: typeof import('element-plus/es')['ElAside']
+    ElContainer: typeof import('element-plus/es')['ElContainer']
+    ElFooter: typeof import('element-plus/es')['ElFooter']
+    ElHeader: typeof import('element-plus/es')['ElHeader']
+    ElMain: typeof import('element-plus/es')['ElMain']
     ElMenu: typeof import('element-plus/es')['ElMenu']
     ElMenuItem: typeof import('element-plus/es')['ElMenuItem']
-    ElRow: typeof import('element-plus/es')['ElRow']
-    EnvironmentsToolbar: typeof import('./src/components/EnvironmentsToolbar.vue')['default']
+    EnvironmentsMenu: typeof import('./src/components/EnvironmentsMenu.vue')['default']
     MainToolbar: typeof import('./src/components/MainToolbar.vue')['default']
-    ProjectsToolbar: typeof import('./src/components/ProjectsToolbar.vue')['default']
+    ProjectsMenu: typeof import('./src/components/ProjectsMenu.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
-    StagesToolbar: typeof import('./src/components/StagesToolbar.vue')['default']
-    SubstratesToolbar: typeof import('./src/components/SubstratesToolbar.vue')['default']
+    StagesMenu: typeof import('./src/components/StagesMenu.vue')['default']
+    SubstratesMenu: typeof import('./src/components/SubstratesMenu.vue')['default']
   }
 }

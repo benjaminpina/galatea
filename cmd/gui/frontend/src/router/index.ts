@@ -7,16 +7,6 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('../pages/ProjectsPage.vue')
   },
   {
-    path: '/substrates',
-    name: 'substrates',
-    component: () => import('../pages/SubstratesPage.vue')
-  },
-  {
-    path: '/stages',
-    name: 'stages',
-    component: () => import('../pages/StagesPage.vue')
-  },
-  {
     path: '/agents',
     name: 'agents',
     component: () => import('../pages/AgentsPage.vue')
@@ -25,7 +15,17 @@ const routes: Array<RouteRecordRaw> = [
     path: '/environments',
     name: 'environments',
     component: () => import('../pages/EnvironmentsPage.vue')
-  }
+  },
+  {
+    path: '/stages',
+    name: 'stages',
+    component: () => import('../pages/StagesPage.vue')
+  },
+  {
+    path: '/substrates',
+    name: 'substrates',
+    component: () => import('../pages/SubstratesPage.vue')
+  },
 ];
 
 const router = createRouter({
