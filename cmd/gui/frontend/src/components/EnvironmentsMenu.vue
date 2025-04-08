@@ -15,7 +15,7 @@ const handleSelect = (index: string) => {
     <el-menu default-active="activeIndex" @select="handleSelect">
         <el-menu-item>Environments</el-menu-item>
         <el-menu-item index="projects">
-            <Icon icon="mdi:category" height="1.5em" /> Projects
+            <Icon icon="mdi:nature-people" height="1.5em" /> Environments
         </el-menu-item>
 
     </el-menu>

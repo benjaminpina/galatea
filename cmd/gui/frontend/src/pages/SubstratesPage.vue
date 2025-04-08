@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import MainToolbar from '../components/MainToolbar.vue'
+import SubstratesMenu from '../components/SubstratesMenu.vue'
 </script>
 
 <template>
@@ -7,7 +8,7 @@ import MainToolbar from '../components/MainToolbar.vue'
       <el-container>
         <el-header><MainToolbar /></el-header>
         <el-container>
-          <el-aside width="200px">Aside</el-aside>
+          <el-aside width="200px"><SubstratesMenu /></el-aside>
           <el-container>
             <el-main>Substrates</el-main>
             <el-footer>Footer</el-footer>
