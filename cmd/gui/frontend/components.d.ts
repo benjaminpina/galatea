@@ -10,6 +10,7 @@ declare module 'vue' {
   export interface GlobalComponents {
     AgentsMenu: typeof import('./src/components/AgentsMenu.vue')['default']
     ElAside: typeof import('element-plus/es')['ElAside']
+    ElBadge: typeof import('element-plus/es')['ElBadge']
     ElContainer: typeof import('element-plus/es')['ElContainer']
     ElFooter: typeof import('element-plus/es')['ElFooter']
     ElHeader: typeof import('element-plus/es')['ElHeader']
