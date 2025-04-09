@@ -4,15 +4,8 @@ package wire
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/google/wire"
-	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/cors"
-	"github.com/gofiber/fiber/v2/middleware/logger"
-	"github.com/gofiber/fiber/v2/middleware/recover"
-
-	"github.com/benjaminpina/galatea/internal/adapters/handlers/fiber/substrate"
 	"github.com/benjaminpina/galatea/internal/adapters/repositories/sqlite"
 	"github.com/benjaminpina/galatea/internal/config"
 	substratePort "github.com/benjaminpina/galatea/internal/core/ports/substrate"
@@ -44,32 +37,23 @@ var ServiceSet = wire.NewSet(
 	wire.Bind(new(substratePort.SubstrateSetService), new(*substrateService.SubstrateSetService)),
 )
 
-// HandlerSet is the provider set for handlers
-var HandlerSet = wire.NewSet(
-	ProvideSubstrateHandler,
-	ProvideMixedSubstrateHandler,
-	ProvideSubstrateSetHandler,
+// CoreSet is the provider set for core components
+var CoreSet = wire.NewSet(
+	DatabaseSet,
+	RepositorySet,
+	ServiceSet,
 )
 
-// AppSet is the provider set for the Fiber application
-var AppSet = wire.NewSet(
-	ProvideFiberApp,
-)
-
-// Application represents the complete application with all its dependencies
-type Application struct {
-	App                *fiber.App
+// CoreApplication represents the core application with all its dependencies
+type CoreApplication struct {
 	Config             *config.Config
 	Database           *sqlite.Database
 	SubstrateRepo      substratePort.SubstrateRepository
 	SubstrateSvc       substratePort.SubstrateService
-	SubstrateHdlr      *substrate.SubstrateHandler
 	MixedSubstrateRepo substratePort.MixedSubstrateRepository
 	MixedSubstrateSvc  substratePort.MixedSubstrateService
-	MixedSubstrateHdlr *substrate.MixedSubstrateHandler
 	SubstrateSetRepo   substratePort.SubstrateSetRepository
 	SubstrateSetSvc    substratePort.SubstrateSetService
-	SubstrateSetHdlr   *substrate.SubstrateSetHandler
 }
 
 // ProvideConfig provides the application configuration
@@ -120,72 +104,14 @@ func ProvideSubstrateSetService(repo substratePort.SubstrateSetRepository) *subs
 	return substrateService.NewSubstrateSetService(repo)
 }
 
-// ProvideSubstrateHandler provides the substrate handler
-func ProvideSubstrateHandler(svc substratePort.SubstrateService) *substrate.SubstrateHandler {
-	return substrate.NewSubstrateHandler(svc)
-}
-
-// ProvideMixedSubstrateHandler provides the mixed substrate handler
-func ProvideMixedSubstrateHandler(svc substratePort.MixedSubstrateService) *substrate.MixedSubstrateHandler {
-	return substrate.NewMixedSubstrateHandler(svc)
-}
-
-// ProvideSubstrateSetHandler provides the substrate set handler
-func ProvideSubstrateSetHandler(svc substratePort.SubstrateSetService) *substrate.SubstrateSetHandler {
-	return substrate.NewSubstrateSetHandler(svc)
-}
-
-// ProvideFiberApp provides the Fiber application
-func ProvideFiberApp() *fiber.App {
-	return fiber.New(fiber.Config{
-		AppName: "Galatea API",
-		ErrorHandler: func(c *fiber.Ctx, err error) error {
-			// Return standardized error response
-			code := fiber.StatusInternalServerError
-			if e, ok := err.(*fiber.Error); ok {
-				code = e.Code
-			}
-			return c.Status(code).JSON(fiber.Map{
-				"error": err.Error(),
-			})
-		},
-	})
-}
-
-// InitializeAPI initializes the API application with all its dependencies
-func InitializeAPI() (*Application, error) {
+// InitializeCore initializes the core application with all its dependencies
+func InitializeCore() (*CoreApplication, error) {
 	wire.Build(
 		ProvideConfig,
 		DatabaseSet,
 		RepositorySet,
 		ServiceSet,
-		HandlerSet,
-		AppSet,
-		wire.Struct(new(Application), "*"),
+		wire.Struct(new(CoreApplication), "*"),
 	)
 	return nil, nil
-}
-
-// SetupAPI configures the API application after initialization
-func SetupAPI(app *Application) error {
-	// Configure middleware
-	app.App.Use(logger.New())
-	app.App.Use(recover.New())
-	app.App.Use(cors.New())
-
-	// Register routes
-	app.SubstrateHdlr.RegisterRoutes(app.App)
-	app.MixedSubstrateHdlr.RegisterRoutes(app.App)
-	app.SubstrateSetHdlr.RegisterRoutes(app.App)
-
-	// Add health check route
-	app.App.Get("/health", func(c *fiber.Ctx) error {
-		return c.Status(fiber.StatusOK).JSON(fiber.Map{
-			"status": "ok",
-			"database": app.Config.DatabaseType,
-		})
-	})
-
-	log.Printf("API configured with database type: %s", app.Config.DatabaseType)
-	return nil
 }
