@@ -6,36 +6,16 @@ export function AddSubstrateToMix(arg1:string,arg2:substrate.SubstratePercentage
 
 export function CreateMixedSubstrate(arg1:substrate.MixedSubstrateRequest):Promise<substrate.MixedSubstrateResponse>;
 
-export function CreateSubstrate(arg1:substrate.SubstrateRequest):Promise<substrate.SubstrateResponse>;
-
-export function CreateSubstrateSet(arg1:substrate.SubstrateSetRequest):Promise<substrate.SubstrateSetResponse>;
-
 export function DeleteMixedSubstrate(arg1:string):Promise<void>;
-
-export function DeleteSubstrate(arg1:string):Promise<void>;
-
-export function DeleteSubstrateSet(arg1:string):Promise<void>;
 
 export function FindMixedSubstratesBySubstrateID(arg1:string,arg2:number,arg3:number):Promise<substrate.MixedSubstratePaginatedResponse>;
 
 export function GetMixedSubstrate(arg1:string):Promise<substrate.MixedSubstrateResponse>;
 
-export function GetSubstrate(arg1:string):Promise<substrate.SubstrateResponse>;
-
-export function GetSubstrateSet(arg1:string):Promise<substrate.SubstrateSetResponse>;
-
 export function ListMixedSubstrates(arg1:number,arg2:number):Promise<substrate.MixedSubstratePaginatedResponse>;
-
-export function ListSubstrateSets(arg1:number,arg2:number):Promise<substrate.SubstrateSetPaginatedResponse>;
-
-export function ListSubstrates(arg1:number,arg2:number):Promise<substrate.PaginatedResponse>;
 
 export function RemoveSubstrateFromMix(arg1:string,arg2:string):Promise<substrate.MixedSubstrateResponse>;
 
 export function UpdateMixedSubstrate(arg1:string,arg2:substrate.MixedSubstrateRequest):Promise<substrate.MixedSubstrateResponse>;
 
-export function UpdateSubstrate(arg1:string,arg2:substrate.SubstrateRequest):Promise<substrate.SubstrateResponse>;
-
 export function UpdateSubstratePercentage(arg1:string,arg2:substrate.SubstratePercentageRequest):Promise<substrate.MixedSubstrateResponse>;
-
-export function UpdateSubstrateSet(arg1:string,arg2:substrate.SubstrateSetRequest):Promise<substrate.SubstrateSetResponse>;
