@@ -1,6 +1,6 @@
 import { useQuery, useQueryClient } from "@tanstack/vue-query";
 
-import { ListSubstrates } from '../../../wailsjs/go/main/App'
+import { ListSubstrates } from '../../../wailsjs/go/main/SubstrateCRUD'
 import { useSubstratesStore } from '../../stores/substratesStore'
 
 
