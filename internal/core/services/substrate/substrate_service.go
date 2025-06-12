@@ -10,6 +10,11 @@ import (
 	"github.com/google/uuid"
 )
 
+// Error messages
+const (
+	ErrSubstrateNotFound = "substrate not found"
+)
+
 // SubstrateServiceImpl implements the SubstrateService interface
 type SubstrateServiceImpl struct {
 	repository substratePort.SubstrateRepository
@@ -62,7 +67,7 @@ func (s *SubstrateServiceImpl) GetSubstrate(id string) (*substrate.Substrate, er
 	}
 	
 	if sub == nil {
-		return nil, errors.New("substrate not found")
+		return nil, errors.New(ErrSubstrateNotFound)
 	}
 	
 	return sub, nil
@@ -77,7 +82,7 @@ func (s *SubstrateServiceImpl) UpdateSubstrate(id, name, color string) (*substra
 	}
 	
 	if !exists {
-		return nil, errors.New("substrate not found")
+		return nil, errors.New(ErrSubstrateNotFound)
 	}
 	
 	// Update substrate
@@ -104,7 +109,7 @@ func (s *SubstrateServiceImpl) DeleteSubstrate(id string) error {
 	}
 	
 	if !exists {
-		return errors.New("substrate not found")
+		return errors.New(ErrSubstrateNotFound)
 	}
 	
 	// Delete substrate
