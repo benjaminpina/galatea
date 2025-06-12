@@ -1,6 +1,7 @@
 package wire
 
 import (
+	filesubstrate "github.com/benjaminpina/galatea/internal/adapters/files/substrate"
 	guisubstrate "github.com/benjaminpina/galatea/internal/adapters/gui/substrate"
 	"github.com/benjaminpina/galatea/internal/adapters/repositories/sqlite"
 	"github.com/benjaminpina/galatea/internal/config"
@@ -16,30 +17,33 @@ var GUIAdapterSet = wire.NewSet(
 	guisubstrate.NewSubstrateSetAdapter,
 )
 
-// GUIApp representa la aplicación GUI con sus adaptadores
+// GUIApp represents the GUI application with its adapters
 type GUIApp struct {
-	Config                *config.Config
-	Database              *sqlite.Database
-	SubstrateAdapter      *guisubstrate.SubstrateAdapter
-	MixedSubstrateAdapter *guisubstrate.MixedSubstrateAdapter
-	SubstrateSetAdapter   *guisubstrate.SubstrateSetAdapter
+	Config                   *config.Config
+	Database                 *sqlite.Database
+	SubstrateAdapter         *guisubstrate.SubstrateAdapter
+	MixedSubstrateAdapter    *guisubstrate.MixedSubstrateAdapter
+	SubstrateSetAdapter      *guisubstrate.SubstrateSetAdapter
+	SubstrateFileService     substratePort.SubstrateFileService
+	MixedSubstrateFileService substratePort.MixedSubstrateFileService
+	SubstrateSetFileService  substratePort.SubstrateSetFileService
 }
 
-// InitializeGUI inicializa la aplicación GUI con inyección de dependencias
+// InitializeGUI initializes the GUI application with dependency injection
 func InitializeGUI() (*GUIApp, error) {
-	// Inicializar configuración
+	// Load the configuration
 	config, err := config.LoadConfig()
 	if err != nil {
 		return nil, err
 	}
 
-	// Inicializar base de datos
+	// Initialize the database
 	db, err := initDatabase(config)
 	if err != nil {
 		return nil, err
 	}
 
-	// Inicializar repositorios
+	// Initialize repositories
 	substrateRepo := provideSubstrateRepository(db)
 	mixedSubstrateRepo := provideMixedSubstrateRepository(db)
 	substrateSetRepo := provideSubstrateSetRepository(db)
@@ -48,19 +52,27 @@ func InitializeGUI() (*GUIApp, error) {
 	substrateService := provideSubstrateService(substrateRepo)
 	mixedSubstrateService := provideMixedSubstrateService(mixedSubstrateRepo, substrateService)
 	substrateSetService := provideSubstrateSetService(substrateSetRepo)
+	
+	// Initialize file services
+	substrateFileService := provideSubstrateFileService(substrateService)
+	mixedSubstrateFileService := provideMixedSubstrateFileService(mixedSubstrateService)
+	substrateSetFileService := provideSubstrateSetFileService(substrateSetService)
 
-	// Inicializar adaptadores para la GUI
+	// Initialize adapters for the GUI
 	substrateAdapter := guisubstrate.NewSubstrateAdapter(substrateService)
 	mixedSubstrateAdapter := guisubstrate.NewMixedSubstrateAdapter(mixedSubstrateService)
 	substrateSetAdapter := guisubstrate.NewSubstrateSetAdapter(substrateSetService)
 
-	// Crear la aplicación GUI
+	// Create the GUI application
 	app := &GUIApp{
-		Config:                config,
-		Database:              db,
-		SubstrateAdapter:      substrateAdapter,
-		MixedSubstrateAdapter: mixedSubstrateAdapter,
-		SubstrateSetAdapter:   substrateSetAdapter,
+		Config:                   config,
+		Database:                 db,
+		SubstrateAdapter:         substrateAdapter,
+		MixedSubstrateAdapter:    mixedSubstrateAdapter,
+		SubstrateSetAdapter:      substrateSetAdapter,
+		SubstrateFileService:     substrateFileService,
+		MixedSubstrateFileService: mixedSubstrateFileService,
+		SubstrateSetFileService:  substrateSetFileService,
 	}
 
 	return app, nil
@@ -76,32 +88,47 @@ func initDatabase(cfg *config.Config) (*sqlite.Database, error) {
 	return nil, nil
 }
 
-// provideSubstrateRepository proporciona el repositorio de sustratos
+// provideSubstrateRepository provides the substrate repository
 func provideSubstrateRepository(db *sqlite.Database) *sqlite.SubstrateRepository {
 	return sqlite.NewSubstrateRepository(db)
 }
 
-// provideMixedSubstrateRepository proporciona el repositorio de sustratos mixtos
+// provideMixedSubstrateRepository provides the mixed substrate repository
 func provideMixedSubstrateRepository(db *sqlite.Database) *sqlite.MixedSubstrateRepository {
 	return sqlite.NewMixedSubstrateRepository(db)
 }
 
-// provideSubstrateSetRepository proporciona el repositorio de conjuntos de sustratos
+// provideSubstrateSetRepository provides the substrate set repository
 func provideSubstrateSetRepository(db *sqlite.Database) *sqlite.SubstrateSetRepository {
 	return sqlite.NewSubstrateSetRepository(db)
 }
 
-// provideSubstrateService proporciona el servicio de sustratos
+// provideSubstrateService provides the substrate service
 func provideSubstrateService(repo substratePort.SubstrateRepository) *substrateService.SubstrateServiceImpl {
 	return substrateService.NewSubstrateService(repo)
 }
 
-// provideMixedSubstrateService proporciona el servicio de sustratos mixtos
+// provideMixedSubstrateService provides the mixed substrate service
 func provideMixedSubstrateService(repo substratePort.MixedSubstrateRepository, substrateSvc substratePort.SubstrateService) *substrateService.MixedSubstrateServiceImpl {
 	return substrateService.NewMixedSubstrateService(repo, substrateSvc)
 }
 
-// provideSubstrateSetService proporciona el servicio de conjuntos de sustratos
+// provideSubstrateSetService provides the substrate set service
 func provideSubstrateSetService(repo substratePort.SubstrateSetRepository) *substrateService.SubstrateSetService {
 	return substrateService.NewSubstrateSetService(repo)
+}
+
+// provideSubstrateFileService provides the file service for substrates
+func provideSubstrateFileService(substrateSvc substratePort.SubstrateService) substratePort.SubstrateFileService {
+	return filesubstrate.NewFileService(substrateSvc)
+}
+
+// provideMixedSubstrateFileService provides the file service for mixed substrates
+func provideMixedSubstrateFileService(mixedSubstrateSvc substratePort.MixedSubstrateService) substratePort.MixedSubstrateFileService {
+	return filesubstrate.NewMixedFileService(mixedSubstrateSvc)
+}
+
+// provideSubstrateSetFileService provides the file service for substrate sets
+func provideSubstrateSetFileService(substrateSetSvc substratePort.SubstrateSetService) substratePort.SubstrateSetFileService {
+	return filesubstrate.NewSetFileService(substrateSetSvc)
 }
