@@ -53,6 +53,11 @@ func NewMixedSubstrateAdapter(service ports.MixedSubstrateService) *MixedSubstra
 	}
 }
 
+// GetService returns the underlying mixed substrate service
+func (a *MixedSubstrateAdapter) GetService() ports.MixedSubstrateService {
+	return a.service
+}
+
 // CreateMixedSubstrate creates a new mixed substrate
 func (a *MixedSubstrateAdapter) CreateMixedSubstrate(req MixedSubstrateRequest) (*MixedSubstrateResponse, error) {
 	// Create the mixed substrate using the service

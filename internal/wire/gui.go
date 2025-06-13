@@ -15,6 +15,9 @@ var GUIAdapterSet = wire.NewSet(
 	guisubstrate.NewSubstrateAdapter,
 	guisubstrate.NewMixedSubstrateAdapter,
 	guisubstrate.NewSubstrateSetAdapter,
+	guisubstrate.NewSubstrateFileAdapter,
+	guisubstrate.NewMixedSubstrateFileAdapter,
+	guisubstrate.NewSubstrateSetFileAdapter,
 )
 
 // GUIApp represents the GUI application with its adapters
@@ -24,9 +27,9 @@ type GUIApp struct {
 	SubstrateAdapter         *guisubstrate.SubstrateAdapter
 	MixedSubstrateAdapter    *guisubstrate.MixedSubstrateAdapter
 	SubstrateSetAdapter      *guisubstrate.SubstrateSetAdapter
-	SubstrateFileService     substratePort.SubstrateFileService
-	MixedSubstrateFileService substratePort.MixedSubstrateFileService
-	SubstrateSetFileService  substratePort.SubstrateSetFileService
+	SubstrateFileAdapter     *guisubstrate.SubstrateFileAdapter
+	MixedSubstrateFileAdapter *guisubstrate.MixedSubstrateFileAdapter
+	SubstrateSetFileAdapter  *guisubstrate.SubstrateSetFileAdapter
 }
 
 // InitializeGUI initializes the GUI application with dependency injection
@@ -62,6 +65,11 @@ func InitializeGUI() (*GUIApp, error) {
 	substrateAdapter := guisubstrate.NewSubstrateAdapter(substrateService)
 	mixedSubstrateAdapter := guisubstrate.NewMixedSubstrateAdapter(mixedSubstrateService)
 	substrateSetAdapter := guisubstrate.NewSubstrateSetAdapter(substrateSetService)
+	
+	// Initialize file adapters for the GUI
+	substrateFileAdapter := guisubstrate.NewSubstrateFileAdapter(substrateFileService)
+	mixedSubstrateFileAdapter := guisubstrate.NewMixedSubstrateFileAdapter(mixedSubstrateFileService)
+	substrateSetFileAdapter := guisubstrate.NewSubstrateSetFileAdapter(substrateSetFileService)
 
 	// Create the GUI application
 	app := &GUIApp{
@@ -70,9 +78,9 @@ func InitializeGUI() (*GUIApp, error) {
 		SubstrateAdapter:         substrateAdapter,
 		MixedSubstrateAdapter:    mixedSubstrateAdapter,
 		SubstrateSetAdapter:      substrateSetAdapter,
-		SubstrateFileService:     substrateFileService,
-		MixedSubstrateFileService: mixedSubstrateFileService,
-		SubstrateSetFileService:  substrateSetFileService,
+		SubstrateFileAdapter:     substrateFileAdapter,
+		MixedSubstrateFileAdapter: mixedSubstrateFileAdapter,
+		SubstrateSetFileAdapter:  substrateSetFileAdapter,
 	}
 
 	return app, nil

@@ -38,6 +38,11 @@ func NewSubstrateSetAdapter(service ports.SubstrateSetService) *SubstrateSetAdap
 	}
 }
 
+// GetService returns the underlying substrate set service
+func (a *SubstrateSetAdapter) GetService() ports.SubstrateSetService {
+	return a.service
+}
+
 // CreateSubstrateSet creates a new substrate set
 func (a *SubstrateSetAdapter) CreateSubstrateSet(req SubstrateSetRequest) (*SubstrateSetResponse, error) {
 	// Create the substrate set using the service

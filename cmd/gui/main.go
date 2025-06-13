@@ -27,6 +27,11 @@ func main() {
 	substrateCRUD := NewSubstrateCRUD(guiApp.SubstrateAdapter)
 	mixedSubstrateCRUD := NewMixedSubstrateCRUD(guiApp.MixedSubstrateAdapter)
 	substrateSetCRUD := NewSubstrateSetCRUD(guiApp.SubstrateSetAdapter)
+	
+	// Create file operation instances
+	substrateFileOps := NewSubstrateFileOperations(guiApp.SubstrateFileAdapter, guiApp.SubstrateAdapter.GetService())
+	mixedSubstrateFileOps := NewMixedSubstrateFileOperations(guiApp.MixedSubstrateFileAdapter, guiApp.MixedSubstrateAdapter.GetService())
+	substrateSetFileOps := NewSubstrateSetFileOperations(guiApp.SubstrateSetFileAdapter, guiApp.SubstrateSetAdapter.GetService())
 
 	// Create application with options
 	err = wails.Run(&options.App{
@@ -43,6 +48,9 @@ func main() {
 			substrateCRUD,
 			mixedSubstrateCRUD,
 			substrateSetCRUD,
+			substrateFileOps,
+			mixedSubstrateFileOps,
+			substrateSetFileOps,
 		},
 	})
 

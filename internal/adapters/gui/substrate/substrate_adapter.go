@@ -37,6 +37,11 @@ func NewSubstrateAdapter(service ports.SubstrateService) *SubstrateAdapter {
 	}
 }
 
+// GetService returns the underlying substrate service
+func (a *SubstrateAdapter) GetService() ports.SubstrateService {
+	return a.service
+}
+
 // CreateSubstrate creates a new substrate
 func (a *SubstrateAdapter) CreateSubstrate(req SubstrateRequest) (*SubstrateResponse, error) {
 	// Create the substrate using the service
@@ -99,27 +104,26 @@ func (a *SubstrateAdapter) DeleteSubstrate(id string) error {
 
 // List gets a paginated list of substrates
 func (a *SubstrateAdapter) List(page, pageSize int) (*PaginatedResponse, error) {
-	// Get paginated substrates using the service
+	// Get the substrates using the service
 	subs, pagination, err := a.service.List(page, pageSize)
 	if err != nil {
 		return nil, err
 	}
 
-	// Convert to responses
-	resp := make([]SubstrateResponse, len(subs))
+	// Convert to response
+	data := make([]SubstrateResponse, len(subs))
 	for i, sub := range subs {
-		resp[i] = SubstrateResponse{
+		data[i] = SubstrateResponse{
 			ID:    sub.ID,
 			Name:  sub.Name,
 			Color: sub.Color,
 		}
 	}
 
-	// Create paginated response
-	paginatedResp := &PaginatedResponse{
-		Data:       resp,
+	return &PaginatedResponse{
+		Data: data,
 		Pagination: guiCommon.MapPaginationInfo(pagination),
-	}
-
-	return paginatedResp, nil
+	}, nil
 }
+
+
