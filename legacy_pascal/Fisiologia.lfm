@@ -1,0 +1,794 @@
+object frmFisiologia: TfrmFisiologia
+  Left = 280
+  Height = 493
+  Top = 156
+  Width = 777
+  ActiveControl = PageControl1
+  BorderStyle = bsDialog
+  Caption = 'Physiology'
+  ClientHeight = 493
+  ClientWidth = 777
+  Font.Height = -11
+  Font.Name = 'MS Sans Serif'
+  OnClose = FormClose
+  OnCreate = FormCreate
+  Position = poScreenCenter
+  ShowHint = True
+  LCLVersion = '0.9.30'
+  object Label16: TLabel
+    Left = 16
+    Height = 15
+    Top = 440
+    Width = 299
+    Caption = 'Double click on blue controls to open formula editor.'
+    ParentColor = False
+  end
+  object spbNotas: TSpeedButton
+    Left = 512
+    Height = 33
+    Hint = 'Note Edit|Open Note Edit'
+    Top = 448
+    Width = 33
+    Glyph.Data = {
+      F6000000424DF600000000000000760000002800000010000000100000000100
+      0400000000008000000000000000000000001000000000000000000000000000
+      80000080000000808000800000008000800080800000C0C0C000808080000000
+      FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFFFF00333333000000
+      00003333330FFFFFFFF000300000FF0F00F0E00BFBFB0FFFFFF0E0BFBF000FFF
+      F0F0E0FBFBFBF0F00FF0E0BFBF00000B0FF0E0FBFBFBFBF0FFF0E0BF0000000F
+      FFF0000BFB00B0FF00F03330000B0FFFFFF0333330B0FFFF000033330B0FF00F
+      0FF03330B00FFFFF0F033309030FFFFF00333330330000000333
+    }
+    NumGlyphs = 0
+    OnClick = spbNotasClick
+  end
+  object btbCancelar: TBitBtn
+    Left = 576
+    Height = 33
+    Top = 448
+    Width = 89
+    Caption = '&Cancel'
+    Kind = bkCancel
+    ModalResult = 2
+    NumGlyphs = 0
+    TabOrder = 2
+  end
+  object PageControl1: TPageControl
+    Left = 8
+    Height = 420
+    Top = 16
+    Width = 753
+    ActivePage = TabSheet1
+    TabIndex = 0
+    TabOrder = 0
+    OnChange = PageControl1Change
+    object TabSheet1: TTabSheet
+      Caption = '&Metabolism'
+      ClientHeight = 383
+      ClientWidth = 745
+      object stgMetabolismo: TStringGrid
+        Left = 6
+        Height = 168
+        Top = 10
+        Width = 736
+        Color = clSkyBlue
+        ColCount = 6
+        Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goEditing, goSmoothScroll]
+        TabOrder = 0
+        TitleFont.Height = -11
+        TitleFont.Name = 'MS Sans Serif'
+        OnDblClick = stgMetabolismoDblClick
+      end
+    end
+    object TabSheet3: TTabSheet
+      Caption = 'M&ovement'
+      ClientHeight = 383
+      ClientWidth = 745
+      ImageIndex = 2
+      object GroupBox3: TGroupBox
+        Left = 8
+        Height = 139
+        Top = 8
+        Width = 729
+        Caption = 'Cost'
+        ClientHeight = 123
+        ClientWidth = 725
+        TabOrder = 0
+        object stgMovimiento: TStringGrid
+          Left = 12
+          Height = 100
+          Top = 3
+          Width = 703
+          Color = clSkyBlue
+          Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goEditing, goSmoothScroll]
+          RowCount = 3
+          TabOrder = 0
+          TitleFont.Height = -11
+          TitleFont.Name = 'MS Sans Serif'
+          OnDblClick = stgMovimientoDblClick
+        end
+      end
+      object GroupBox4: TGroupBox
+        Left = -2
+        Height = 121
+        Top = 146
+        Width = 739
+        Caption = 'Speed (squares per cycle)'
+        ClientHeight = 105
+        ClientWidth = 735
+        TabOrder = 1
+        object stgVelocidad: TStringGrid
+          Left = 22
+          Height = 84
+          Top = 1
+          Width = 703
+          Color = clSkyBlue
+          ColCount = 8
+          Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goEditing, goSmoothScroll]
+          RowCount = 2
+          TabOrder = 0
+          TitleFont.Height = -11
+          TitleFont.Name = 'MS Sans Serif'
+          OnDblClick = stgVelocidadDblClick
+        end
+      end
+      object btnImportar: TButton
+        Left = 528
+        Height = 33
+        Top = 283
+        Width = 209
+        Caption = '&Import subtrates names'
+        OnClick = btnImportarClick
+        TabOrder = 2
+      end
+    end
+    object TabSheet5: TTabSheet
+      Caption = 'F&oraging'
+      ClientHeight = 383
+      ClientWidth = 745
+      ImageIndex = 7
+      object GroupBox10: TGroupBox
+        Left = 6
+        Height = 165
+        Top = 2
+        Width = 729
+        Caption = 'Cost'
+        ClientHeight = 149
+        ClientWidth = 725
+        TabOrder = 0
+        object stgAlimentacion: TStringGrid
+          Left = 8
+          Height = 126
+          Top = 1
+          Width = 706
+          Color = clSkyBlue
+          Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goEditing, goSmoothScroll]
+          TabOrder = 0
+          TitleFont.Height = -11
+          TitleFont.Name = 'MS Sans Serif'
+          OnDblClick = stgAlimentacionDblClick
+        end
+      end
+      object GroupBox11: TGroupBox
+        Left = 8
+        Height = 129
+        Top = 176
+        Width = 729
+        Caption = 'Benefits (nutrient units taken)'
+        ClientHeight = 113
+        ClientWidth = 725
+        TabOrder = 1
+        object Label34: TLabel
+          Left = 8
+          Height = 15
+          Top = 13
+          Width = 36
+          Caption = '&Water:'
+          FocusControl = edtAgua
+          ParentColor = False
+        end
+        object Label35: TLabel
+          Left = 8
+          Height = 15
+          Top = 59
+          Width = 86
+          Caption = 'Carbo&hidrates:'
+          FocusControl = edtAzucar
+          ParentColor = False
+        end
+        object Label36: TLabel
+          Left = 378
+          Height = 15
+          Top = 11
+          Width = 38
+          Caption = '&Lipids:'
+          FocusControl = edtGrasa
+          ParentColor = False
+        end
+        object Label37: TLabel
+          Left = 384
+          Height = 15
+          Top = 56
+          Width = 45
+          Caption = '&Protein:'
+          FocusControl = edtProteina
+          ParentColor = False
+        end
+        object edtAgua: TEdit
+          Left = 8
+          Height = 22
+          Top = 29
+          Width = 330
+          Color = clSkyBlue
+          OnDblClick = edtAguaDblClick
+          OnMouseUp = edtAguaMouseUp
+          TabOrder = 0
+          Text = 'edtAgua'
+        end
+        object edtAzucar: TEdit
+          Left = 10
+          Height = 22
+          Top = 75
+          Width = 330
+          Color = clSkyBlue
+          OnDblClick = edtAzucarDblClick
+          OnMouseUp = edtAzucarMouseUp
+          TabOrder = 1
+          Text = 'edtAzucar'
+        end
+        object edtGrasa: TEdit
+          Left = 384
+          Height = 22
+          Top = 27
+          Width = 330
+          Color = clSkyBlue
+          OnDblClick = edtGrasaDblClick
+          OnMouseUp = edtGrasaMouseUp
+          TabOrder = 2
+          Text = 'edtGrasa'
+        end
+        object edtProteina: TEdit
+          Left = 384
+          Height = 22
+          Top = 75
+          Width = 330
+          Color = clSkyBlue
+          OnDblClick = edtProteinaDblClick
+          OnMouseUp = edtProteinaMouseUp
+          TabOrder = 3
+          Text = 'edtProteina'
+        end
+      end
+    end
+    object TabSheet2: TTabSheet
+      Caption = 'F&ighting'
+      ClientHeight = 383
+      ClientWidth = 745
+      ImageIndex = 2
+      object GroupBox5: TGroupBox
+        Left = 6
+        Height = 185
+        Top = 2
+        Width = 729
+        Caption = 'Cost'
+        ClientHeight = 169
+        ClientWidth = 725
+        TabOrder = 0
+        object stgCombate: TStringGrid
+          Left = 6
+          Height = 144
+          Top = 1
+          Width = 706
+          Color = clSkyBlue
+          Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goEditing, goSmoothScroll]
+          RowCount = 4
+          TabOrder = 0
+          TitleFont.Height = -11
+          TitleFont.Name = 'MS Sans Serif'
+          OnDblClick = stgCombateDblClick
+        end
+      end
+    end
+    object TabSheet4: TTabSheet
+      Caption = 'M-F &interaction'
+      ClientHeight = 383
+      ClientWidth = 745
+      ImageIndex = 3
+      object GroupBox6: TGroupBox
+        Left = 8
+        Height = 265
+        Top = 16
+        Width = 729
+        Caption = 'Costs'
+        ClientHeight = 249
+        ClientWidth = 725
+        TabOrder = 0
+        object stgCortejo: TStringGrid
+          Left = 12
+          Height = 220
+          Top = 3
+          Width = 704
+          Color = clSkyBlue
+          Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goEditing, goSmoothScroll]
+          RowCount = 7
+          TabOrder = 0
+          TitleFont.Height = -11
+          TitleFont.Name = 'MS Sans Serif'
+          OnDblClick = stgCortejoDblClick
+        end
+      end
+    end
+    object TabSheet6: TTabSheet
+      Caption = '&Gamete production'
+      ClientHeight = 383
+      ClientWidth = 745
+      ImageIndex = 5
+      object Label3: TLabel
+        Left = 8
+        Height = 15
+        Top = 16
+        Width = 122
+        Caption = 'Max number of &eggs:'
+        FocusControl = edtMaximoH
+        ParentColor = False
+      end
+      object Label1: TLabel
+        Left = 8
+        Height = 15
+        Top = 202
+        Width = 168
+        Caption = 'Max number of &sperm packs:'
+        FocusControl = edtMaximoP
+        ParentColor = False
+      end
+      object edtMaximoH: TEdit
+        Left = 8
+        Height = 22
+        Top = 32
+        Width = 721
+        Color = clSkyBlue
+        OnDblClick = edtMaximoHDblClick
+        OnMouseUp = edtMaximoHMouseUp
+        TabOrder = 0
+        Text = 'edtMaximoH'
+      end
+      object edtMaximoP: TEdit
+        Left = 8
+        Height = 22
+        Top = 218
+        Width = 721
+        Color = clSkyBlue
+        OnDblClick = edtMaximoPDblClick
+        OnMouseUp = edtMaximoPMouseUp
+        TabOrder = 2
+        Text = 'edtMaximoP'
+      end
+      object GroupBox1: TGroupBox
+        Left = 8
+        Height = 121
+        Top = 56
+        Width = 729
+        Caption = 'Energetic costs of each egg'
+        ClientHeight = 105
+        ClientWidth = 725
+        TabOrder = 1
+        object Label4: TLabel
+          Left = 14
+          Height = 15
+          Top = 3
+          Width = 36
+          Caption = '&Water:'
+          FocusControl = edtAguaH
+          ParentColor = False
+        end
+        object Label5: TLabel
+          Left = 14
+          Height = 15
+          Top = 51
+          Width = 38
+          Caption = '&Lipids:'
+          FocusControl = edtGrasaH
+          ParentColor = False
+        end
+        object Label6: TLabel
+          Left = 368
+          Height = 15
+          Top = 3
+          Width = 86
+          Caption = 'Ca&rbohidrates:'
+          FocusControl = edtAzucarH
+          ParentColor = False
+        end
+        object Label7: TLabel
+          Left = 368
+          Height = 15
+          Top = 48
+          Width = 45
+          Caption = '&Protein:'
+          FocusControl = edtProteinasH
+          ParentColor = False
+        end
+        object edtAguaH: TEdit
+          Left = 14
+          Height = 22
+          Top = 24
+          Width = 330
+          Color = clSkyBlue
+          OnDblClick = edtAguaHDblClick
+          OnMouseUp = edtAguaHMouseUp
+          TabOrder = 0
+          Text = 'edtAguaH'
+        end
+        object edtGrasaH: TEdit
+          Left = 14
+          Height = 22
+          Top = 67
+          Width = 330
+          Color = clSkyBlue
+          OnDblClick = edtGrasaHDblClick
+          OnMouseUp = edtGrasaHMouseUp
+          TabOrder = 1
+          Text = 'edtGrasaH'
+        end
+        object edtAzucarH: TEdit
+          Left = 368
+          Height = 22
+          Top = 24
+          Width = 330
+          Color = clSkyBlue
+          OnDblClick = edtAzucarHDblClick
+          OnMouseUp = edtAzucarHMouseUp
+          TabOrder = 2
+          Text = 'edtAzucarH'
+        end
+        object edtProteinasH: TEdit
+          Left = 368
+          Height = 22
+          Top = 67
+          Width = 330
+          Color = clSkyBlue
+          OnDblClick = edtProteinasHDblClick
+          OnMouseUp = edtProteinasHMouseUp
+          TabOrder = 3
+          Text = 'edtProteinasH'
+        end
+      end
+      object GroupBox2: TGroupBox
+        Left = 8
+        Height = 128
+        Top = 242
+        Width = 729
+        Caption = 'Energetic cost of each sperm pack'
+        ClientHeight = 112
+        ClientWidth = 725
+        TabOrder = 3
+        object Label2: TLabel
+          Left = 14
+          Height = 15
+          Top = 2
+          Width = 36
+          Caption = '&Water:'
+          FocusControl = edtAguaP
+          ParentColor = False
+        end
+        object Label8: TLabel
+          Left = 16
+          Height = 15
+          Top = 51
+          Width = 38
+          Caption = 'L&ipids:'
+          FocusControl = edtGrasaP
+          ParentColor = False
+        end
+        object Label9: TLabel
+          Left = 368
+          Height = 15
+          Top = 2
+          Width = 86
+          Caption = 'Car&bohidrates:'
+          FocusControl = edtAzucarP
+          ParentColor = False
+        end
+        object Label10: TLabel
+          Left = 368
+          Height = 15
+          Top = 51
+          Width = 45
+          Caption = 'Pro&tein:'
+          FocusControl = edtProteinasP
+          ParentColor = False
+        end
+        object edtAguaP: TEdit
+          Left = 14
+          Height = 22
+          Top = 21
+          Width = 330
+          Color = clSkyBlue
+          OnDblClick = edtAguaPDblClick
+          OnMouseUp = edtAguaPMouseUp
+          TabOrder = 0
+          Text = 'edtAguaP'
+        end
+        object edtGrasaP: TEdit
+          Left = 14
+          Height = 22
+          Top = 74
+          Width = 330
+          Color = clSkyBlue
+          OnDblClick = edtGrasaPDblClick
+          OnMouseUp = edtGrasaPMouseUp
+          TabOrder = 1
+          Text = 'edtGrasaP'
+        end
+        object edtAzucarP: TEdit
+          Left = 368
+          Height = 22
+          Top = 21
+          Width = 330
+          Color = clSkyBlue
+          OnDblClick = edtAzucarPDblClick
+          OnMouseUp = edtAzucarPMouseUp
+          TabOrder = 2
+          Text = 'edtAzucarP'
+        end
+        object edtProteinasP: TEdit
+          Left = 368
+          Height = 22
+          Top = 74
+          Width = 330
+          Color = clSkyBlue
+          OnDblClick = edtProteinasPDblClick
+          OnMouseUp = edtProteinasPMouseUp
+          TabOrder = 3
+          Text = 'edtProteinasP'
+        end
+      end
+    end
+    object TabSheet7: TTabSheet
+      Caption = 'Gametes &dynamic'
+      ClientHeight = 383
+      ClientWidth = 745
+      ImageIndex = 6
+      object GroupBox7: TGroupBox
+        Left = 8
+        Height = 152
+        Top = 8
+        Width = 729
+        Caption = 'Sperm packs'
+        ClientHeight = 136
+        ClientWidth = 725
+        TabOrder = 0
+        object Label26: TLabel
+          Left = 4
+          Height = 15
+          Top = 3
+          Width = 341
+          Caption = 'Number of &sperm packs given per copula (male vs female):'
+          FocusControl = edtEsperma
+          ParentColor = False
+        end
+        object Label27: TLabel
+          Left = 3
+          Height = 15
+          Top = 41
+          Width = 283
+          Caption = 'Max number of sperm &packs storaged by female:'
+          FocusControl = edtMaxPaquetes
+          ParentColor = False
+        end
+        object Label28: TLabel
+          Left = 6
+          Height = 15
+          Top = 81
+          Width = 318
+          Caption = 'C&onsuption rate of sperm pack nutrients (0-1) (female):'
+          FocusControl = edtConsumoPaquete
+          ParentColor = False
+        end
+        object edtEsperma: TEdit
+          Left = 4
+          Height = 22
+          Top = 17
+          Width = 713
+          Color = clSkyBlue
+          OnDblClick = edtEspermaDblClick
+          OnMouseUp = edtEspermaMouseUp
+          TabOrder = 0
+          Text = 'edtEsperma'
+        end
+        object edtMaxPaquetes: TEdit
+          Left = 4
+          Height = 22
+          Top = 59
+          Width = 713
+          Color = clSkyBlue
+          OnDblClick = edtMaxPaquetesDblClick
+          OnMouseUp = edtMaxPaquetesMouseUp
+          TabOrder = 1
+          Text = 'edtMaxPaquetes'
+        end
+        object edtConsumoPaquete: TEdit
+          Left = 4
+          Height = 22
+          Top = 97
+          Width = 713
+          Color = clSkyBlue
+          OnDblClick = edtConsumoPaqueteDblClick
+          OnMouseUp = edtConsumoPaqueteMouseUp
+          TabOrder = 2
+          Text = 'edtConsumoPaquete'
+        end
+      end
+      object GroupBox9: TGroupBox
+        Left = 4
+        Height = 152
+        Top = 160
+        Width = 729
+        Caption = 'Fertilization'
+        ClientHeight = 136
+        ClientWidth = 725
+        TabOrder = 1
+        object Label29: TLabel
+          Left = 8
+          Height = 15
+          Top = 1
+          Width = 375
+          Caption = 'Fraction of e&ggs fertilized just after copula (0-1) (female vs male):'
+          FocusControl = edtFertilizados
+          ParentColor = False
+        end
+        object Label30: TLabel
+          Left = 8
+          Height = 15
+          Top = 41
+          Width = 233
+          Caption = 'Probabilit&y of paternity (female vs male):'
+          ParentColor = False
+        end
+        object Label11: TLabel
+          Left = 10
+          Height = 15
+          Top = 81
+          Width = 288
+          Caption = 'Rate of sperm degradation (0-1) (female vs male):'
+          FocusControl = edtDegradacion
+          ParentColor = False
+        end
+        object edtFertilizados: TEdit
+          Left = 8
+          Height = 22
+          Top = 17
+          Width = 713
+          Color = clSkyBlue
+          OnDblClick = edtFertilizadosDblClick
+          OnMouseUp = edtFertilizadosMouseUp
+          TabOrder = 0
+          Text = 'edtFertilizados'
+        end
+        object edtPaternidad: TEdit
+          Left = 8
+          Height = 22
+          Top = 57
+          Width = 713
+          Color = clSkyBlue
+          OnDblClick = edtPaternidadDblClick
+          OnMouseUp = edtPaternidadMouseUp
+          TabOrder = 1
+          Text = 'edtPaternidad'
+        end
+        object edtDegradacion: TEdit
+          Left = 8
+          Height = 22
+          Top = 99
+          Width = 713
+          Color = clSkyBlue
+          OnDblClick = edtDegradacionDblClick
+          OnMouseUp = edtDegradacionMouseUp
+          TabOrder = 2
+          Text = 'edtDegradacion'
+        end
+      end
+      object GroupBox8: TGroupBox
+        Left = 4
+        Height = 66
+        Top = 312
+        Width = 729
+        Caption = 'Oviposition'
+        ClientHeight = 50
+        ClientWidth = 725
+        TabOrder = 2
+        object Label31: TLabel
+          Left = 8
+          Height = 15
+          Top = 0
+          Width = 150
+          Caption = 'Eggs o&viposited per cycle:'
+          FocusControl = edtHuevos
+          ParentColor = False
+        end
+        object edtHuevos: TEdit
+          Left = 8
+          Height = 22
+          Top = 16
+          Width = 713
+          Color = clSkyBlue
+          OnDblClick = edtHuevosDblClick
+          OnMouseUp = edtHuevosMouseUp
+          TabOrder = 0
+          Text = 'edtHuevos'
+        end
+      end
+    end
+    object TabSheet8: TTabSheet
+      Caption = '&Energetic loss'
+      ClientHeight = 383
+      ClientWidth = 745
+      ImageIndex = 7
+      object GroupBox12: TGroupBox
+        Left = 8
+        Height = 177
+        Top = 32
+        Width = 729
+        ClientHeight = 173
+        ClientWidth = 725
+        TabOrder = 0
+        object Label32: TLabel
+          Left = 4
+          Height = 15
+          Top = 11
+          Width = 307
+          Caption = 'Sperm pack energetic value lost for female use (0-1):'
+          ParentColor = False
+        end
+        object Label33: TLabel
+          Left = 4
+          Height = 15
+          Top = 91
+          Width = 257
+          Caption = 'Egg energetic value lost for  agent use (0-1):'
+          ParentColor = False
+        end
+        object edtFraccionPaquete: TEdit
+          Left = 4
+          Height = 22
+          Top = 35
+          Width = 710
+          Color = clSkyBlue
+          OnDblClick = edtFraccionPaqueteDblClick
+          OnMouseUp = edtFraccionPaqueteMouseUp
+          TabOrder = 0
+          Text = 'edtFraccionPaquete'
+        end
+        object edtFraccionHuevo: TEdit
+          Left = 4
+          Height = 22
+          Top = 115
+          Width = 710
+          Color = clSkyBlue
+          OnDblClick = edtFraccionHuevoDblClick
+          OnMouseUp = edtFraccionHuevoMouseUp
+          TabOrder = 1
+          Text = 'edtFraccionHuevo'
+        end
+      end
+    end
+  end
+  object btbAceptar: TBitBtn
+    Left = 674
+    Height = 33
+    Top = 448
+    Width = 89
+    Caption = '&OK'
+    Kind = bkOK
+    ModalResult = 1
+    NumGlyphs = 0
+    OnClick = btbAceptarClick
+    TabOrder = 1
+  end
+  object OpenDialog1: TOpenDialog
+    Filter = 'Galatea Set of Substrates|*.sgl'
+    Options = [ofFileMustExist, ofEnableSizing, ofViewDetail]
+    left = 448
+    top = 448
+  end
+end

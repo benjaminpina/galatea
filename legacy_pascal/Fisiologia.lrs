@@ -1,0 +1,233 @@
+{ This is an automatically generated lazarus resource file }
+
+LazarusResources.Add('TfrmFisiologia','FORMDATA',[
+  'TPF0'#14'TfrmFisiologia'#13'frmFisiologia'#4'Left'#3#24#1#6'Height'#3#237#1#3
+  +'Top'#3#156#0#5'Width'#3#9#3#13'ActiveControl'#7#12'PageControl1'#11'BorderS'
+  +'tyle'#7#8'bsDialog'#7'Caption'#6#10'Physiology'#12'ClientHeight'#3#237#1#11
+  +'ClientWidth'#3#9#3#11'Font.Height'#2#245#9'Font.Name'#6#13'MS Sans Serif'#7
+  +'OnClose'#7#9'FormClose'#8'OnCreate'#7#10'FormCreate'#8'Position'#7#14'poScr'
+  +'eenCenter'#8'ShowHint'#9#10'LCLVersion'#6#6'0.9.30'#0#6'TLabel'#7'Label16'#4
+  +'Left'#2#16#6'Height'#2#15#3'Top'#3#184#1#5'Width'#3'+'#1#7'Caption'#6'5Doub'
+  +'le click on blue controls to open formula editor.'#11'ParentColor'#8#0#0#12
+  +'TSpeedButton'#8'spbNotas'#4'Left'#3#0#2#6'Height'#2'!'#4'Hint'#6#24'Note Ed'
+  +'it|Open Note Edit'#3'Top'#3#192#1#5'Width'#2'!'#10'Glyph.Data'#10#250#0#0#0
+  +#246#0#0#0'BM'#246#0#0#0#0#0#0#0'v'#0#0#0'('#0#0#0#16#0#0#0#16#0#0#0#1#0#4#0
+  +#0#0#0#0#128#0#0#0#0#0#0#0#0#0#0#0#16#0#0#0#0#0#0#0#0#0#0#0#0#0#128#0#0#128#0
+  +#0#0#128#128#0#128#0#0#0#128#0#128#0#128#128#0#0#192#192#192#0#128#128#128#0
+  +#0#0#255#0#0#255#0#0#0#255#255#0#255#0#0#0#255#0#255#0#255#255#0#0#255#255
+  +#255#0'333'#0#0#0#0#0'333'#15#255#255#255#240#0'0'#0#0#255#15#0#240#224#11
+  +#251#251#15#255#255#240#224#191#191#0#15#255#240#240#224#251#251#251#240#240
+  +#15#240#224#191#191#0#0#11#15#240#224#251#251#251#251#240#255#240#224#191#0#0
+  +#0#15#255#240#0#11#251#0#176#255#0#240'30'#0#11#15#255#255#240'330'#176#255
+  +#255#0#0'33'#11#15#240#15#15#240'30'#176#15#255#255#15#3'3'#9#3#15#255#255#0
+  +'3303'#0#0#0#3'3'#9'NumGlyphs'#2#0#7'OnClick'#7#13'spbNotasClick'#0#0#7'TBit'
+  +'Btn'#11'btbCancelar'#4'Left'#3'@'#2#6'Height'#2'!'#3'Top'#3#192#1#5'Width'#2
+  +'Y'#7'Caption'#6#7'&Cancel'#4'Kind'#7#8'bkCancel'#11'ModalResult'#2#2#9'NumG'
+  +'lyphs'#2#0#8'TabOrder'#2#2#0#0#12'TPageControl'#12'PageControl1'#4'Left'#2#8
+  +#6'Height'#3#164#1#3'Top'#2#16#5'Width'#3#241#2#10'ActivePage'#7#9'TabSheet1'
+  +#8'TabIndex'#2#0#8'TabOrder'#2#0#8'OnChange'#7#18'PageControl1Change'#0#9'TT'
+  +'abSheet'#9'TabSheet1'#7'Caption'#6#11'&Metabolism'#12'ClientHeight'#3#127#1
+  +#11'ClientWidth'#3#233#2#0#11'TStringGrid'#14'stgMetabolismo'#4'Left'#2#6#6
+  +'Height'#3#168#0#3'Top'#2#10#5'Width'#3#224#2#5'Color'#7#9'clSkyBlue'#8'ColC'
+  +'ount'#2#6#7'Options'#11#15'goFixedVertLine'#15'goFixedHorzLine'#10'goVertLi'
+  +'ne'#10'goHorzLine'#13'goRangeSelect'#9'goEditing'#14'goSmoothScroll'#0#8'Ta'
+  +'bOrder'#2#0#16'TitleFont.Height'#2#245#14'TitleFont.Name'#6#13'MS Sans Seri'
+  +'f'#10'OnDblClick'#7#22'stgMetabolismoDblClick'#0#0#0#9'TTabSheet'#9'TabShee'
+  +'t3'#7'Caption'#6#9'M&ovement'#12'ClientHeight'#3#127#1#11'ClientWidth'#3#233
+  +#2#10'ImageIndex'#2#2#0#9'TGroupBox'#9'GroupBox3'#4'Left'#2#8#6'Height'#3#139
+  +#0#3'Top'#2#8#5'Width'#3#217#2#7'Caption'#6#4'Cost'#12'ClientHeight'#2'{'#11
+  +'ClientWidth'#3#213#2#8'TabOrder'#2#0#0#11'TStringGrid'#13'stgMovimiento'#4
+  +'Left'#2#12#6'Height'#2'd'#3'Top'#2#3#5'Width'#3#191#2#5'Color'#7#9'clSkyBlu'
+  +'e'#7'Options'#11#15'goFixedVertLine'#15'goFixedHorzLine'#10'goVertLine'#10
+  +'goHorzLine'#13'goRangeSelect'#9'goEditing'#14'goSmoothScroll'#0#8'RowCount'
+  +#2#3#8'TabOrder'#2#0#16'TitleFont.Height'#2#245#14'TitleFont.Name'#6#13'MS S'
+  +'ans Serif'#10'OnDblClick'#7#21'stgMovimientoDblClick'#0#0#0#9'TGroupBox'#9
+  +'GroupBox4'#4'Left'#2#254#6'Height'#2'y'#3'Top'#3#146#0#5'Width'#3#227#2#7'C'
+  +'aption'#6#25'Speed (squares per cycle)'#12'ClientHeight'#2'i'#11'ClientWidt'
+  +'h'#3#223#2#8'TabOrder'#2#1#0#11'TStringGrid'#12'stgVelocidad'#4'Left'#2#22#6
+  +'Height'#2'T'#3'Top'#2#1#5'Width'#3#191#2#5'Color'#7#9'clSkyBlue'#8'ColCount'
+  +#2#8#7'Options'#11#15'goFixedVertLine'#15'goFixedHorzLine'#10'goVertLine'#10
+  +'goHorzLine'#13'goRangeSelect'#9'goEditing'#14'goSmoothScroll'#0#8'RowCount'
+  +#2#2#8'TabOrder'#2#0#16'TitleFont.Height'#2#245#14'TitleFont.Name'#6#13'MS S'
+  +'ans Serif'#10'OnDblClick'#7#20'stgVelocidadDblClick'#0#0#0#7'TButton'#11'bt'
+  +'nImportar'#4'Left'#3#16#2#6'Height'#2'!'#3'Top'#3#27#1#5'Width'#3#209#0#7'C'
+  +'aption'#6#23'&Import subtrates names'#7'OnClick'#7#16'btnImportarClick'#8'T'
+  +'abOrder'#2#2#0#0#0#9'TTabSheet'#9'TabSheet5'#7'Caption'#6#9'F&oraging'#12'C'
+  +'lientHeight'#3#127#1#11'ClientWidth'#3#233#2#10'ImageIndex'#2#7#0#9'TGroupB'
+  +'ox'#10'GroupBox10'#4'Left'#2#6#6'Height'#3#165#0#3'Top'#2#2#5'Width'#3#217#2
+  +#7'Caption'#6#4'Cost'#12'ClientHeight'#3#149#0#11'ClientWidth'#3#213#2#8'Tab'
+  +'Order'#2#0#0#11'TStringGrid'#15'stgAlimentacion'#4'Left'#2#8#6'Height'#2'~'
+  +#3'Top'#2#1#5'Width'#3#194#2#5'Color'#7#9'clSkyBlue'#7'Options'#11#15'goFixe'
+  +'dVertLine'#15'goFixedHorzLine'#10'goVertLine'#10'goHorzLine'#13'goRangeSele'
+  +'ct'#9'goEditing'#14'goSmoothScroll'#0#8'TabOrder'#2#0#16'TitleFont.Height'#2
+  +#245#14'TitleFont.Name'#6#13'MS Sans Serif'#10'OnDblClick'#7#23'stgAlimentac'
+  +'ionDblClick'#0#0#0#9'TGroupBox'#10'GroupBox11'#4'Left'#2#8#6'Height'#3#129#0
+  +#3'Top'#3#176#0#5'Width'#3#217#2#7'Caption'#6#31'Benefits (nutrient units ta'
+  +'ken)'#12'ClientHeight'#2'q'#11'ClientWidth'#3#213#2#8'TabOrder'#2#1#0#6'TLa'
+  +'bel'#7'Label34'#4'Left'#2#8#6'Height'#2#15#3'Top'#2#13#5'Width'#2'$'#7'Capt'
+  ,'ion'#6#7'&Water:'#12'FocusControl'#7#7'edtAgua'#11'ParentColor'#8#0#0#6'TLa'
+  +'bel'#7'Label35'#4'Left'#2#8#6'Height'#2#15#3'Top'#2';'#5'Width'#2'V'#7'Capt'
+  +'ion'#6#15'Carbo&hidrates:'#12'FocusControl'#7#9'edtAzucar'#11'ParentColor'#8
+  +#0#0#6'TLabel'#7'Label36'#4'Left'#3'z'#1#6'Height'#2#15#3'Top'#2#11#5'Width'
+  +#2'&'#7'Caption'#6#8'&Lipids:'#12'FocusControl'#7#8'edtGrasa'#11'ParentColor'
+  +#8#0#0#6'TLabel'#7'Label37'#4'Left'#3#128#1#6'Height'#2#15#3'Top'#2'8'#5'Wid'
+  +'th'#2'-'#7'Caption'#6#9'&Protein:'#12'FocusControl'#7#11'edtProteina'#11'Pa'
+  +'rentColor'#8#0#0#5'TEdit'#7'edtAgua'#4'Left'#2#8#6'Height'#2#22#3'Top'#2#29
+  +#5'Width'#3'J'#1#5'Color'#7#9'clSkyBlue'#10'OnDblClick'#7#15'edtAguaDblClick'
+  +#9'OnMouseUp'#7#14'edtAguaMouseUp'#8'TabOrder'#2#0#4'Text'#6#7'edtAgua'#0#0#5
+  +'TEdit'#9'edtAzucar'#4'Left'#2#10#6'Height'#2#22#3'Top'#2'K'#5'Width'#3'J'#1
+  +#5'Color'#7#9'clSkyBlue'#10'OnDblClick'#7#17'edtAzucarDblClick'#9'OnMouseUp'
+  +#7#16'edtAzucarMouseUp'#8'TabOrder'#2#1#4'Text'#6#9'edtAzucar'#0#0#5'TEdit'#8
+  +'edtGrasa'#4'Left'#3#128#1#6'Height'#2#22#3'Top'#2#27#5'Width'#3'J'#1#5'Colo'
+  +'r'#7#9'clSkyBlue'#10'OnDblClick'#7#16'edtGrasaDblClick'#9'OnMouseUp'#7#15'e'
+  +'dtGrasaMouseUp'#8'TabOrder'#2#2#4'Text'#6#8'edtGrasa'#0#0#5'TEdit'#11'edtPr'
+  +'oteina'#4'Left'#3#128#1#6'Height'#2#22#3'Top'#2'K'#5'Width'#3'J'#1#5'Color'
+  +#7#9'clSkyBlue'#10'OnDblClick'#7#19'edtProteinaDblClick'#9'OnMouseUp'#7#18'e'
+  +'dtProteinaMouseUp'#8'TabOrder'#2#3#4'Text'#6#11'edtProteina'#0#0#0#0#9'TTab'
+  +'Sheet'#9'TabSheet2'#7'Caption'#6#9'F&ighting'#12'ClientHeight'#3#127#1#11'C'
+  +'lientWidth'#3#233#2#10'ImageIndex'#2#2#0#9'TGroupBox'#9'GroupBox5'#4'Left'#2
+  +#6#6'Height'#3#185#0#3'Top'#2#2#5'Width'#3#217#2#7'Caption'#6#4'Cost'#12'Cli'
+  +'entHeight'#3#169#0#11'ClientWidth'#3#213#2#8'TabOrder'#2#0#0#11'TStringGrid'
+  +#10'stgCombate'#4'Left'#2#6#6'Height'#3#144#0#3'Top'#2#1#5'Width'#3#194#2#5
+  +'Color'#7#9'clSkyBlue'#7'Options'#11#15'goFixedVertLine'#15'goFixedHorzLine'
+  +#10'goVertLine'#10'goHorzLine'#13'goRangeSelect'#9'goEditing'#14'goSmoothScr'
+  +'oll'#0#8'RowCount'#2#4#8'TabOrder'#2#0#16'TitleFont.Height'#2#245#14'TitleF'
+  +'ont.Name'#6#13'MS Sans Serif'#10'OnDblClick'#7#18'stgCombateDblClick'#0#0#0
+  +#0#9'TTabSheet'#9'TabSheet4'#7'Caption'#6#16'M-F &interaction'#12'ClientHeig'
+  +'ht'#3#127#1#11'ClientWidth'#3#233#2#10'ImageIndex'#2#3#0#9'TGroupBox'#9'Gro'
+  +'upBox6'#4'Left'#2#8#6'Height'#3#9#1#3'Top'#2#16#5'Width'#3#217#2#7'Caption'
+  +#6#5'Costs'#12'ClientHeight'#3#249#0#11'ClientWidth'#3#213#2#8'TabOrder'#2#0
+  +#0#11'TStringGrid'#10'stgCortejo'#4'Left'#2#12#6'Height'#3#220#0#3'Top'#2#3#5
+  +'Width'#3#192#2#5'Color'#7#9'clSkyBlue'#7'Options'#11#15'goFixedVertLine'#15
+  +'goFixedHorzLine'#10'goVertLine'#10'goHorzLine'#13'goRangeSelect'#9'goEditin'
+  +'g'#14'goSmoothScroll'#0#8'RowCount'#2#7#8'TabOrder'#2#0#16'TitleFont.Height'
+  +#2#245#14'TitleFont.Name'#6#13'MS Sans Serif'#10'OnDblClick'#7#18'stgCortejo'
+  +'DblClick'#0#0#0#0#9'TTabSheet'#9'TabSheet6'#7'Caption'#6#18'&Gamete product'
+  +'ion'#12'ClientHeight'#3#127#1#11'ClientWidth'#3#233#2#10'ImageIndex'#2#5#0#6
+  +'TLabel'#6'Label3'#4'Left'#2#8#6'Height'#2#15#3'Top'#2#16#5'Width'#2'z'#7'Ca'
+  +'ption'#6#20'Max number of &eggs:'#12'FocusControl'#7#10'edtMaximoH'#11'Pare'
+  +'ntColor'#8#0#0#6'TLabel'#6'Label1'#4'Left'#2#8#6'Height'#2#15#3'Top'#3#202#0
+  +#5'Width'#3#168#0#7'Caption'#6#27'Max number of &sperm packs:'#12'FocusContr'
+  +'ol'#7#10'edtMaximoP'#11'ParentColor'#8#0#0#5'TEdit'#10'edtMaximoH'#4'Left'#2
+  +#8#6'Height'#2#22#3'Top'#2' '#5'Width'#3#209#2#5'Color'#7#9'clSkyBlue'#10'On'
+  +'DblClick'#7#18'edtMaximoHDblClick'#9'OnMouseUp'#7#17'edtMaximoHMouseUp'#8'T'
+  +'abOrder'#2#0#4'Text'#6#10'edtMaximoH'#0#0#5'TEdit'#10'edtMaximoP'#4'Left'#2
+  +#8#6'Height'#2#22#3'Top'#3#218#0#5'Width'#3#209#2#5'Color'#7#9'clSkyBlue'#10
+  +'OnDblClick'#7#18'edtMaximoPDblClick'#9'OnMouseUp'#7#17'edtMaximoPMouseUp'#8
+  +'TabOrder'#2#2#4'Text'#6#10'edtMaximoP'#0#0#9'TGroupBox'#9'GroupBox1'#4'Left'
+  +#2#8#6'Height'#2'y'#3'Top'#2'8'#5'Width'#3#217#2#7'Caption'#6#27'Energetic c'
+  +'osts of each egg'#12'ClientHeight'#2'i'#11'ClientWidth'#3#213#2#8'TabOrder'
+  +#2#1#0#6'TLabel'#6'Label4'#4'Left'#2#14#6'Height'#2#15#3'Top'#2#3#5'Width'#2
+  +'$'#7'Caption'#6#7'&Water:'#12'FocusControl'#7#8'edtAguaH'#11'ParentColor'#8
+  +#0#0#6'TLabel'#6'Label5'#4'Left'#2#14#6'Height'#2#15#3'Top'#2'3'#5'Width'#2
+  +'&'#7'Caption'#6#8'&Lipids:'#12'FocusControl'#7#9'edtGrasaH'#11'ParentColor'
+  +#8#0#0#6'TLabel'#6'Label6'#4'Left'#3'p'#1#6'Height'#2#15#3'Top'#2#3#5'Width'
+  +#2'V'#7'Caption'#6#15'Ca&rbohidrates:'#12'FocusControl'#7#10'edtAzucarH'#11
+  +'ParentColor'#8#0#0#6'TLabel'#6'Label7'#4'Left'#3'p'#1#6'Height'#2#15#3'Top'
+  +#2'0'#5'Width'#2'-'#7'Caption'#6#9'&Protein:'#12'FocusControl'#7#13'edtProte'
+  +'inasH'#11'ParentColor'#8#0#0#5'TEdit'#8'edtAguaH'#4'Left'#2#14#6'Height'#2
+  +#22#3'Top'#2#24#5'Width'#3'J'#1#5'Color'#7#9'clSkyBlue'#10'OnDblClick'#7#16
+  +'edtAguaHDblClick'#9'OnMouseUp'#7#15'edtAguaHMouseUp'#8'TabOrder'#2#0#4'Text'
+  +#6#8'edtAguaH'#0#0#5'TEdit'#9'edtGrasaH'#4'Left'#2#14#6'Height'#2#22#3'Top'#2
+  ,'C'#5'Width'#3'J'#1#5'Color'#7#9'clSkyBlue'#10'OnDblClick'#7#17'edtGrasaHDbl'
+  +'Click'#9'OnMouseUp'#7#16'edtGrasaHMouseUp'#8'TabOrder'#2#1#4'Text'#6#9'edtG'
+  +'rasaH'#0#0#5'TEdit'#10'edtAzucarH'#4'Left'#3'p'#1#6'Height'#2#22#3'Top'#2#24
+  +#5'Width'#3'J'#1#5'Color'#7#9'clSkyBlue'#10'OnDblClick'#7#18'edtAzucarHDblCl'
+  +'ick'#9'OnMouseUp'#7#17'edtAzucarHMouseUp'#8'TabOrder'#2#2#4'Text'#6#10'edtA'
+  +'zucarH'#0#0#5'TEdit'#13'edtProteinasH'#4'Left'#3'p'#1#6'Height'#2#22#3'Top'
+  +#2'C'#5'Width'#3'J'#1#5'Color'#7#9'clSkyBlue'#10'OnDblClick'#7#21'edtProtein'
+  +'asHDblClick'#9'OnMouseUp'#7#20'edtProteinasHMouseUp'#8'TabOrder'#2#3#4'Text'
+  +#6#13'edtProteinasH'#0#0#0#9'TGroupBox'#9'GroupBox2'#4'Left'#2#8#6'Height'#3
+  +#128#0#3'Top'#3#242#0#5'Width'#3#217#2#7'Caption'#6'!Energetic cost of each '
+  +'sperm pack'#12'ClientHeight'#2'p'#11'ClientWidth'#3#213#2#8'TabOrder'#2#3#0
+  +#6'TLabel'#6'Label2'#4'Left'#2#14#6'Height'#2#15#3'Top'#2#2#5'Width'#2'$'#7
+  +'Caption'#6#7'&Water:'#12'FocusControl'#7#8'edtAguaP'#11'ParentColor'#8#0#0#6
+  +'TLabel'#6'Label8'#4'Left'#2#16#6'Height'#2#15#3'Top'#2'3'#5'Width'#2'&'#7'C'
+  +'aption'#6#8'L&ipids:'#12'FocusControl'#7#9'edtGrasaP'#11'ParentColor'#8#0#0
+  +#6'TLabel'#6'Label9'#4'Left'#3'p'#1#6'Height'#2#15#3'Top'#2#2#5'Width'#2'V'#7
+  +'Caption'#6#15'Car&bohidrates:'#12'FocusControl'#7#10'edtAzucarP'#11'ParentC'
+  +'olor'#8#0#0#6'TLabel'#7'Label10'#4'Left'#3'p'#1#6'Height'#2#15#3'Top'#2'3'#5
+  +'Width'#2'-'#7'Caption'#6#9'Pro&tein:'#12'FocusControl'#7#13'edtProteinasP'
+  +#11'ParentColor'#8#0#0#5'TEdit'#8'edtAguaP'#4'Left'#2#14#6'Height'#2#22#3'To'
+  +'p'#2#21#5'Width'#3'J'#1#5'Color'#7#9'clSkyBlue'#10'OnDblClick'#7#16'edtAgua'
+  +'PDblClick'#9'OnMouseUp'#7#15'edtAguaPMouseUp'#8'TabOrder'#2#0#4'Text'#6#8'e'
+  +'dtAguaP'#0#0#5'TEdit'#9'edtGrasaP'#4'Left'#2#14#6'Height'#2#22#3'Top'#2'J'#5
+  +'Width'#3'J'#1#5'Color'#7#9'clSkyBlue'#10'OnDblClick'#7#17'edtGrasaPDblClick'
+  +#9'OnMouseUp'#7#16'edtGrasaPMouseUp'#8'TabOrder'#2#1#4'Text'#6#9'edtGrasaP'#0
+  +#0#5'TEdit'#10'edtAzucarP'#4'Left'#3'p'#1#6'Height'#2#22#3'Top'#2#21#5'Width'
+  +#3'J'#1#5'Color'#7#9'clSkyBlue'#10'OnDblClick'#7#18'edtAzucarPDblClick'#9'On'
+  +'MouseUp'#7#17'edtAzucarPMouseUp'#8'TabOrder'#2#2#4'Text'#6#10'edtAzucarP'#0
+  +#0#5'TEdit'#13'edtProteinasP'#4'Left'#3'p'#1#6'Height'#2#22#3'Top'#2'J'#5'Wi'
+  +'dth'#3'J'#1#5'Color'#7#9'clSkyBlue'#10'OnDblClick'#7#21'edtProteinasPDblCli'
+  +'ck'#9'OnMouseUp'#7#20'edtProteinasPMouseUp'#8'TabOrder'#2#3#4'Text'#6#13'ed'
+  +'tProteinasP'#0#0#0#0#9'TTabSheet'#9'TabSheet7'#7'Caption'#6#16'Gametes &dyn'
+  +'amic'#12'ClientHeight'#3#127#1#11'ClientWidth'#3#233#2#10'ImageIndex'#2#6#0
+  +#9'TGroupBox'#9'GroupBox7'#4'Left'#2#8#6'Height'#3#152#0#3'Top'#2#8#5'Width'
+  +#3#217#2#7'Caption'#6#11'Sperm packs'#12'ClientHeight'#3#136#0#11'ClientWidt'
+  +'h'#3#213#2#8'TabOrder'#2#0#0#6'TLabel'#7'Label26'#4'Left'#2#4#6'Height'#2#15
+  +#3'Top'#2#3#5'Width'#3'U'#1#7'Caption'#6'9Number of &sperm packs given per c'
+  +'opula (male vs female):'#12'FocusControl'#7#10'edtEsperma'#11'ParentColor'#8
+  +#0#0#6'TLabel'#7'Label27'#4'Left'#2#3#6'Height'#2#15#3'Top'#2')'#5'Width'#3
+  +#27#1#7'Caption'#6'.Max number of sperm &packs storaged by female:'#12'Focus'
+  +'Control'#7#14'edtMaxPaquetes'#11'ParentColor'#8#0#0#6'TLabel'#7'Label28'#4
+  +'Left'#2#6#6'Height'#2#15#3'Top'#2'Q'#5'Width'#3'>'#1#7'Caption'#6'8C&onsupt'
+  +'ion rate of sperm pack nutrients (0-1) (female):'#12'FocusControl'#7#17'edt'
+  +'ConsumoPaquete'#11'ParentColor'#8#0#0#5'TEdit'#10'edtEsperma'#4'Left'#2#4#6
+  +'Height'#2#22#3'Top'#2#17#5'Width'#3#201#2#5'Color'#7#9'clSkyBlue'#10'OnDblC'
+  +'lick'#7#18'edtEspermaDblClick'#9'OnMouseUp'#7#17'edtEspermaMouseUp'#8'TabOr'
+  +'der'#2#0#4'Text'#6#10'edtEsperma'#0#0#5'TEdit'#14'edtMaxPaquetes'#4'Left'#2
+  +#4#6'Height'#2#22#3'Top'#2';'#5'Width'#3#201#2#5'Color'#7#9'clSkyBlue'#10'On'
+  +'DblClick'#7#22'edtMaxPaquetesDblClick'#9'OnMouseUp'#7#21'edtMaxPaquetesMous'
+  +'eUp'#8'TabOrder'#2#1#4'Text'#6#14'edtMaxPaquetes'#0#0#5'TEdit'#17'edtConsum'
+  +'oPaquete'#4'Left'#2#4#6'Height'#2#22#3'Top'#2'a'#5'Width'#3#201#2#5'Color'#7
+  +#9'clSkyBlue'#10'OnDblClick'#7#25'edtConsumoPaqueteDblClick'#9'OnMouseUp'#7
+  +#24'edtConsumoPaqueteMouseUp'#8'TabOrder'#2#2#4'Text'#6#17'edtConsumoPaquete'
+  +#0#0#0#9'TGroupBox'#9'GroupBox9'#4'Left'#2#4#6'Height'#3#152#0#3'Top'#3#160#0
+  +#5'Width'#3#217#2#7'Caption'#6#13'Fertilization'#12'ClientHeight'#3#136#0#11
+  +'ClientWidth'#3#213#2#8'TabOrder'#2#1#0#6'TLabel'#7'Label29'#4'Left'#2#8#6'H'
+  +'eight'#2#15#3'Top'#2#1#5'Width'#3'w'#1#7'Caption'#6'FFraction of e&ggs fert'
+  +'ilized just after copula (0-1) (female vs male):'#12'FocusControl'#7#15'edt'
+  +'Fertilizados'#11'ParentColor'#8#0#0#6'TLabel'#7'Label30'#4'Left'#2#8#6'Heig'
+  +'ht'#2#15#3'Top'#2')'#5'Width'#3#233#0#7'Caption'#6'+Probabilit&y of paterni'
+  +'ty (female vs male):'#11'ParentColor'#8#0#0#6'TLabel'#7'Label11'#4'Left'#2
+  +#10#6'Height'#2#15#3'Top'#2'Q'#5'Width'#3' '#1#7'Caption'#6'1Rate of sperm d'
+  +'egradation (0-1) (female vs male):'#12'FocusControl'#7#14'edtDegradacion'#11
+  +'ParentColor'#8#0#0#5'TEdit'#15'edtFertilizados'#4'Left'#2#8#6'Height'#2#22#3
+  ,'Top'#2#17#5'Width'#3#201#2#5'Color'#7#9'clSkyBlue'#10'OnDblClick'#7#23'edtF'
+  +'ertilizadosDblClick'#9'OnMouseUp'#7#22'edtFertilizadosMouseUp'#8'TabOrder'#2
+  +#0#4'Text'#6#15'edtFertilizados'#0#0#5'TEdit'#13'edtPaternidad'#4'Left'#2#8#6
+  +'Height'#2#22#3'Top'#2'9'#5'Width'#3#201#2#5'Color'#7#9'clSkyBlue'#10'OnDblC'
+  +'lick'#7#21'edtPaternidadDblClick'#9'OnMouseUp'#7#20'edtPaternidadMouseUp'#8
+  +'TabOrder'#2#1#4'Text'#6#13'edtPaternidad'#0#0#5'TEdit'#14'edtDegradacion'#4
+  +'Left'#2#8#6'Height'#2#22#3'Top'#2'c'#5'Width'#3#201#2#5'Color'#7#9'clSkyBlu'
+  +'e'#10'OnDblClick'#7#22'edtDegradacionDblClick'#9'OnMouseUp'#7#21'edtDegrada'
+  +'cionMouseUp'#8'TabOrder'#2#2#4'Text'#6#14'edtDegradacion'#0#0#0#9'TGroupBox'
+  +#9'GroupBox8'#4'Left'#2#4#6'Height'#2'B'#3'Top'#3'8'#1#5'Width'#3#217#2#7'Ca'
+  +'ption'#6#11'Oviposition'#12'ClientHeight'#2'2'#11'ClientWidth'#3#213#2#8'Ta'
+  +'bOrder'#2#2#0#6'TLabel'#7'Label31'#4'Left'#2#8#6'Height'#2#15#3'Top'#2#0#5
+  +'Width'#3#150#0#7'Caption'#6#27'Eggs o&viposited per cycle:'#12'FocusControl'
+  +#7#9'edtHuevos'#11'ParentColor'#8#0#0#5'TEdit'#9'edtHuevos'#4'Left'#2#8#6'He'
+  +'ight'#2#22#3'Top'#2#16#5'Width'#3#201#2#5'Color'#7#9'clSkyBlue'#10'OnDblCli'
+  +'ck'#7#17'edtHuevosDblClick'#9'OnMouseUp'#7#16'edtHuevosMouseUp'#8'TabOrder'
+  +#2#0#4'Text'#6#9'edtHuevos'#0#0#0#0#9'TTabSheet'#9'TabSheet8'#7'Caption'#6#15
+  +'&Energetic loss'#12'ClientHeight'#3#127#1#11'ClientWidth'#3#233#2#10'ImageI'
+  +'ndex'#2#7#0#9'TGroupBox'#10'GroupBox12'#4'Left'#2#8#6'Height'#3#177#0#3'Top'
+  +#2' '#5'Width'#3#217#2#12'ClientHeight'#3#173#0#11'ClientWidth'#3#213#2#8'Ta'
+  +'bOrder'#2#0#0#6'TLabel'#7'Label32'#4'Left'#2#4#6'Height'#2#15#3'Top'#2#11#5
+  +'Width'#3'3'#1#7'Caption'#6'5Sperm pack energetic value lost for female use '
+  +'(0-1):'#11'ParentColor'#8#0#0#6'TLabel'#7'Label33'#4'Left'#2#4#6'Height'#2
+  +#15#3'Top'#2'['#5'Width'#3#1#1#7'Caption'#6'.Egg energetic value lost for  a'
+  +'gent use (0-1):'#11'ParentColor'#8#0#0#5'TEdit'#18'edtFraccionPaquete'#4'Le'
+  +'ft'#2#4#6'Height'#2#22#3'Top'#2'#'#5'Width'#3#198#2#5'Color'#7#9'clSkyBlue'
+  +#10'OnDblClick'#7#26'edtFraccionPaqueteDblClick'#9'OnMouseUp'#7#25'edtFracci'
+  +'onPaqueteMouseUp'#8'TabOrder'#2#0#4'Text'#6#18'edtFraccionPaquete'#0#0#5'TE'
+  +'dit'#16'edtFraccionHuevo'#4'Left'#2#4#6'Height'#2#22#3'Top'#2's'#5'Width'#3
+  +#198#2#5'Color'#7#9'clSkyBlue'#10'OnDblClick'#7#24'edtFraccionHuevoDblClick'
+  +#9'OnMouseUp'#7#23'edtFraccionHuevoMouseUp'#8'TabOrder'#2#1#4'Text'#6#16'edt'
+  +'FraccionHuevo'#0#0#0#0#0#7'TBitBtn'#10'btbAceptar'#4'Left'#3#162#2#6'Height'
+  +#2'!'#3'Top'#3#192#1#5'Width'#2'Y'#7'Caption'#6#3'&OK'#4'Kind'#7#4'bkOK'#11
+  +'ModalResult'#2#1#9'NumGlyphs'#2#0#7'OnClick'#7#15'btbAceptarClick'#8'TabOrd'
+  +'er'#2#1#0#0#11'TOpenDialog'#11'OpenDialog1'#6'Filter'#6#31'Galatea Set of S'
+  +'ubstrates|*.sgl'#7'Options'#11#15'ofFileMustExist'#14'ofEnableSizing'#12'of'
+  +'ViewDetail'#0#4'left'#3#192#1#3'top'#3#192#1#0#0#0
+]);

@@ -1,0 +1,53 @@
+object frmEditorNotas: TfrmEditorNotas
+  Left = 474
+  Height = 367
+  Top = 180
+  Width = 389
+  ActiveControl = memNotas
+  Caption = 'Note Editor'
+  ClientHeight = 367
+  ClientWidth = 389
+  Font.Height = -11
+  Font.Name = 'MS Sans Serif'
+  FormStyle = fsStayOnTop
+  OnCreate = FormCreate
+  LCLVersion = '0.9.26.2'
+  object memNotas: TMemo
+    Left = 8
+    Height = 304
+    Top = 8
+    Width = 366
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    Lines.Strings = (
+      'memNotas'
+    )
+    ScrollBars = ssAutoBoth
+    TabOrder = 0
+  end
+  object btbCancelar: TBitBtn
+    Left = 187
+    Height = 33
+    Top = 321
+    Width = 89
+    Anchors = [akRight, akBottom]
+    Caption = '&Cancel'
+    Kind = bkCancel
+    ModalResult = 2
+    NumGlyphs = 0
+    OnClick = btbCancelarClick
+    TabOrder = 1
+  end
+  object btbAceptar: TBitBtn
+    Left = 285
+    Height = 33
+    Top = 321
+    Width = 89
+    Anchors = [akRight, akBottom]
+    Caption = '&OK'
+    Kind = bkOK
+    ModalResult = 1
+    NumGlyphs = 0
+    OnClick = btbAceptarClick
+    TabOrder = 2
+  end
+end

@@ -1,0 +1,263 @@
+object frmAsignacion: TfrmAsignacion
+  Left = 241
+  Height = 494
+  Top = 113
+  Width = 539
+  ActiveControl = PageControl1
+  BorderStyle = bsDialog
+  Caption = 'Prototype allocation'
+  ClientHeight = 494
+  ClientWidth = 539
+  Font.Height = -11
+  Font.Name = 'MS Sans Serif'
+  OnClose = FormClose
+  OnCreate = FormCreate
+  Position = poScreenCenter
+  ShowHint = True
+  LCLVersion = '0.9.26.2'
+  object spbNotas: TSpeedButton
+    Left = 8
+    Height = 33
+    Hint = 'Note Edit|Open Note Edit'
+    Top = 440
+    Width = 33
+    Color = clBtnFace
+    Glyph.Data = {
+      F6000000424DF600000000000000760000002800000010000000100000000100
+      0400000000008000000000000000000000001000000000000000000000000000
+      80000080000000808000800000008000800080800000C0C0C000808080000000
+      FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFFFF00333333000000
+      00003333330FFFFFFFF000300000FF0F00F0E00BFBFB0FFFFFF0E0BFBF000FFF
+      F0F0E0FBFBFBF0F00FF0E0BFBF00000B0FF0E0FBFBFBFBF0FFF0E0BF0000000F
+      FFF0000BFB00B0FF00F03330000B0FFFFFF0333330B0FFFF000033330B0FF00F
+      0FF03330B00FFFFF0F033309030FFFFF00333330330000000333
+    }
+    NumGlyphs = 0
+    OnClick = spbNotasClick
+  end
+  object BitBtn1: TBitBtn
+    Left = 440
+    Height = 33
+    Top = 440
+    Width = 89
+    Caption = '&OK'
+    Kind = bkOK
+    ModalResult = 1
+    NumGlyphs = 0
+    OnClick = BitBtn1Click
+    TabOrder = 0
+  end
+  object BitBtn2: TBitBtn
+    Left = 336
+    Height = 33
+    Top = 440
+    Width = 89
+    Caption = '&Cancel'
+    Kind = bkCancel
+    ModalResult = 2
+    NumGlyphs = 0
+    TabOrder = 1
+  end
+  object PageControl1: TPageControl
+    Left = 8
+    Height = 400
+    Top = 8
+    Width = 521
+    ActivePage = TabSheet1
+    TabIndex = 0
+    TabOrder = 2
+    object TabSheet1: TTabSheet
+      Caption = '&Males'
+      ClientHeight = 400
+      ClientWidth = 521
+      object GroupBox1: TGroupBox
+        Left = 8
+        Height = 153
+        Top = 8
+        Width = 497
+        Caption = 'Criteria'
+        ClientHeight = 136
+        ClientWidth = 493
+        TabOrder = 0
+        object stgValoresM: TStringGrid
+          Left = 16
+          Height = 113
+          Top = 24
+          Width = 465
+          ColCount = 4
+          Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goColSizing, goEditing, goAlwaysShowEditor]
+          TabOrder = 0
+          TitleFont.Height = -11
+          TitleFont.Name = 'MS Sans Serif'
+          OnDblClick = stgValoresMDblClick
+          OnKeyPress = stgValoresMKeyPress
+          ColWidths = (
+            64
+            64
+            58
+            64
+          )
+          RowHeights = (
+            24
+            24
+            24
+            24
+            24
+          )
+        end
+      end
+      object GroupBox2: TGroupBox
+        Left = 8
+        Height = 160
+        Top = 172
+        Width = 497
+        Caption = 'Hyerarchy'
+        ClientHeight = 143
+        ClientWidth = 493
+        TabOrder = 1
+        object spbSubirM: TSpeedButton
+          Left = 464
+          Height = 22
+          Top = 32
+          Width = 23
+          Color = clBtnFace
+          Glyph.Data = {
+            F6000000424DF600000000000000760000002800000010000000100000000100
+            0400000000008000000000000000000000001000000000000000000000000000
+            80000080000000808000800000008000800080800000C0C0C000808080000000
+            FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFFFF00333333000333
+            33333333330C033333333333330C033333333333330C033333333333330C0333
+            33333333330C033333333330000C000033333330CCCCCCC0333333330CCCCC03
+            333333330CCCCC033333333330CCC0333333333330CCC03333333333330C0333
+            33333333330C0333333333333330333333333333333033333333
+          }
+          NumGlyphs = 0
+          OnClick = spbSubirMClick
+        end
+        object spbBajarM: TSpeedButton
+          Left = 464
+          Height = 22
+          Top = 80
+          Width = 23
+          Color = clBtnFace
+          Glyph.Data = {
+            F6000000424DF600000000000000760000002800000010000000100000000100
+            0400000000008000000000000000000000001000000000000000000000000000
+            80000080000000808000800000008000800080800000C0C0C000808080000000
+            FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFFFF00333333303333
+            333333333330333333333333330C033333333333330C03333333333330CCC033
+            3333333330CCC033333333330CCCCC03333333330CCCCC0333333330CCCCCCC0
+            33333330000C000033333333330C033333333333330C033333333333330C0333
+            33333333330C033333333333330C033333333333330003333333
+          }
+          NumGlyphs = 0
+          OnClick = spbBajarMClick
+        end
+        object lstJerarquiaM: TListBox
+          Left = 16
+          Height = 105
+          Top = 16
+          Width = 433
+          OnClick = lstJerarquiaMClick
+          TabOrder = 0
+          TopIndex = -1
+        end
+      end
+    end
+    object TabSheet2: TTabSheet
+      Caption = '&Females'
+      ClientHeight = 400
+      ClientWidth = 521
+      ImageIndex = 1
+      object GroupBox3: TGroupBox
+        Left = 8
+        Height = 153
+        Top = 8
+        Width = 497
+        Caption = 'Criteria'
+        ClientHeight = 136
+        ClientWidth = 493
+        TabOrder = 0
+        object stgValoresH: TStringGrid
+          Left = 16
+          Height = 113
+          Top = 24
+          Width = 465
+          ColCount = 4
+          Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goColSizing, goEditing, goAlwaysShowEditor]
+          TabOrder = 0
+          TitleFont.Height = -11
+          TitleFont.Name = 'MS Sans Serif'
+          OnDblClick = stgValoresHDblClick
+          OnKeyPress = stgValoresHKeyPress
+        end
+      end
+      object GroupBox4: TGroupBox
+        Left = 8
+        Height = 160
+        Top = 172
+        Width = 497
+        Caption = 'Hyerarchy'
+        ClientHeight = 143
+        ClientWidth = 493
+        TabOrder = 1
+        object spbSubirH: TSpeedButton
+          Left = 464
+          Height = 22
+          Top = 32
+          Width = 23
+          Color = clBtnFace
+          Glyph.Data = {
+            F6000000424DF600000000000000760000002800000010000000100000000100
+            0400000000008000000000000000000000001000000000000000000000000000
+            80000080000000808000800000008000800080800000C0C0C000808080000000
+            FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFFFF00333333000333
+            33333333330C033333333333330C033333333333330C033333333333330C0333
+            33333333330C033333333330000C000033333330CCCCCCC0333333330CCCCC03
+            333333330CCCCC033333333330CCC0333333333330CCC03333333333330C0333
+            33333333330C0333333333333330333333333333333033333333
+          }
+          NumGlyphs = 0
+          OnClick = spbSubirHClick
+        end
+        object spbBajarH: TSpeedButton
+          Left = 464
+          Height = 22
+          Top = 80
+          Width = 23
+          Color = clBtnFace
+          Glyph.Data = {
+            F6000000424DF600000000000000760000002800000010000000100000000100
+            0400000000008000000000000000000000001000000000000000000000000000
+            80000080000000808000800000008000800080800000C0C0C000808080000000
+            FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFFFF00333333303333
+            333333333330333333333333330C033333333333330C03333333333330CCC033
+            3333333330CCC033333333330CCCCC03333333330CCCCC0333333330CCCCCCC0
+            33333330000C000033333333330C033333333333330C033333333333330C0333
+            33333333330C033333333333330C033333333333330003333333
+          }
+          NumGlyphs = 0
+          OnClick = spbBajarHClick
+        end
+        object lstJerarquiaH: TListBox
+          Left = 16
+          Height = 105
+          Top = 16
+          Width = 433
+          OnClick = lstJerarquiaHClick
+          TabOrder = 0
+          TopIndex = -1
+        end
+      end
+    end
+  end
+  object StaticText1: TStaticText
+    Left = 8
+    Height = 17
+    Top = 416
+    Width = 327
+    Alignment = taCenter
+    Caption = 'Double click over cells into formula column for opening formula editor'
+    TabOrder = 3
+  end
+end

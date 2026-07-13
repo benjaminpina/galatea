@@ -1,0 +1,67 @@
+object frmVerSustrato: TfrmVerSustrato
+  Left = 326
+  Height = 196
+  Top = 262
+  Width = 250
+  ActiveControl = BitBtn1
+  BorderStyle = bsDialog
+  Caption = 'Review substrate'
+  ClientHeight = 196
+  ClientWidth = 250
+  Font.Height = -11
+  Font.Name = 'MS Sans Serif'
+  OnCreate = FormCreate
+  Position = poScreenCenter
+  LCLVersion = '0.9.26.2'
+  object Label1: TLabel
+    Left = 8
+    Height = 17
+    Top = 8
+    Width = 145
+    Caption = 'Square compositon:'
+    ParentColor = False
+  end
+  object lblXY: TLabel
+    Left = 8
+    Height = 17
+    Top = 32
+    Width = 38
+    Caption = 'lblXY'
+    ParentColor = False
+  end
+  object Label2: TLabel
+    Left = 8
+    Height = 17
+    Top = 88
+    Width = 43
+    Caption = 'Color:'
+    ParentColor = False
+  end
+  object lblColor: TLabel
+    Left = 8
+    Height = 25
+    Top = 112
+    Width = 227
+    AutoSize = False
+    ParentColor = False
+    OnClick = lblColorClick
+  end
+  object BitBtn1: TBitBtn
+    Left = 152
+    Height = 33
+    Top = 152
+    Width = 89
+    Caption = '&OK'
+    Kind = bkOK
+    NumGlyphs = 0
+    TabOrder = 0
+  end
+  object sttComposicion: TStaticText
+    Left = 8
+    Height = 17
+    Top = 56
+    Width = 227
+    Caption = 'sttComposicion'
+    TabOrder = 1
+  end
+end

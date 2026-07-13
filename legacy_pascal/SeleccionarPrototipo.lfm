@@ -1,0 +1,115 @@
+object frmSeleccionaPrototipo: TfrmSeleccionaPrototipo
+  Left = 256
+  Height = 413
+  Top = 111
+  Width = 342
+  ActiveControl = btbAceptar
+  BorderStyle = bsDialog
+  Caption = 'Select Agent'
+  ClientHeight = 413
+  ClientWidth = 342
+  Font.Height = -11
+  Font.Name = 'MS Sans Serif'
+  OnCreate = FormCreate
+  Position = poScreenCenter
+  LCLVersion = '0.9.26.2'
+  object Label1: TLabel
+    Left = 8
+    Height = 17
+    Top = 184
+    Width = 58
+    Caption = '&Males:'
+    FocusControl = lstMachos
+    ParentColor = False
+  end
+  object Label2: TLabel
+    Left = 8
+    Height = 17
+    Top = 272
+    Width = 78
+    Caption = '&Females:'
+    FocusControl = lstHembras
+    ParentColor = False
+  end
+  object Label3: TLabel
+    Left = 8
+    Height = 17
+    Top = 8
+    Width = 133
+    Caption = 'I&mmature males:'
+    FocusControl = lstMachosInm
+    ParentColor = False
+  end
+  object Label4: TLabel
+    Left = 8
+    Height = 17
+    Top = 96
+    Width = 147
+    Caption = 'Imm&ature females:'
+    FocusControl = lstHembrasInm
+    ParentColor = False
+  end
+  object lstMachos: TListBox
+    Left = 8
+    Height = 65
+    Top = 200
+    Width = 321
+    OnClick = lstMachosClick
+    OnDblClick = lstMachosDblClick
+    TabOrder = 2
+    TopIndex = -1
+  end
+  object btbAceptar: TBitBtn
+    Left = 240
+    Height = 33
+    Top = 368
+    Width = 89
+    Caption = '&OK'
+    Kind = bkOK
+    ModalResult = 1
+    NumGlyphs = 0
+    TabOrder = 4
+  end
+  object btbCancelar: TBitBtn
+    Left = 136
+    Height = 33
+    Top = 368
+    Width = 89
+    Caption = '&Cancel'
+    Kind = bkCancel
+    ModalResult = 2
+    NumGlyphs = 0
+    OnClick = btbCancelarClick
+    TabOrder = 5
+  end
+  object lstHembras: TListBox
+    Left = 8
+    Height = 65
+    Top = 288
+    Width = 321
+    OnClick = lstHembrasClick
+    OnDblClick = lstHembrasDblClick
+    TabOrder = 3
+    TopIndex = -1
+  end
+  object lstMachosInm: TListBox
+    Left = 8
+    Height = 65
+    Top = 24
+    Width = 321
+    OnClick = lstMachosInmClick
+    OnDblClick = lstMachosInmDblClick
+    TabOrder = 0
+    TopIndex = -1
+  end
+  object lstHembrasInm: TListBox
+    Left = 8
+    Height = 65
+    Top = 112
+    Width = 321
+    OnClick = lstHembrasInmClick
+    OnDblClick = lstHembrasInmDblClick
+    TabOrder = 1
+    TopIndex = -1
+  end
+end

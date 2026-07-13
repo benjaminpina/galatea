@@ -1,0 +1,383 @@
+object frmGeneralesAg: TfrmGeneralesAg
+  Left = 237
+  Height = 390
+  Top = 81
+  Width = 279
+  ActiveControl = edtContinuas
+  BorderStyle = bsDialog
+  Caption = 'General options'
+  ClientHeight = 390
+  ClientWidth = 279
+  Font.Height = -11
+  Font.Name = 'MS Sans Serif'
+  OnCreate = FormCreate
+  Position = poScreenCenter
+  LCLVersion = '0.9.26.2'
+  object btbAceptar: TBitBtn
+    Left = 176
+    Height = 33
+    Top = 344
+    Width = 89
+    Caption = '&OK'
+    Kind = bkOK
+    ModalResult = 1
+    NumGlyphs = 0
+    OnClick = btbAceptarClick
+    TabOrder = 2
+  end
+  object btbCancelar: TBitBtn
+    Left = 72
+    Height = 33
+    Top = 344
+    Width = 89
+    Caption = '&Cancel'
+    Kind = bkCancel
+    ModalResult = 2
+    NumGlyphs = 0
+    TabOrder = 3
+  end
+  object GroupBox1: TGroupBox
+    Left = 8
+    Height = 120
+    Top = 8
+    Width = 257
+    Caption = 'Default values:'
+    ClientHeight = 120
+    ClientWidth = 257
+    TabOrder = 0
+    object Label1: TLabel
+      Left = 8
+      Height = 18
+      Top = 10
+      Width = 151
+      Caption = 'Continuos variables:'
+      ParentColor = False
+    end
+    object Label2: TLabel
+      Left = 8
+      Height = 18
+      Top = 51
+      Width = 146
+      Caption = 'Discretes variables:'
+      ParentColor = False
+    end
+    object edtContinuas: TEdit
+      Left = 8
+      Height = 21
+      Top = 24
+      Width = 129
+      OnChange = edtContinuasChange
+      OnKeyPress = edtContinuasKeyPress
+      TabOrder = 0
+      Text = 'edtContinuas'
+    end
+    object edtDiscretas: TEdit
+      Left = 6
+      Height = 21
+      Top = 66
+      Width = 129
+      OnKeyPress = edtDiscretasKeyPress
+      TabOrder = 1
+      Text = 'edtDiscretas'
+    end
+  end
+  object GroupBox2: TGroupBox
+    Left = 8
+    Height = 193
+    Top = 136
+    Width = 257
+    Caption = 'Default motion tendencies'
+    ClientHeight = 193
+    ClientWidth = 257
+    TabOrder = 1
+    object Label3: TLabel
+      Left = 8
+      Height = 17
+      Top = 27
+      Width = 34
+      Caption = 'NW:'
+      ParentColor = False
+    end
+    object Label4: TLabel
+      Left = 104
+      Height = 17
+      Top = 24
+      Width = 17
+      Caption = 'N:'
+      ParentColor = False
+    end
+    object Label5: TLabel
+      Left = 176
+      Height = 17
+      Top = 24
+      Width = 28
+      Caption = 'NE:'
+      ParentColor = False
+    end
+    object Image1: TImage
+      Left = 96
+      Height = 16
+      Top = 56
+      Width = 16
+      AutoSize = True
+      Picture.Data = {
+        07544269746D6170F6000000424DF60000000000000076000000280000001000
+        0000100000000100040000000000800000000000000000000000100000000000
+        000000000000000080000080000000808000800000008000800080800000C0C0
+        C000808080000000FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFF
+        FF00333333333333333333333333333808333333333333809033333338333809
+        0833333330038090833333333090090833333333099990833333333309999033
+        3333333099999903333333309999900833333309999003333333330990033333
+        3333309003333333333330033333333333333333333333333333333333333333
+        3333
+      }
+    end
+    object Image2: TImage
+      Left = 128
+      Height = 16
+      Top = 56
+      Width = 16
+      AutoSize = True
+      Picture.Data = {
+        07544269746D6170F6000000424DF60000000000000076000000280000001000
+        0000100000000100040000000000800000000000000000000000100000000000
+        000000000000000080000080000000808000800000008000800080800000C0C0
+        C000808080000000FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFF
+        FF00333333000333333333333309033333333333330903333333333333090333
+        3333333333090333333333333309033333333330000900003333333099999990
+        3333333309999903333333330999990333333333309990333333333330999033
+        3333333333090333333333333309033333333333333033333333333333303333
+        3333
+      }
+    end
+    object Image3: TImage
+      Left = 160
+      Height = 16
+      Top = 56
+      Width = 16
+      AutoSize = True
+      Picture.Data = {
+        07544269746D6170F6000000424DF60000000000000076000000280000001000
+        0000100000000100040000000000800000000000000000000000100000000000
+        000000000000000080000080000000808000800000008000800080800000C0C0
+        C000808080000000FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFF
+        FF00333333333333333333333333333333333808333333333333309083333333
+        3333380908333833333333809083003333333338090090333333333380999903
+        3333333330999903333333330999999033333338009999903333333333009999
+        0333333333330099033333333333330090333333333333330033333333333333
+        3333
+      }
+    end
+    object Image4: TImage
+      Left = 96
+      Height = 16
+      Top = 88
+      Width = 16
+      AutoSize = True
+      Picture.Data = {
+        07544269746D6170F6000000424DF60000000000000076000000280000001000
+        0000100000000100040000000000800000000000000000000000100000000000
+        000000000000000080000080000000808000800000008000800080800000C0C0
+        C000808080000000FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFF
+        FF00333333333333333333333333333333333333333333333333333333330033
+        3333333333009033333333330099903333333300999990000000009999999999
+        9990330099999000000033330099903333333333330090333333333333330033
+        3333333333333333333333333333333333333333333333333333333333333333
+        3333
+      }
+    end
+    object Image5: TImage
+      Left = 160
+      Height = 16
+      Top = 88
+      Width = 16
+      AutoSize = True
+      Picture.Data = {
+        07544269746D6170F6000000424DF60000000000000076000000280000001000
+        0000100000000100040000000000800000000000000000000000100000000000
+        000000000000000080000080000000808000800000008000800080800000C0C0
+        C000808080000000FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFF
+        FF00333333333333333333333333333333333333333333333333333333333333
+        3333333333003333333333333309003333333333330999003333000000099999
+        0033099999999999990000000009999900333333330999003333333333090033
+        3333333333003333333333333333333333333333333333333333333333333333
+        3333
+      }
+    end
+    object Label6: TLabel
+      Left = 184
+      Height = 17
+      Top = 80
+      Width = 17
+      Caption = 'E:'
+      ParentColor = False
+    end
+    object Image6: TImage
+      Left = 96
+      Height = 16
+      Top = 120
+      Width = 16
+      AutoSize = True
+      Picture.Data = {
+        07544269746D6170F6000000424DF60000000000000076000000280000001000
+        0000100000000100040000000000800000000000000000000000100000000000
+        000000000000000080000080000000808000800000008000800080800000C0C0
+        C000808080000000FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFF
+        FF00333333333333333333333333333333333003333333333333309003333333
+        3333330990033333333333099990033333333330999990083333333099999903
+        3333333309999033333333330999908333333333309009083333333330038090
+        8333333338333809083333333333338090333333333333380833333333333333
+        3333
+      }
+    end
+    object Image7: TImage
+      Left = 128
+      Height = 16
+      Top = 120
+      Width = 16
+      AutoSize = True
+      Picture.Data = {
+        07544269746D6170F6000000424DF60000000000000076000000280000001000
+        0000100000000100040000000000800000000000000000000000100000000000
+        000000000000000080000080000000808000800000008000800080800000C0C0
+        C000808080000000FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFF
+        FF00333333303333333333333330333333333333330903333333333333090333
+        3333333330999033333333333099903333333333099999033333333309999903
+        3333333099999990333333300009000033333333330903333333333333090333
+        3333333333090333333333333309033333333333330903333333333333000333
+        3333
+      }
+    end
+    object Image8: TImage
+      Left = 160
+      Height = 16
+      Top = 120
+      Width = 16
+      AutoSize = True
+      Picture.Data = {
+        07544269746D6170F6000000424DF60000000000000076000000280000001000
+        0000100000000100040000000000800000000000000000000000100000000000
+        000000000000000080000080000000808000800000008000800080800000C0C0
+        C000808080000000FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFF
+        FF00333333333333333333333333333333333333333333330033333333333300
+        9033333333330099033333333300999903333338009999903333333309999990
+        3333333330999903333333338099990333333338090090333333338090830033
+        3333380908333833333330908333333333333808333333333333333333333333
+        3333
+      }
+    end
+    object Label7: TLabel
+      Left = 8
+      Height = 17
+      Top = 144
+      Width = 29
+      Caption = 'SW'
+      ParentColor = False
+    end
+    object Label8: TLabel
+      Left = 104
+      Height = 17
+      Top = 144
+      Width = 17
+      Caption = 'S:'
+      ParentColor = False
+    end
+    object Label9: TLabel
+      Left = 176
+      Height = 17
+      Top = 144
+      Width = 28
+      Caption = 'SE:'
+      ParentColor = False
+    end
+    object Label12: TLabel
+      Left = 8
+      Height = 17
+      Top = 80
+      Width = 23
+      Caption = 'W:'
+      FocusControl = edtO
+      ParentColor = False
+    end
+    object edtNO: TEdit
+      Left = 40
+      Height = 21
+      Top = 24
+      Width = 41
+      MaxLength = 4
+      OnKeyPress = edtNOKeyPress
+      TabOrder = 0
+      Text = 'edtN'
+    end
+    object edtN: TEdit
+      Left = 120
+      Height = 21
+      Top = 24
+      Width = 41
+      MaxLength = 4
+      OnKeyPress = edtNKeyPress
+      TabOrder = 1
+      Text = 'edtN'
+    end
+    object edtNE: TEdit
+      Left = 200
+      Height = 21
+      Top = 24
+      Width = 41
+      MaxLength = 4
+      OnKeyPress = edtNEKeyPress
+      TabOrder = 2
+      Text = 'edtN'
+    end
+    object edtO: TEdit
+      Left = 40
+      Height = 21
+      Top = 80
+      Width = 41
+      MaxLength = 4
+      OnKeyPress = edtOKeyPress
+      TabOrder = 3
+      Text = 'edtO'
+    end
+    object edtE: TEdit
+      Left = 200
+      Height = 21
+      Top = 80
+      Width = 41
+      MaxLength = 4
+      OnKeyPress = edtEKeyPress
+      TabOrder = 4
+      Text = 'edtE'
+    end
+    object edtSO: TEdit
+      Left = 40
+      Height = 21
+      Top = 140
+      Width = 41
+      MaxLength = 4
+      OnKeyPress = edtSOKeyPress
+      TabOrder = 5
+      Text = 'edtS'
+    end
+    object edtS: TEdit
+      Left = 120
+      Height = 21
+      Top = 140
+      Width = 41
+      MaxLength = 4
+      OnKeyPress = edtSKeyPress
+      TabOrder = 6
+      Text = 'edtS'
+    end
+    object edtSE: TEdit
+      Left = 200
+      Height = 21
+      Top = 140
+      Width = 41
+      MaxLength = 4
+      OnKeyPress = edtSEKeyPress
+      TabOrder = 7
+      Text = 'edtS'
+    end
+  end
+end

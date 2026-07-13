@@ -1,0 +1,25 @@
+object frmPantallaEscenario: TfrmPantallaEscenario
+  Left = 195
+  Height = 240
+  Top = 93
+  Width = 320
+  Align = alClient
+  BorderStyle = bsNone
+  Caption = 'frmPantallaEscenario'
+  ClientHeight = 240
+  ClientWidth = 320
+  Color = clWhite
+  Font.Height = -11
+  Font.Name = 'MS Sans Serif'
+  OnClose = FormClose
+  OnCreate = FormCreate
+  OnKeyPress = FormKeyPress
+  Position = poDefault
+  LCLVersion = '0.9.26.2'
+  WindowState = wsMaximized
+  object imgEscenario: TImage
+    Height = 105
+    Width = 105
+    OnMouseUp = imgEscenarioMouseUp
+  end
+end

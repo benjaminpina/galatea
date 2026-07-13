@@ -1,0 +1,17 @@
+{ Este es un archivo de recurso de Lazarus generado automáticamente }
+
+LazarusResources.Add('TfrmBuscarCarpeta','FORMDATA',[
+  'TPF0'#17'TfrmBuscarCarpeta'#16'frmBuscarCarpeta'#4'Left'#3#6#1#6'Height'#3
+  +#219#0#3'Top'#2'u'#5'Width'#3'9'#1#13'ActiveControl'#7#10'btnAceptar'#11'Bor'
+  +'derIcons'#11#12'biSystemMenu'#10'biMaximize'#0#11'BorderStyle'#7#8'bsDialog'
+  +#7'Caption'#6#11'Find folder'#12'ClientHeight'#3#219#0#11'ClientWidth'#3'9'#1
+  +#11'Font.Height'#2#245#9'Font.Name'#6#13'MS Sans Serif'#8'Position'#7#9'poDe'
+  +'fault'#10'LCLVersion'#6#8'0.9.26.2'#0#6'TLabel'#9'lblTitulo'#4'Left'#2#8#6
+  +'Height'#2#17#3'Top'#2#8#5'Width'#2'7'#7'Caption'#6#9'lblTitulo'#11'ParentCo'
+  +'lor'#8#0#0#7'TBitBtn'#10'btnAceptar'#4'Left'#3#253#0#6'Height'#2'!'#3'Top'#3
+  +#186#1#5'Width'#2'Y'#7'Anchors'#11#7'akRight'#8'akBottom'#0#7'Caption'#6#3'&'
+  +'OK'#4'Kind'#7#4'bkOK'#9'NumGlyphs'#2#0#8'TabOrder'#2#0#0#0#7'TBitBtn'#11'bt'
+  +'nCancelar'#4'Left'#3#149#0#6'Height'#2'!'#3'Top'#3#186#1#5'Width'#2'Y'#7'An'
+  +'chors'#11#7'akRight'#8'akBottom'#0#7'Caption'#6#7'&Cancel'#4'Kind'#7#8'bkCa'
+  +'ncel'#9'NumGlyphs'#2#0#8'TabOrder'#2#1#0#0#0
+]);

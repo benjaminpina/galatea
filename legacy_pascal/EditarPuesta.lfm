@@ -1,0 +1,169 @@
+object frmEditarPuesta: TfrmEditarPuesta
+  Left = 302
+  Height = 333
+  Top = 150
+  Width = 351
+  ActiveControl = cmbPadre
+  BorderStyle = bsDialog
+  Caption = 'Edit egg clutch properties'
+  ClientHeight = 333
+  ClientWidth = 351
+  Font.Height = -11
+  Font.Name = 'MS Sans Serif'
+  OnClose = FormClose
+  OnCreate = FormCreate
+  Position = poScreenCenter
+  LCLVersion = '0.9.26.2'
+  object GroupBox1: TGroupBox
+    Left = 8
+    Height = 96
+    Top = 8
+    Width = 337
+    Caption = 'Parents'
+    ClientHeight = 72
+    ClientWidth = 333
+    TabOrder = 0
+    object Label1: TLabel
+      Left = 22
+      Height = 18
+      Top = 10
+      Width = 65
+      Caption = '&Father:'
+      FocusControl = cmbPadre
+      ParentColor = False
+    end
+    object Label2: TLabel
+      Left = 22
+      Height = 18
+      Top = 42
+      Width = 69
+      Caption = '&Mother:'
+      FocusControl = cmbMadre
+      ParentColor = False
+    end
+    object cmbPadre: TComboBox
+      Left = 102
+      Height = 21
+      Top = 10
+      Width = 225
+      ItemIndex = 0
+      Items.Strings = (
+        'Pigmalion'
+        ''
+      )
+      MaxLength = 65535
+      Style = csDropDownList
+      TabOrder = 0
+      Text = 'Pigmalion'
+    end
+    object cmbMadre: TComboBox
+      Left = 102
+      Height = 21
+      Top = 42
+      Width = 225
+      ItemIndex = 0
+      Items.Strings = (
+        'Galatea'
+      )
+      MaxLength = 65535
+      Style = csDropDownList
+      TabOrder = 1
+      Text = 'Galatea'
+    end
+  end
+  object btbCancelar: TBitBtn
+    Left = 152
+    Height = 33
+    Top = 288
+    Width = 89
+    Caption = '&Cancel'
+    Kind = bkCancel
+    ModalResult = 2
+    NumGlyphs = 0
+    TabOrder = 3
+  end
+  object btbAceptar: TBitBtn
+    Left = 256
+    Height = 33
+    Top = 288
+    Width = 89
+    Caption = '&OK'
+    Kind = bkOK
+    ModalResult = 1
+    NumGlyphs = 0
+    OnClick = btbAceptarClick
+    TabOrder = 4
+  end
+  object GroupBox2: TGroupBox
+    Left = 8
+    Height = 81
+    Top = 192
+    Width = 337
+    Caption = 'Clutch size'
+    ClientHeight = 57
+    ClientWidth = 333
+    TabOrder = 2
+    object Label3: TLabel
+      Left = 22
+      Height = 18
+      Top = 10
+      Width = 135
+      Caption = '&Number of eggs:'
+      FocusControl = edtNumero
+      ParentColor = False
+    end
+    object edtNumero: TEdit
+      Left = 104
+      Height = 21
+      Top = 26
+      Width = 145
+      OnKeyPress = edtNumeroKeyPress
+      TabOrder = 0
+      Text = '4'
+    end
+    object UpDown1: TUpDown
+      Left = 249
+      Height = 21
+      Top = 26
+      Width = 16
+      Associate = edtNumero
+      Min = 1
+      Position = 4
+      TabOrder = 1
+    end
+  end
+  object GroupBox3: TGroupBox
+    Left = 8
+    Height = 65
+    Top = 112
+    Width = 337
+    ClientHeight = 41
+    ClientWidth = 333
+    TabOrder = 1
+    object Label4: TLabel
+      Left = 22
+      Height = 18
+      Top = 10
+      Width = 35
+      Caption = 'Age:'
+      ParentColor = False
+    end
+    object Label5: TLabel
+      Left = 272
+      Height = 18
+      Top = 10
+      Width = 46
+      Caption = 'cycles'
+      ParentColor = False
+    end
+    object edtEdad: TEdit
+      Left = 104
+      Height = 21
+      Top = 10
+      Width = 145
+      OnKeyPress = edtEdadKeyPress
+      TabOrder = 0
+      Text = '0'
+    end
+  end
+end

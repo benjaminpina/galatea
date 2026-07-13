@@ -1,0 +1,34 @@
+{ This is an automatically generated lazarus resource file }
+
+LazarusResources.Add('TfrmAtractividad','FORMDATA',[
+  'TPF0'#16'TfrmAtractividad'#15'frmAtractividad'#4'Left'#3#231#1#6'Height'#3
+  +#242#0#3'Top'#3#237#0#5'Width'#3#247#1#13'ActiveControl'#7#10'btbAceptar'#11
+  +'BorderStyle'#7#8'bsDialog'#7'Caption'#6#12'Attractivity'#12'ClientHeight'#3
+  +#242#0#11'ClientWidth'#3#247#1#11'Font.Height'#2#245#9'Font.Name'#6#13'MS Sa'
+  +'ns Serif'#8'OnCreate'#7#10'FormCreate'#8'Position'#7#14'poScreenCenter'#10
+  +'LCLVersion'#6#6'0.9.30'#0#6'TLabel'#7'Label16'#4'Left'#2#8#6'Height'#2#15#3
+  +'Top'#3#144#0#5'Width'#3'L'#1#7'Caption'#6';Double click over blue controls '
+  +'for opening formula editor.'#11'ParentColor'#8#0#0#7'TBitBtn'#10'btbAceptar'
+  +#4'Left'#3#144#1#6'Height'#2'!'#3'Top'#3#200#0#5'Width'#2'Y'#7'Caption'#6#3
+  +'&OK'#4'Kind'#7#4'bkOK'#11'ModalResult'#2#1#9'NumGlyphs'#2#0#7'OnClick'#7#15
+  +'btbAceptarClick'#8'TabOrder'#2#0#0#0#7'TBitBtn'#11'btbCancelar'#4'Left'#3'('
+  +#1#6'Height'#2'!'#3'Top'#3#200#0#5'Width'#2'Y'#7'Caption'#6#7'&Cancel'#4'Kin'
+  +'d'#7#8'bkCancel'#11'ModalResult'#2#2#9'NumGlyphs'#2#0#8'TabOrder'#2#1#0#0#9
+  +'TGroupBox'#9'GroupBox1'#4'Left'#2#8#6'Height'#3#129#0#3'Top'#2#8#5'Width'#3
+  +#225#1#12'ClientHeight'#2'}'#11'ClientWidth'#3#221#1#8'TabOrder'#2#2#0#6'TLa'
+  +'bel'#6'Label2'#4'Left'#2#8#6'Height'#2#15#3'Top'#2'4'#5'Width'#2'i'#7'Capti'
+  +'on'#6#19'&Perception radius:'#12'FocusControl'#7#8'edtRadio'#11'ParentColor'
+  +#8#0#0#6'TLabel'#6'Label1'#4'Left'#2#8#6'Height'#2#15#3'Top'#2#2#5'Width'#2
+  +']'#7'Caption'#6#20'A&ttractivity (+/-):'#12'FocusControl'#7#15'edtAtractivi'
+  +'dad'#11'ParentColor'#8#0#0#6'TLabel'#6'Label3'#4'Left'#3#155#1#6'Height'#2
+  +#15#3'Top'#2'A'#5'Width'#2'0'#7'Caption'#6#7'squares'#11'ParentColor'#8#0#0#5
+  +'TEdit'#15'edtAtractividad'#4'Left'#2#8#6'Height'#2#22#3'Top'#2#20#5'Width'#3
+  +#206#1#5'Color'#7#9'clSkyBlue'#10'OnDblClick'#7#23'edtAtractividadDblClick'#9
+  +'OnMouseUp'#7#22'edtAtractividadMouseUp'#8'TabOrder'#2#0#4'Text'#6#15'edtAtr'
+  +'actividad'#0#0#5'TEdit'#8'edtRadio'#4'Left'#2#8#6'Height'#2#22#3'Top'#2'G'#5
+  +'Width'#3'~'#1#5'Color'#7#9'clSkyBlue'#10'OnDblClick'#7#16'edtRadioDblClick'
+  +#9'OnMouseUp'#7#15'edtRadioMouseUp'#8'TabOrder'#2#1#4'Text'#6#8'edtRadio'#0#0
+  +#0#9'TCheckBox'#14'chbInicializar'#4'Left'#2#16#6'Height'#2#26#3'Top'#3#168#0
+  +#5'Width'#3#224#0#7'Caption'#6'''&Initialize all cells with these values'#8
+  +'TabOrder'#2#3#0#0#0
+]);

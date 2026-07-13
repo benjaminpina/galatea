@@ -1,0 +1,120 @@
+object frmSeleccionarElemento: TfrmSeleccionarElemento
+  Left = 318
+  Height = 556
+  Top = 122
+  Width = 342
+  ActiveControl = btbAceptar
+  BorderStyle = bsDialog
+  Caption = 'Select element'
+  ClientHeight = 556
+  ClientWidth = 342
+  Font.Height = -11
+  Font.Name = 'MS Sans Serif'
+  OnCloseQuery = FormCloseQuery
+  OnCreate = FormCreate
+  Position = poScreenCenter
+  LCLVersion = '0.9.26.2'
+  object GroupBox1: TGroupBox
+    Left = 8
+    Height = 120
+    Top = 8
+    Width = 321
+    Caption = 'Agents'
+    ClientHeight = 120
+    ClientWidth = 321
+    TabOrder = 0
+    object lstAgentes: TListBox
+      Left = 6
+      Height = 89
+      Top = 2
+      Width = 305
+      OnClick = lstAgentesClick
+      OnDblClick = lstAgentesDblClick
+      TabOrder = 0
+      TopIndex = -1
+    end
+  end
+  object GroupBox2: TGroupBox
+    Left = 8
+    Height = 121
+    Top = 264
+    Width = 321
+    Caption = 'Dynamic elements (nutriments sources)'
+    ClientHeight = 121
+    ClientWidth = 321
+    TabOrder = 1
+    object lstDinamicos: TListBox
+      Left = 6
+      Height = 89
+      Top = 2
+      Width = 305
+      OnClick = lstDinamicosClick
+      OnDblClick = lstDinamicosDblClick
+      TabOrder = 0
+      TopIndex = -1
+    end
+  end
+  object btbAceptar: TBitBtn
+    Left = 241
+    Height = 33
+    Top = 512
+    Width = 89
+    Caption = '&OK'
+    Kind = bkOK
+    ModalResult = 1
+    NumGlyphs = 0
+    OnClick = btbAceptarClick
+    TabOrder = 2
+  end
+  object btbCancelar: TBitBtn
+    Left = 136
+    Height = 33
+    Top = 512
+    Width = 89
+    Caption = '&Cancel'
+    Kind = bkCancel
+    ModalResult = 2
+    NumGlyphs = 0
+    TabOrder = 3
+  end
+  object GroupBox3: TGroupBox
+    Left = 8
+    Height = 120
+    Top = 384
+    Width = 321
+    Caption = 'Dynamic elements (oviposition sites)'
+    ClientHeight = 120
+    ClientWidth = 321
+    TabOrder = 4
+    object lstOviposicion: TListBox
+      Left = 6
+      Height = 89
+      Top = 2
+      Width = 305
+      OnClick = lstOviposicionClick
+      OnDblClick = lstOviposicionDblClick
+      TabOrder = 0
+      TopIndex = -1
+    end
+  end
+  object GroupBox4: TGroupBox
+    Left = 8
+    Height = 136
+    Top = 128
+    Width = 321
+    Caption = 'Eggs'
+    ClientHeight = 136
+    ClientWidth = 321
+    TabOrder = 5
+    object lstHuevos: TListBox
+      Left = 6
+      Height = 105
+      Top = 2
+      Width = 305
+      OnClick = lstHuevosClick
+      OnDblClick = lstHuevosDblClick
+      TabOrder = 0
+      TopIndex = -1
+    end
+  end
+end

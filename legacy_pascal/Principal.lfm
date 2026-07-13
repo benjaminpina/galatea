@@ -1,0 +1,726 @@
+object frmPrincipal: TfrmPrincipal
+  Left = 303
+  Height = 534
+  Top = 361
+  Width = 1530
+  ActiveControl = edtRetardo
+  Caption = 'Galatea'
+  ClientHeight = 534
+  ClientWidth = 1530
+  DesignTimePPI = 192
+  Font.Height = -22
+  Font.Name = 'MS Sans Serif'
+  Menu = MainMenu1
+  OnClose = FormClose
+  OnCloseQuery = FormCloseQuery
+  OnCreate = FormCreate
+  OnPaint = FormPaint
+  OnResize = FormResize
+  Position = poDefault
+  ShowHint = True
+  LCLVersion = '3.8.0.0'
+  object ptbEntorno: TPaintBox
+    AnchorSideLeft.Control = pnlStatus
+    AnchorSideLeft.Side = asrBottom
+    AnchorSideTop.Control = ToolBar1
+    AnchorSideTop.Side = asrBottom
+    AnchorSideRight.Control = scbVertical
+    AnchorSideBottom.Control = scbHorizontal
+    Left = 354
+    Height = 438
+    Top = 50
+    Width = 1163
+    Anchors = [akTop, akLeft, akRight, akBottom]
+  end
+  object StatusBar1: TStatusBar
+    Left = 0
+    Height = 33
+    Top = 501
+    Width = 1530
+    Panels = <    
+      item
+        Width = 800
+      end    
+      item
+        Width = 100
+      end>
+  end
+  object ToolBar1: TToolBar
+    Cursor = crHandPoint
+    Left = 0
+    Height = 50
+    Top = 0
+    Width = 1530
+    Caption = 'ToolBar1'
+    Images = ImageList1
+    TabOrder = 0
+    object ToolButton5: TToolButton
+      Left = 1
+      Top = 2
+      Action = actNuevo
+    end
+    object ToolButton2: TToolButton
+      Left = 47
+      Top = 2
+      Action = actAbrir
+    end
+    object ToolButton3: TToolButton
+      Left = 93
+      Top = 2
+      Action = actGuardar
+    end
+    object ToolButton4: TToolButton
+      Left = 139
+      Height = 44
+      Top = 2
+      Caption = 'ToolButton4'
+      ImageIndex = 3
+      Style = tbsSeparator
+    end
+    object tlbInicio: TToolButton
+      Left = 155
+      Top = 2
+      Action = actIniciar
+    end
+    object tlbPausa: TToolButton
+      Left = 201
+      Top = 2
+      Action = actPausa
+    end
+    object tlbPaso: TToolButton
+      Left = 247
+      Top = 2
+      Action = actPaso
+    end
+    object tlbAlto: TToolButton
+      Left = 293
+      Top = 2
+      Action = actDetener
+    end
+    object ToolButton9: TToolButton
+      Left = 339
+      Height = 44
+      Top = 2
+      Caption = 'ToolButton9'
+      ImageIndex = 7
+      Style = tbsSeparator
+    end
+    object ToolButton8: TToolButton
+      Left = 497
+      Height = 44
+      Top = 2
+      Caption = 'ToolButton8'
+      ImageIndex = 6
+      Style = tbsSeparator
+    end
+    object ToolButton18: TToolButton
+      Left = 547
+      Top = 2
+      Action = actIncZoom
+    end
+    object ToolButton19: TToolButton
+      Left = 593
+      Top = 2
+      Action = actDecZoom
+    end
+    object ToolButton21: TToolButton
+      Left = 639
+      Height = 44
+      Top = 2
+      Caption = 'ToolButton21'
+      ImageIndex = 9
+      Style = tbsSeparator
+    end
+    object tlbVisualizar: TToolButton
+      Left = 655
+      Top = 2
+      Action = actNoDesplegar
+    end
+    object ToolButton23: TToolButton
+      Left = 701
+      Height = 44
+      Top = 2
+      Caption = 'ToolButton23'
+      ImageIndex = 6
+      Style = tbsSeparator
+    end
+    object ToolButton20: TToolButton
+      Left = 863
+      Height = 44
+      Top = 2
+      Caption = 'ToolButton20'
+      ImageIndex = 8
+      Style = tbsSeparator
+    end
+    object ToolButton7: TToolButton
+      Left = 879
+      Top = 2
+      Action = actEntornos
+    end
+    object ToolButton10: TToolButton
+      Left = 925
+      Top = 2
+      Action = actEditor
+    end
+    object ToolButton6: TToolButton
+      Left = 971
+      Top = 2
+      Action = actAgentes
+    end
+    object ToolButton1: TToolButton
+      Left = 1017
+      Top = 2
+      Action = actSustratos
+    end
+    object ToolButton13: TToolButton
+      Left = 1063
+      Top = 2
+      Action = actAnalizador
+    end
+    object ToolButton16: TToolButton
+      Left = 1109
+      Height = 44
+      Top = 2
+      Caption = 'ToolButton16'
+      ImageIndex = 12
+      Style = tbsSeparator
+    end
+    object ToolButton25: TToolButton
+      Left = 1125
+      Top = 2
+      Action = actExpEntorno
+    end
+    object ToolButton26: TToolButton
+      Left = 1171
+      Height = 44
+      Top = 2
+      Caption = 'ToolButton26'
+      ImageIndex = 7
+      Style = tbsSeparator
+    end
+    object ToolButton15: TToolButton
+      Left = 1187
+      Top = 2
+      Action = actAyuda
+    end
+    object ToolButton14: TToolButton
+      Left = 1233
+      Height = 44
+      Top = 2
+      Caption = 'ToolButton14'
+      ImageIndex = 6
+      Style = tbsSeparator
+    end
+    object ToolButton17: TToolButton
+      Left = 1249
+      Top = 2
+      Action = actSalir
+    end
+    object edtRetardo: TEdit
+      Left = 355
+      Height = 43
+      Hint = 'Delay|Specifies the time (in miliconds) of delay between cycle and cycle'
+      Top = 2
+      Width = 142
+      TabOrder = 1
+      Text = '0'
+      OnChange = edtRetardoChange
+      OnKeyPress = edtRetardoKeyPress
+    end
+    object updRetardo: TUpDown
+      Left = 513
+      Height = 44
+      Top = 2
+      Width = 34
+      Associate = edtRetardo
+      Increment = 10
+      Max = 5000
+      Min = 0
+      Position = 0
+      TabOrder = 0
+      Thousands = False
+    end
+    object cmbEscala: TComboBox
+      Left = 717
+      Height = 41
+      Hint = 'Zoom|Specifies the zoom factor'
+      Top = 2
+      Width = 146
+      ItemHeight = 0
+      ItemIndex = 4
+      Items.Strings = (
+        '20 %'
+        '40 %'
+        '60 %'
+        '80 %'
+        '100 %'
+        '120 %'
+        '140 %'
+        '160 %'
+        '180 %'
+        '200 %'
+      )
+      MaxLength = 65535
+      Style = csDropDownList
+      TabOrder = 2
+      Text = '100 %'
+      OnChange = cmbEscalaChange
+    end
+  end
+  object scbHorizontal: TScrollBar
+    AnchorSideLeft.Control = pnlStatus
+    AnchorSideLeft.Side = asrBottom
+    AnchorSideRight.Control = scbVertical
+    AnchorSideBottom.Control = StatusBar1
+    Left = 354
+    Height = 13
+    Top = 488
+    Width = 1163
+    Anchors = [akLeft, akRight, akBottom]
+    PageSize = 0
+    TabOrder = 1
+    Visible = False
+    OnChange = scbHorizontalChange
+  end
+  object scbVertical: TScrollBar
+    AnchorSideTop.Control = ToolBar1
+    AnchorSideTop.Side = asrBottom
+    AnchorSideRight.Control = Owner
+    AnchorSideRight.Side = asrBottom
+    AnchorSideBottom.Control = scbHorizontal
+    Left = 1517
+    Height = 438
+    Top = 50
+    Width = 13
+    Anchors = [akTop, akRight, akBottom]
+    Kind = sbVertical
+    PageSize = 0
+    TabOrder = 2
+    Visible = False
+    OnChange = scbVerticalChange
+  end
+  object pnlStatus: TPanel
+    Left = 0
+    Height = 451
+    Top = 50
+    Width = 354
+    Align = alLeft
+    ClientHeight = 451
+    ClientWidth = 354
+    TabOrder = 3
+    object btnInformar: TBitBtn
+      Left = 64
+      Height = 50
+      Top = 624
+      Width = 226
+      Action = actInformar
+      Images = ImageList1
+      ImageIndex = 22
+      TabOrder = 0
+    end
+    object memInfo: TMemo
+      Left = 12
+      Height = 592
+      Top = 14
+      Width = 324
+      Lines.Strings = (
+        'Memo1'
+      )
+      ScrollBars = ssAutoBoth
+      TabOrder = 1
+    end
+  end
+  object ActionList1: TActionList
+    Images = ImageList1
+    Left = 448
+    Top = 96
+    object actNuevo: TAction
+      Caption = '&New project'
+      Enabled = False
+      Hint = 'New project|Create a new simulation project'
+      ImageIndex = 0
+      OnExecute = actNuevoExecute
+      ShortCut = 16462
+    end
+    object actAbrir: TAction
+      Caption = '&Open Environment'
+      Hint = 'Open environment|Open a environment file'
+      ImageIndex = 1
+      OnExecute = actAbrirExecute
+      ShortCut = 16463
+    end
+    object actGuardar: TAction
+      Caption = '&Save Project'
+      Enabled = False
+      Hint = 'Save project|Save the current project'
+      ImageIndex = 2
+      OnExecute = actGuardarExecute
+      ShortCut = 16467
+    end
+    object actGuardarComo: TAction
+      Caption = 'S&ave Project As'
+      Enabled = False
+      Hint = 'Save project as|Save the current project in a new file'
+      ImageIndex = 3
+      OnExecute = actGuardarComoExecute
+    end
+    object actCerrar: TAction
+      Caption = 'C&lose Environment'
+      Hint = 'Close project|Close the current environment'
+      ImageIndex = 4
+      OnExecute = actCerrarExecute
+    end
+    object actSalir: TAction
+      Caption = 'E&xit'
+      Hint = 'Exit|Leave from Galatea'
+      ImageIndex = 5
+      OnExecute = actSalirExecute
+    end
+    object actIniciar: TAction
+      Caption = '&Run'
+      Hint = 'Run|Run the current proyect'
+      ImageIndex = 6
+      OnExecute = actIniciarExecute
+      ShortCut = 116
+    end
+    object actPausa: TAction
+      Caption = '&Pause'
+      Hint = 'Pause|Pause in the current running'
+      ImageIndex = 7
+      OnExecute = actPausaExecute
+      ShortCut = 16464
+    end
+    object actPaso: TAction
+      Caption = '&Next step'
+      Hint = 'Next step|Ejecutes the next step in the current running'
+      ImageIndex = 8
+      OnExecute = actPasoExecute
+      ShortCut = 119
+    end
+    object actDetener: TAction
+      Caption = '&Stop'
+      Hint = 'Stop|Stopping the current running'
+      ImageIndex = 9
+      OnExecute = actDetenerExecute
+      ShortCut = 16497
+    end
+    object actEditor: TAction
+      Caption = '&Stage Editor'
+      Hint = 'Stage Editor|Open the Stage Editor'
+      ImageIndex = 10
+      OnExecute = actEditorExecute
+    end
+    object actSustratos: TAction
+      Caption = 'S&ubstrate Editor'
+      Hint = 'Substratum Editor|Open the Substratum Editor'
+      ImageIndex = 14
+      OnExecute = actSustratosExecute
+    end
+    object actAgentes: TAction
+      Caption = '&Agent Editor'
+      Hint = 'Agent Editor|Open Agent Editor'
+      ImageIndex = 16
+      OnExecute = actAgentesExecute
+    end
+    object actOpcionesProyecto: TAction
+      Caption = '&Proyect options'
+      Hint = 'Project options|Set project options'
+      ImageIndex = 11
+      OnExecute = actOpcionesProyectoExecute
+    end
+    object actGenerales: TAction
+      Caption = '&General options'
+      Hint = 'General options|Set general options'
+      ImageIndex = 12
+      OnExecute = actGeneralesExecute
+    end
+    object actAyuda: TAction
+      Caption = '&Contents'
+      Hint = 'Help contents|Show the help contents'
+      ImageIndex = 13
+      ShortCut = 112
+    end
+    object actAcerca: TAction
+      Caption = '&About Galatea'
+      Hint = 'About|Show program information'
+    end
+    object actEntornos: TAction
+      Caption = '&Environment Editor'
+      Hint = 'Environment Editor|Open the Environment Editor'
+      ImageIndex = 15
+      OnExecute = actEntornosExecute
+    end
+    object actDecZoom: TAction
+      Caption = 'Zoom &out'
+      Hint = 'Zoom out|Decrease zoom factor'
+      ImageIndex = 17
+      OnExecute = actDecZoomExecute
+      ShortCut = 16463
+    end
+    object actIncZoom: TAction
+      Caption = 'Zoom &in'
+      Hint = 'Zoom in|Increase zoom factor'
+      ImageIndex = 18
+      OnExecute = actIncZoomExecute
+      ShortCut = 16457
+    end
+    object actNoDesplegar: TAction
+      Caption = 'Not &display'
+      Hint = 'Not display|Enables the execution without displaying environment mode, accelerating the execution'
+      ImageIndex = 19
+      OnExecute = actNoDesplegarExecute
+      ShortCut = 16452
+    end
+    object actAnalizador: TAction
+      Caption = '&Output files analizer'
+      Hint = 'Output files analizer|Open the output files analizer'
+      ImageIndex = 20
+      OnExecute = actAnalizadorExecute
+    end
+    object actExpEntorno: TAction
+      Caption = 'Export to environment file'
+      Hint = 'Export to environment file|Export simulation state to a new environment file'
+      ImageIndex = 21
+    end
+    object actInformar: TAction
+      Caption = 'Show information'
+      Hint = 'Show information|Show information about current simulation state'
+      ImageIndex = 22
+      OnExecute = actInformarExecute
+    end
+  end
+  object MainMenu1: TMainMenu
+    Images = ImageList1
+    Left = 528
+    Top = 96
+    object Proyecto1: TMenuItem
+      Caption = '&File'
+      object Nuevo1: TMenuItem
+        Action = actNuevo
+        OnClick = actNuevoExecute
+      end
+      object Abrirproyecto1: TMenuItem
+        Action = actAbrir
+        OnClick = actAbrirExecute
+      end
+      object GuardarProyecto1: TMenuItem
+        Action = actGuardar
+        OnClick = actGuardarExecute
+      end
+      object GuardarProyectocomo1: TMenuItem
+        Action = actGuardarComo
+        OnClick = actGuardarComoExecute
+      end
+      object CerrarProyecto1: TMenuItem
+        Action = actCerrar
+        OnClick = actCerrarExecute
+      end
+      object N4: TMenuItem
+        Caption = '-'
+      end
+      object Exporttoenvironmentfile1: TMenuItem
+        Caption = 'Export to environment file'
+        Hint = 'Export to environment file |Export simulation state to a new environment file'
+        ImageIndex = 24
+        OnClick = actExpEntornoExecute
+      end
+      object N1: TMenuItem
+        Caption = '-'
+      end
+      object R1: TMenuItem
+        Caption = 'reciente'
+        Visible = False
+        OnClick = R1Click
+      end
+      object R21: TMenuItem
+        Caption = 'reciente'
+        Visible = False
+        OnClick = R21Click
+      end
+      object R31: TMenuItem
+        Caption = 'reciente'
+        Visible = False
+        OnClick = R31Click
+      end
+      object R41: TMenuItem
+        Caption = 'reciente'
+        Visible = False
+        OnClick = R41Click
+      end
+      object R51: TMenuItem
+        Caption = 'reciente'
+        Visible = False
+        OnClick = R51Click
+      end
+      object N2: TMenuItem
+        Caption = '-'
+        Visible = False
+      end
+      object Salir1: TMenuItem
+        Action = actSalir
+        OnClick = actSalirExecute
+      end
+    end
+    object Ejecucin1: TMenuItem
+      Caption = '&Run'
+      object Iniciar1: TMenuItem
+        Action = actIniciar
+        OnClick = actIniciarExecute
+      end
+      object Pausa1: TMenuItem
+        Action = actPausa
+        OnClick = actPausaExecute
+      end
+      object Pasosiguiente1: TMenuItem
+        Action = actPaso
+        OnClick = actPasoExecute
+      end
+      object Detener1: TMenuItem
+        Action = actDetener
+        OnClick = actDetenerExecute
+      end
+    end
+    object View1: TMenuItem
+      Caption = '&View'
+      object Zoomin1: TMenuItem
+        Action = actIncZoom
+        OnClick = actIncZoomExecute
+      end
+      object Zoomout1: TMenuItem
+        Action = actDecZoom
+        OnClick = actDecZoomExecute
+      end
+    end
+    object Herramientas1: TMenuItem
+      Caption = '&Tools'
+      object EnvironmentEditor1: TMenuItem
+        Action = actEntornos
+        OnClick = actEntornosExecute
+      end
+      object EditordeEscenarios1: TMenuItem
+        Action = actEditor
+        OnClick = actEditorExecute
+      end
+      object Agentstypes1: TMenuItem
+        Action = actAgentes
+        OnClick = actAgentesExecute
+      end
+      object SubstratumEditor1: TMenuItem
+        Action = actSustratos
+        OnClick = actSustratosExecute
+      end
+      object Outputfilesanalizer1: TMenuItem
+        Action = actAnalizador
+        OnClick = actAnalizadorExecute
+      end
+    end
+    object Opciones1: TMenuItem
+      Caption = '&Options'
+      object DelProyecto1: TMenuItem
+        Action = actOpcionesProyecto
+        Enabled = False
+        OnClick = actOpcionesProyectoExecute
+      end
+      object Generales1: TMenuItem
+        Action = actGenerales
+        OnClick = actGeneralesExecute
+      end
+      object N5: TMenuItem
+        Caption = '-'
+        ImageIndex = 21
+      end
+      object Exporttoenvironmentfile2: TMenuItem
+        Action = actExpEntorno
+      end
+    end
+    object Ayuda1: TMenuItem
+      Caption = '&Help'
+      object Contenido1: TMenuItem
+        Action = actAyuda
+      end
+      object N3: TMenuItem
+        Caption = '-'
+      end
+      object AcercadeGalatea1: TMenuItem
+        Action = actAcerca
+      end
+    end
+  end
+  object dlgAbreProyecto: TOpenDialog
+    Title = 'Open Environment'
+    Filter = 'Galatea environment|*.ngl'
+    Options = [ofHideReadOnly, ofPathMustExist, ofFileMustExist, ofEnableSizing]
+    Left = 688
+    Top = 96
+  end
+  object dlgGuardarProyecto: TSaveDialog
+    Title = 'Guardar Proyecto como...'
+    Filter = 'Proyecto de Galatea (*.pgl)|*.pgl'
+    Options = [ofOverwritePrompt, ofHideReadOnly, ofPathMustExist, ofEnableSizing]
+    Left = 768
+    Top = 96
+  end
+  object ImageList1: TImageList
+    BkColor = clForm
+    Left = 848
+    Top = 96
+    Bitmap = {
+      4C7A170000001000000010000000020600000000000078DAED5C5B72EB300865
+      DFF9C9C63AD39D716BC77200F1949CEBA6B13A9A34920E20047A99181011ACE4
+      D5D1FAE5536B5B297F7CB7724C73AFE589D1F0B1267EA713E9C3C11359CA7857
+      1FBC5F18A5BD1F5AAEE213F26BF8DBED961EBFB7C1FBF6CBB366FB5BD942BBE5
+      564ECB68396452E4DF97FF77F8E5F3EBEBEB34FF6F329FE5FF929FAA8717FABF
+      D5FFCBFF5FE0FF199F1B5FB3D6EA3E177C6E4B0F9DAB340A3E67E3733E97E3DF
+      CBE3E5A4CFD97ACCF9FC40FF97F19003B819CDF63F84738E577F147E3287F67D
+      047ED125CD23784AA78ADFE6ACE71CC2E7A271FFDFE6A219FF6F3466FC9FCA31
+      E3FF30E9FF206419F57FD99FAAFF7778290772BC3AFF355D7AFE6FED25127B92
+      43F07FC1FF83FE87FE9FC007FE3FBFFFAF9E2F68F951E787D1B2FC58BBD8362E
+      8B7EB544C6CDC4D3F18DD773BE8FA3FB2836C65E5F0C3F6B73B1EBAF037BF7CA
+      3E32EC7775ECBCF153F6DA5ED9B09D6AE5B3FE33B7FFAFE9CFB1DF9F557AB70E
+      736E4FE097CF51FC339F8CB7D6B77791FFD3F1FE7AEAE3E3F5D8C627F64353F3
+      5FED6C9F3E054CEEBBB0922C7C4650B22E46783C008F07E0F1003C9EC8FF2CFD
+      97C75FDEB35959C3BFE0DCF14EE92FFAFF0C9EB619F1BF4FC79F327E97FF5FFE
+      FF22FFFF0DF3079EC81F2EFFBFFCFF03FD1F27FDE753F197FFBF53BAFDF46724
+      13FCAE5BA51DD3BD82EFC6C7C076F507E13DF9B3782BBF139EDE5455C64F6235
+      1A91FD9C8DF7FA9FC50FFBCF79EB3864EE6CFAE7EF665B670DE99F7B3F697AFC
+      EDE7E6814C18C42E68310168F3B5FA1AC507A0A573F4FB68F23574E5F1D4FA97
+      19FF20EEC31D3F530F108F5F4A0749FD43A0FF21DD43D15620E96B65FFC59C01
+      1E9621763005832CEE44D2CBC6DE29E708F7F021D95978AD3EC26A78DA2EC27A
+      F80C56F6DF52BF478F6A2F83B5F0169F9CFE2DDA59FDD7F97AFACF6233FA4F9C
+      83BDF5756C0340E3C6682C5901ABEA34A021B1F6F7406612DFA67E37E231EC7E
+      73FE9ADE51C45A41176F17C49F9058815E87B2DC7EA626F5B0C61161277B17BF
+      BE9F6945DB16C724F92BF1EF2CEED0D2BB767F4365C740EF5A0CBE8647217F10
+      C3CFCA28BDBDFF4A9DBC1FD5E2FB5A7B2FF6CF9A3868BC5F662D8DD6D54ADB96
+      6FED9C41FFE8770F8F1B5E623C7C3B3F51FE142365F1F094BFF677FB257730EB
+      9978CBF404B9DA1B8FDBA4F3C86EBF144B6911BC19FB29F18477C35B7BC78E3F
+      A5E1F017720CA80BB0E57DEE34F2A3CDCDC91C2F63A777FC4DE0E8F9DB89BD66
+      FC578CCE5F8B1D77E5DFCB0FB6BFD1BC8EB97E4781561DB3D7A74DACEEABDC41
+      61B31F56D7EC6CF0FE6E02FF90F329BF2E5F8EBFAA3798C357F96B7AE7E30221
+      FFF2FD1FE53F72FF96C05BF6F7D0EF71FC190DD0F86188F7FCC8E73F9EDF2669
+      1375158F304E0306658009ECFEFB9B2A4F60FC4BCF575BBC7E113374809DC512
+      3C3B4497C716C6B16F9EE856E07EBFB33DDEF63D7D75B0B49739F9AC736DFBFD
+      FDBDCA443F231A8D8F86A5349CBEAC75167649810C3B7FCD8C137D98E27F40FF
+      A7F49F1CFFD41D92697FF118549F6D5D3414ECD9FE3FE07BBBFD534C9BC6298D
+      C8FF29DFE6B7491FD8F95BCB5876FE18E17F40FFA7F47FF9FFDBFBFF83CEA2DF
+      4AD6EE85EE7D5EED5196330CA7B5EE5745FBD5369FF68052E6BE9C63EF669B27
+      DEA261D53DE46CFA0043BEBEECBEB5A7FC5DFD086C0A7FB7B116BED3BB7C1F49
+      823FFBEDA7213F9793F0D7B0AABDD878262F0AFBEBC64FC82FB00D6FDB2DA8BE
+      B09FFFA51F0086B60F9AAF24C676C67FBB3B8F62DC4F87559E3741FF3E0E9478
+      F53997F8AEBD1BC4E4ABFCFEDC783748FFEC4CE1EBBC7302AC7E63F00E0B8A57
+      F90734643C8AAA3B8506D8BFC7EF74870A2EF83DBE276BC4BF140BEEE141790F
+      81F1FF4BF91B7D7E29FFFF1E87ECCC5B68D5D1FD205967C3F59FCF836C0FDCAF
+      4FCFF557AD2FE0E5FA8BC0E557E56378ECD74082F7D6FD2E06CFC527E309051E
+      010B78617B65FE82065BBFC7F8D7F0E299F83DB3F6C5FA67F7FFDD7A8DFDFE45
+      EACFF2156B7F3D71D69F8C03CE840245EF6CCA040A6B710C53EF9281DCFB38D5
+      39DC59FF3BBD15E6EF6E0F52C137BB55639014FAFD7A6EEF9F327B21C9DF93E3
+      57F32FEC018DF1838CDE2167C333EB7F690FF00F371BE3A5
+    }
+  end
+  object dlgGuardarEntorno: TSaveDialog
+    Title = 'Save Galatea Environment'
+    Filter = 'Galatea Environment (*.ngl)|*.ngl'
+    Options = [ofOverwritePrompt, ofHideReadOnly, ofPathMustExist, ofEnableSizing]
+    Left = 640
+    Top = 240
+  end
+end

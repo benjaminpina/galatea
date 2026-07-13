@@ -1,0 +1,334 @@
+object frmLlenarCelda: TfrmLlenarCelda
+  Left = 367
+  Height = 447
+  Top = 173
+  Width = 788
+  ActiveControl = edtMoverse
+  BorderStyle = bsDialog
+  Caption = 'Fill cell'
+  ClientHeight = 447
+  ClientWidth = 788
+  Font.Height = -11
+  Font.Name = 'MS Sans Serif'
+  OnCreate = FormCreate
+  Position = poScreenCenter
+  LCLVersion = '0.9.30'
+  object Label16: TLabel
+    Left = 8
+    Height = 15
+    Top = 392
+    Width = 332
+    Caption = 'Double click over blue controls for opening formula editor.'
+    ParentColor = False
+  end
+  object btbAceptar: TBitBtn
+    Left = 688
+    Height = 33
+    Top = 400
+    Width = 89
+    Caption = '&OK'
+    Kind = bkOK
+    ModalResult = 1
+    NumGlyphs = 0
+    OnClick = btbAceptarClick
+    TabOrder = 5
+  end
+  object btbCancelar: TBitBtn
+    Left = 589
+    Height = 33
+    Top = 400
+    Width = 89
+    Caption = '&Cancel'
+    Kind = bkCancel
+    ModalResult = 2
+    NumGlyphs = 0
+    TabOrder = 6
+  end
+  object GroupBox2: TGroupBox
+    Left = 8
+    Height = 233
+    Top = 152
+    Width = 385
+    Caption = 'Foraging'
+    ClientHeight = 217
+    ClientWidth = 381
+    TabOrder = 1
+    object Label10: TLabel
+      Left = 16
+      Height = 15
+      Top = 10
+      Width = 34
+      Caption = 'Drink:'
+      FocusControl = edtAgua
+      ParentColor = False
+    end
+    object Label11: TLabel
+      Left = 16
+      Height = 15
+      Top = 58
+      Width = 106
+      Caption = 'Eat carbohidrates:'
+      FocusControl = edtAzucar
+      ParentColor = False
+    end
+    object Label12: TLabel
+      Left = 16
+      Height = 15
+      Top = 106
+      Width = 57
+      Caption = 'Eat lipids:'
+      FocusControl = edtGrasa
+      ParentColor = False
+    end
+    object Label13: TLabel
+      Left = 16
+      Height = 15
+      Top = 154
+      Width = 67
+      Caption = 'Eat protein:'
+      FocusControl = edtProteina
+      ParentColor = False
+    end
+    object edtAgua: TEdit
+      Left = 16
+      Height = 22
+      Top = 26
+      Width = 345
+      Color = clSkyBlue
+      OnDblClick = edtAguaDblClick
+      OnMouseUp = edtAguaMouseUp
+      TabOrder = 0
+      Text = 'edtA'
+    end
+    object edtAzucar: TEdit
+      Left = 16
+      Height = 22
+      Top = 74
+      Width = 345
+      Color = clSkyBlue
+      OnDblClick = edtAzucarDblClick
+      OnMouseUp = edtAzucarMouseUp
+      TabOrder = 1
+      Text = 'edtA'
+    end
+    object edtGrasa: TEdit
+      Left = 16
+      Height = 22
+      Top = 120
+      Width = 345
+      Color = clSkyBlue
+      OnDblClick = edtGrasaDblClick
+      OnMouseUp = edtGrasaMouseUp
+      TabOrder = 2
+      Text = 'edtG'
+    end
+    object edtProteina: TEdit
+      Left = 16
+      Height = 22
+      Top = 170
+      Width = 345
+      Color = clSkyBlue
+      OnDblClick = edtProteinaDblClick
+      OnMouseUp = edtProteinaMouseUp
+      TabOrder = 3
+      Text = 'edtP'
+    end
+  end
+  object GroupBox3: TGroupBox
+    Left = 400
+    Height = 130
+    Top = 8
+    Width = 377
+    Caption = 'Begin fighting'
+    ClientHeight = 114
+    ClientWidth = 373
+    TabOrder = 2
+    object Label17: TLabel
+      Left = 8
+      Height = 15
+      Top = 10
+      Width = 45
+      Caption = 'Display:'
+      FocusControl = edtCombateD
+      ParentColor = False
+    end
+    object Label18: TLabel
+      Left = 8
+      Height = 15
+      Top = 58
+      Width = 53
+      Caption = 'Escalate:'
+      FocusControl = edtCombateE
+      ParentColor = False
+    end
+    object edtCombateD: TEdit
+      Left = 8
+      Height = 22
+      Top = 26
+      Width = 353
+      Color = clSkyBlue
+      OnDblClick = edtCombateDDblClick
+      OnMouseUp = edtCombateDMouseUp
+      TabOrder = 0
+      Text = 'edtCombateD'
+    end
+    object edtCombateE: TEdit
+      Left = 8
+      Height = 22
+      Top = 74
+      Width = 353
+      Color = clSkyBlue
+      OnDblClick = edtCombateEDblClick
+      OnMouseUp = edtCombateEMouseUp
+      TabOrder = 1
+      Text = 'edtCombateE'
+    end
+  end
+  object GroupBox4: TGroupBox
+    Left = 400
+    Height = 122
+    Top = 152
+    Width = 377
+    Caption = 'Begin copula attempt'
+    ClientHeight = 106
+    ClientWidth = 373
+    TabOrder = 3
+    object Label19: TLabel
+      Left = 8
+      Height = 15
+      Top = 10
+      Width = 45
+      Caption = 'Display:'
+      ParentColor = False
+    end
+    object Label20: TLabel
+      Left = 8
+      Height = 15
+      Top = 58
+      Width = 53
+      Caption = 'Escalate:'
+      ParentColor = False
+    end
+    object edtCortejoD: TEdit
+      Left = 8
+      Height = 22
+      Top = 26
+      Width = 353
+      Color = clSkyBlue
+      OnDblClick = edtCortejoDDblClick
+      OnMouseUp = edtCortejoDMouseUp
+      TabOrder = 0
+      Text = 'edtCortejoD'
+    end
+    object edtCortejoE: TEdit
+      Left = 8
+      Height = 22
+      Top = 74
+      Width = 353
+      Color = clSkyBlue
+      OnDblClick = edtCortejoEDblClick
+      OnMouseUp = edtCortejoEMouseUp
+      TabOrder = 1
+      Text = 'edtCortejoE'
+    end
+  end
+  object GroupBox5: TGroupBox
+    Left = 400
+    Height = 105
+    Top = 280
+    Width = 377
+    Caption = 'Others'
+    ClientHeight = 89
+    ClientWidth = 373
+    TabOrder = 4
+    object Label15: TLabel
+      Left = 8
+      Height = 15
+      Top = 2
+      Width = 68
+      Caption = 'O&viposition:'
+      FocusControl = edtOviposicion
+      ParentColor = False
+    end
+    object Label14: TLabel
+      Left = 8
+      Height = 15
+      Top = 45
+      Width = 34
+      Caption = 'Dead:'
+      FocusControl = edtMorir
+      ParentColor = False
+    end
+    object edtOviposicion: TEdit
+      Left = 8
+      Height = 22
+      Top = 18
+      Width = 353
+      Color = clSkyBlue
+      OnDblClick = edtOviposicionDblClick
+      OnMouseUp = edtOviposicionMouseUp
+      TabOrder = 0
+      Text = 'edtOviposicion'
+    end
+    object edtMorir: TEdit
+      Left = 8
+      Height = 22
+      Top = 58
+      Width = 353
+      Color = clSkyBlue
+      OnDblClick = edtMorirDblClick
+      OnMouseUp = edtMorirMouseUp
+      TabOrder = 1
+      Text = 'edtM'
+    end
+  end
+  object GroupBox1: TGroupBox
+    Left = 8
+    Height = 130
+    Top = 8
+    Width = 385
+    Caption = 'Movement'
+    ClientHeight = 114
+    ClientWidth = 381
+    TabOrder = 0
+    object Label1: TLabel
+      Left = 14
+      Height = 15
+      Top = 58
+      Width = 30
+      Caption = '&Rest:'
+      FocusControl = edtR
+      ParentColor = False
+    end
+    object Label2: TLabel
+      Left = 16
+      Height = 15
+      Top = 10
+      Width = 34
+      Caption = 'Move:'
+      ParentColor = False
+    end
+    object edtR: TEdit
+      Left = 14
+      Height = 22
+      Top = 74
+      Width = 353
+      Color = clSkyBlue
+      OnDblClick = edtRDblClick
+      OnMouseUp = edtRMouseUp
+      TabOrder = 1
+      Text = 'edtR'
+    end
+    object edtMoverse: TEdit
+      Left = 16
+      Height = 22
+      Top = 26
+      Width = 353
+      Color = clSkyBlue
+      OnDblClick = edtMoverseDblClick
+      OnMouseUp = edtMoverseMouseUp
+      TabOrder = 0
+      Text = 'edtM'
+    end
+  end
+end

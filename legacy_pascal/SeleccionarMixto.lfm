@@ -1,0 +1,81 @@
+object frmSeleccionarMixto: TfrmSeleccionarMixto
+  Left = 233
+  Height = 319
+  Top = 109
+  Width = 413
+  ActiveControl = lstMixtos
+  BorderStyle = bsDialog
+  Caption = 'Select mixed substrate'
+  ClientHeight = 319
+  ClientWidth = 413
+  Font.Height = -11
+  Font.Name = 'MS Sans Serif'
+  OnCreate = FormCreate
+  Position = poScreenCenter
+  LCLVersion = '0.9.26.2'
+  object btbAceptar: TBitBtn
+    Left = 312
+    Height = 33
+    Top = 272
+    Width = 89
+    Caption = '&OK'
+    Kind = bkOK
+    ModalResult = 1
+    NumGlyphs = 0
+    OnClick = btbAceptarClick
+    TabOrder = 1
+  end
+  object btbCancelar: TBitBtn
+    Left = 208
+    Height = 33
+    Top = 272
+    Width = 89
+    Caption = '&Cancel'
+    Kind = bkCancel
+    ModalResult = 2
+    NumGlyphs = 0
+    TabOrder = 2
+  end
+  object grbSustratos: TGroupBox
+    Left = 8
+    Height = 256
+    Top = 8
+    Width = 393
+    Caption = 'Mixed substrates'
+    ClientHeight = 232
+    ClientWidth = 389
+    TabOrder = 0
+    OnClick = grbSustratosClick
+    object Label1: TLabel
+      Left = 230
+      Height = 18
+      Top = 154
+      Width = 46
+      Caption = 'Color:'
+      ParentColor = False
+    end
+    object lblColor: TLabel
+      Left = 230
+      Height = 41
+      Top = 178
+      Width = 145
+      AutoSize = False
+      Color = clWhite
+      ParentColor = False
+      Transparent = False
+    end
+    object lstMixtos: TListBox
+      Left = 6
+      Height = 137
+      Top = 2
+      Width = 377
+      Items.Strings = (
+        ''
+      )
+      ItemHeight = 20
+      OnClick = lstMixtosClick
+      OnDblClick = lstMixtosDblClick
+      TabOrder = 0
+    end
+  end
+end

@@ -1,0 +1,478 @@
+object frmEditorAgentes: TfrmEditorAgentes
+  Left = 264
+  Height = 57
+  Top = 125
+  Width = 585
+  BorderIcons = [biSystemMenu, biMinimize]
+  BorderStyle = bsSingle
+  Caption = 'Galatea Agent Editor'
+  ClientHeight = 57
+  ClientWidth = 585
+  Font.Height = -11
+  Font.Name = 'MS Sans Serif'
+  Menu = MainMenu1
+  OnClose = FormClose
+  OnCloseQuery = FormCloseQuery
+  OnCreate = FormCreate
+  Position = poDefault
+  ShowHint = True
+  LCLVersion = '3.2.0.0'
+  object ToolBar1: TToolBar
+    Cursor = crHandPoint
+    Left = 0
+    Height = 29
+    Top = 0
+    Width = 585
+    Caption = 'ToolBar1'
+    Images = ImageList1
+    TabOrder = 0
+    object ToolButton1: TToolButton
+      Left = 1
+      Top = 2
+      Action = actNuevo
+    end
+    object ToolButton2: TToolButton
+      Left = 24
+      Top = 2
+      Action = actAbrir
+    end
+    object ToolButton3: TToolButton
+      Left = 47
+      Top = 2
+      Action = actGuardar
+    end
+    object ToolButton4: TToolButton
+      Left = 70
+      Height = 22
+      Top = 2
+      Caption = 'ToolButton4'
+      ImageIndex = 3
+      Style = tbsSeparator
+    end
+    object ToolButton20: TToolButton
+      Left = 78
+      Top = 2
+      Action = actExportar
+    end
+    object ToolButton19: TToolButton
+      Left = 101
+      Height = 22
+      Top = 2
+      Caption = 'ToolButton19'
+      ImageIndex = 5
+      Style = tbsSeparator
+    end
+    object ToolButton16: TToolButton
+      Left = 109
+      Top = 2
+      Action = actGenetica
+    end
+    object ToolButton5: TToolButton
+      Left = 132
+      Top = 2
+      Action = actMorfologia
+    end
+    object ToolButton6: TToolButton
+      Left = 155
+      Top = 2
+      Action = actFisiologia
+    end
+    object ToolButton10: TToolButton
+      Left = 178
+      Height = 22
+      Top = 2
+      Caption = 'ToolButton10'
+      ImageIndex = 8
+      Style = tbsSeparator
+    end
+    object ToolButton11: TToolButton
+      Left = 186
+      Top = 2
+      Action = actPrototipos
+    end
+    object ToolButton7: TToolButton
+      Left = 209
+      Top = 2
+      Action = actEstadios
+    end
+    object ToolButton17: TToolButton
+      Left = 232
+      Top = 2
+      Action = actAsignacion
+    end
+    object ToolButton12: TToolButton
+      Left = 255
+      Height = 22
+      Top = 2
+      Caption = 'ToolButton12'
+      ImageIndex = 9
+      Style = tbsSeparator
+    end
+    object ToolButton9: TToolButton
+      Left = 263
+      Top = 2
+      Action = actMatrices
+    end
+    object ToolButton18: TToolButton
+      Left = 286
+      Top = 2
+      Action = actMemoria
+    end
+    object ToolButton8: TToolButton
+      Left = 309
+      Height = 22
+      Top = 2
+      Caption = 'ToolButton8'
+      ImageIndex = 5
+      Style = tbsSeparator
+    end
+    object ToolButton13: TToolButton
+      Left = 317
+      Top = 2
+      Action = actAyuda
+    end
+    object ToolButton14: TToolButton
+      Left = 340
+      Height = 22
+      Top = 2
+      Caption = 'ToolButton14'
+      ImageIndex = 10
+      Style = tbsSeparator
+    end
+    object ToolButton15: TToolButton
+      Left = 348
+      Top = 2
+      Action = actSalir
+    end
+  end
+  object StatusBar1: TStatusBar
+    Left = 0
+    Height = 23
+    Top = 34
+    Width = 585
+    Panels = <    
+      item
+        Width = 300
+      end    
+      item
+        Width = 50
+      end>
+  end
+  object ActionList1: TActionList
+    Images = ImageList1
+    Left = 40
+    Top = 32
+    object actNuevo: TAction
+      Caption = '&New Set of Agents'
+      Hint = 'New|Create a new Set of Agents'
+      ImageIndex = 0
+      OnExecute = actNuevoExecute
+      ShortCut = 16462
+    end
+    object actAbrir: TAction
+      Caption = '&Open Set of Agents'
+      Hint = 'Open|Open an existing Set of Agents'
+      ImageIndex = 1
+      OnExecute = actAbrirExecute
+      ShortCut = 16463
+    end
+    object actGuardar: TAction
+      Caption = '&Save Set of Agents'
+      Hint = 'Save|Save the current Set of Agents'
+      ImageIndex = 2
+      OnExecute = actGuardarExecute
+      ShortCut = 16467
+    end
+    object actGuardarComo: TAction
+      Caption = 'S&ave Set of Agents as'
+      Hint = 'Save as|Save the current Set of Agents as a new file'
+      ImageIndex = 3
+      OnExecute = actGuardarComoExecute
+    end
+    object actCerrar: TAction
+      Caption = 'C&lose Set of Agents'
+      Hint = 'Close|Close the current Set of Agents'
+      ImageIndex = 6
+      OnExecute = actCerrarExecute
+    end
+    object actSalir: TAction
+      Caption = 'E&xit'
+      Hint = 'Exit|Exit Galatea Agent Editor'
+      ImageIndex = 4
+      OnExecute = actSalirExecute
+    end
+    object actMorfologia: TAction
+      Caption = '&Morphology'
+      Hint = 'Morphology|Set agents morphologycal features'
+      ImageIndex = 7
+      OnExecute = actMorfologiaExecute
+    end
+    object actFisiologia: TAction
+      Caption = '&Physiology'
+      Hint = 'Physiology|Set agents physiological features'
+      ImageIndex = 8
+      OnExecute = actFisiologiaExecute
+    end
+    object actEstadios: TAction
+      Caption = '&Life stages'
+      Hint = 'Life stages|Setting agents life stages'
+      ImageIndex = 9
+      OnExecute = actEstadiosExecute
+    end
+    object actMatrices: TAction
+      Caption = '&Interaction matrices'
+      Hint = 'Interactions matrices|Edit interaction matrices'
+      ImageIndex = 15
+      OnExecute = actMatricesExecute
+    end
+    object actPrototipos: TAction
+      Caption = '&Edit prototype list'
+      Hint = 'Prototypes|Edit prototype list'
+      ImageIndex = 14
+      OnExecute = actPrototiposExecute
+    end
+    object actAyuda: TAction
+      Caption = '&Contents'
+      Hint = 'Help|Show help constents'
+      ImageIndex = 5
+      ShortCut = 112
+    end
+    object actAcerca: TAction
+      Caption = '&About ...'
+      Hint = 'About ...|Show program information'
+      OnExecute = actAcercaExecute
+    end
+    object actPropiedades: TAction
+      Caption = 'Set of Agents &properties'
+      Hint = 'Properties|Show Set of Agents properties dialog box'
+      ImageIndex = 10
+      OnExecute = actPropiedadesExecute
+    end
+    object actGenerales: TAction
+      Caption = '&General options'
+      Hint = 'General options|Set general options'
+      ImageIndex = 11
+      OnExecute = actGeneralesExecute
+    end
+    object actMemoria: TAction
+      Caption = 'Behavioral &memory'
+      Hint = 'Behavioral memory|Edit behavioral memory matrix'
+      ImageIndex = 16
+      OnExecute = actMemoriaExecute
+    end
+    object actGenetica: TAction
+      Caption = '&Loci values'
+      Hint = 'Loci|Set loci values'
+      ImageIndex = 13
+      OnExecute = actGeneticaExecute
+    end
+    object actAsignacion: TAction
+      Caption = 'Prototype &allocation'
+      Hint = 'Prototype allocation|Set prototype allocation criteria'
+      ImageIndex = 12
+      OnExecute = actAsignacionExecute
+    end
+    object actExportar: TAction
+      Caption = '&Export data'
+      Hint = 'Export data|Export data to MS Excel'
+      ImageIndex = 17
+      OnExecute = actExportarExecute
+    end
+  end
+  object ImageList1: TImageList
+    BkColor = clForm
+    Left = 136
+    Top = 32
+    Bitmap = {
+      4C7A120000001000000010000000C20400000000000078DAED5B8991EB200CA5
+      0CB7B2ADA495D496DAF443E243081D8FC3C9E66F98616C839F90041220EC4444
+      C94A5E1DAFCF57EDDD96F2E7B395639A7B6D990A1A3ED6C4EF74227D3878C64B
+      33DED547291745699743CBAD78807F0D7FBD5EE1FEFB18BC3F7ECBAC8DFDB52C
+      D3DEF256CECB7879425264DF5FFBAFF0F97ABBDDDE66FF1BCFEFB27FD99EAA87
+      13EDDF92FF6BFF27D83F6273FD73D6A3BACE0D36B7A6A7CE551A0D3667E3319B
+      C3DAAFF9F1326873B61E319BEF903FF787ECC075D0ACF729F4395EFD2CFC600E
+      C7F70C7CD625CF3D784EA715BFFAACC38794BEA8DFFE575F3462FF1B8D11FBE7
+      7C8CD87F1AB4FF2478E9B57F294FABFD5778C9079578D5FF6DBAF4ECDF5A4B00
+      6B9229F8FFC1FE03F943FB07F0A6FDE3724632DFCBAF7BCB66DF02F87CEDC51F
+      F9CD786B7C7F0AFF7F1DEFDB938F8FEDD1C603FEB0D34F413E8BF8BCC1E71270
+      239094F90EA121B1F673C0339BDFD467231E61CB5DB64F0A9E84AFADE75B67EF
+      C7F7614ABB7579DD7F9B3F977A78CC1354F15EED5FF7F940BC9BCB9571A0ED7F
+      8B7587A5776D4DC679A740EFDA1E5CC393E03FD8C317659CDE2EBF52C76430E7
+      F7ED7D6FEEB716867CBEB7DE71161CF0BBD3E27FADF1455E3E2B7ED85BD6E243
+      1D2CEF772DB1BE37F17C8CC4FBF9D27FF0388A58E3D9B218EBEC6D2FE6AED73B
+      62772D71A450EE9EF92F18AB51FCAD694CA1E5A3F63312FF5B2E656E4D0FCCF2
+      CC92C692CBD6ACF797825FA8C2E9340EBC962B3E03FCE5D2A78B0D7B516820E9
+      22F01781F764CF5713BFE8BA84F04A9B4DF889F28FE03DB911F911FC12F08EE0
+      17476EDD76CAF1178DB988C64832ED3BF3B2655916F1C8DFD3EE231AB25EE2D8
+      BDE6675499345914F939AD5E7D16F8BC16B8D56BFE7B59CE819D327CC9BF8B2F
+      64EAC0ABFCAFF8FBD228E76EFE3D7C8FCE25DE9EAFC0FEF26CA2C17ECEB459CF
+      8F729FE8DD8F608FFB39F8F352CF79E80C7C73ECE6A7D64753DC27E3031A09C1
+      1B343C192BFC4FDCB714E11D7A863C117EF77F14CC2F843F4B1A5CAEE8D9D727
+      F03C1A43B4D7F4CE86839F5B0578D1567DEE75D0F4DAB7CFCD029E2838BBD4CE
+      04C96ED792353A1F244BE7E4CB68B66BE8CA6B53930FE9FFE0DCD7ED3F530F29
+      EE3F4807A0FE53A0FF2EDDA7C6B192405B6BB65FC206E0B49C62035330549C3B
+      4B7AE8B7374A3CC90D3C69E7181A5EAB8FB01A9EBF17613D3C8295F25BEAF7E8
+      71ED21580B6FB583E9DFA28DEABFBD5D4FFF2816D13F100FF5E6D78F4AD17985
+      3C0895D83DCE5C5E77EC514FFCEAFA21AB6DC9C3BBF1A3FA9BA1FF5EFE63FF1F
+      1E881FED5D9FD9C2EFDF444DC4FF96FEFB26788FF30A3C75622D1E10BAC03E01
+      DEB745DF86B5E0A9513602CABEE3FF8573AFE77FB0757EBBFF47F1A3FC7FBAFC
+      BF417F1363AC9E0FA393FCC09F6E5FFB360929B3722B3E0D7EBF6DD0CB1F86E9
+      73602EDFEAEE5715CFEAD3F61D8DC01575B3F92FE9A74A2656E7CAAFF1CFF572
+      16FF52CF7A59AC7FCE23E7BFA63D5FFF56FBA21FC2FEF3F87FC5F889DB079D54
+      E4FFEDF865BCFFF163A7A3F851FE47E73F64FF378247F68E56FC238A9DCC58FF
+      CC587F4EC12BDF2EC2FCEBDFE2BF0E6FF03F437F27AD5F60BCFFFF30864FC1FF
+      C3ADED9FF0CFFED03FE7CAF997D9BE8D576904EFC7E770BAFC84D2E868BF3C9B
+      EBC3A760FD00CB0F0FD37EEC7E4E3A1A9BAAD23F9B87AC61
+    }
+  end
+  object MainMenu1: TMainMenu
+    Images = ImageList1
+    Left = 88
+    Top = 32
+    object File1: TMenuItem
+      Caption = '&File'
+      object NewSetofAgents1: TMenuItem
+        Action = actNuevo
+        OnClick = actNuevoExecute
+      end
+      object OpenSetofAgents1: TMenuItem
+        Action = actAbrir
+        OnClick = actAbrirExecute
+      end
+      object SaveSetofAgents1: TMenuItem
+        Action = actGuardar
+        OnClick = actGuardarExecute
+      end
+      object SaveSetofAgentsas1: TMenuItem
+        Action = actGuardarComo
+        OnClick = actGuardarComoExecute
+      end
+      object CloseSetofAgents1: TMenuItem
+        Action = actCerrar
+        OnClick = actCerrarExecute
+      end
+      object N3: TMenuItem
+        Caption = '-'
+      end
+      object Exportdata1: TMenuItem
+        Action = actExportar
+        OnClick = actExportarExecute
+      end
+      object N1: TMenuItem
+        Caption = '-'
+      end
+      object R11: TMenuItem
+        Caption = 'R1'
+        Visible = False
+        OnClick = R11Click
+      end
+      object R21: TMenuItem
+        Caption = 'R2'
+        Visible = False
+        OnClick = R21Click
+      end
+      object R31: TMenuItem
+        Caption = 'R3'
+        Visible = False
+        OnClick = R31Click
+      end
+      object R41: TMenuItem
+        Caption = 'R4'
+        Visible = False
+        OnClick = R41Click
+      end
+      object R51: TMenuItem
+        Caption = 'R5'
+        Visible = False
+        OnClick = R51Click
+      end
+      object N2: TMenuItem
+        Caption = '-'
+        Visible = False
+      end
+      object ExitGalateaAgentEditor1: TMenuItem
+        Action = actSalir
+        OnClick = actSalirExecute
+      end
+    end
+    object Genotype1: TMenuItem
+      Caption = '&Genotype'
+      object Loci1: TMenuItem
+        Action = actGenetica
+        OnClick = actGeneticaExecute
+      end
+    end
+    object Phenotype1: TMenuItem
+      Caption = '&Phenotype'
+      object Morphology1: TMenuItem
+        Action = actMorfologia
+        OnClick = actMorfologiaExecute
+      end
+      object Physiology1: TMenuItem
+        Action = actFisiologia
+        OnClick = actFisiologiaExecute
+      end
+    end
+    object Prototypes1: TMenuItem
+      Caption = 'P&rototypes'
+      object Editprototypelist1: TMenuItem
+        Action = actPrototipos
+        OnClick = actPrototiposExecute
+      end
+      object Stagesoflife1: TMenuItem
+        Action = actEstadios
+        OnClick = actEstadiosExecute
+      end
+      object Prototypeallocation1: TMenuItem
+        Action = actAsignacion
+        OnClick = actAsignacionExecute
+      end
+    end
+    object Conducts1: TMenuItem
+      Caption = '&Matrices'
+      object Interactionmatrixes1: TMenuItem
+        Action = actMatrices
+        OnClick = actMatricesExecute
+      end
+      object Conductsmemory1: TMenuItem
+        Action = actMemoria
+        OnClick = actMemoriaExecute
+      end
+    end
+    object Options1: TMenuItem
+      Caption = '&Options'
+      object SetofAgentsproperties1: TMenuItem
+        Action = actPropiedades
+        OnClick = actPropiedadesExecute
+      end
+      object Generaloptions1: TMenuItem
+        Action = actGenerales
+        OnClick = actGeneralesExecute
+      end
+    end
+    object Help1: TMenuItem
+      Caption = '&Help'
+      object Contents1: TMenuItem
+        Action = actAyuda
+      end
+      object About1: TMenuItem
+        Action = actAcerca
+        OnClick = actAcercaExecute
+      end
+    end
+  end
+  object dlgAbrirAgentes: TOpenDialog
+    Title = 'Open Galatea Set of Agents'
+    Filter = 'Galatea Set of Agents (*.agl)|*.agl'
+    Options = [ofHideReadOnly, ofPathMustExist, ofFileMustExist, ofEnableSizing]
+    Left = 232
+    Top = 32
+  end
+  object dlgGuardarAgentes: TSaveDialog
+    Title = 'Save Galatea Set of Agents as'
+    Filter = 'Galatea Set of Agents (*.agl)|*.agl'
+    Options = [ofOverwritePrompt, ofHideReadOnly, ofPathMustExist, ofEnableSizing]
+    Left = 280
+    Top = 32
+  end
+end

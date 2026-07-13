@@ -1,0 +1,109 @@
+{ Este es un archivo de recurso de Lazarus generado automáticamente }
+
+LazarusResources.Add('TfrmEditarHuevo','FORMDATA',[
+  'TPF0'#15'TfrmEditarHuevo'#14'frmEditarHuevo'#4'Left'#3#138#1#6'Height'#3'7'#2
+  +#3'Top'#2's'#5'Width'#3#189#1#13'ActiveControl'#7#12'PageControl1'#11'Border'
+  +'Style'#7#8'bsDialog'#7'Caption'#6#19'Edit egg properties'#12'ClientHeight'#3
+  +'7'#2#11'ClientWidth'#3#189#1#11'Font.Height'#2#245#9'Font.Name'#6#13'MS San'
+  +'s Serif'#8'OnCreate'#7#10'FormCreate'#8'Position'#7#14'poScreenCenter'#10'L'
+  +'CLVersion'#6#8'0.9.26.2'#0#12'TPageControl'#12'PageControl1'#4'Left'#2#8#6
+  +'Height'#3#241#1#3'Top'#2#8#5'Width'#3#169#1#10'ActivePage'#7#9'TabSheet1'#8
+  +'TabIndex'#2#0#8'TabOrder'#2#0#0#9'TTabSheet'#9'TabSheet1'#7'Caption'#6#21'&'
+  +'General / Physiology'#12'ClientHeight'#3#201#1#11'ClientWidth'#3#165#1#0#9
+  +'TGroupBox'#10'GroupBox60'#6'Height'#2'y'#3'Top'#2#3#5'Width'#3#145#1#12'Cli'
+  +'entHeight'#2'u'#11'ClientWidth'#3#141#1#8'TabOrder'#2#0#0#6'TLabel'#7'Label'
+  +'12'#4'Left'#2#8#6'Height'#2#18#3'Top'#2#2#5'Width'#2'='#7'Caption'#6#6'&Nam'
+  +'e:'#12'FocusControl'#7#9'edtNombre'#11'ParentColor'#8#0#0#6'TLabel'#6'Label'
+  +'2'#4'Left'#2#8#6'Height'#2#18#3'Top'#2'2'#5'Width'#2'.'#7'Caption'#6#5'&Age'
+  +':'#12'FocusControl'#7#7'edtEdad'#11'ParentColor'#8#0#0#5'TEdit'#9'edtNombre'
+  +#4'Left'#2#8#6'Height'#2#21#3'Top'#2#18#5'Width'#3#225#0#8'TabOrder'#2#0#4'T'
+  +'ext'#6#9'edtNombre'#0#0#5'TEdit'#7'edtEdad'#4'Left'#2#8#6'Height'#2#21#3'To'
+  +'p'#2'B'#5'Width'#3#225#0#10'OnKeyPress'#7#15'edtEdadKeyPress'#8'TabOrder'#2
+  +#1#4'Text'#6#7'edtEdad'#0#0#0#9'TGroupBox'#9'GroupBox1'#6'Height'#2'i'#3'Top'
+  +#2'{'#5'Width'#3#145#1#12'ClientHeight'#2'e'#11'ClientWidth'#3#141#1#8'TabOr'
+  +'der'#2#1#0#6'TLabel'#7'Label13'#4'Left'#2#8#6'Height'#2#18#3'Top'#2#5#5'Wid'
+  +'th'#2'"'#7'Caption'#6#4'Sex:'#11'ParentColor'#8#0#0#6'TLabel'#7'Label15'#4
+  +'Left'#2#8#6'Height'#2#18#3'Top'#2#29#5'Width'#2'6'#7'Caption'#6#7'Father:'
+  +#11'ParentColor'#8#0#0#6'TLabel'#7'Label16'#4'Left'#2#8#6'Height'#2#18#3'Top'
+  +#2'5'#5'Width'#2':'#7'Caption'#6#7'Mother:'#11'ParentColor'#8#0#0#11'TStatic'
+  +'Text'#7'sttSexo'#4'Left'#3#156#0#6'Height'#2#17#3'Top'#2#5#5'Width'#3#233#0
+  +#7'Caption'#6#7'sttSexo'#8'TabOrder'#2#0#0#0#11'TStaticText'#8'sttPadre'#4'L'
+  +'eft'#3#156#0#6'Height'#2#17#3'Top'#2#30#5'Width'#3#233#0#7'Caption'#6#8'stt'
+  +'Padre'#8'TabOrder'#2#1#0#0#11'TStaticText'#8'sttMadre'#4'Left'#3#156#0#6'He'
+  +'ight'#2#17#3'Top'#2'6'#5'Width'#3#233#0#7'Caption'#6#8'sttMadre'#8'TabOrder'
+  +#2#2#0#0#0#9'TGroupBox'#10'GroupBox20'#4'Left'#2#254#6'Height'#3#208#0#3'Top'
+  +#3#235#0#5'Width'#3#145#1#7'Caption'#6#27'Nutrients internal reserves'#12'Cl'
+  +'ientHeight'#3#191#0#11'ClientWidth'#3#141#1#8'TabOrder'#2#2#0#6'TLabel'#6'L'
+  +'abel3'#4'Left'#2#16#6'Height'#2#18#3'Top'#2#5#5'Width'#2'>'#7'Caption'#6#7
+  +'&Water:'#12'FocusControl'#7#7'edtAgua'#11'ParentColor'#8#0#0#6'TLabel'#6'La'
+  +'bel4'#4'Left'#2#16#6'Height'#2#18#3'Top'#2'5'#5'Width'#2'y'#7'Caption'#6#15
+  +'Ca&rbohidrates:'#12'FocusControl'#7#9'edtAzucar'#11'ParentColor'#8#0#0#6'TL'
+  +'abel'#6'Label5'#4'Left'#2#16#6'Height'#2#18#3'Top'#2'c'#5'Width'#2'<'#7'Cap'
+  +'tion'#6#8'&Lipids:'#12'FocusControl'#7#8'edtGrasa'#11'ParentColor'#8#0#0#6
+  +'TLabel'#6'Label6'#4'Left'#2#16#6'Height'#2#18#3'Top'#3#138#0#5'Width'#2'F'#7
+  +'Caption'#6#9'Prot&ein:'#12'FocusControl'#7#11'edtProteina'#11'ParentColor'#8
+  +#0#0#5'TEdit'#7'edtAgua'#4'Left'#2#16#6'Height'#2#21#3'Top'#2#21#5'Width'#3
+  +#241#0#8'TabOrder'#2#0#4'Text'#6#7'edtAgua'#0#0#5'TEdit'#9'edtAzucar'#4'Left'
+  +#2#16#6'Height'#2#21#3'Top'#2'E'#5'Width'#3#241#0#8'TabOrder'#2#1#4'Text'#6#9
+  +'edtAzucar'#0#0#5'TEdit'#8'edtGrasa'#4'Left'#2#16#6'Height'#2#21#3'Top'#2'r'
+  +#5'Width'#3#241#0#8'TabOrder'#2#2#4'Text'#6#8'edtGrasa'#0#0#5'TEdit'#11'edtP'
+  +'roteina'#4'Left'#2#16#6'Height'#2#21#3'Top'#3#154#0#5'Width'#3#241#0#8'TabO'
+  +'rder'#2#3#4'Text'#6#11'edtProteina'#0#0#0#0#9'TTabSheet'#9'TabSheet2'#7'Cap'
+  +'tion'#6#16'Co&ntinuous loci'#12'ClientHeight'#3#201#1#11'ClientWidth'#3#165
+  +#1#10'ImageIndex'#2#1#0#10'TScrollBox'#5'sbxLC'#6'Height'#3#185#1#3'Top'#2#8
+  +#5'Width'#3#153#1#8'TabOrder'#2#0#0#9'TGroupBox'#7'grpLCP1'#4'Left'#2#4#6'He'
+  +'ight'#2'R'#3'Top'#2#248#5'Width'#2'i'#7'Caption'#6#16'Paternal Locus 1'#12
+  +'ClientHeight'#2'A'#11'ClientWidth'#2'e'#8'TabOrder'#2#0#0#12'TRadioButton'#8
+  +'rdbLCDP1'#4'Left'#2#9#6'Height'#2#20#3'Top'#2#1#5'Width'#2'D'#7'Caption'#6#8
+  +'Dominant'#7'Checked'#9#7'OnClick'#7#13'rdbLCDP1Click'#5'State'#7#9'cbChecke'
+  +'d'#8'TabOrder'#2#0#0#0#12'TRadioButton'#8'rdbLCRP1'#4'Left'#2#8#6'Height'#2
+  +#20#3'Top'#2#16#5'Width'#2'E'#7'Caption'#6#8'Recesive'#7'OnClick'#7#13'rdbLC'
+  +'RP1Click'#8'TabOrder'#2#1#0#0#5'TEdit'#7'edtLCP1'#4'Left'#2#9#6'Height'#2#21
+  +#3'Top'#2')'#5'Width'#2'Y'#8'OnChange'#7#13'edtLCP1Change'#10'OnKeyPress'#7
+  +#15'edtLCP1KeyPress'#8'TabOrder'#2#2#4'Text'#6#7'edtLCP1'#0#0#0#9'TGroupBox'
+  +#7'grpLCM1'#4'Left'#2'p'#6'Height'#2'Q'#3'Top'#2#248#5'Width'#2'i'#7'Caption'
+  +#6#16'Maternal Locus 1'#12'ClientHeight'#2'@'#11'ClientWidth'#2'e'#8'TabOrde'
+  +'r'#2#1#0#12'TRadioButton'#8'rdbLCDM1'#4'Left'#2#8#6'Height'#2#20#3'Top'#2#1
+  +#5'Width'#2'D'#7'Caption'#6#8'Dominant'#7'Checked'#9#7'OnClick'#7#13'rdbLCDM'
+  ,'1Click'#5'State'#7#9'cbChecked'#8'TabOrder'#2#0#0#0#12'TRadioButton'#8'rdbL'
+  +'CRM1'#4'Left'#2#8#6'Height'#2#20#3'Top'#2#16#5'Width'#2'E'#7'Caption'#6#8'R'
+  +'ecesive'#7'OnClick'#7#13'rdbLCRM1Click'#8'TabOrder'#2#1#0#0#5'TEdit'#7'edtL'
+  +'CM1'#4'Left'#2#8#6'Height'#2#21#3'Top'#2')'#5'Width'#2'Y'#8'OnChange'#7#13
+  +'edtLCM1Change'#10'OnKeyPress'#7#15'edtLCM1KeyPress'#8'TabOrder'#2#2#4'Text'
+  +#6#7'edtLCM1'#0#0#0#9'TGroupBox'#6'grpLC1'#4'Left'#3#220#0#6'Height'#2'Q'#3
+  +'Top'#2#248#5'Width'#3#185#0#7'Caption'#6#17'Expressed Locus 1'#12'ClientHei'
+  +'ght'#2'@'#11'ClientWidth'#3#181#0#8'TabOrder'#2#2#0#11'TStaticText'#6'sttLC'
+  +'1'#4'Left'#2#8#6'Height'#2#17#3'Top'#2')'#5'Width'#3#169#0#7'Caption'#6#6's'
+  +'ttLC1'#8'TabOrder'#2#0#0#0#0#0#0#9'TTabSheet'#9'TabSheet3'#7'Caption'#6#15
+  +'&Discretes loci'#12'ClientHeight'#3#201#1#11'ClientWidth'#3#165#1#10'ImageI'
+  +'ndex'#2#2#0#10'TScrollBox'#5'sbxLD'#6'Height'#3#193#1#3'Top'#2#4#5'Width'#3
+  +#153#1#8'TabOrder'#2#0#0#9'TGroupBox'#7'grpLDP1'#6'Height'#2'Q'#3'Top'#2#252
+  +#5'Width'#2'i'#7'Caption'#6#16'Paternal Locus 1'#12'ClientHeight'#2'@'#11'Cl'
+  +'ientWidth'#2'e'#8'TabOrder'#2#0#0#12'TRadioButton'#8'rdbLDDP1'#4'Left'#2#10
+  +#6'Height'#2#20#3'Top'#2#253#5'Width'#2'D'#7'Caption'#6#8'Dominant'#7'Checke'
+  +'d'#9#7'OnClick'#7#13'rdbLDDP1Click'#5'State'#7#9'cbChecked'#8'TabOrder'#2#0
+  +#0#0#12'TRadioButton'#8'rdbLDRP1'#4'Left'#2#10#6'Height'#2#20#3'Top'#2#13#5
+  +'Width'#2'E'#7'Caption'#6#8'Recesive'#7'OnClick'#7#13'rdbLDRP1Click'#8'TabOr'
+  +'der'#2#1#0#0#5'TEdit'#7'edtLDP1'#4'Left'#2#8#6'Height'#2#21#3'Top'#2'%'#5'W'
+  +'idth'#2'Y'#8'OnChange'#7#13'edtLDP1Change'#10'OnKeyPress'#7#15'edtLDP1KeyPr'
+  +'ess'#8'TabOrder'#2#2#4'Text'#6#7'edtLDP1'#0#0#0#9'TGroupBox'#7'grpLDM1'#4'L'
+  +'eft'#2'l'#6'Height'#2'Q'#3'Top'#2#252#5'Width'#2'i'#7'Caption'#6#16'Materna'
+  +'l Locus 1'#12'ClientHeight'#2'@'#11'ClientWidth'#2'e'#8'TabOrder'#2#1#0#12
+  +'TRadioButton'#8'rdbLDDM1'#4'Left'#2#8#6'Height'#2#20#3'Top'#2#253#5'Width'#2
+  +'D'#7'Caption'#6#8'Dominant'#7'Checked'#9#7'OnClick'#7#13'rdbLDDM1Click'#5'S'
+  +'tate'#7#9'cbChecked'#8'TabOrder'#2#0#0#0#12'TRadioButton'#8'rdbLDRM1'#4'Lef'
+  +'t'#2#7#6'Height'#2#20#3'Top'#2#13#5'Width'#2'E'#7'Caption'#6#8'Recesive'#7
+  +'OnClick'#7#13'rdbLDRM1Click'#8'TabOrder'#2#1#0#0#5'TEdit'#7'edtLDM1'#4'Left'
+  +#2#7#6'Height'#2#21#3'Top'#2'%'#5'Width'#2'Y'#8'OnChange'#7#13'edtLDM1Change'
+  +#10'OnKeyPress'#7#15'edtLDM1KeyPress'#8'TabOrder'#2#2#4'Text'#6#7'edtLDM1'#0
+  +#0#0#9'TGroupBox'#6'grpLD1'#4'Left'#3#220#0#6'Height'#2'Q'#3'Top'#2#252#5'Wi'
+  +'dth'#3#185#0#7'Caption'#6#17'Expressed Locus 1'#12'ClientHeight'#2'@'#11'Cl'
+  +'ientWidth'#3#181#0#8'TabOrder'#2#2#0#11'TStaticText'#6'sttLD1'#4'Left'#2#6#6
+  +'Height'#2#17#3'Top'#2'%'#5'Width'#3#169#0#7'Caption'#6#6'sttLD1'#8'TabOrder'
+  +#2#0#0#0#0#0#0#0#7'TBitBtn'#10'btbAceptar'#4'Left'#3'X'#1#6'Height'#2'!'#3'T'
+  +'op'#3#8#2#5'Width'#2'Y'#7'Caption'#6#3'&OK'#4'Kind'#7#4'bkOK'#11'ModalResul'
+  +'t'#2#1#9'NumGlyphs'#2#0#7'OnClick'#7#15'btbAceptarClick'#8'TabOrder'#2#1#0#0
+  +#7'TBitBtn'#11'btbCancelar'#4'Left'#3#240#0#6'Height'#2'!'#3'Top'#3#8#2#5'Wi'
+  +'dth'#2'Y'#7'Caption'#6#7'&Cancel'#4'Kind'#7#8'bkCancel'#11'ModalResult'#2#2
+  +#9'NumGlyphs'#2#0#8'TabOrder'#2#2#0#0#0
+]);

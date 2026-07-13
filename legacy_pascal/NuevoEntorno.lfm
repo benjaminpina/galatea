@@ -1,0 +1,171 @@
+object frmNuevoEntorno: TfrmNuevoEntorno
+  Left = 259
+  Height = 359
+  Top = 125
+  Width = 299
+  ActiveControl = edtTitulo
+  BorderStyle = bsDialog
+  Caption = 'New Environment'
+  ClientHeight = 359
+  ClientWidth = 299
+  Font.Height = -11
+  Font.Name = 'MS Sans Serif'
+  OnCloseQuery = FormCloseQuery
+  OnCreate = FormCreate
+  Position = poScreenCenter
+  LCLVersion = '0.9.26.2'
+  object Label1: TLabel
+    Left = 16
+    Height = 11
+    Top = 8
+    Width = 30
+    Caption = '&Title:'
+    FocusControl = edtTitulo
+    ParentColor = False
+  end
+  object Label2: TLabel
+    Left = 16
+    Height = 11
+    Top = 56
+    Width = 39
+    Caption = '&Stage:'
+    FocusControl = edtEscenario
+    ParentColor = False
+  end
+  object Label3: TLabel
+    Left = 16
+    Height = 11
+    Top = 208
+    Width = 53
+    Caption = 'C&oments:'
+    FocusControl = memComentarios
+    ParentColor = False
+  end
+  object Label4: TLabel
+    Left = 16
+    Height = 11
+    Top = 112
+    Width = 46
+    Caption = '&Agents:'
+    FocusControl = edtAgentes
+    ParentColor = False
+  end
+  object Label5: TLabel
+    Left = 16
+    Height = 11
+    Top = 160
+    Width = 99
+    Caption = '&Initial cycles count:'
+    FocusControl = edtCiclos
+    ParentColor = False
+  end
+  object edtTitulo: TEdit
+    Left = 16
+    Height = 21
+    Top = 24
+    Width = 273
+    MaxLength = 80
+    TabOrder = 0
+    Text = 'edtTitulo'
+  end
+  object edtEscenario: TEdit
+    Left = 16
+    Height = 21
+    Top = 80
+    Width = 241
+    TabOrder = 1
+    Text = 'edtEscenario'
+  end
+  object memComentarios: TMemo
+    Left = 16
+    Height = 65
+    Top = 232
+    Width = 273
+    Lines.Strings = (
+      'memComentarios'
+    )
+    TabOrder = 6
+  end
+  object btnEscenario: TButton
+    Left = 264
+    Height = 25
+    Top = 76
+    Width = 25
+    Caption = '...'
+    Font.Height = -11
+    Font.Name = 'MS Sans Serif'
+    Font.Style = [fsBold]
+    OnClick = btnEscenarioClick
+    ParentFont = False
+    TabOrder = 2
+  end
+  object btbAceptar: TBitBtn
+    Left = 200
+    Height = 33
+    Top = 312
+    Width = 89
+    Caption = '&OK'
+    Kind = bkOK
+    ModalResult = 1
+    NumGlyphs = 0
+    OnClick = btbAceptarClick
+    TabOrder = 7
+  end
+  object btbCancelar: TBitBtn
+    Left = 96
+    Height = 33
+    Top = 312
+    Width = 89
+    Caption = '&Cancel'
+    Kind = bkCancel
+    ModalResult = 2
+    NumGlyphs = 0
+    TabOrder = 8
+  end
+  object edtAgentes: TEdit
+    Left = 16
+    Height = 21
+    Top = 128
+    Width = 241
+    TabOrder = 3
+    Text = 'edtAgentes'
+  end
+  object btnAgentes: TButton
+    Left = 264
+    Height = 25
+    Top = 124
+    Width = 25
+    Caption = '...'
+    Font.Height = -11
+    Font.Name = 'MS Sans Serif'
+    Font.Style = [fsBold]
+    OnClick = btnAgentesClick
+    ParentFont = False
+    TabOrder = 4
+  end
+  object edtCiclos: TEdit
+    Left = 16
+    Height = 21
+    Top = 176
+    Width = 177
+    OnKeyPress = edtCiclosKeyPress
+    TabOrder = 5
+    Text = 'edtCiclos'
+  end
+  object odlEscenario: TOpenDialog
+    Width = 503
+    Height = 528
+    Filter = 'Galatea Stage|*.egl'
+    Options = [ofFileMustExist, ofEnableSizing, ofViewDetail]
+    left = 16
+    top = 312
+  end
+  object odlAgentes: TOpenDialog
+    Width = 503
+    Height = 528
+    Filter = 'Galatea Set of Agents|*.agl'
+    Options = [ofFileMustExist, ofEnableSizing, ofViewDetail]
+    left = 56
+    top = 312
+  end
+end

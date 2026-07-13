@@ -1,0 +1,48 @@
+{ Este es un archivo de recurso de Lazarus generado automáticamente }
+
+LazarusResources.Add('TfrmNuevoEscenario','FORMDATA',[
+  'TPF0'#18'TfrmNuevoEscenario'#17'frmNuevoEscenario'#4'Left'#3'Z'#1#6'Height'#3
+  +#142#1#3'Top'#3#219#0#5'Width'#3't'#1#13'ActiveControl'#7#9'edtTitulo'#11'Bo'
+  +'rderStyle'#7#8'bsDialog'#7'Caption'#6#9'New stage'#12'ClientHeight'#3#142#1
+  +#11'ClientWidth'#3't'#1#11'Font.Height'#2#245#9'Font.Name'#6#13'MS Sans Seri'
+  +'f'#12'OnCloseQuery'#7#14'FormCloseQuery'#8'OnCreate'#7#10'FormCreate'#8'Pos'
+  +'ition'#7#14'poScreenCenter'#10'LCLVersion'#6#8'0.9.26.2'#0#6'TLabel'#6'Labe'
+  +'l1'#4'Left'#2#8#6'Height'#2#17#3'Top'#2#16#5'Width'#2'.'#7'Caption'#6#7'&Ti'
+  +'tle:'#12'FocusControl'#7#9'edtTitulo'#11'ParentColor'#8#0#0#6'TLabel'#6'Lab'
+  +'el2'#4'Left'#2#8#6'Height'#2#17#3'Top'#2'H'#5'Width'#2'x'#7'Caption'#6#15'L'
+  +'ongitude &N-S:'#12'FocusControl'#7#9'edtAltura'#11'ParentColor'#8#0#0#6'TLa'
+  +'bel'#6'Label3'#4'Left'#3#192#0#6'Height'#2#17#3'Top'#2'H'#5'Width'#2'{'#7'C'
+  +'aption'#6#15'Longitude &E-W:'#12'FocusControl'#7#10'edtAnchura'#11'ParentCo'
+  +'lor'#8#0#0#6'TLabel'#6'Label4'#4'Left'#2#8#6'Height'#2#17#3'Top'#3#184#0#5
+  +'Width'#2't'#7'Caption'#6#15'&Base sustrate:'#12'FocusControl'#7#11'cmbSustr'
+  +'ato'#11'ParentColor'#8#0#0#6'TLabel'#6'Label5'#4'Left'#2#8#6'Height'#2#17#3
+  +'Top'#3#240#0#5'Width'#2'R'#7'Caption'#6#9'C&oments:'#12'FocusControl'#7#14
+  +'memComentarios'#11'ParentColor'#8#0#0#6'TLabel'#6'Label6'#4'Left'#2#8#6'Hei'
+  +'ght'#2#17#3'Top'#3#128#0#5'Width'#3#136#0#7'Caption'#6#18'&Set of substrate'
+  +'s'#12'FocusControl'#7#8'edtJuego'#11'ParentColor'#8#0#0#5'TEdit'#9'edtTitul'
+  +'o'#4'Left'#2#8#6'Height'#2#21#3'Top'#2'('#5'Width'#3'a'#1#9'MaxLength'#2'P'
+  +#8'TabOrder'#2#0#4'Text'#6#9'edtTitulo'#0#0#5'TEdit'#9'edtAltura'#4'Left'#2#8
+  +#6'Height'#2#21#3'Top'#2'`'#5'Width'#2')'#9'MaxLength'#2#4#8'TabOrder'#2#1#4
+  +'Text'#6#4'edtA'#0#0#5'TEdit'#10'edtAnchura'#4'Left'#3#192#0#6'Height'#2#21#3
+  +'Top'#2'`'#5'Width'#2')'#9'MaxLength'#2#4#8'TabOrder'#2#2#4'Text'#6#4'edtA'#0
+  +#0#9'TComboBox'#11'cmbSustrato'#4'Left'#2#8#6'Height'#2#21#3'Top'#3#208#0#5
+  +'Width'#3#209#0#9'ItemIndex'#2#0#13'Items.Strings'#1#6#1'1'#6#1'2'#6#1'3'#6#1
+  +'4'#6#1'5'#6#1'6'#6#1'7'#0#9'MaxLength'#4#255#255#0#0#5'Style'#7#14'csDropDo'
+  +'wnList'#8'TabOrder'#2#5#4'Text'#6#1'1'#0#0#5'TMemo'#14'memComentarios'#4'Le'
+  +'ft'#2#8#6'Height'#2'I'#3'Top'#3#8#1#5'Width'#3'a'#1#13'Lines.Strings'#1#6#14
+  +'memComentarios'#0#9'MaxLength'#3','#1#8'TabOrder'#2#6#0#0#7'TBitBtn'#10'btb'
+  +'Aceptar'#4'Left'#3#16#1#6'Height'#2'!'#3'Top'#3'`'#1#5'Width'#2'Y'#7'Captio'
+  +'n'#6#3'&OK'#4'Kind'#7#4'bkOK'#11'ModalResult'#2#1#9'NumGlyphs'#2#0#7'OnClic'
+  +'k'#7#15'btbAceptarClick'#8'TabOrder'#2#7#0#0#7'TBitBtn'#11'btbCancelar'#4'L'
+  +'eft'#3#168#0#6'Height'#2'!'#3'Top'#3'`'#1#5'Width'#2'Y'#7'Caption'#6#7'&Can'
+  +'cel'#4'Kind'#7#8'bkCancel'#11'ModalResult'#2#2#9'NumGlyphs'#2#0#7'OnClick'#7
+  +#16'btbCancelarClick'#8'TabOrder'#2#8#0#0#5'TEdit'#8'edtJuego'#4'Left'#2#8#6
+  +'Height'#2#21#3'Top'#3#152#0#5'Width'#3'A'#1#8'TabOrder'#2#3#4'Text'#6#8'edt'
+  +'Juego'#0#0#7'TButton'#18'btnSeleccionaJuego'#4'Left'#3'P'#1#6'Height'#2#25#3
+  +'Top'#3#152#0#5'Width'#2#25#7'Caption'#6#3'...'#11'Font.Height'#2#243#9'Font'
+  +'.Name'#6#13'MS Sans Serif'#10'Font.Style'#11#6'fsBold'#0#7'OnClick'#7#23'bt'
+  +'nSeleccionaJuegoClick'#10'ParentFont'#8#8'TabOrder'#2#4#0#0#11'TOpenDialog'
+  +#11'OpenDialog1'#6'Filter'#6#31'Galatea Set of Substrates|*.sgl'#7'Options'
+  +#11#15'ofFileMustExist'#14'ofEnableSizing'#12'ofViewDetail'#0#4'left'#2'.'#3
+  +'top'#3'g'#1#0#0#0
+]);

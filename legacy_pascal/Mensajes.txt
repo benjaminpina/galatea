@@ -1,0 +1,904 @@
+Mensajes parta el soporte multilenguaje
+
+{*******************************************************************************
+Contiene diversas funciones y procedimientos relacionados con cuadros de
+diálogos comunes.
+
+Sistema Galatea
+Proyecto:
+Autor: Benjamín Piña Altamirano
+2002
+*******************************************************************************}
+
+*** Mensajes en diseño ***
+
+Archivo = File
+Nuevo = New
+Abrir = Open
+Guardar = Save
+Guardar como = Save as
+Cerrar = Close
+Salir = Exit
+
+Edición = Edit
+Cortar = Cut
+Copiar = Copy
+Pegar = Paste
+
+Ayuda = Help
+Contenido = Contents
+Acerca de ... = About of ...   //About ..
+
+Agregar = Add
+Eliminar = Remove
+Modificar = Edit  //Modify
+
+Aceptar = OK
+Cancelar = Cancel
+
+Composición = Composition
+
+Elegir color
+= Choose color
+
+Editor de Sustratos de Galatea = Substrata Editor of Galatea
+//Galatea Substrate Editor
+
+Juego de sustratos = Set of substrata//substrates
+
+Crea un nuevo juego de sustratos
+= Creates//Create a new set of substrata//substrates
+
+Abre un archivo de juego de sustratos
+= Open a set of substrata//substrates file
+
+Guarda el juego se sustratos actual
+= Save the current set of substrata//substrates set
+
+Guarda el juego de sustratos actual como un nuevo archivo
+= Save the current set of substrata as new file
+
+Cierra el juego de sustratos actual
+= Close the current set of substrata
+
+Sale del Editor de Sustratos de Galatea
+= Leave from Substrata Editor of Galatea
+
+Muestra el contenido de la ayuda
+= Show help contents
+
+Muestra informacion sobre el programa
+= Show program information
+
+Programa para la edición de sustratos del Programa Simulador de Estrategias
+Reproductivas Galatea
+= Program for Substrata Edition of the Reproductive Strategies Simulator Program
+Galatea
+
+Editor de Escenarios
+= Stage Editor
+
+Cierra el escenario actual
+= Close the current stage
+
+Incrementar zoom
+= Zoom in
+
+Decrementar zoom
+= Zoom out
+
+Incrementa el tamaño al que se ve le escenario
+= Increase the zoom factor
+
+Decrementa el tamaño al que se ve el escenario
+= Decrease the zoom factor
+
+Apuntador
+= Pointer
+
+Habilita el apuntador para seleccionar
+= Enables the pointer to marquee
+
+Dibuja en el escenario un punto del sustrato seleccionado
+= Draws a point of the selected substratum on the stage
+
+Rectángulo
+= Rectangle
+
+Rectángulo relleno
+= Filled rectangle
+
+Seleccionar un sustrato mixto
+= Select a mixed substrata
+
+Obtener juego de sustratos
+= Get set of substrata
+
+Guarda el juego de sustratos en un nuevo archivo
+= Save the set of substrata in a new file
+
+Longitud N-S = Length N-S
+Longitud E-O = Length E-W
+Sustrato base = Base substratum
+
+Obtiene un nuevo juego se sustratos desde un archivo
+= Load a new set of substrata from a file
+
+*** Mensajes en tiempo de ejecución ***
+
+Sin título = Untitled
+
+¿Desea guardar los cambios en el juego de sustratos actual antes de crear uno nuevo?
+= Do you want to save the changes in the current set of substrata before creating one new?
+
+¿Desea guardar los cambios en el juego de sustratos actual antes de cerrarlo?
+= Do you want to save the changes in the current set of substrata before close it?
+
+El directorio de sustratos no existe, ¿desea crearlo?
+= The directory of substrata does not exist, do you want to create it?
+
+Sustrato vacío = Empty substratum
+
+El valor especificado es incorrecto
+= The specified value is incorrect.
+
+La suma de los procentajes debe ser igual a 100.
+= The sum of the percentages should be equal to 100.
+
+¿Esta seguro de eliminar el sustrato mixto?
+= Are you sure of removing the mixed substratum?
+
+No existe el archivo
+=  The file does not exist
+
+El índice solicitado va más allá de los límites del arreglo.
+= Index required is out of the array limits.
+
+El valor especificado es mayor o menor al permitido.
+= Especified value is greater than or less than the permitted.
+
+Las coordenadas solicitadas van más allá de los límites del arreglo.
+= Required coordinates are out of the array limits.
+
+El porcentaje deber ser múltiplo de 20.
+= The percentage must be multiple of 20.
+
+El valor mínimo permitido es X
+= The minimum value permitted is X
+
+Falta archivo de juego de sustratos.
+= Missing set of substrata file.
+
+¿Desea guardar los cambios en el escenario actual antes de crear uno nuevo?
+= Do you want to save the changes in the current stage before creating one new?
+
+¿Desea guardar los cambios en el escenario actual antes de cerrarlo?
+= Do you want to save the changes in the current stage before close it?
+
+El directorio de escenarios no existe, ¿desea crearlo?
+= The directory of stages does not exist, do you want to create it?
+
+************************************************************************
+Segunda revisión
+
+***Diseño
+
+Corta la zona marcada = Cut the market zone
+
+Copia la zona marcada al portapapeles = Copy the marked zone to clipboard
+
+Pega el contenido del portapapeles = Paste the clipboard content
+
+***Ejecución
+
+No se encontró el Editor de Escenarios, se recomienda reinstalar el paquete
+Galatea
+= Stage Editor not found, reinstaling Galatea package is recomended.
+
+No se encontró el Editor de Sustratos, se recomienda reinstalar el paquete
+Galatea
+= Substratum Editor not found, reinstaling Galatea package is recomended.
+
+El directorio de proyectos no existe, ¿desea crearlo?
+= The directory of projects does not exist, do you want to create it?
+
+¿Desea guardar los cambios en el proyecto actual antes de crear uno nuevo?
+= Do you want to save the changes in the current project before creating
+one new?
+
+¿Desea guardar los cambios en el proyecto actual antes de cerrarlo?
+= Do you want to save the changes in the current project before close it?
+
+
+--Crea un nuevo proyecto de simulación de Abedus breviceps
+= Creates a new simulation project of Abedus breviceps
+
+Ejecuta el proyecto actual = Run the current proyect
+
+Pausa en la ejecución actual = Pause in the current running
+
+Realiza el siguiente paso en la ejecucón actual
+= Ejecutes the next step in the current running
+
+Exportar datos a Excel = Exporting data to Excel
+
+--Establecer las propiedades de los agentes
+= Set the agents' properties
+
+Establecer las opciones del proyecto = Set project options
+
+Establecer las opciones generales = Set general options
+
+Herramientas = Tools
+
+Ejecución = Run
+
+--Cantidades = Quantities
+
+--El máximo permitido para el número de fuentes alimenticias es
+igual a la tercera parte del total de unidades cuadradas contenidas en el
+escenario.
+=The maximum permitted for number of nutritious sources are equal to the third
+part of the total of square contained units in the stage.
+
+Alimenticio = Nourishing
+
+Neutro = Neutral
+
+Oviposición = Oviposition
+
+Repulsivo = Repulsive
+
+Proporción sexual = Sex ratio
+
+El valor debe ser positivo = The value must be positive.
+
+--Merodeador = Prowler
+
+--Patrullero = Patrol
+
+--Volar si la distancia al hospedero de oviposicion es menor a:
+Fly if distance from ovipositon host is less than:
+
+--Perseguir si un macho se encuentra a una distacia del hospedero de oviposición
+menor a:
+=Persecute if a male distance from ovipositon host is less than:
+
+--Revolotear por el hospedero de oviposición si la distancia a este es menor a:
+= To flutter about oviposition host if the distance from it is less than:
+
+--Guardar pupa si su edad es mayo a:
+= Cover pupa if her age is greater than:
+
+--Priorizar forrageo si la energía es menor a:
+Prioritize forage if energy is less than:
+
+Distribución de tamaños
+= Size distribution
+
+--Alas = Wings
+--Longitud =  Length
+--Anchura = Width
+--Altura = Height
+
+--Todas las distancias se establecen en base a las unidades cuadrardas contenidas
+en el escenario.
+= All the distances settle down based on the square contained units in the
+stage.
+
+--Radio de percepción = Perception radius
+
+Tendecia de movimiento = Motion tendency
+
+Todas las unidades de edad se basan en la duración de un ciclo.
+= All the age units are based on the duration of a cycle.
+
+//////////////////////////////////////////////////////////////////////
+Editor de Entornos de Galatea
+= Galatea Environment Editor
+
+Corta la zona marcada = Cut the marked zone
+Copia la zona marcada al portapapeles = Copy the marked zone to the clipboard
+Pega el contenido del portapapeles = Paste the clipboard content
+
+Crea un nuevo prototipo de agente = Create a new agent prototype
+Elmina un prototipo de agente del Entorno actual
+= Remove agent prototype from then current Enviroment
+Modifica prototipo de agente = Modify agent prototype
+
+Fuente de agua = Water source
+Fuente de grasa = Fat source
+Fuente de azucar = Sugar source
+Fuente de proteínas = Protein source
+Sitio de oviposición = Oviposition site
+
+Selecciona un agente para colocarlo en el entorno
+= Select an agent to put it on the environment
+Coloca una fuente de agua en el entorno
+= Put a water source on the environment
+Coloca una fuente de grasa en el entorno
+= Put a fat source on the environment
+Coloca una fuente de azúcar en el entorno
+= Put a sugar source on the environment
+Coloca una fuente de proteínas en el entorno
+= Put a protein source on the environment
+Coloca un sitio de oviposición en el entorno
+= Put a oviposition site on the environment
+
+Editor de Agentes de Galatea = Galatea Agent Editor
+
+Juego de Agentes = Set of Agents
+Morfología = Morphology
+Fisiología = Physiology
+
+Estadio = Stage of life*
+* Supongo que "stage" es la traducción correcta de estadio cuando se trata de
+una etapa del desarrollo, pero considero que usar la palabra "stage" con dos
+significados muy diferentes (escenario, estadio) en el mismo sistema puede crear
+confuciones. ¿Qué sugieres?
+
+Conductas = Conducts
+
+Interaction matrixes = Matrices de interacción
+Editar lista de prototipos = Edit prototype list
+Establecer cracterísticas morfológicas de los agentes
+= Setting agents morphologycal features
+Establecer cracterísticas fisiológicas de los agentes
+= Setting agents fisiológicas features
+Establecer los estadios de los agentes
+= Setting agents stages of life
+Establecer las conductas posibles
+= Setting possible conducts
+Editar las matrices de interacción
+= Edit interaction matrixes
+
+Caracteres discretos = Discreets characters
+Caracteres continuos = Continuous characters
+Valores por omisión = Default values
+
+Nombre = Name
+Por defecto = Default
+Varianza = Variance
+Movimiento = Movement
+Costo = Cost
+En reposo = At rest
+Velocidad = Speed
+Inmaduro = Immature
+
+Opciones generales = General options
+Establecer opciones generales = Set general options
+
+Importar nombres de sustratos = Import substrates names
+
+Tendencias de movimiento = Motion tendencies
+
+Doble clic para editar celda = Double click for cell editing
+
+Variables continuas = Continuous variables
+Variables discretas = Discreets variables
+Varianzas = Variances
+
+Diferente para huevos = Diferent for eggs
+Diferente para inmaduros = Diferent for immatures
+
+Bioenergética = Bioenergetic
+
+mlEscAltMn
+La longitud N-S del escenario ha sido modificada y ahora es menor, esto
+provocará pérdida de información en el archivo de entorno.
+= The longitude N-S of the stage has been modified and it now is minor, this
+it will cause loss of information in the environment file.
+
+mlEscAncMn
+La longitud E-O del escenario ha sido modificada y ahora es menor, esto
+provocará pérdida de información en el archivo de entorno.
+= The longitude E-W of the stage has been modified and it now is minor, this
+it will cause loss of information in the environment file.
+
+mlFltEscAsc
+No se encontró el escenario asociado. = Associate stage not found.
+
+mlFltAgntAsc
+No se encontró el juego de agentes asociado.
+= Associate set of agents not found.
+
+mlElementoAc
+Elemento actual = Current element
+
+mlErrExtNCES
+La extensión del archivo no corresponde a un juego de sustratos de Galatea.
+= File extension do not match with a Galatea set of substrates.
+
+mlErrExtNCGL
+La extensión del archivo no corresponde a un proyecto de Galatea.
+= File extension do not match with a Galatea project.
+
+mlErrExtNCEE
+La extensión del archivo no corresponde a un escenario de Galatea.
+= File extension do not match with a Galatea stage.
+
+mlErrExtNCEEN
+La extensión del archivo no corresponde a un entorno de Galatea.
+= File extension do not match with a Galatea environment.
+
+mlErrExtNCEA
+La extensión del archivo no corresponde a un juego de agentes de Galatea.
+= File extension do not match with a Galatea set of agents.
+
+/////////////////////////////////////////////////////////////////////////
+TERCERA REVISIÓN
+
+Inicializar todos los prototipos existentes con los nuevos valores
+= Inicialize all existing prototypes with new values
+
+Elementos dinámicos = Dynamic elements
+
+Metabolismo = Metabolism
+Virginidad = Virginity
+Producción de huevos = Eggs production
+
+Reversible = Reversible
+Después de x ciclos = After x cycles
+
+Cuadros por ciclo = squares per cycle
+
+Requerimientos para cambio de estadio = Change life stage requirements
+Condiciones para cambio de estadio = Change life stage conditions
+
+Cambiar al siguiente estadio después de X ciclos, y/o cuando se cubran los
+requerimientos indicados. = Change to next life stage after X cycles, and/or
+requirements indicated are covered.
+
+Atractividad = Attractivity
+
+Forrajeo = Foraging
+
+Beneficios = Benefits
+Unidades de nutrimento tomadas = Nutriment units taked
+
+Pelea = Fighting
+Cortejo = Mating
+Otros = Others
+
+Morir = Dead
+
+Longevidad = Longevity
+
+Ligar = Linking
+Ligar estadio al prototipo: = Link life stage to prototype:
+
+Memoria de percepción = Perception memory
+
+Variables disponibles = Available variables
+
+Doble clic para insertar variable a la fórmula = Double click for insert
+variable into formula
+
+Ver matrices de atractividad = View attractivity matrices
+Ver matrices de interacción = View interaction matrices
+
+Doble clic sobre controles color crema para abrir editor de fómulas.
+= Double click over cream color controls for opening formula editor.
+
+[EN VENTANA DE COMBATES]
+D : Despliege = D : Display
+E : Escalada  = S : Escalate
+R : Retirarse = R : Retreat
+
+[EN VENTANA DE CORTEJO]
+D : Intento despliegue  = D : Display attempt
+E : Intento escalado    = E : Escalate attempt
+C : Copular             = C : Copulate
+R : Rechazar            = R : Reject
+
+Paquetes espermáticos = Sperm packs
+
+Número de paquetes espermáticos entregadas por cópula
+= Number of sperm packs given per copulate
+
+Fracción de huevos fertilizados después de cópula (0-1)
+= Fraction of eggs fertilized after copulate (0-1)
+
+Probabilidad de paternidad
+= Probability of paternity
+
+Memoria de conducta = Conduct memory
+
+Aplicable unicamente en adultos = Applicable only in adults
+
+Varianza heredable = Variance heredable
+
+Máximo número de paquetes espermáticos almacenados por la hembra
+= Max number of sperm packs storaged by female:
+
+Tasa de consumo del paquete espermático (0-1)
+= Consuption rate of sperm pack (0-1)
+
+Pérdida energética = energetic lossing
+
+Fracción de nutrimentos del paquete espermático perdida al
+transferirlo a la hembra.
+= Sperm pack fraction lost during transfer it to female.
+
+Fracción de nutrimentos del huevo perdida al convertirse en agente.
+= Egg nutriments fraction lost during agent convertion.
+
+
+Doble clic sobre celdas en columna de valores por omisión para abrir el
+editor de fórmulas
+= Double click over cells into default column for opening formula editor
+
+Genética = Genetic
+
+Valores de loci = Loci values
+
+Asignación de prototipo = Prototype allocation
+
+Establecer criterios de asignación prototipos
+= Set prototype allocation criteria
+
+mlNinguno
+Ninguno = None
+
+mlBeber
+Beber = Drink
+
+mlCmrGrasa
+Comer grasa = Eat fat
+
+mlCmrAzucar
+Comer azúcar = Eat sugar
+
+mlCmrProteina
+Comer proteína = Eat protein
+
+mlEmisor
+Emisor = Issuing
+
+mlReceptor
+Receptor = Receiver
+
+mlElmnrPrttp
+¿Esta seguro de eliminar el prototipo?
+= Are you sure of removing prototype?
+
+mlMinimo
+Mínimo = Minimum
+
+mlCritico
+Crítico = Critical
+
+mlOptimo
+Óptimo = Optimum
+
+mlIncial
+Inicial = Initial
+
+mlMaximo
+Máximo = Maximum
+
+mlNutrimentos
+Nutrimentos  = Nutriments
+
+mlRqrmnts
+Requerimientos = Requirements
+
+mlTasaMutacion
+Tasa de mutación = Mutation rate
+
+mlElmnrEstd
+¿Está seguro de eliminar el estadio? = Are you shure of removing life stage?
+
+mlErrMtcnMnr1
+El valor de tasa de mutación debe estar entre 0 y 1.
+= Mutation rate value must be between 0 and 1.
+
+mlErrFracc
+El valor debe estar entre 0 y 1.
+= Value must be between 0 and 1.
+
+mlRstFrml
+El resultado de la fórmula, según los valores propuestos es:
+= Formula result, according to proposed values is:
+
+mlDesplegar
+Desplegar = Display
+
+mlEscalar
+Escalar  = Scale
+
+mlRetirar
+Retirar = Retreat
+
+mlIA
+I-A = A-A
+
+mlIB
+I-B = A-B
+
+mlCopular
+Copular = Copulate
+
+mlRechazar
+Rechazar = Reject
+
+mlDominante
+Dominante = Dominant
+
+mlRecesivo
+Recesivo = Recessive
+
+mlRangoMut
+Rango mutacion = Mutation range
+
+mlOperador
+Operador = Operator
+
+Si el contendiente ejecuta X, este prototipo de agente responde con Y
+= If contender plays X, this agent prototype responses with Y
+
+Si la pareja potencial ejecuta X, este prototipo de agente responde con Y
+= If potential mate plays X, this agent prototype responses with Y
+
+Asignación de sexo asociada a la descendencia del prototipo
+= Sex allocation associated to prototype offspring
+
+Para exportar los datos es indispensable tener instalado Microsoft Excel versión
+XP o superior.
+= For export data is indispensable to have installed Microsoft Excel version
+XP or upper.
+
+Excel es una marca registrada de Microsoft Corporation
+= Excel is a trademark propertie of Microsoft Corporation
+
+Pantalla completa = Full screen
+
+Ver escenario en pantalla completa = View stage on full screen
+
+Colocar agente en estadio de huevo en un sitio de oviposición o sobre un 
+agente adulto
+= Put agent in egg life stage in a oviposition site or on an adult agent
+
+Calidad = Quality
+Nivel = Level
+
+Operador suma = Add operator
+Operador resta = Subtraction operator
+Operador multiplicación = Multiplication operator
+Operador división = Division operator
+Operador módulo = Modulus operator
+Operador exponente = Exponent operator
+Variable aleatoria = Random variable
+Abrir paréntesis = Open bracket
+Cerrar paréntesis = Close bracket
+
+mlErrFltPlnt
+No especificó un nombre de plantilla
+= Missing template name
+
+mlNtrmntUndds
+Unidades de nutrimentos tomadas
+= Nutriment units taked
+
+mlNmrPETC
+Número de paquetes espermáticos transferidos por cópula
+= Number of sperm packs given per copula
+
+mlMaxPEAH
+Número máximo de paquetes espermáticos almacenados por la hembra
+= Max number of sperm packs storaged by female
+
+mlTasaConsmPE
+Tasa de consumo del paquete espermático
+= Consuption rate of sperm pack
+
+mlFrccHFC
+Fracción de huevos fertilizados justo después de la cópula
+= Fraction of eggs fertilized just after copula (0-1)
+
+mlPrbbPtrnd
+Probabilidad de paternidad
+= Probability of paternity
+
+mlHvsOvpstd
+Huevos ovipositados por ciclo
+= Eggs oviposited per cycle
+
+mlPrddPE
+Valor energético del paquete espermático perdido para el uso de la hembra
+=Sperm pack energetic value lost for female use
+
+mlPrddHv
+Valor energértico perdido para uso del agente
+= Egg energetic value lost for  agent use
+
+mlNoElmntEdt
+No hay ningún elemento editable sobre este cuadro.
+= There is not any element to edit on this squar.
+
+mlNoSlccElmnt
+No se seleccionó ningún elemento.
+= Miss selected element.
+
+///////////////////////////////////////////////////////////////////////////////
+Cuarta traducción
+
+Time variables = Variables de tiempo
+Genetic variables = variables genéticas**
+Morphological variables = Variables morfológicas**
+Physiological variables = Variables fisiológicas**
+Reproductive variables = Variables reproductivas
+Memory variables = Variables de memoria
+
+Las tendencias de movimiento son relativas, por ejemplo, la tendencia de ir
+hacia el norte es en realidad una tendencia a conservar la dirección actual,
+y una tendencia a ir hacia el sur es en realidad una tendencia a cambiar la
+dirección actual en 180º.
+= Movement tendencies are relative to the present direction, for example, the
+tendency of going north is in fact a tendency to conserve the current direction,
+and a tendency to go south is a tendency to change the current address by 180º.**
+
+Copy &N times = Copiar N veces
+
+Coloca N copias del elemento aleatoriamente distribuidas en el entorno
+= Places N copies of the element in the environment distributed at random**
+
+Intial column values can not be formulas**.	********Concepto abandonado
+= Los valores de la coumna Inicial no pueden ser fórmulas.
+
+Sustratos permitidos = Allowed substrates
+
+Puesta de huevos = Egg clutch
+
+mlIniTdsClds
+Inicializar todas las celdas con... = Initialize all cells with...
+
+mlNoCncdStrts
+Los nombres de sustratos del escenario no coinciden con los del juego de
+agentes, se actualizará el juego de agentes con los nombres de sustratos
+del escenario. Esto no afectará al archivo de juego de agentes original.
+=Substrate names in this stage do not coincide with those of the set of
+agents, the set of agents will be upgraded with the names of substrates of this
+stage. This will not affect the original set of agents file.**
+
+mlLcsPtrn
+Locus paterno = Paternal locus
+
+mlLcsMtrn
+Locus materno = Maternal locus
+
+mlLcsExprsd
+Locus expresado = Expressed locus
+
+mlTmnEscnrMnr
+El tamaño del escenario seleccionado es menor al actual. Para importar un nuevo
+escenario es necesario que su tamaño sea igual o mayor al actual.
+= The size of the selected stage is smaller to the current one. To import a new
+stage it is necessary that their size is the same or bigger than the current stage.**
+
+mlNmrPrttMnr
+Existe diferencia entre el número de estadios, y/o prototipos machos, y/o
+prototipos hembras entre el juego de agentes seleccionado y el actual. Para
+importar un nuevo juego de agentes es necesario que tanto el número de estadios,
+prototipos machos y prototipos hembras sean iguales o mayores al juego de
+agentes actual.
+= There are difference between number of life stages, and/or male prototypes,
+and/or female prototypes between the selected set of agents and the current one.
+To import a new set of agents it is necessary that the number of
+life stages, male prototypes and female prototypes are the same or bigger than the
+current set of agents.**
+(esta me confunde hasta en español, es muy confuso el primer enunciado, no lo
+puedes reescribir de manera más simple?)
+
+mlIndefinido
+Indefinido = Undefined
+
+mlNMrcCsllSus
+No se marcó ninguna casilla de sustrato, debe marcarse al menos una.
+= No substrate checkbox was marked, at least one should be marked**.
+
+mlSustNngnCdr
+Alguno de los sustratos marcados no se encuentran en ningún cuadro del entorno,
+desmarque la casilla correspondiente al sustrato: X
+= Some of the marked substrates is not in any square of the environment,
+uncheck the checkbox corresponding to the substrate: X
+
+mlNoElmntOvps
+No hay ningún agente adulto o sitio de oviposición en este cuadro.
+= There is no adult agent or oviposition site on this square.**
+
+mlNvlMxHvs
+El número máximo de huevos almacenados en este sitio de oviposición sería
+rebasado con la cantidad de huevos solicitada. No se creará la puesta.
+= The maximum number of eggs stored in this oviposition site would be
+surpassed with the quantity of eggs requested. The clutch will not be created.
+
+///////////////////////////////////////////////////////////////////
+Quinta revisión
+
+Retardo = Delay
+
+Especifica el tiempo (en milisegundos) de la pausa entre ciclo y ciclo
+= Specifies the time (in miliconds) of delay between cycle and cycle
+
+No desplegar = Not display
+Habilita el modo de ejecución sin desplegar entorno, acelerando la ejecución
+= Enables the execution without displaying environment mode, accelerating the
+execution
+
+Mostrar información = Show information
+Muestra información sobre el estado de la simualción
+=Display information about simulation state
+
+Exportar a archivo de entorno
+= Export to environment file
+
+Exporta estado de la simulación a un archivo de entorno nuevo
+= Export simulation state to a new environment file
+
+Guardado automático
+= Autosave
+
+Guardar automaticamente cada X ciclos
+= Autosave each X cycles
+
+Recordar último directorio utilizado
+= Remember last used directory
+
+Mostrar información cada X ciclos
+= Show information each X cycles
+
+Detener ejecución de la simulación a los X ciclos
+= Stop running simulation at X cycles
+
+Gardar archivos de salida cada X ciclos
+= Save output files each X cycles
+
+mlTodosMuertos
+Todos los agentes han muerto, se ha detenido la ejecución de la simulación auto-
+máticamente.
+= All agents have died, simulation running has stopped automatically.
+
+mlArchSalida
+Archivos de salida
+=Output files
+
+mlSalida
+Salida = Output
+
+mlDegrEsperma
+Tasa de degradación de esperma
+= Rate of sperm degradation
+
+mlFltArchEntrn
+No se encontró el archivo de entorno
+= Environment file not found
+
+mlFltJgAgnts
+Falta archivo de juego de agentes
+= Missing set of agents file
+
+mlPregDetener
+Esto provocará que la simulación retorne a su estado inicial. ¿Está seguro de
+detener la ejecución?
+= This will cause that the simulation returns to its initial state. Are you
+sure of stopping the execution?
+
+mlDirSalNE
+El directorio para archivos de salida no existe. ¿Desea crearlo?
+= The directory of output files does not exist, do you want to create it?
+
+mlErrDirSalNC
+No fue posible crear archivos de salida.
+= It was not possible to create output files.
+
+mlErrFltAnlzdr
+No se encontró el analizador de archivos de salida. Se recomienda reinstalar
+el paquete Galatea.
+= Output files analizer not found, reinstaling Galatea package is recomended.
+
+mlGentico
+= Genetic
+
+mlAmbiental
+= Environmental

@@ -1,0 +1,273 @@
+{ This is an automatically generated lazarus resource file }
+
+LazarusResources.Add('TfrmPrincipal','FORMDATA',[
+  'TPF0'#13'TfrmPrincipal'#12'frmPrincipal'#4'Left'#3'/'#1#6'Height'#3#22#2#3'T'
+  +'op'#3'i'#1#5'Width'#3#250#5#13'ActiveControl'#7#10'edtRetardo'#7'Caption'#6
+  +#7'Galatea'#12'ClientHeight'#3#22#2#11'ClientWidth'#3#250#5#13'DesignTimePPI'
+  +#3#192#0#11'Font.Height'#2#234#9'Font.Name'#6#13'MS Sans Serif'#4'Menu'#7#9
+  +'MainMenu1'#7'OnClose'#7#9'FormClose'#12'OnCloseQuery'#7#14'FormCloseQuery'#8
+  +'OnCreate'#7#10'FormCreate'#7'OnPaint'#7#9'FormPaint'#8'OnResize'#7#10'FormR'
+  +'esize'#8'Position'#7#9'poDefault'#8'ShowHint'#9#10'LCLVersion'#6#7'3.8.0.0'
+  +#0#9'TPaintBox'#10'ptbEntorno'#22'AnchorSideLeft.Control'#7#9'pnlStatus'#19
+  +'AnchorSideLeft.Side'#7#9'asrBottom'#21'AnchorSideTop.Control'#7#8'ToolBar1'
+  +#18'AnchorSideTop.Side'#7#9'asrBottom'#23'AnchorSideRight.Control'#7#11'scbV'
+  +'ertical'#24'AnchorSideBottom.Control'#7#13'scbHorizontal'#4'Left'#3'b'#1#6
+  +'Height'#3#182#1#3'Top'#2'2'#5'Width'#3#139#4#7'Anchors'#11#5'akTop'#6'akLef'
+  +'t'#7'akRight'#8'akBottom'#0#0#0#10'TStatusBar'#10'StatusBar1'#4'Left'#2#0#6
+  +'Height'#2'!'#3'Top'#3#245#1#5'Width'#3#250#5#6'Panels'#14#1#5'Width'#3' '#3
+  +#0#1#5'Width'#2'd'#0#0#0#0#8'TToolBar'#8'ToolBar1'#6'Cursor'#7#11'crHandPoin'
+  +'t'#4'Left'#2#0#6'Height'#2'2'#3'Top'#2#0#5'Width'#3#250#5#7'Caption'#6#8'To'
+  +'olBar1'#6'Images'#7#10'ImageList1'#8'TabOrder'#2#0#0#11'TToolButton'#11'Too'
+  +'lButton5'#4'Left'#2#1#3'Top'#2#2#6'Action'#7#8'actNuevo'#0#0#11'TToolButton'
+  +#11'ToolButton2'#4'Left'#2'/'#3'Top'#2#2#6'Action'#7#8'actAbrir'#0#0#11'TToo'
+  +'lButton'#11'ToolButton3'#4'Left'#2']'#3'Top'#2#2#6'Action'#7#10'actGuardar'
+  +#0#0#11'TToolButton'#11'ToolButton4'#4'Left'#3#139#0#6'Height'#2','#3'Top'#2
+  +#2#7'Caption'#6#11'ToolButton4'#10'ImageIndex'#2#3#5'Style'#7#12'tbsSeparato'
+  +'r'#0#0#11'TToolButton'#9'tlbInicio'#4'Left'#3#155#0#3'Top'#2#2#6'Action'#7
+  +#10'actIniciar'#0#0#11'TToolButton'#8'tlbPausa'#4'Left'#3#201#0#3'Top'#2#2#6
+  +'Action'#7#8'actPausa'#0#0#11'TToolButton'#7'tlbPaso'#4'Left'#3#247#0#3'Top'
+  +#2#2#6'Action'#7#7'actPaso'#0#0#11'TToolButton'#7'tlbAlto'#4'Left'#3'%'#1#3
+  +'Top'#2#2#6'Action'#7#10'actDetener'#0#0#11'TToolButton'#11'ToolButton9'#4'L'
+  +'eft'#3'S'#1#6'Height'#2','#3'Top'#2#2#7'Caption'#6#11'ToolButton9'#10'Image'
+  +'Index'#2#7#5'Style'#7#12'tbsSeparator'#0#0#11'TToolButton'#11'ToolButton8'#4
+  +'Left'#3#241#1#6'Height'#2','#3'Top'#2#2#7'Caption'#6#11'ToolButton8'#10'Ima'
+  +'geIndex'#2#6#5'Style'#7#12'tbsSeparator'#0#0#11'TToolButton'#12'ToolButton1'
+  +'8'#4'Left'#3'#'#2#3'Top'#2#2#6'Action'#7#10'actIncZoom'#0#0#11'TToolButton'
+  +#12'ToolButton19'#4'Left'#3'Q'#2#3'Top'#2#2#6'Action'#7#10'actDecZoom'#0#0#11
+  +'TToolButton'#12'ToolButton21'#4'Left'#3#127#2#6'Height'#2','#3'Top'#2#2#7'C'
+  +'aption'#6#12'ToolButton21'#10'ImageIndex'#2#9#5'Style'#7#12'tbsSeparator'#0
+  +#0#11'TToolButton'#13'tlbVisualizar'#4'Left'#3#143#2#3'Top'#2#2#6'Action'#7
+  +#14'actNoDesplegar'#0#0#11'TToolButton'#12'ToolButton23'#4'Left'#3#189#2#6'H'
+  +'eight'#2','#3'Top'#2#2#7'Caption'#6#12'ToolButton23'#10'ImageIndex'#2#6#5'S'
+  +'tyle'#7#12'tbsSeparator'#0#0#11'TToolButton'#12'ToolButton20'#4'Left'#3'_'#3
+  +#6'Height'#2','#3'Top'#2#2#7'Caption'#6#12'ToolButton20'#10'ImageIndex'#2#8#5
+  +'Style'#7#12'tbsSeparator'#0#0#11'TToolButton'#11'ToolButton7'#4'Left'#3'o'#3
+  +#3'Top'#2#2#6'Action'#7#11'actEntornos'#0#0#11'TToolButton'#12'ToolButton10'
+  +#4'Left'#3#157#3#3'Top'#2#2#6'Action'#7#9'actEditor'#0#0#11'TToolButton'#11
+  +'ToolButton6'#4'Left'#3#203#3#3'Top'#2#2#6'Action'#7#10'actAgentes'#0#0#11'T'
+  +'ToolButton'#11'ToolButton1'#4'Left'#3#249#3#3'Top'#2#2#6'Action'#7#12'actSu'
+  +'stratos'#0#0#11'TToolButton'#12'ToolButton13'#4'Left'#3''''#4#3'Top'#2#2#6
+  +'Action'#7#13'actAnalizador'#0#0#11'TToolButton'#12'ToolButton16'#4'Left'#3
+  +'U'#4#6'Height'#2','#3'Top'#2#2#7'Caption'#6#12'ToolButton16'#10'ImageIndex'
+  +#2#12#5'Style'#7#12'tbsSeparator'#0#0#11'TToolButton'#12'ToolButton25'#4'Lef'
+  +'t'#3'e'#4#3'Top'#2#2#6'Action'#7#13'actExpEntorno'#0#0#11'TToolButton'#12'T'
+  +'oolButton26'#4'Left'#3#147#4#6'Height'#2','#3'Top'#2#2#7'Caption'#6#12'Tool'
+  +'Button26'#10'ImageIndex'#2#7#5'Style'#7#12'tbsSeparator'#0#0#11'TToolButton'
+  +#12'ToolButton15'#4'Left'#3#163#4#3'Top'#2#2#6'Action'#7#8'actAyuda'#0#0#11
+  +'TToolButton'#12'ToolButton14'#4'Left'#3#209#4#6'Height'#2','#3'Top'#2#2#7'C'
+  +'aption'#6#12'ToolButton14'#10'ImageIndex'#2#6#5'Style'#7#12'tbsSeparator'#0
+  +#0#11'TToolButton'#12'ToolButton17'#4'Left'#3#225#4#3'Top'#2#2#6'Action'#7#8
+  +'actSalir'#0#0#5'TEdit'#10'edtRetardo'#4'Left'#3'c'#1#6'Height'#2'+'#4'Hint'
+  +#6'HDelay|Specifies the time (in miliconds) of delay between cycle and cycle'
+  +#3'Top'#2#2#5'Width'#3#142#0#8'TabOrder'#2#1#4'Text'#6#1'0'#8'OnChange'#7#16
+  +'edtRetardoChange'#10'OnKeyPress'#7#18'edtRetardoKeyPress'#0#0#7'TUpDown'#10
+  +'updRetardo'#4'Left'#3#1#2#6'Height'#2','#3'Top'#2#2#5'Width'#2'"'#9'Associa'
+  +'te'#7#10'edtRetardo'#9'Increment'#2#10#3'Max'#3#136#19#3'Min'#2#0#8'Positio'
+  +'n'#2#0#8'TabOrder'#2#0#9'Thousands'#8#0#0#9'TComboBox'#9'cmbEscala'#4'Left'
+  +#3#205#2#6'Height'#2')'#4'Hint'#6#30'Zoom|Specifies the zoom factor'#3'Top'#2
+  ,#2#5'Width'#3#146#0#10'ItemHeight'#2#0#9'ItemIndex'#2#4#13'Items.Strings'#1#6
+  +#4'20 %'#6#4'40 %'#6#4'60 %'#6#4'80 %'#6#5'100 %'#6#5'120 %'#6#5'140 %'#6#5
+  +'160 %'#6#5'180 %'#6#5'200 %'#0#9'MaxLength'#4#255#255#0#0#5'Style'#7#14'csD'
+  +'ropDownList'#8'TabOrder'#2#2#4'Text'#6#5'100 %'#8'OnChange'#7#15'cmbEscalaC'
+  +'hange'#0#0#0#10'TScrollBar'#13'scbHorizontal'#22'AnchorSideLeft.Control'#7#9
+  +'pnlStatus'#19'AnchorSideLeft.Side'#7#9'asrBottom'#23'AnchorSideRight.Contro'
+  +'l'#7#11'scbVertical'#24'AnchorSideBottom.Control'#7#10'StatusBar1'#4'Left'#3
+  +'b'#1#6'Height'#2#13#3'Top'#3#232#1#5'Width'#3#139#4#7'Anchors'#11#6'akLeft'
+  +#7'akRight'#8'akBottom'#0#8'PageSize'#2#0#8'TabOrder'#2#1#7'Visible'#8#8'OnC'
+  +'hange'#7#19'scbHorizontalChange'#0#0#10'TScrollBar'#11'scbVertical'#21'Anch'
+  +'orSideTop.Control'#7#8'ToolBar1'#18'AnchorSideTop.Side'#7#9'asrBottom'#23'A'
+  +'nchorSideRight.Control'#7#5'Owner'#20'AnchorSideRight.Side'#7#9'asrBottom'
+  +#24'AnchorSideBottom.Control'#7#13'scbHorizontal'#4'Left'#3#237#5#6'Height'#3
+  +#182#1#3'Top'#2'2'#5'Width'#2#13#7'Anchors'#11#5'akTop'#7'akRight'#8'akBotto'
+  +'m'#0#4'Kind'#7#10'sbVertical'#8'PageSize'#2#0#8'TabOrder'#2#2#7'Visible'#8#8
+  +'OnChange'#7#17'scbVerticalChange'#0#0#6'TPanel'#9'pnlStatus'#4'Left'#2#0#6
+  +'Height'#3#195#1#3'Top'#2'2'#5'Width'#3'b'#1#5'Align'#7#6'alLeft'#12'ClientH'
+  +'eight'#3#195#1#11'ClientWidth'#3'b'#1#8'TabOrder'#2#3#0#7'TBitBtn'#11'btnIn'
+  +'formar'#4'Left'#2'@'#6'Height'#2'2'#3'Top'#3'p'#2#5'Width'#3#226#0#6'Action'
+  +#7#11'actInformar'#6'Images'#7#10'ImageList1'#10'ImageIndex'#2#22#8'TabOrder'
+  +#2#0#0#0#5'TMemo'#7'memInfo'#4'Left'#2#12#6'Height'#3'P'#2#3'Top'#2#14#5'Wid'
+  +'th'#3'D'#1#13'Lines.Strings'#1#6#5'Memo1'#0#10'ScrollBars'#7#10'ssAutoBoth'
+  +#8'TabOrder'#2#1#0#0#0#11'TActionList'#11'ActionList1'#6'Images'#7#10'ImageL'
+  +'ist1'#4'Left'#3#192#1#3'Top'#2'`'#0#7'TAction'#8'actNuevo'#7'Caption'#6#12
+  +'&New project'#7'Enabled'#8#4'Hint'#6'+New project|Create a new simulation p'
+  +'roject'#10'ImageIndex'#2#0#9'OnExecute'#7#15'actNuevoExecute'#8'ShortCut'#3
+  +'N@'#0#0#7'TAction'#8'actAbrir'#7'Caption'#6#17'&Open Environment'#4'Hint'#6
+  +'(Open environment|Open a environment file'#10'ImageIndex'#2#1#9'OnExecute'#7
+  +#15'actAbrirExecute'#8'ShortCut'#3'O@'#0#0#7'TAction'#10'actGuardar'#7'Capti'
+  +'on'#6#13'&Save Project'#7'Enabled'#8#4'Hint'#6'%Save project|Save the curre'
+  +'nt project'#10'ImageIndex'#2#2#9'OnExecute'#7#17'actGuardarExecute'#8'Short'
+  +'Cut'#3'S@'#0#0#7'TAction'#14'actGuardarComo'#7'Caption'#6#16'S&ave Project '
+  +'As'#7'Enabled'#8#4'Hint'#6'6Save project as|Save the current project in a n'
+  +'ew file'#10'ImageIndex'#2#3#9'OnExecute'#7#21'actGuardarComoExecute'#0#0#7
+  +'TAction'#9'actCerrar'#7'Caption'#6#18'C&lose Environment'#4'Hint'#6'+Close '
+  +'project|Close the current environment'#10'ImageIndex'#2#4#9'OnExecute'#7#16
+  +'actCerrarExecute'#0#0#7'TAction'#8'actSalir'#7'Caption'#6#5'E&xit'#4'Hint'#6
+  +#23'Exit|Leave from Galatea'#10'ImageIndex'#2#5#9'OnExecute'#7#15'actSalirEx'
+  +'ecute'#0#0#7'TAction'#10'actIniciar'#7'Caption'#6#4'&Run'#4'Hint'#6#27'Run|'
+  +'Run the current proyect'#10'ImageIndex'#2#6#9'OnExecute'#7#17'actIniciarExe'
+  +'cute'#8'ShortCut'#2't'#0#0#7'TAction'#8'actPausa'#7'Caption'#6#6'&Pause'#4
+  +'Hint'#6'"Pause|Pause in the current running'#10'ImageIndex'#2#7#9'OnExecute'
+  +#7#15'actPausaExecute'#8'ShortCut'#3'P@'#0#0#7'TAction'#7'actPaso'#7'Caption'
+  +#6#10'&Next step'#4'Hint'#6'7Next step|Ejecutes the next step in the current'
+  +' running'#10'ImageIndex'#2#8#9'OnExecute'#7#14'actPasoExecute'#8'ShortCut'#2
+  +'w'#0#0#7'TAction'#10'actDetener'#7'Caption'#6#5'&Stop'#4'Hint'#6'!Stop|Stop'
+  +'ping the current running'#10'ImageIndex'#2#9#9'OnExecute'#7#17'actDetenerEx'
+  +'ecute'#8'ShortCut'#3'q@'#0#0#7'TAction'#9'actEditor'#7'Caption'#6#13'&Stage'
+  +' Editor'#4'Hint'#6'"Stage Editor|Open the Stage Editor'#10'ImageIndex'#2#10
+  +#9'OnExecute'#7#16'actEditorExecute'#0#0#7'TAction'#12'actSustratos'#7'Capti'
+  +'on'#6#17'S&ubstrate Editor'#4'Hint'#6',Substratum Editor|Open the Substratu'
+  +'m Editor'#10'ImageIndex'#2#14#9'OnExecute'#7#19'actSustratosExecute'#0#0#7
+  +'TAction'#10'actAgentes'#7'Caption'#6#13'&Agent Editor'#4'Hint'#6#30'Agent E'
+  +'ditor|Open Agent Editor'#10'ImageIndex'#2#16#9'OnExecute'#7#17'actAgentesEx'
+  +'ecute'#0#0#7'TAction'#19'actOpcionesProyecto'#7'Caption'#6#16'&Proyect opti'
+  +'ons'#4'Hint'#6'#Project options|Set project options'#10'ImageIndex'#2#11#9
+  +'OnExecute'#7#26'actOpcionesProyectoExecute'#0#0#7'TAction'#12'actGenerales'
+  +#7'Caption'#6#16'&General options'#4'Hint'#6'#General options|Set general op'
+  +'tions'#10'ImageIndex'#2#12#9'OnExecute'#7#19'actGeneralesExecute'#0#0#7'TAc'
+  +'tion'#8'actAyuda'#7'Caption'#6#9'&Contents'#4'Hint'#6'$Help contents|Show t'
+  +'he help contents'#10'ImageIndex'#2#13#8'ShortCut'#2'p'#0#0#7'TAction'#9'act'
+  +'Acerca'#7'Caption'#6#14'&About Galatea'#4'Hint'#6#30'About|Show program inf'
+  +'ormation'#0#0#7'TAction'#11'actEntornos'#7'Caption'#6#19'&Environment Edito'
+  +'r'#4'Hint'#6'.Environment Editor|Open the Environment Editor'#10'ImageIndex'
+  ,#2#15#9'OnExecute'#7#18'actEntornosExecute'#0#0#7'TAction'#10'actDecZoom'#7
+  +'Caption'#6#9'Zoom &out'#4'Hint'#6#29'Zoom out|Decrease zoom factor'#10'Imag'
+  +'eIndex'#2#17#9'OnExecute'#7#17'actDecZoomExecute'#8'ShortCut'#3'O@'#0#0#7'T'
+  +'Action'#10'actIncZoom'#7'Caption'#6#8'Zoom &in'#4'Hint'#6#28'Zoom in|Increa'
+  +'se zoom factor'#10'ImageIndex'#2#18#9'OnExecute'#7#17'actIncZoomExecute'#8
+  +'ShortCut'#3'I@'#0#0#7'TAction'#14'actNoDesplegar'#7'Caption'#6#12'Not &disp'
+  +'lay'#4'Hint'#6'aNot display|Enables the execution without displaying enviro'
+  +'nment mode, accelerating the execution'#10'ImageIndex'#2#19#9'OnExecute'#7
+  +#21'actNoDesplegarExecute'#8'ShortCut'#3'D@'#0#0#7'TAction'#13'actAnalizador'
+  +#7'Caption'#6#22'&Output files analizer'#4'Hint'#6'4Output files analizer|Op'
+  +'en the output files analizer'#10'ImageIndex'#2#20#9'OnExecute'#7#20'actAnal'
+  +'izadorExecute'#0#0#7'TAction'#13'actExpEntorno'#7'Caption'#6#26'Export to e'
+  +'nvironment file'#4'Hint'#6'LExport to environment file|Export simulation st'
+  +'ate to a new environment file'#10'ImageIndex'#2#21#0#0#7'TAction'#11'actInf'
+  +'ormar'#7'Caption'#6#16'Show information'#4'Hint'#6'@Show information|Show i'
+  +'nformation about current simulation state'#10'ImageIndex'#2#22#9'OnExecute'
+  +#7#18'actInformarExecute'#0#0#0#9'TMainMenu'#9'MainMenu1'#6'Images'#7#10'Ima'
+  +'geList1'#4'Left'#3#16#2#3'Top'#2'`'#0#9'TMenuItem'#9'Proyecto1'#7'Caption'#6
+  +#5'&File'#0#9'TMenuItem'#6'Nuevo1'#6'Action'#7#8'actNuevo'#7'OnClick'#7#15'a'
+  +'ctNuevoExecute'#0#0#9'TMenuItem'#14'Abrirproyecto1'#6'Action'#7#8'actAbrir'
+  +#7'OnClick'#7#15'actAbrirExecute'#0#0#9'TMenuItem'#16'GuardarProyecto1'#6'Ac'
+  +'tion'#7#10'actGuardar'#7'OnClick'#7#17'actGuardarExecute'#0#0#9'TMenuItem'
+  +#20'GuardarProyectocomo1'#6'Action'#7#14'actGuardarComo'#7'OnClick'#7#21'act'
+  +'GuardarComoExecute'#0#0#9'TMenuItem'#15'CerrarProyecto1'#6'Action'#7#9'actC'
+  +'errar'#7'OnClick'#7#16'actCerrarExecute'#0#0#9'TMenuItem'#2'N4'#7'Caption'#6
+  +#1'-'#0#0#9'TMenuItem'#24'Exporttoenvironmentfile1'#7'Caption'#6#26'Export t'
+  +'o environment file'#4'Hint'#6'MExport to environment file |Export simulatio'
+  +'n state to a new environment file'#10'ImageIndex'#2#24#7'OnClick'#7#20'actE'
+  +'xpEntornoExecute'#0#0#9'TMenuItem'#2'N1'#7'Caption'#6#1'-'#0#0#9'TMenuItem'
+  +#2'R1'#7'Caption'#6#8'reciente'#7'Visible'#8#7'OnClick'#7#7'R1Click'#0#0#9'T'
+  +'MenuItem'#3'R21'#7'Caption'#6#8'reciente'#7'Visible'#8#7'OnClick'#7#8'R21Cl'
+  +'ick'#0#0#9'TMenuItem'#3'R31'#7'Caption'#6#8'reciente'#7'Visible'#8#7'OnClic'
+  +'k'#7#8'R31Click'#0#0#9'TMenuItem'#3'R41'#7'Caption'#6#8'reciente'#7'Visible'
+  +#8#7'OnClick'#7#8'R41Click'#0#0#9'TMenuItem'#3'R51'#7'Caption'#6#8'reciente'
+  +#7'Visible'#8#7'OnClick'#7#8'R51Click'#0#0#9'TMenuItem'#2'N2'#7'Caption'#6#1
+  +'-'#7'Visible'#8#0#0#9'TMenuItem'#6'Salir1'#6'Action'#7#8'actSalir'#7'OnClic'
+  +'k'#7#15'actSalirExecute'#0#0#0#9'TMenuItem'#9'Ejecucin1'#7'Caption'#6#4'&Ru'
+  +'n'#0#9'TMenuItem'#8'Iniciar1'#6'Action'#7#10'actIniciar'#7'OnClick'#7#17'ac'
+  +'tIniciarExecute'#0#0#9'TMenuItem'#6'Pausa1'#6'Action'#7#8'actPausa'#7'OnCli'
+  +'ck'#7#15'actPausaExecute'#0#0#9'TMenuItem'#14'Pasosiguiente1'#6'Action'#7#7
+  +'actPaso'#7'OnClick'#7#14'actPasoExecute'#0#0#9'TMenuItem'#8'Detener1'#6'Act'
+  +'ion'#7#10'actDetener'#7'OnClick'#7#17'actDetenerExecute'#0#0#0#9'TMenuItem'
+  +#5'View1'#7'Caption'#6#5'&View'#0#9'TMenuItem'#7'Zoomin1'#6'Action'#7#10'act'
+  +'IncZoom'#7'OnClick'#7#17'actIncZoomExecute'#0#0#9'TMenuItem'#8'Zoomout1'#6
+  +'Action'#7#10'actDecZoom'#7'OnClick'#7#17'actDecZoomExecute'#0#0#0#9'TMenuIt'
+  +'em'#13'Herramientas1'#7'Caption'#6#6'&Tools'#0#9'TMenuItem'#18'EnvironmentE'
+  +'ditor1'#6'Action'#7#11'actEntornos'#7'OnClick'#7#18'actEntornosExecute'#0#0
+  +#9'TMenuItem'#19'EditordeEscenarios1'#6'Action'#7#9'actEditor'#7'OnClick'#7
+  +#16'actEditorExecute'#0#0#9'TMenuItem'#12'Agentstypes1'#6'Action'#7#10'actAg'
+  +'entes'#7'OnClick'#7#17'actAgentesExecute'#0#0#9'TMenuItem'#17'SubstratumEdi'
+  +'tor1'#6'Action'#7#12'actSustratos'#7'OnClick'#7#19'actSustratosExecute'#0#0
+  +#9'TMenuItem'#20'Outputfilesanalizer1'#6'Action'#7#13'actAnalizador'#7'OnCli'
+  +'ck'#7#20'actAnalizadorExecute'#0#0#0#9'TMenuItem'#9'Opciones1'#7'Caption'#6
+  +#8'&Options'#0#9'TMenuItem'#12'DelProyecto1'#6'Action'#7#19'actOpcionesProye'
+  +'cto'#7'Enabled'#8#7'OnClick'#7#26'actOpcionesProyectoExecute'#0#0#9'TMenuIt'
+  +'em'#10'Generales1'#6'Action'#7#12'actGenerales'#7'OnClick'#7#19'actGenerale'
+  +'sExecute'#0#0#9'TMenuItem'#2'N5'#7'Caption'#6#1'-'#10'ImageIndex'#2#21#0#0#9
+  +'TMenuItem'#24'Exporttoenvironmentfile2'#6'Action'#7#13'actExpEntorno'#0#0#0
+  +#9'TMenuItem'#6'Ayuda1'#7'Caption'#6#5'&Help'#0#9'TMenuItem'#10'Contenido1'#6
+  +'Action'#7#8'actAyuda'#0#0#9'TMenuItem'#2'N3'#7'Caption'#6#1'-'#0#0#9'TMenuI'
+  +'tem'#16'AcercadeGalatea1'#6'Action'#7#9'actAcerca'#0#0#0#0#11'TOpenDialog'
+  +#15'dlgAbreProyecto'#5'Title'#6#16'Open Environment'#6'Filter'#6#25'Galatea '
+  +'environment|*.ngl'#7'Options'#11#14'ofHideReadOnly'#15'ofPathMustExist'#15
+  +'ofFileMustExist'#14'ofEnableSizing'#0#4'Left'#3#176#2#3'Top'#2'`'#0#0#11'TS'
+  ,'aveDialog'#18'dlgGuardarProyecto'#5'Title'#6#24'Guardar Proyecto como...'#6
+  +'Filter'#6'!Proyecto de Galatea (*.pgl)|*.pgl'#7'Options'#11#17'ofOverwriteP'
+  +'rompt'#14'ofHideReadOnly'#15'ofPathMustExist'#14'ofEnableSizing'#0#4'Left'#3
+  +#0#3#3'Top'#2'`'#0#0#10'TImageList'#10'ImageList1'#7'BkColor'#7#6'clForm'#4
+  +'Left'#3'P'#3#3'Top'#2'`'#6'Bitmap'#10#24#6#0#0'Lz'#23#0#0#0#16#0#0#0#16#0#0
+  +#0#2#6#0#0#0#0#0#0'x'#218#237'\[r'#235'0'#8'e'#223#249#201#198':'#211#157'qk'
+  +#199'r'#0#241#148#156#235#166#177':'#154'4'#146#14' '#4'z'#153#24#16#17#172
+  +#228#213#209#250#229'Sk[)'#127'|'#183'rLs'#175#229#137#209#240#177'&~'#167#19
+  +#233#195#193#19'Y'#202'xW'#31#188'_'#24#165#189#31'Z'#174#226#19#242'k'#248
+  +#219#237#150#30#191#183#193#251#246#203#179'f'#251'['#217'B'#187#229'VN'#203
+  +'h9dR'#228#223#151#255'w'#248#229#243#235#235#235'4'#255'o2'#159#229#255#146
+  +#159#170#135#23#250#191#213#255#203#255'_'#224#255#25#159#27'_'#179#214#234
+  +'>'#23'|nK'#15#157#171'4'#10'>g'#227's>'#151#227#223#203#227#229#164#207#217
+  +'z'#204#249#252'@'#255#151#241#144#3#184#25#205#246'?'#132's'#142'W'#127#20
+  +'~2'#135#246'}'#4'~'#209'%'#205'#xJ'#167#138#223#230#172#231#28#194#231#162
+  +'q'#255#223#230#162#25#255'o4f'#252#159#202'1'#227#255'0'#233#255' d'#25#245
+  +#127#217#159#170#255'wx)'#7'r'#188':'#255'5]z'#254'o'#237'%'#18'{'#146'C'#240
+  +#127#193#255#131#254#135#254#159#192#7#254'?'#191#255#175#158'/h'#249'Q'#231
+  +#135#209#178#252'X'#187#216'6.'#139'~'#181'D'#198#205#196#211#241#141#215's'
+  +#190#143#163#251'(6'#198'^_'#12'?ks'#177#235#175#3'{'#247#202'>2'#236'wu'#236
+  +#188#241'S'#246#218'^'#217#176#157'j'#229#179#254'3'#183#255#175#233#207#177
+  +#223#159'Uz'#183#14'snO'#224#151#207'Q'#252'3'#159#140#183#214#183'w'#145#255
+  +#211#241#254'z'#234#227#227#245#216#198''''#246'CS'#243'_'#237'l'#159'>'#5'L'
+  +#238#187#176#146',|FP'#178'.Fx<'#0#143#7#224#241#0'<'#158#200#255','#253#151
+  +#199'_'#222#179'YY'#195#191#224#220#241'N'#233'/'#250#255#12#158#182#25#241
+  +#191'O'#199#159'2~'#151#255'_'#254#255'"'#255#255#13#243#7#158#200#31'.'#255
+  +#191#252#255#3#253#31''''#253#231'S'#241#151#255#191'S'#186#253#244'g$'#19
+  +#252#174'['#165#29#211#189#130#239#198#199#192'v'#245#7#225'='#249#179'x+'
+  +#191#19#158#222'TU'#198'Ob5'#26#145#253#156#141#247#250#159#197#15#251#207'y'
+  +#235'8d'#238'l'#250#231#239'f[g'#13#233#159'{?iz'#252#237#231#230#129'L'#24
+  +#196'.h1'#1'h'#243#181#250#26#197#7#160#165's'#244#251'h'#242'5t'#229#241#212
+  +#250#151#25#255' '#238#195#29'?S'#15#16#143'_J'#7'I'#253'C'#160#255'!'#221'C'
+  +#209'V '#233'ke'#255#197#156#1#30#150'!v0'#5#131','#238'D'#210#203#198#222')'
+  +#231#8#247#240'!'#217'Yx'#173'>'#194'jx'#218'.'#194'z'#248#12'V'#246#223'R'
+  +#191'G'#143'j/'#131#181#240#22#159#156#254'-'#218'Y'#253#215#249'z'#250#207
+  +'b3'#250'O'#156#131#189#245'ul'#3'@'#227#198'h,Y'#1#171#234'4'#160'!'#177#246
+  +#247'@f'#18#223#166'~7'#226'1'#236'~s'#254#154#222'Q'#196'ZA'#23'o'#23#196
+  +#159#144'X'#129'^'#135#178#220'~'#166'&'#245#176#198#17'a''{'#23#191#190#159
+  +'iE'#219#22#199'$'#249'+'#241#239','#238#208#210#187'v'#127'Ce'#199'@'#239'Z'
+  +#12#190#134'G!'#127#16#195#207#202'('#189#189#255'J'#157#188#31#213#226#251
+  +'Z{/'#246#207#154'8h'#188'_f-'#141#214#213'J'#219#150'o'#237#156'A'#255#232
+  +'w'#15#143#27'^b<|;?Q'#254#20'#e'#241#240#148#191#246'w'#251'%w0'#235#153'x'
+  +#203#244#4#185#218#27#143#219#164#243#200'n'#191#20'Ki'#17#188#25#251')'#241
+  +#132'w'#195'[{'#199#142'?'#165#225#240#23'r'#12#168#11#176#229'}'#238'4'#242
+  +#163#205#205#201#28'/c'#167'w'#252'M'#224#232#249#219#137#189'f'#252'W'#140
+  +#206'_'#139#29'w'#229#223#203#15#182#191#209#188#142#185'~G'#129'V'#29#179
+  +#215#167'M'#172#238#171#220'Aa'#179#31'V'#215#236'l'#240#254'n'#2#255#144#243
+  +')'#191'._'#142#191#170'7'#152#195'W'#249'kz'#231#227#2'!'#255#242#253#31#229
+  +'?r'#255#150#192'['#246#247#208#239'q'#252#25#13#208#248'a'#136#247#252#200
+  +#231'?'#158#223'&i'#19'u'#21#143'0N'#3#6'e'#128#9#236#254#251#155'*O`'#252'K'
+  +#207'W['#188'~'#17'3t'#128#157#197#18'<;D'#151#199#22#198#177'o'#158#232'V'
+  +#224'~'#191#179'='#222#246'=}u'#176#180#151'9'#249#172'sm'#251#253#253#189
+  +#202'D?#'#26#141#143#134#165'4'#156#190#172'u'#22'vI'#129#12';'#127#205#140
+  +#19'}'#152#226#127'@'#255#167#244#159#28#255#212#29#146'i'#127#241#24'T'#159
+  +'m]4'#20#236#217#254'?'#224'{'#187#253'SL'#155#198')'#141#200#255')'#223#230
+  +#183'I'#31#216#249'['#203'Xv'#254#24#225#127'@'#255#167#244#127#249#255#219
+  +#251#255#131#206#162#223'J'#214#238#133#238'}^'#237'Q'#150'3'#12#167#181#238
+  +'WE'#251#213'6'#159#246#128'R'#230#190#156'c'#239'f'#155''''#222#162'a'#213
+  +'='#228'l'#250#0'C'#190#190#236#190#181#167#252']'#253#8'l'#10#127#183#177#22
+  +#190#211#187'|'#31'I'#130'?'#251#237#167'!?'#151#147#240#215#176#170#189#216
+  +'x&/'#10#251#235#198'O'#200'/'#176#13'o'#219'-'#168#190#176#159#255#165#31#0
+  +#134#182#15#154#175'$'#198'v'#198#127#187';'#143'b'#220'O'#135'U'#158'7A'#255
+  +'>'#14#148'x'#245'9'#151#248#174#189#27#196#228#171#252#254#220'x7H'#255#236
+  +'L'#225#235#188's'#2#172'~c'#240#14#11#138'W'#249#7'4d<'#138#170';'#133#6#216
+  ,#191#199#239't'#135#10'.'#248'='#190'''k'#196#191#20#11#238#225'Ay'#15#129
+  +#241#255'K'#249#27'}~)'#255#255#30#135#236#204'[h'#213#209#253' Yg'#195#245
+  +#159#207#131'l'#15#220#175'O'#207#245'W'#173'/'#224#229#250#139#192#229'W'
+  +#229'cx'#236#215'@'#130#247#214#253'.'#6#207#197''''#227#9#5#30#1#11'xa{e'
+  +#254#130#6'['#191#199#248#215#240#226#153#248'='#179#246#197#250'g'#247#255
+  +#221'z'#141#253#254'E'#234#207#242#21'k'#127'=q'#214#159#140#3#206#132#2'E'
+  +#239'l'#202#4#10'kq'#12'S'#239#146#129#220#251'8'#213'9'#220'Y'#255';'#189#21
+  +#230#239'n'#15'R'#193'7'#187'Uc'#144#20#250#253'zn'#239#159'2{!'#201#223#147
+  +#227'W'#243'/'#236#1#141#241#131#140#222'!g'#195'3'#235#127'i'#15#240#15'7'
+  +#27#227#165#0#0#11'TSaveDialog'#17'dlgGuardarEntorno'#5'Title'#6#24'Save Gal'
+  +'atea Environment'#6'Filter'#6'!Galatea Environment (*.ngl)|*.ngl'#7'Options'
+  +#11#17'ofOverwritePrompt'#14'ofHideReadOnly'#15'ofPathMustExist'#14'ofEnable'
+  +'Sizing'#0#4'Left'#3#128#2#3'Top'#3#240#0#0#0#0
+]);

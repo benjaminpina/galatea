@@ -1,0 +1,112 @@
+object frmAtractividad: TfrmAtractividad
+  Left = 487
+  Height = 242
+  Top = 237
+  Width = 503
+  ActiveControl = btbAceptar
+  BorderStyle = bsDialog
+  Caption = 'Attractivity'
+  ClientHeight = 242
+  ClientWidth = 503
+  Font.Height = -11
+  Font.Name = 'MS Sans Serif'
+  OnCreate = FormCreate
+  Position = poScreenCenter
+  LCLVersion = '0.9.30'
+  object Label16: TLabel
+    Left = 8
+    Height = 15
+    Top = 144
+    Width = 332
+    Caption = 'Double click over blue controls for opening formula editor.'
+    ParentColor = False
+  end
+  object btbAceptar: TBitBtn
+    Left = 400
+    Height = 33
+    Top = 200
+    Width = 89
+    Caption = '&OK'
+    Kind = bkOK
+    ModalResult = 1
+    NumGlyphs = 0
+    OnClick = btbAceptarClick
+    TabOrder = 0
+  end
+  object btbCancelar: TBitBtn
+    Left = 296
+    Height = 33
+    Top = 200
+    Width = 89
+    Caption = '&Cancel'
+    Kind = bkCancel
+    ModalResult = 2
+    NumGlyphs = 0
+    TabOrder = 1
+  end
+  object GroupBox1: TGroupBox
+    Left = 8
+    Height = 129
+    Top = 8
+    Width = 481
+    ClientHeight = 125
+    ClientWidth = 477
+    TabOrder = 2
+    object Label2: TLabel
+      Left = 8
+      Height = 15
+      Top = 52
+      Width = 105
+      Caption = '&Perception radius:'
+      FocusControl = edtRadio
+      ParentColor = False
+    end
+    object Label1: TLabel
+      Left = 8
+      Height = 15
+      Top = 2
+      Width = 93
+      Caption = 'A&ttractivity (+/-):'
+      FocusControl = edtAtractividad
+      ParentColor = False
+    end
+    object Label3: TLabel
+      Left = 411
+      Height = 15
+      Top = 65
+      Width = 48
+      Caption = 'squares'
+      ParentColor = False
+    end
+    object edtAtractividad: TEdit
+      Left = 8
+      Height = 22
+      Top = 20
+      Width = 462
+      Color = clSkyBlue
+      OnDblClick = edtAtractividadDblClick
+      OnMouseUp = edtAtractividadMouseUp
+      TabOrder = 0
+      Text = 'edtAtractividad'
+    end
+    object edtRadio: TEdit
+      Left = 8
+      Height = 22
+      Top = 71
+      Width = 382
+      Color = clSkyBlue
+      OnDblClick = edtRadioDblClick
+      OnMouseUp = edtRadioMouseUp
+      TabOrder = 1
+      Text = 'edtRadio'
+    end
+  end
+  object chbInicializar: TCheckBox
+    Left = 16
+    Height = 26
+    Top = 168
+    Width = 224
+    Caption = '&Initialize all cells with these values'
+    TabOrder = 3
+  end
+end

@@ -1,0 +1,32 @@
+{ Este es un archivo de recurso de Lazarus generado automáticamente }
+
+LazarusResources.Add('TfrmExportar','FORMDATA',[
+  'TPF0'#12'TfrmExportar'#11'frmExportar'#4'Left'#3#216#0#6'Height'#3'R'#1#3'To'
+  +'p'#2'w'#5'Width'#3'n'#2#18'HorzScrollBar.Page'#3'm'#2#18'VertScrollBar.Page'
+  +#3'Q'#1#13'ActiveControl'#7#11'btbCancelar'#11'BorderStyle'#7#8'bsDialog'#7
+  +'Caption'#6#11'Export data'#12'ClientHeight'#3'R'#1#11'ClientWidth'#3'n'#2#11
+  +'Font.Height'#2#245#9'Font.Name'#6#13'MS Sans Serif'#12'OnCloseQuery'#7#14'F'
+  +'ormCloseQuery'#8'OnCreate'#7#10'FormCreate'#8'Position'#7#14'poScreenCenter'
+  +#0#7'TBitBtn'#11'btbCancelar'#4'Left'#3#160#1#6'Height'#2'!'#3'Top'#3#24#1#5
+  +'Width'#2'Y'#7'Caption'#6#7'&Cancel'#4'Kind'#7#8'bkCancel'#11'ModalResult'#2
+  +#2#9'NumGlyphs'#2#0#8'TabOrder'#2#0#0#0#7'TBitBtn'#10'btbAceptar'#4'Left'#3#8
+  +#2#6'Height'#2'!'#3'Top'#3#24#1#5'Width'#2'Y'#7'Caption'#6#3'&OK'#4'Kind'#7#4
+  +'bkOK'#11'ModalResult'#2#1#9'NumGlyphs'#2#0#7'OnClick'#7#15'btbAceptarClick'
+  +#8'TabOrder'#2#1#0#0#9'TGroupBox'#9'GroupBox1'#4'Left'#2#8#6'Height'#3#128#0
+  +#3'Top'#2#8#5'Width'#3'Y'#2#7'Caption'#6#15'Important notes'#12'ClientHeight'
+  +#2'h'#11'ClientWidth'#3'U'#2#8'TabOrder'#2#2#0#11'TStaticText'#11'StaticText'
+  +'1'#4'Left'#2#9#6'Height'#2#17#3'Top'#2#24#5'Width'#3#146#1#7'Caption'#6'WFo'
+  +'r data export is indispensable you must install Microsoft Excel version XP '
+  +'or higher.'#8'TabOrder'#2#0#0#0#11'TStaticText'#11'StaticText2'#4'Left'#2#8
+  +#6'Height'#2#17#3'Top'#2'8'#5'Width'#3#2#1#7'Caption'#6'7Excel is a trademar'
+  +'k propertie of Microsoft Corporation'#8'TabOrder'#2#1#0#0#0#9'TGroupBox'#12
+  +'grbPlantilla'#4'Left'#2#16#6'Height'#2'Q'#3'Top'#3#184#0#5'Width'#3'Y'#2#12
+  +'ClientHeight'#2'9'#11'ClientWidth'#3'U'#2#8'TabOrder'#2#3#0#6'TLabel'#6'Lab'
+  +'el1'#4'Left'#2#8#6'Height'#2#18#3'Top'#2#24#5'Width'#2'V'#7'Caption'#6#10'&'
+  +'Template:'#12'FocusControl'#7#12'edtPlantilla'#11'ParentColor'#8#0#0#5'TEdi'
+  +'t'#12'edtPlantilla'#4'Left'#2'X'#6'Height'#2#21#3'Top'#2#24#5'Width'#3#241#1
+  +#8'TabOrder'#2#0#4'Text'#6#12'edtPlantilla'#0#0#0#9'TCheckBox'#12'chbPlantil'
+  +'la'#4'Left'#2#24#6'Height'#2#27#3'Top'#3#152#0#5'Width'#3#160#0#7'Caption'#6
+  +#18'Export to template'#7'OnClick'#7#17'chbPlantillaClick'#8'TabOrder'#2#4#0
+  +#0#0
+]);

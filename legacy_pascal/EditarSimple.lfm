@@ -1,0 +1,115 @@
+object frmEditarSimple: TfrmEditarSimple
+  Left = 436
+  Height = 206
+  Top = 227
+  Width = 285
+  ActiveControl = edtNombre
+  BorderStyle = bsDialog
+  Caption = 'Edit Simple Substrate'
+  ClientHeight = 206
+  ClientWidth = 285
+  Font.Height = -11
+  Font.Name = 'MS Sans Serif'
+  Position = poScreenCenter
+  LCLVersion = '0.9.26.2'
+  object Label1: TLabel
+    Left = 16
+    Height = 17
+    Top = 32
+    Width = 60
+    Caption = '&Name:'
+    FocusControl = edtNombre
+    ParentColor = False
+  end
+  object Label2: TLabel
+    Left = 16
+    Height = 17
+    Top = 72
+    Width = 43
+    Caption = 'Color:'
+    ParentColor = False
+  end
+  object lblNumero: TLabel
+    Left = 16
+    Height = 17
+    Top = 8
+    Width = 63
+    Caption = 'Number:'
+    ParentColor = False
+  end
+  object shpColor: TShape
+    Left = 96
+    Height = 33
+    Top = 64
+    Width = 177
+    Pen.Cosmetic = True
+  end
+  object edtNombre: TEdit
+    Left = 96
+    Height = 21
+    Top = 32
+    Width = 177
+    MaxLength = 15
+    OnKeyPress = edtNombreKeyPress
+    TabOrder = 0
+    Text = 'edtNombre'
+  end
+  object btnColor: TButton
+    Left = 96
+    Height = 33
+    Top = 112
+    Width = 177
+    Caption = 'Choose co&lor'
+    OnClick = btnColorClick
+    TabOrder = 1
+  end
+  object btbAceptar: TBitBtn
+    Left = 184
+    Height = 33
+    Top = 160
+    Width = 89
+    Caption = '&OK'
+    Kind = bkOK
+    ModalResult = 1
+    NumGlyphs = 0
+    OnClick = btbAceptarClick
+    TabOrder = 2
+  end
+  object btbCancelar: TBitBtn
+    Left = 80
+    Height = 33
+    Top = 160
+    Width = 89
+    Caption = '&Cancel'
+    Kind = bkCancel
+    ModalResult = 2
+    NumGlyphs = 0
+    TabOrder = 3
+  end
+  object ColorDialog1: TColorDialog
+    CustomColors.Strings = (
+      'ColorA=000000'
+      'ColorB=000080'
+      'ColorC=008000'
+      'ColorD=008080'
+      'ColorE=800000'
+      'ColorF=800080'
+      'ColorG=808000'
+      'ColorH=808080'
+      'ColorI=C0C0C0'
+      'ColorJ=0000FF'
+      'ColorK=00FF00'
+      'ColorL=00FFFF'
+      'ColorM=FF0000'
+      'ColorN=FF00FF'
+      'ColorO=FFFF00'
+      'ColorP=FFFFFF'
+      'ColorQ=C0DCC0'
+      'ColorR=F0CAA6'
+      'ColorS=F0FBFF'
+      'ColorT=A4A0A0'
+    )
+    left = 16
+    top = 136
+  end
+end

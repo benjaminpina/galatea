@@ -1,0 +1,29 @@
+{ Este es un archivo de recurso de Lazarus generado automáticamente }
+
+LazarusResources.Add('TfrmSeleccionaJuego','FORMDATA',[
+  'TPF0'#19'TfrmSeleccionaJuego'#18'frmSeleccionaJuego'#4'Left'#3'5'#1#6'Height'
+  +#3#174#1#3'Top'#3#197#0#5'Width'#3'T'#1#13'ActiveControl'#7#7'BitBtn1'#11'Bo'
+  +'rderStyle'#7#8'bsDialog'#7'Caption'#6#24'Select set of substrates'#12'Clien'
+  +'tHeight'#3#174#1#11'ClientWidth'#3'T'#1#11'Font.Height'#2#245#9'Font.Name'#6
+  +#13'MS Sans Serif'#8'OnCreate'#7#10'FormCreate'#8'Position'#7#14'poScreenCen'
+  +'ter'#10'LCLVersion'#6#8'0.9.26.2'#0#6'TLabel'#6'Label1'#4'Left'#2#8#6'Heigh'
+  +'t'#2#17#3'Top'#3#224#0#5'Width'#2'#'#7'Caption'#6#6'Title:'#11'ParentColor'
+  +#8#0#0#6'TLabel'#6'Label2'#4'Left'#2#8#6'Height'#2#17#3'Top'#3#0#1#5'Width'#2
+  +'G'#7'Caption'#6#8'Coments:'#11'ParentColor'#8#0#0#6'TLabel'#6'Label3'#4'Lef'
+  +'t'#3#176#0#6'Height'#2#17#3'Top'#3#0#1#5'Width'#2'S'#7'Caption'#6#11'Substr'
+  +'ates:'#11'ParentColor'#8#0#0#12'TFileListBox'#12'FileListBox1'#4'Left'#2#8#6
+  +'Height'#3#209#0#3'Top'#2#8#5'Width'#3'A'#1#9'Directory'#6#14'/home/benjamin'
+  +#4'Mask'#6#5'*.sgl'#8'OnChange'#7#18'FileListBox1Change'#10'OnDblClick'#7#20
+  +'FileListBox1DblClick'#8'TabOrder'#2#1#8'TopIndex'#2#255#0#0#11'TStaticText'
+  +#9'sttTitulo'#4'Left'#2'8'#6'Height'#2#17#3'Top'#3#224#0#5'Width'#3#17#1#7'C'
+  +'aption'#6#9'sttTitulo'#8'TabOrder'#2#2#0#0#11'TStaticText'#14'sttComentario'
+  +'s'#4'Left'#2#8#6'Height'#2'Y'#3'Top'#3#24#1#5'Width'#3#153#0#7'Caption'#6#14
+  +'sttComentarios'#8'TabOrder'#2#3#0#0#8'TListBox'#12'lstSustratos'#4'Left'#3
+  +#176#0#6'Height'#2'`'#3'Top'#3#24#1#5'Width'#3#153#0#8'TabOrder'#2#5#8'TopIn'
+  +'dex'#2#255#0#0#7'TBitBtn'#7'BitBtn1'#4'Left'#3#240#0#6'Height'#2'!'#3'Top'#3
+  +#128#1#5'Width'#2'Y'#7'Caption'#6#3'&OK'#4'Kind'#7#4'bkOK'#11'ModalResult'#2
+  +#1#9'NumGlyphs'#2#0#7'OnClick'#7#12'BitBtn1Click'#8'TabOrder'#2#0#0#0#7'TBit'
+  +'Btn'#7'BitBtn2'#4'Left'#3#136#0#6'Height'#2'!'#3'Top'#3#128#1#5'Width'#2'Y'
+  +#7'Caption'#6#7'&Cancel'#4'Kind'#7#8'bkCancel'#11'ModalResult'#2#2#9'NumGlyp'
+  +'hs'#2#0#8'TabOrder'#2#4#0#0#0
+]);

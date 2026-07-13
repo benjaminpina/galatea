@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <ProjectOptions>
+    <Version Value="12"/>
+    <General>
+      <Flags>
+        <CompatibilityMode Value="True"/>
+      </Flags>
+      <UseXPManifest Value="True"/>
+      <Icon Value="0"/>
+    </General>
+    <VersionInfo>
+      <Language Value=""/>
+      <CharSet Value=""/>
+    </VersionInfo>
+    <BuildModes Count="1">
+      <Item1 Name="default" Default="True"/>
+    </BuildModes>
+    <PublishOptions>
+      <Version Value="2"/>
+    </PublishOptions>
+    <RunParams>
+      <local>
+        <CommandLineParams Value="-f Output/HcMG0001/HcMG.sag"/>
+        <LaunchingApplication PathPlusParams="/usr/X11R6/bin/xterm -T &apos;Lazarus Run Output&apos; -e $(LazarusDir)/tools/runwait.sh $(TargetCmdLine)"/>
+      </local>
+      <FormatVersion Value="2"/>
+      <Modes Count="1">
+        <Mode0 Name="default">
+          <local>
+            <CommandLineParams Value="-f Output/HcMG0001/HcMG.sag"/>
+            <LaunchingApplication PathPlusParams="/usr/X11R6/bin/xterm -T &apos;Lazarus Run Output&apos; -e $(LazarusDir)/tools/runwait.sh $(TargetCmdLine)"/>
+          </local>
+        </Mode0>
+      </Modes>
+    </RunParams>
+    <Units Count="7">
+      <Unit0>
+        <Filename Value="filtrador.lpr"/>
+        <IsPartOfProject Value="True"/>
+        <IsVisibleTab Value="True"/>
+        <TopLine Value="93"/>
+        <CursorPos X="35" Y="173"/>
+        <UsageCount Value="35"/>
+        <Bookmarks Count="1">
+          <Item0 X="12" Y="135" ID="1"/>
+        </Bookmarks>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
+      </Unit0>
+      <Unit1>
+        <Filename Value="ArchivosSalida.pas"/>
+        <EditorIndex Value="4"/>
+        <TopLine Value="10"/>
+        <CursorPos X="13" Y="43"/>
+        <UsageCount Value="17"/>
+        <Loaded Value="True"/>
+      </Unit1>
+      <Unit2>
+        <Filename Value="Comunes.pas"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="192"/>
+        <CursorPos Y="208"/>
+        <UsageCount Value="17"/>
+        <Loaded Value="True"/>
+      </Unit2>
+      <Unit3>
+        <Filename Value="FuncElementosCadenas.pas"/>
+        <EditorIndex Value="6"/>
+        <TopLine Value="358"/>
+        <CursorPos X="3" Y="362"/>
+        <UsageCount Value="13"/>
+        <Loaded Value="True"/>
+      </Unit3>
+      <Unit4>
+        <Filename Value="Sustratos.pas"/>
+        <EditorIndex Value="5"/>
+        <TopLine Value="31"/>
+        <CursorPos X="54" Y="50"/>
+        <UsageCount Value="12"/>
+        <Loaded Value="True"/>
+      </Unit4>
+      <Unit5>
+        <Filename Value="Entornos.pas"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="190"/>
+        <CursorPos X="14" Y="208"/>
+        <UsageCount Value="12"/>
+        <Loaded Value="True"/>
+      </Unit5>
+      <Unit6>
+        <Filename Value="Agentes.pas"/>
+        <EditorIndex Value="3"/>
+        <TopLine Value="1316"/>
+        <CursorPos X="3" Y="1324"/>
+        <UsageCount Value="12"/>
+        <Loaded Value="True"/>
+      </Unit6>
+    </Units>
+    <JumpHistory Count="30" HistoryIndex="29">
+      <Position1>
+        <Filename Value="filtrador.lpr"/>
+        <Caret Line="36" TopLine="26"/>
+      </Position1>
+      <Position2>
+        <Filename Value="filtrador.lpr"/>
+        <Caret Line="166" TopLine="150"/>
+      </Position2>
+      <Position3>
+        <Filename Value="filtrador.lpr"/>
+        <Caret Line="113" Column="28" TopLine="97"/>
+      </Position3>
+      <Position4>
+        <Filename Value="filtrador.lpr"/>
+        <Caret Line="168" Column="6" TopLine="151"/>
+      </Position4>
+      <Position5>
+        <Filename Value="Entornos.pas"/>
+        <Caret Line="208" Column="14" TopLine="190"/>
+      </Position5>
+      <Position6>
+        <Filename Value="filtrador.lpr"/>
+        <Caret Line="144" Column="21" TopLine="142"/>
+      </Position6>
+      <Position7>
+        <Filename Value="filtrador.lpr"/>
+        <Caret Line="17" Column="15"/>
+      </Position7>
+      <Position8>
+        <Filename Value="filtrador.lpr"/>
+        <Caret Line="162" Column="6" TopLine="144"/>
+      </Position8>
+      <Position9>
+        <Filename Value="filtrador.lpr"/>
+        <Caret Line="164" Column="30" TopLine="146"/>
+      </Position9>
+      <Position10>
+        <Filename Value="filtrador.lpr"/>
+        <Caret Line="165" Column="22" TopLine="145"/>
+      </Position10>
+      <Position11>
+        <Filename Value="filtrador.lpr"/>
+        <Caret Line="172" Column="24" TopLine="157"/>
+      </Position11>
+      <Position12>
+        <Filename Value="filtrador.lpr"/>
+        <Caret Line="179" Column="34" TopLine="157"/>
+      </Position12>
+      <Position13>
+        <Filename Value="filtrador.lpr"/>
+        <Caret Line="180" Column="36" TopLine="161"/>
+      </Position13>
+      <Position14>
+        <Filename Value="filtrador.lpr"/>
+        <Caret Line="172" Column="26" TopLine="156"/>
+      </Position14>
+      <Position15>
+        <Filename Value="filtrador.lpr"/>
+        <Caret Line="173" Column="50" TopLine="157"/>
+      </Position15>
+      <Position16>
+        <Filename Value="filtrador.lpr"/>
+        <Caret Line="175" TopLine="158"/>
+      </Position16>
+      <Position17>
+        <Filename Value="filtrador.lpr"/>
+        <Caret Line="174" TopLine="158"/>
+      </Position17>
+      <Position18>
+        <Filename Value="filtrador.lpr"/>
+        <Caret Line="176" TopLine="160"/>
+      </Position18>
+      <Position19>
+        <Filename Value="filtrador.lpr"/>
+        <Caret Line="175" TopLine="159"/>
+      </Position19>
+      <Position20>
+        <Filename Value="Comunes.pas"/>
+        <Caret Line="202" TopLine="186"/>
+      </Position20>
+      <Position21>
+        <Filename Value="Comunes.pas"/>
+        <Caret Line="203" TopLine="187"/>
+      </Position21>
+      <Position22>
+        <Filename Value="Comunes.pas"/>
+        <Caret Line="204" TopLine="188"/>
+      </Position22>
+      <Position23>
+        <Filename Value="Comunes.pas"/>
+        <Caret Line="205" TopLine="189"/>
+      </Position23>
+      <Position24>
+        <Filename Value="Comunes.pas"/>
+        <Caret Line="206" TopLine="190"/>
+      </Position24>
+      <Position25>
+        <Filename Value="Comunes.pas"/>
+        <Caret Line="207" TopLine="191"/>
+      </Position25>
+      <Position26>
+        <Filename Value="Comunes.pas"/>
+        <Caret Line="208" TopLine="192"/>
+      </Position26>
+      <Position27>
+        <Filename Value="filtrador.lpr"/>
+        <Caret Line="201" Column="18" TopLine="176"/>
+      </Position27>
+      <Position28>
+        <Filename Value="filtrador.lpr"/>
+        <Caret Line="203" Column="11" TopLine="186"/>
+      </Position28>
+      <Position29>
+        <Filename Value="filtrador.lpr"/>
+        <Caret Line="206" Column="24" TopLine="187"/>
+      </Position29>
+      <Position30>
+        <Filename Value="filtrador.lpr"/>
+        <Caret Line="213" Column="30" TopLine="194"/>
+      </Position30>
+    </JumpHistory>
+  </ProjectOptions>
+  <CompilerOptions>
+    <Version Value="11"/>
+    <SearchPaths>
+      <IncludeFiles Value="$(ProjOutDir)"/>
+    </SearchPaths>
+    <Parsing>
+      <SyntaxOptions>
+        <UseAnsiStrings Value="False"/>
+      </SyntaxOptions>
+    </Parsing>
+    <Linking>
+      <Debugging>
+        <DebugInfoType Value="dsDwarf3"/>
+      </Debugging>
+    </Linking>
+  </CompilerOptions>
+  <Debugging>
+    <Exceptions Count="3">
+      <Item1>
+        <Name Value="EAbort"/>
+      </Item1>
+      <Item2>
+        <Name Value="ECodetoolError"/>
+      </Item2>
+      <Item3>
+        <Name Value="EFOpenError"/>
+      </Item3>
+    </Exceptions>
+  </Debugging>
+</CONFIG>

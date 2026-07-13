@@ -1,0 +1,456 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <ProjectOptions>
+    <Version Value="12"/>
+    <General>
+      <Flags>
+        <LRSInOutputDirectory Value="False"/>
+        <CompatibilityMode Value="True"/>
+      </Flags>
+    </General>
+    <VersionInfo>
+      <Language Value=""/>
+      <CharSet Value=""/>
+    </VersionInfo>
+    <BuildModes Count="1">
+      <Item1 Name="default" Default="True"/>
+    </BuildModes>
+    <PublishOptions>
+      <Version Value="2"/>
+    </PublishOptions>
+    <RunParams>
+      <local>
+        <LaunchingApplication PathPlusParams="/usr/X11R6/bin/xterm -T &apos;Lazarus Run Output&apos; -e $(LazarusDir)/tools/runwait.sh $(TargetCmdLine)"/>
+      </local>
+      <FormatVersion Value="2"/>
+      <Modes Count="1">
+        <Mode0 Name="default">
+          <local>
+            <LaunchingApplication PathPlusParams="/usr/X11R6/bin/xterm -T &apos;Lazarus Run Output&apos; -e $(LazarusDir)/tools/runwait.sh $(TargetCmdLine)"/>
+          </local>
+        </Mode0>
+      </Modes>
+    </RunParams>
+    <RequiredPackages Count="1">
+      <Item1>
+        <PackageName Value="LCL"/>
+      </Item1>
+    </RequiredPackages>
+    <Units Count="45">
+      <Unit0>
+        <Filename Value="EdAgnGlt.lpr"/>
+        <IsPartOfProject Value="True"/>
+        <CursorPos X="29" Y="30"/>
+        <UsageCount Value="72"/>
+      </Unit0>
+      <Unit1>
+        <Filename Value="EditorAgentes.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="frmEditorAgentes"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <TopLine Value="1276"/>
+        <CursorPos X="44" Y="1290"/>
+        <UsageCount Value="72"/>
+        <Loaded Value="True"/>
+      </Unit1>
+      <Unit2>
+        <Filename Value="NuevoJuegoAgentes.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="frmNuevoJuegoAgentes"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <CursorPos X="3" Y="8"/>
+        <UsageCount Value="72"/>
+      </Unit2>
+      <Unit3>
+        <Filename Value="PropiedadesJuegoAgentes.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="frmPropiedadesJuegoAgentes"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <CursorPos X="3" Y="8"/>
+        <UsageCount Value="72"/>
+      </Unit3>
+      <Unit4>
+        <Filename Value="Genetica.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="frmGenetica"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <TopLine Value="243"/>
+        <CursorPos X="3" Y="261"/>
+        <UsageCount Value="72"/>
+      </Unit4>
+      <Unit5>
+        <Filename Value="GeneralesAg.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="frmGeneralesAg"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <CursorPos X="3" Y="8"/>
+        <UsageCount Value="72"/>
+      </Unit5>
+      <Unit6>
+        <Filename Value="SeleccionaJuego.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="frmSeleccionaJuego"/>
+        <HasResources Value="True"/>
+        <TopLine Value="23"/>
+        <CursorPos X="20" Y="23"/>
+        <UsageCount Value="72"/>
+      </Unit6>
+      <Unit7>
+        <Filename Value="Prototipos.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="frmPrototipos"/>
+        <HasResources Value="True"/>
+        <TopLine Value="44"/>
+        <CursorPos X="18" Y="59"/>
+        <UsageCount Value="72"/>
+      </Unit7>
+      <Unit8>
+        <Filename Value="EditarPrototipo.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="frmEditarPrototipo"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <TopLine Value="676"/>
+        <CursorPos X="2" Y="678"/>
+        <UsageCount Value="72"/>
+      </Unit8>
+      <Unit9>
+        <Filename Value="MatricesInteraccion.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="frmMatricesInteraccion"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <TopLine Value="105"/>
+        <CursorPos X="3" Y="132"/>
+        <UsageCount Value="72"/>
+      </Unit9>
+      <Unit10>
+        <Filename Value="LlenarCelda.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="frmLlenarCelda"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="345"/>
+        <CursorPos X="15" Y="357"/>
+        <UsageCount Value="72"/>
+      </Unit10>
+      <Unit11>
+        <Filename Value="Fisiologia.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="frmFisiologia"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <TopLine Value="364"/>
+        <CursorPos X="33" Y="372"/>
+        <UsageCount Value="72"/>
+        <Bookmarks Count="2">
+          <Item0 X="3" Y="1092" ID="1"/>
+          <Item1 X="3" Y="795" ID="2"/>
+        </Bookmarks>
+      </Unit11>
+      <Unit12>
+        <Filename Value="Estadios.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="frmEstadios"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <CursorPos X="3" Y="8"/>
+        <UsageCount Value="72"/>
+      </Unit12>
+      <Unit13>
+        <Filename Value="AcercaEdAg.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="frmAcerca"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <CursorPos X="3" Y="8"/>
+        <UsageCount Value="72"/>
+      </Unit13>
+      <Unit14>
+        <Filename Value="EditarEstadio.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="frmEditarEstadio"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <TopLine Value="409"/>
+        <CursorPos X="63" Y="426"/>
+        <UsageCount Value="72"/>
+      </Unit14>
+      <Unit15>
+        <Filename Value="Atractividad.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="frmAtractividad"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <TopLine Value="77"/>
+        <CursorPos X="3" Y="79"/>
+        <UsageCount Value="72"/>
+      </Unit15>
+      <Unit16>
+        <Filename Value="EditorFormulas.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="frmEditorFormulas"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <TopLine Value="151"/>
+        <CursorPos X="3" Y="153"/>
+        <UsageCount Value="72"/>
+      </Unit16>
+      <Unit17>
+        <Filename Value="MemoriaConducta.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="frmMemoriaConducta"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <TopLine Value="14"/>
+        <CursorPos X="34" Y="41"/>
+        <UsageCount Value="72"/>
+      </Unit17>
+      <Unit18>
+        <Filename Value="Morfologia.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="frmMorfologia"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <TopLine Value="47"/>
+        <CursorPos Y="61"/>
+        <UsageCount Value="72"/>
+      </Unit18>
+      <Unit19>
+        <Filename Value="Asignacion.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="frmAsignacion"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <TopLine Value="33"/>
+        <CursorPos X="3" Y="44"/>
+        <UsageCount Value="72"/>
+      </Unit19>
+      <Unit20>
+        <Filename Value="ExportarAgentes.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="frmExportar"/>
+        <HasResources Value="True"/>
+        <TopLine Value="824"/>
+        <CursorPos Y="842"/>
+        <UsageCount Value="72"/>
+      </Unit20>
+      <Unit21>
+        <Filename Value="EditorNotas.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="frmEditorNotas"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <TopLine Value="25"/>
+        <CursorPos X="16" Y="52"/>
+        <UsageCount Value="72"/>
+      </Unit21>
+      <Unit22>
+        <Filename Value="../../../usr/share/lazarus/lcl/include/application.inc"/>
+        <TopLine Value="326"/>
+        <CursorPos Y="342"/>
+        <UsageCount Value="11"/>
+      </Unit22>
+      <Unit23>
+        <Filename Value="../../../usr/share/lazarus/lcl/include/winapi.inc"/>
+        <TopLine Value="274"/>
+        <CursorPos Y="290"/>
+        <UsageCount Value="11"/>
+      </Unit23>
+      <Unit24>
+        <Filename Value="../../../usr/share/lazarus/lcl/grids.pas"/>
+        <UnitName Value="Grids"/>
+        <TopLine Value="6779"/>
+        <CursorPos Y="6795"/>
+        <UsageCount Value="9"/>
+      </Unit24>
+      <Unit25>
+        <Filename Value="Calculate.pas"/>
+        <TopLine Value="289"/>
+        <CursorPos X="37" Y="304"/>
+        <UsageCount Value="10"/>
+        <Bookmarks Count="1">
+          <Item0 X="7" Y="304" ID="1"/>
+        </Bookmarks>
+      </Unit25>
+      <Unit26>
+        <Filename Value="JuegoAgentes.pas"/>
+        <TopLine Value="1406"/>
+        <CursorPos X="7" Y="1422"/>
+        <UsageCount Value="11"/>
+      </Unit26>
+      <Unit27>
+        <Filename Value="Prototipos.lrs"/>
+        <TopLine Value="2"/>
+        <CursorPos X="4" Y="101"/>
+        <UsageCount Value="9"/>
+      </Unit27>
+      <Unit28>
+        <Filename Value="../../../usr/lib/lazarus/lcl/grids.pas"/>
+        <UnitName Value="Grids"/>
+        <TopLine Value="6780"/>
+        <CursorPos Y="6795"/>
+        <UsageCount Value="9"/>
+      </Unit28>
+      <Unit29>
+        <Filename Value="../../../usr/lib/lazarus/lcl/include/customform.inc"/>
+        <TopLine Value="1965"/>
+        <CursorPos Y="1980"/>
+        <UsageCount Value="9"/>
+      </Unit29>
+      <Unit30>
+        <Filename Value="../../../usr/lib/lazarus/lcl/include/dragdock.inc"/>
+        <TopLine Value="94"/>
+        <CursorPos Y="109"/>
+        <UsageCount Value="9"/>
+      </Unit30>
+      <Unit31>
+        <Filename Value="../../../usr/lib/lazarus/lcl/include/control.inc"/>
+        <TopLine Value="1224"/>
+        <CursorPos Y="1239"/>
+        <UsageCount Value="9"/>
+      </Unit31>
+      <Unit32>
+        <Filename Value="../../../usr/lib/lazarus/lcl/include/winapi.inc"/>
+        <TopLine Value="375"/>
+        <CursorPos Y="391"/>
+        <UsageCount Value="9"/>
+      </Unit32>
+      <Unit33>
+        <Filename Value="../../../usr/lib/lazarus/lcl/interfaces/gtk/gtkwinapi.inc"/>
+        <TopLine Value="5515"/>
+        <CursorPos Y="5530"/>
+        <UsageCount Value="9"/>
+      </Unit33>
+      <Unit34>
+        <Filename Value="../../../usr/lib/lazarus/lcl/interfaces/gtk/gtkproc.inc"/>
+        <TopLine Value="365"/>
+        <CursorPos Y="380"/>
+        <UsageCount Value="9"/>
+      </Unit34>
+      <Unit35>
+        <Filename Value="../../../usr/lib/lazarus/lcl/interfaces/gtk/gtk1extra.inc"/>
+        <TopLine Value="305"/>
+        <CursorPos Y="320"/>
+        <UsageCount Value="9"/>
+      </Unit35>
+      <Unit36>
+        <Filename Value="../../../usr/lib/lazarus/lcl/include/wincontrol.inc"/>
+        <TopLine Value="4628"/>
+        <CursorPos Y="4643"/>
+        <UsageCount Value="9"/>
+      </Unit36>
+      <Unit37>
+        <Filename Value="../../../usr/lib/lazarus/lcl/controls.pp"/>
+        <UnitName Value="Controls"/>
+        <TopLine Value="2393"/>
+        <CursorPos Y="2408"/>
+        <UsageCount Value="9"/>
+      </Unit37>
+      <Unit38>
+        <Filename Value="../../../usr/lib/lazarus/lcl/forms.pp"/>
+        <UnitName Value="Forms"/>
+        <TopLine Value="490"/>
+        <CursorPos X="14" Y="505"/>
+        <UsageCount Value="9"/>
+      </Unit38>
+      <Unit39>
+        <Filename Value="Comunes.pas"/>
+        <TopLine Value="344"/>
+        <CursorPos X="29" Y="359"/>
+        <UsageCount Value="9"/>
+      </Unit39>
+      <Unit40>
+        <Filename Value="/usr/lib/lazarus/0.9.30/components/lnet/lib/lcommon.pp"/>
+        <UnitName Value="lCommon"/>
+        <TopLine Value="510"/>
+        <CursorPos Y="532"/>
+        <UsageCount Value="10"/>
+      </Unit40>
+      <Unit41>
+        <Filename Value="/usr/lib/lazarus/0.9.30/components/lnet/lazaruspackage/lclgtkeventer.inc"/>
+        <TopLine Value="87"/>
+        <CursorPos Y="109"/>
+        <UsageCount Value="10"/>
+      </Unit41>
+      <Unit42>
+        <Filename Value="/usr/share/lazarus/3.2.0/lcl/lresources.pp"/>
+        <UnitName Value="LResources"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="3150"/>
+        <CursorPos X="19" Y="3161"/>
+        <UsageCount Value="10"/>
+      </Unit42>
+      <Unit43>
+        <Filename Value="EditorAgentes.lfm"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="275"/>
+        <CursorPos X="32" Y="298"/>
+        <UsageCount Value="10"/>
+        <DefaultSyntaxHighlighter Value="LFM"/>
+      </Unit43>
+      <Unit44>
+        <Filename Value="/usr/share/lazarus/3.2.0/lcl/include/monitor.inc"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="16"/>
+        <CursorPos Y="34"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit44>
+    </Units>
+    <JumpHistory Count="3" HistoryIndex="2">
+      <Position1>
+        <Filename Value="EditorAgentes.pas"/>
+        <Caret Line="1284" Column="40" TopLine="1276"/>
+      </Position1>
+      <Position2>
+        <Filename Value="EditorAgentes.pas"/>
+        <Caret Line="1290" Column="44" TopLine="1276"/>
+      </Position2>
+      <Position3>
+        <Filename Value="/usr/share/lazarus/3.2.0/lcl/include/monitor.inc"/>
+        <Caret Line="28" Column="36" TopLine="16"/>
+      </Position3>
+    </JumpHistory>
+  </ProjectOptions>
+  <CompilerOptions>
+    <Version Value="11"/>
+    <Parsing>
+      <SyntaxOptions>
+        <CStyleOperator Value="False"/>
+        <UseAnsiStrings Value="False"/>
+      </SyntaxOptions>
+    </Parsing>
+    <Linking>
+      <Debugging>
+        <DebugInfoType Value="dsDwarf3"/>
+      </Debugging>
+    </Linking>
+  </CompilerOptions>
+  <Debugging>
+    <Exceptions Count="5">
+      <Item1>
+        <Name Value="ECodetoolError"/>
+      </Item1>
+      <Item2>
+        <Name Value="EFOpenError"/>
+      </Item2>
+      <Item3>
+        <Name Value="EConvertError"/>
+      </Item3>
+      <Item4>
+        <Name Value="RunError(216)"/>
+      </Item4>
+      <Item5>
+        <Name Value="EAccessViolation"/>
+      </Item5>
+    </Exceptions>
+  </Debugging>
+</CONFIG>

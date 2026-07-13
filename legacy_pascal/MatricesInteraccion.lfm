@@ -1,0 +1,490 @@
+object frmMatricesInteraccion: TfrmMatricesInteraccion
+  Left = 278
+  Height = 464
+  Top = 134
+  Width = 798
+  ActiveControl = stgSustratos
+  BorderStyle = bsDialog
+  Caption = 'Interaction matrices'
+  ClientHeight = 464
+  ClientWidth = 798
+  Font.Height = -11
+  Font.Name = 'MS Sans Serif'
+  OnClose = FormClose
+  OnCreate = FormCreate
+  Position = poScreenCenter
+  ShowHint = True
+  LCLVersion = '0.9.26.2'
+  object spbNotas: TSpeedButton
+    Left = 368
+    Height = 33
+    Hint = 'Note Edit|Open Note Edit'
+    Top = 408
+    Width = 33
+    Color = clBtnFace
+    Glyph.Data = {
+      F6000000424DF600000000000000760000002800000010000000100000000100
+      0400000000008000000000000000000000001000000000000000000000000000
+      80000080000000808000800000008000800080800000C0C0C000808080000000
+      FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFFFF00333333000000
+      00003333330FFFFFFFF000300000FF0F00F0E00BFBFB0FFFFFF0E0BFBF000FFF
+      F0F0E0FBFBFBF0F00FF0E0BFBF00000B0FF0E0FBFBFBFBF0FFF0E0BF0000000F
+      FFF0000BFB00B0FF00F03330000B0FFFFFF0333330B0FFFF000033330B0FF00F
+      0FF03330B00FFFFF0F033309030FFFFF00333330330000000333
+    }
+    NumGlyphs = 0
+    OnClick = spbNotasClick
+  end
+  object PageControl1: TPageControl
+    Left = 16
+    Height = 352
+    Top = 8
+    Width = 769
+    ActivePage = TabSheet1
+    PopupMenu = pumMatricesA
+    TabIndex = 0
+    TabOrder = 0
+    object TabSheet1: TTabSheet
+      Caption = '&Substrates'
+      ClientHeight = 352
+      ClientWidth = 769
+      object lblClicS: TLabel
+        Left = 8
+        Height = 17
+        Top = 232
+        Width = 197
+        Caption = 'Double click for cell editing'
+        ParentColor = False
+      end
+      object stgSustratos: TStringGrid
+        Left = 8
+        Height = 201
+        Top = 16
+        Width = 745
+        ColCount = 8
+        Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRowSizing, goColSizing, goTabs]
+        PopupMenu = pumMatrices
+        RowCount = 7
+        TabOrder = 0
+        TitleFont.Height = -11
+        TitleFont.Name = 'MS Sans Serif'
+        OnDblClick = stgSustratosDblClick
+        OnSelectCell = stgSustratosSelectCell
+      end
+      object btnImportar: TButton
+        Left = 318
+        Height = 33
+        Top = 263
+        Width = 217
+        Caption = 'I&mport subtrates names'
+        OnClick = btnImportarClick
+        TabOrder = 1
+      end
+      object stgSustratosA: TStringGrid
+        Left = 8
+        Height = 201
+        Top = 32
+        Width = 745
+        ColCount = 8
+        Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRowSizing, goColSizing, goTabs]
+        PopupMenu = pumMatricesA
+        RowCount = 7
+        TabOrder = 2
+        TitleFont.Height = -11
+        TitleFont.Name = 'MS Sans Serif'
+        OnDblClick = stgSustratosADblClick
+        OnSelectCell = stgSustratosASelectCell
+      end
+      object stgSustratosM: TStringGrid
+        Left = 8
+        Height = 201
+        Top = 48
+        Width = 745
+        Color = clCream
+        ColCount = 8
+        Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRowSizing, goColSizing, goEditing, goTabs, goAlwaysShowEditor]
+        PopupMenu = pumMatricesM
+        RowCount = 7
+        TabOrder = 3
+        TitleFont.Height = -11
+        TitleFont.Name = 'MS Sans Serif'
+        OnDblClick = stgSustratosMDblClick
+        OnSelectCell = stgSustratosMSelectCell
+      end
+      object btnInicializarS: TButton
+        Left = 550
+        Height = 33
+        Top = 263
+        Width = 203
+        Caption = '&Initialize all cells with...'
+        OnClick = btnInicializarSClick
+        TabOrder = 4
+        Visible = False
+      end
+    end
+    object TabSheet2: TTabSheet
+      Caption = '&Dynamic elements'
+      ClientHeight = 352
+      ClientWidth = 769
+      ImageIndex = 1
+      object lblClicD: TLabel
+        Left = 8
+        Height = 17
+        Top = 232
+        Width = 197
+        Caption = 'Double click for cell editing'
+        ParentColor = False
+      end
+      object stgDinamicos: TStringGrid
+        Left = 8
+        Height = 201
+        Top = 16
+        Width = 745
+        ColCount = 6
+        Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRowSizing, goColSizing, goTabs]
+        PopupMenu = pumMatrices
+        RowCount = 7
+        TabOrder = 0
+        TitleFont.Height = -11
+        TitleFont.Name = 'MS Sans Serif'
+        OnDblClick = stgDinamicosDblClick
+        OnSelectCell = stgDinamicosSelectCell
+      end
+      object stgDinamicosA: TStringGrid
+        Left = 8
+        Height = 201
+        Top = 32
+        Width = 745
+        ColCount = 6
+        Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRowSizing, goColSizing, goTabs]
+        PopupMenu = pumMatricesA
+        RowCount = 7
+        TabOrder = 1
+        TitleFont.Height = -11
+        TitleFont.Name = 'MS Sans Serif'
+        OnDblClick = stgDinamicosADblClick
+        OnSelectCell = stgDinamicosASelectCell
+      end
+      object stgDinamicosM: TStringGrid
+        Left = 8
+        Height = 201
+        Top = 48
+        Width = 745
+        Color = clCream
+        ColCount = 6
+        Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRowSizing, goColSizing, goEditing, goTabs, goAlwaysShowEditor]
+        PopupMenu = pumMatricesM
+        RowCount = 7
+        TabOrder = 2
+        TitleFont.Height = -11
+        TitleFont.Name = 'MS Sans Serif'
+        OnDblClick = stgDinamicosMDblClick
+        OnSelectCell = stgDinamicosMSelectCell
+      end
+      object btnInicializarD: TButton
+        Left = 550
+        Height = 33
+        Top = 263
+        Width = 203
+        Caption = '&Initialize all cells with...'
+        OnClick = btnInicializarDClick
+        TabOrder = 3
+        Visible = False
+      end
+    end
+    object TabSheet3: TTabSheet
+      Caption = 'A&gents'
+      ClientHeight = 352
+      ClientWidth = 769
+      ImageIndex = 2
+      object lblClicA: TLabel
+        Left = 8
+        Height = 17
+        Top = 232
+        Width = 197
+        Caption = 'Double click for cell editing'
+        ParentColor = False
+      end
+      object stgAgentes: TStringGrid
+        Left = 8
+        Height = 201
+        Top = 16
+        Width = 745
+        ColCount = 7
+        Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goDrawFocusSelected, goRowSizing, goColSizing, goTabs]
+        PopupMenu = pumMatrices
+        RowCount = 7
+        TabOrder = 0
+        TitleFont.Height = -11
+        TitleFont.Name = 'MS Sans Serif'
+        OnDblClick = stgAgentesDblClick
+        OnSelectCell = stgAgentesSelectCell
+      end
+      object stgAgentesA: TStringGrid
+        Left = 8
+        Height = 201
+        Top = 32
+        Width = 745
+        ColCount = 7
+        Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goDrawFocusSelected, goRowSizing, goColSizing, goTabs]
+        PopupMenu = pumMatricesA
+        RowCount = 7
+        TabOrder = 1
+        TitleFont.Height = -11
+        TitleFont.Name = 'MS Sans Serif'
+        OnDblClick = stgAgentesADblClick
+        OnSelectCell = stgAgentesASelectCell
+      end
+      object stgAgentesM: TStringGrid
+        Left = 8
+        Height = 201
+        Top = 48
+        Width = 745
+        Color = clCream
+        ColCount = 7
+        Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goDrawFocusSelected, goRowSizing, goColSizing, goEditing, goTabs, goAlwaysShowEditor]
+        PopupMenu = pumMatricesM
+        RowCount = 7
+        TabOrder = 2
+        TitleFont.Height = -11
+        TitleFont.Name = 'MS Sans Serif'
+        OnDblClick = stgAgentesMDblClick
+        OnSelectCell = stgAgentesMSelectCell
+      end
+      object btnInicializarA: TButton
+        Left = 550
+        Height = 33
+        Top = 263
+        Width = 203
+        Caption = '&Initialize all cells with...'
+        OnClick = btnInicializarAClick
+        TabOrder = 3
+        Visible = False
+      end
+    end
+  end
+  object GroupBox1: TGroupBox
+    Left = 16
+    Height = 65
+    Top = 384
+    Width = 337
+    Caption = 'View matrices'
+    ClientHeight = 44
+    ClientWidth = 333
+    TabOrder = 1
+    object rdbInteraccion: TRadioButton
+      Left = 6
+      Height = 26
+      Top = 2
+      Width = 99
+      Caption = 'I&nteraction'
+      Checked = True
+      OnClick = rdbInteraccionClick
+      State = cbChecked
+      TabOrder = 0
+    end
+    object rdbAtractividad: TRadioButton
+      Left = 110
+      Height = 26
+      Top = 2
+      Width = 99
+      Caption = 'A&ttractivity'
+      OnClick = rdbAtractividadClick
+      TabOrder = 1
+    end
+    object rdbMemoria: TRadioButton
+      Left = 214
+      Height = 26
+      Top = 2
+      Width = 82
+      Caption = '&Memory'
+      OnClick = rdbMemoriaClick
+      TabOrder = 2
+    end
+  end
+  object btbCancelar: TBitBtn
+    Left = 592
+    Height = 33
+    Top = 416
+    Width = 89
+    Caption = '&Cancel'
+    Kind = bkCancel
+    ModalResult = 2
+    NumGlyphs = 0
+    TabOrder = 2
+  end
+  object btbAceptar: TBitBtn
+    Left = 696
+    Height = 33
+    Top = 416
+    Width = 89
+    Caption = '&OK'
+    Kind = bkOK
+    ModalResult = 1
+    NumGlyphs = 0
+    OnClick = btbAceptarClick
+    TabOrder = 3
+  end
+  object ActionList1: TActionList
+    Images = ImageList1
+    left = 360
+    top = 368
+    object actCopiar: TAction
+      Caption = '&Copy'
+      DisableIfNoHandler = True
+      Hint = 'Copy cell|Copy cel content to clipboard'
+      ImageIndex = 0
+      OnExecute = actCopiarExecute
+    end
+    object actPegar: TAction
+      Caption = '&Paste'
+      DisableIfNoHandler = True
+      Hint = 'Paste|Paste clipboard content to cell'
+      ImageIndex = 1
+      OnExecute = actPegarExecute
+    end
+    object actCopiarA: TAction
+      Caption = '&Copy'
+      DisableIfNoHandler = True
+      ImageIndex = 0
+      OnExecute = actCopiarAExecute
+    end
+    object actPegarA: TAction
+      Caption = '&Paste'
+      DisableIfNoHandler = True
+      ImageIndex = 1
+      OnExecute = actPegarAExecute
+    end
+    object actCopiarM: TAction
+      Caption = '&Copy'
+      DisableIfNoHandler = True
+      Hint = 'Copy cell|Copy cel content to clipboard'
+      ImageIndex = 0
+      OnExecute = actCopiarMExecute
+    end
+    object actPegarM: TAction
+      Caption = '&Paste'
+      DisableIfNoHandler = True
+      Hint = 'Paste|Paste clipboard content to cell'
+      ImageIndex = 1
+      OnExecute = actPegarMExecute
+    end
+  end
+  object ImageList1: TImageList
+    BkColor = clForeground
+    left = 400
+    top = 368
+    Bitmap = {
+      4C69020000001000000010000000000000FF000000FF000000FF000000FF0000
+      00FF000000FF0000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+      FFFF000000FF000000FF000000000000FFFF0000FFFF0000FFFF0000FFFF0000
+      FFFF000000000000000000000000000000FFFFFFFFFF000000FFBDBDBDFFFFFF
+      FFFF000000FFFFFFFFFF000000FF00000000000000007B7B7BFF0000FFFF0000
+      FFFF0000FFFF0000000000000000000000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+      FFFF000000FFFFFFFFFFFFFFFFFF000000FF00000000000000000000FFFF0000
+      FFFF0000FFFF0000000000000000000000FFFFFFFFFF000000FF000000FFFFFF
+      FFFF000000FF000000FF000000FF000000FF000000FF000000000000FFFF0000
+      FFFF0000FFFF0000000000000000000000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+      FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF0000FFFF0000FFFF0000FFFF0000
+      FFFF0000FFFF0000FFFF0000FFFF000000FFFFFFFFFF000000FF000000FF0000
+      00FF000000FFFFFFFFFF000000FFFFFFFFFF000000FF0000FFFF0000FFFF0000
+      FFFF0000FFFF0000FFFF00000000000000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+      FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF000000FF000000000000FFFF0000
+      FFFF0000FFFF0000000000000000000000FFFFFFFFFF000000FF000000FFFFFF
+      FFFF000000FF000000FF000000FFFFFFFFFF000000FF000000FF000000FF0000
+      FFFF000000FF000000FF7B7B7BFF000000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+      FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF000000FF000000FF000000FF7B7B
+      7BFF00FFFFFF00FFFFFF000000FF000000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+      FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF000000FF000000FF000000FF7B7B
+      7BFF7B7B7BFF00FFFFFF000000FF000000FF000000FF000000FF000000FF0000
+      00FF000000FF000000FF000000FF000000FF000000FF7B7B7BFF7B7B7BFF0000
+      00FF000000FF7B7B7BFF000000FF000000000000000000000000000000000000
+      000000000000000000FF00FFFFFF7B7B7BFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+      FFFFFFFFFFFF00FFFFFF000000FF000000000000000000000000000000000000
+      000000000000000000FF00FFFFFF7B7B7BFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+      FFFFFFFFFFFF00FFFFFF000000FF000000000000000000000000000000000000
+      000000000000000000FF00FFFFFF7B7B7BFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+      FFFFFFFFFFFF00FFFFFF000000FF000000000000000000000000000000000000
+      000000000000000000FF00FFFFFF7B7B7BFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+      FFFFFFFFFFFF00FFFFFF000000FF7B7B7BFF000000FF000000FF000000FF0000
+      00FF000000FF000000FF000000FF000000FF7B7B7BFF00000000000000000000
+      0000000000000000000000000000000000FF00FFFFFF00FFFFFF7B7B7BFF0000
+      00FF000000FF7B7B7BFF00FFFFFF00FFFFFF0000FFFF0000FFFF0000FFFF0000
+      FFFF000000000000000000000000000000FF00FFFFFF7B7B7BFF7B7B7BFF0000
+      00FF000000FF7B7B7BFF7B7B7BFF00FFFFFF000000FF000000000000FFFF0000
+      FFFF0000FFFF0000000000000000000000FF7B7B7BFF000000FF000000FF7B7B
+      7BFF7B7B7BFF000000FF000000FF7B7B7BFF000000FF000000000000FFFF0000
+      FFFF0000FFFF0000000000000000000000FF00FFFFFF7B7B7BFFFFFFFFFFFFFF
+      FFFFFFFFFFFFFFFFFFFFFFFFFFFF00FFFFFF000000FF000000000000FFFF0000
+      FFFF0000FFFF0000000000000000000000FF00FFFFFF7B7B7BFFFFFFFFFFFFFF
+      FFFFFFFFFFFFFFFFFFFFFFFFFFFF00FFFFFF0000FFFF0000FFFF0000FFFF0000
+      FFFF0000FFFF0000FFFF0000FFFF000000FF00FFFFFF7B7B7BFFFFFFFFFFFFFF
+      FFFFFFFFFFFFFFFFFFFFFFFFFFFF00FFFFFF000000FF0000FFFF0000FFFF0000
+      FFFF0000FFFF0000FFFF00000000000000FF00FFFFFF7B7B7BFFFFFFFFFFFFFF
+      FFFFFFFFFFFFFFFFFFFFFFFFFFFF00FFFFFF000000FF000000000000FFFF0000
+      FFFF0000FFFF0000000000000000000000FF00FFFFFF7B7B7BFFFFFFFFFFFFFF
+      FFFFFFFFFFFFFFFFFFFFFFFFFFFF00FFFFFF000000FF000000FF000000FF0000
+      FFFF000000000000000000000000000000FF00FFFFFF7B7B7BFFFFFFFFFFFFFF
+      FFFFFFFFFFFFFFFFFFFFFFFFFFFF00FFFFFF000000FFFFFFFFFF000000FF0000
+      00FF000000000000000000000000000000FF00FFFFFF7B7B7BFF7B7B7BFF7B7B
+      7BFF7B7B7BFF7B7B7BFF00FFFFFF00FFFFFF000000FFFFFFFFFF000000FFFFFF
+      FFFF000000FF0000000000000000000000FF00FFFFFF00FFFFFF00FFFFFF00FF
+      FFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF000000FFFFFFFFFF000000FFFFFF
+      FFFFFFFFFFFF000000FF000000007B7B7BFF000000FF000000FF000000FF0000
+      00FF000000FF000000FF000000FF000000FF7B7B7BFFFFFFFFFF000000FF0000
+      00FF000000FF000000FF000000FF000000000000000000000000000000000000
+      000000000000000000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+      FFFFFFFFFFFFFFFFFFFF000000FF000000000000000000000000000000000000
+      000000000000000000FFFFFFFFFF000000FF000000FF000000FF000000FFFFFF
+      FFFF000000FFFFFFFFFF000000FF000000000000000000000000000000000000
+      000000000000000000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+      FFFFFFFFFFFFFFFFFFFF000000FF
+    }
+  end
+  object pumMatrices: TPopupMenu
+    Images = ImageList1
+    left = 440
+    top = 368
+    object Copy1: TMenuItem
+      Action = actCopiar
+      OnClick = actCopiarExecute
+    end
+    object Paste1: TMenuItem
+      Action = actPegar
+      OnClick = actPegarExecute
+    end
+  end
+  object pumMatricesA: TPopupMenu
+    Images = ImageList1
+    left = 480
+    top = 368
+    object actCopiarA1: TMenuItem
+      Action = actCopiarA
+      OnClick = actCopiarAExecute
+    end
+    object actPegarA1: TMenuItem
+      Action = actPegarA
+      OnClick = actPegarAExecute
+    end
+  end
+  object pumMatricesM: TPopupMenu
+    Images = ImageList1
+    left = 520
+    top = 368
+    object Copy2: TMenuItem
+      Action = actCopiarM
+      OnClick = actCopiarMExecute
+    end
+    object Paste2: TMenuItem
+      Action = actPegarM
+      OnClick = actPegarMExecute
+    end
+  end
+  object OpenDialog1: TOpenDialog
+    Filter = 'Galatea Set of Substrates|*.sgl'
+    Options = [ofFileMustExist, ofEnableSizing, ofViewDetail]
+    left = 560
+    top = 368
+  end
+end

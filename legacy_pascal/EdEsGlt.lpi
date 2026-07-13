@@ -1,0 +1,362 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <ProjectOptions>
+    <Version Value="12"/>
+    <General>
+      <Flags>
+        <LRSInOutputDirectory Value="False"/>
+        <CompatibilityMode Value="True"/>
+      </Flags>
+    </General>
+    <VersionInfo>
+      <Language Value=""/>
+      <CharSet Value=""/>
+    </VersionInfo>
+    <BuildModes Count="1">
+      <Item1 Name="default" Default="True"/>
+    </BuildModes>
+    <PublishOptions>
+      <Version Value="2"/>
+    </PublishOptions>
+    <RunParams>
+      <local>
+        <LaunchingApplication PathPlusParams="/usr/X11R6/bin/xterm -T &apos;Lazarus Run Output&apos; -e $(LazarusDir)/tools/runwait.sh $(TargetCmdLine)"/>
+      </local>
+      <FormatVersion Value="2"/>
+      <Modes Count="1">
+        <Mode0 Name="default">
+          <local>
+            <LaunchingApplication PathPlusParams="/usr/X11R6/bin/xterm -T &apos;Lazarus Run Output&apos; -e $(LazarusDir)/tools/runwait.sh $(TargetCmdLine)"/>
+          </local>
+        </Mode0>
+      </Modes>
+    </RunParams>
+    <RequiredPackages Count="1">
+      <Item1>
+        <PackageName Value="LCL"/>
+      </Item1>
+    </RequiredPackages>
+    <Units Count="28">
+      <Unit0>
+        <Filename Value="EdEsGlt.lpr"/>
+        <IsPartOfProject Value="True"/>
+        <CursorPos X="19" Y="25"/>
+        <UsageCount Value="24"/>
+      </Unit0>
+      <Unit1>
+        <Filename Value="EditorEscenarios.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="frmEditorEscenarios"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <TopLine Value="1465"/>
+        <CursorPos X="11" Y="1447"/>
+        <UsageCount Value="24"/>
+        <Bookmarks Count="1">
+          <Item0 X="44" Y="1444" ID="1"/>
+        </Bookmarks>
+        <Loaded Value="True"/>
+      </Unit1>
+      <Unit2>
+        <Filename Value="NuevoEscenario.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="frmNuevoEscenario"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <TopLine Value="37"/>
+        <CursorPos X="20" Y="64"/>
+        <UsageCount Value="24"/>
+      </Unit2>
+      <Unit3>
+        <Filename Value="PropiedadesEscenario.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="frmPropiedadesEscenario"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <TopLine Value="28"/>
+        <CursorPos X="36" Y="55"/>
+        <UsageCount Value="24"/>
+      </Unit3>
+      <Unit4>
+        <Filename Value="SeleccionarMixto.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="frmSeleccionarMixto"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <TopLine Value="24"/>
+        <CursorPos X="34" Y="51"/>
+        <UsageCount Value="24"/>
+      </Unit4>
+      <Unit5>
+        <Filename Value="VerSustrato.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="frmVerSustrato"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <CursorPos X="3" Y="18"/>
+        <UsageCount Value="24"/>
+      </Unit5>
+      <Unit6>
+        <Filename Value="AcercaEdEs.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="frmAcerca"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <CursorPos X="3" Y="17"/>
+        <UsageCount Value="24"/>
+      </Unit6>
+      <Unit7>
+        <Filename Value="SeleccionaJuego.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="frmSeleccionaJuego"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <CursorPos X="3" Y="10"/>
+        <UsageCount Value="24"/>
+      </Unit7>
+      <Unit8>
+        <Filename Value="PantallaEscenario.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="frmPantallaEscenario"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <TopLine Value="6"/>
+        <CursorPos X="19" Y="33"/>
+        <UsageCount Value="24"/>
+      </Unit8>
+      <Unit9>
+        <Filename Value="../../../usr/share/fpcsrc/2.2.2/rtl/unix/classes.pp"/>
+        <TopLine Value="7"/>
+        <CursorPos X="5" Y="36"/>
+        <UsageCount Value="10"/>
+      </Unit9>
+      <Unit10>
+        <Filename Value="FuncElementosCadenas.pas"/>
+        <TopLine Value="3"/>
+        <CursorPos Y="29"/>
+        <UsageCount Value="10"/>
+      </Unit10>
+      <Unit11>
+        <Filename Value="Entornos.pas"/>
+        <TopLine Value="102"/>
+        <CursorPos X="3" Y="129"/>
+        <UsageCount Value="10"/>
+      </Unit11>
+      <Unit12>
+        <Filename Value="Mediadores.pas"/>
+        <TopLine Value="103"/>
+        <CursorPos X="11" Y="131"/>
+        <UsageCount Value="10"/>
+      </Unit12>
+      <Unit13>
+        <Filename Value="Cruzadores.pas"/>
+        <CursorPos X="26" Y="11"/>
+        <UsageCount Value="10"/>
+      </Unit13>
+      <Unit14>
+        <Filename Value="Dibujo.pas"/>
+        <EditorIndex Value="2"/>
+        <CursorPos X="3" Y="11"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit14>
+      <Unit15>
+        <Filename Value="Escenarios.pas"/>
+        <TopLine Value="86"/>
+        <CursorPos X="31" Y="93"/>
+        <UsageCount Value="11"/>
+      </Unit15>
+      <Unit16>
+        <Filename Value="../../../../usr/lib/lazarus/lcl/include/customcontrol.inc"/>
+        <TopLine Value="66"/>
+        <CursorPos Y="81"/>
+        <UsageCount Value="10"/>
+      </Unit16>
+      <Unit17>
+        <Filename Value="../../../../usr/lib/lazarus/lcl/include/customform.inc"/>
+        <TopLine Value="802"/>
+        <CursorPos Y="817"/>
+        <UsageCount Value="10"/>
+      </Unit17>
+      <Unit18>
+        <Filename Value="../../../../usr/lib/lazarus/lcl/include/canvas.inc"/>
+        <TopLine Value="1487"/>
+        <CursorPos Y="1502"/>
+        <UsageCount Value="10"/>
+      </Unit18>
+      <Unit19>
+        <Filename Value="../../../../usr/lib/lazarus/lcl/include/wincontrol.inc"/>
+        <TopLine Value="4293"/>
+        <CursorPos Y="4308"/>
+        <UsageCount Value="10"/>
+      </Unit19>
+      <Unit20>
+        <Filename Value="../../../../usr/lib/lazarus/lcl/include/control.inc"/>
+        <TopLine Value="596"/>
+        <CursorPos Y="611"/>
+        <UsageCount Value="10"/>
+      </Unit20>
+      <Unit21>
+        <Filename Value="../../../../usr/lib/lazarus/lcl/include/winapi.inc"/>
+        <TopLine Value="641"/>
+        <CursorPos Y="656"/>
+        <UsageCount Value="10"/>
+      </Unit21>
+      <Unit22>
+        <Filename Value="../../../../usr/lib/lazarus/lcl/interfaces/gtk/gtkwinapi.inc"/>
+        <TopLine Value="4867"/>
+        <CursorPos Y="4882"/>
+        <UsageCount Value="10"/>
+      </Unit22>
+      <Unit23>
+        <Filename Value="../../../../usr/lib/lazarus/lcl/include/intfbasewinapi.inc"/>
+        <TopLine Value="1210"/>
+        <CursorPos Y="1225"/>
+        <UsageCount Value="10"/>
+      </Unit23>
+      <Unit24>
+        <Filename Value="../../../../usr/lib/lazarus/lcl/interfaces/gtk/gtkwidgetset.inc"/>
+        <TopLine Value="4368"/>
+        <CursorPos Y="4383"/>
+        <UsageCount Value="10"/>
+      </Unit24>
+      <Unit25>
+        <Filename Value="../../../../usr/lib/lazarus/lcl/dynhasharray.pp"/>
+        <UnitName Value="DynHashArray"/>
+        <TopLine Value="622"/>
+        <CursorPos Y="637"/>
+        <UsageCount Value="10"/>
+      </Unit25>
+      <Unit26>
+        <Filename Value="../../../../usr/lib/lazarus/lcl/interfaces/gtk/gtkdef.pp"/>
+        <UnitName Value="GtkDef"/>
+        <TopLine Value="613"/>
+        <CursorPos Y="628"/>
+        <UsageCount Value="10"/>
+      </Unit26>
+      <Unit27>
+        <Filename Value="EditorEscenarios.lfm"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="1997"/>
+        <CursorPos X="33" Y="2020"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+        <DefaultSyntaxHighlighter Value="LFM"/>
+      </Unit27>
+    </Units>
+    <JumpHistory Count="22" HistoryIndex="21">
+      <Position1>
+        <Filename Value="EditorEscenarios.pas"/>
+        <Caret Line="1442" Column="3" TopLine="1435"/>
+      </Position1>
+      <Position2>
+        <Filename Value="EditorEscenarios.pas"/>
+        <Caret Line="981" Column="3" TopLine="975"/>
+      </Position2>
+      <Position3>
+        <Filename Value="EditorEscenarios.pas"/>
+        <Caret Line="947" Column="15" TopLine="68"/>
+      </Position3>
+      <Position4>
+        <Filename Value="EditorEscenarios.pas"/>
+        <Caret Line="237" Column="27" TopLine="222"/>
+      </Position4>
+      <Position5>
+        <Filename Value="EditorEscenarios.pas"/>
+        <Caret Line="606" Column="14" TopLine="568"/>
+      </Position5>
+      <Position6>
+        <Filename Value="EditorEscenarios.pas"/>
+        <Caret Line="1450" Column="4" TopLine="1432"/>
+      </Position6>
+      <Position7>
+        <Filename Value="EditorEscenarios.pas"/>
+        <Caret Line="15" Column="11"/>
+      </Position7>
+      <Position8>
+        <Filename Value="EditorEscenarios.pas"/>
+        <Caret Line="357" Column="23" TopLine="342"/>
+      </Position8>
+      <Position9>
+        <Filename Value="EditorEscenarios.pas"/>
+        <Caret Line="375" Column="24" TopLine="360"/>
+      </Position9>
+      <Position10>
+        <Filename Value="EditorEscenarios.pas"/>
+        <Caret Line="608" Column="17" TopLine="226"/>
+      </Position10>
+      <Position11>
+        <Filename Value="EditorEscenarios.pas"/>
+        <Caret Line="32" Column="5" TopLine="29"/>
+      </Position11>
+      <Position12>
+        <Filename Value="EditorEscenarios.pas"/>
+        <Caret Line="223" Column="29" TopLine="209"/>
+      </Position12>
+      <Position13>
+        <Filename Value="EditorEscenarios.pas"/>
+        <Caret Line="1511" Column="13" TopLine="1489"/>
+      </Position13>
+      <Position14>
+        <Filename Value="Dibujo.pas"/>
+        <Caret Line="28" Column="15" TopLine="19"/>
+      </Position14>
+      <Position15>
+        <Filename Value="EditorEscenarios.pas"/>
+        <Caret Line="1511" Column="13" TopLine="1489"/>
+      </Position15>
+      <Position16>
+        <Filename Value="EditorEscenarios.pas"/>
+        <Caret Line="566" TopLine="559"/>
+      </Position16>
+      <Position17>
+        <Filename Value="EditorEscenarios.pas"/>
+        <Caret Line="467" Column="17" TopLine="461"/>
+      </Position17>
+      <Position18>
+        <Filename Value="EditorEscenarios.pas"/>
+        <Caret Line="466" Column="60" TopLine="458"/>
+      </Position18>
+      <Position19>
+        <Filename Value="EditorEscenarios.pas"/>
+        <Caret Line="314" Column="4" TopLine="309"/>
+      </Position19>
+      <Position20>
+        <Filename Value="EditorEscenarios.lfm"/>
+        <Caret Line="13" Column="46"/>
+      </Position20>
+      <Position21>
+        <Filename Value="EditorEscenarios.lfm"/>
+        <Caret Line="1241" Column="20" TopLine="1220"/>
+      </Position21>
+      <Position22>
+        <Filename Value="EditorEscenarios.lfm"/>
+        <Caret Line="1757" Column="31" TopLine="1734"/>
+      </Position22>
+    </JumpHistory>
+  </ProjectOptions>
+  <CompilerOptions>
+    <Version Value="11"/>
+    <Parsing>
+      <SyntaxOptions>
+        <UseAnsiStrings Value="False"/>
+      </SyntaxOptions>
+    </Parsing>
+    <Linking>
+      <Debugging>
+        <DebugInfoType Value="dsDwarf3"/>
+      </Debugging>
+    </Linking>
+  </CompilerOptions>
+  <Debugging>
+    <Exceptions Count="2">
+      <Item1>
+        <Name Value="ECodetoolError"/>
+      </Item1>
+      <Item2>
+        <Name Value="EFOpenError"/>
+      </Item2>
+    </Exceptions>
+  </Debugging>
+</CONFIG>

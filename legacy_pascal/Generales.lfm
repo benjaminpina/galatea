@@ -1,0 +1,419 @@
+object frmGenerales: TfrmGenerales
+  Left = 325
+  Height = 448
+  Top = 153
+  Width = 465
+  ActiveControl = PageControl1
+  BorderStyle = bsDialog
+  Caption = 'General options'
+  ClientHeight = 448
+  ClientWidth = 465
+  Font.Height = -11
+  Font.Name = 'MS Sans Serif'
+  OnCreate = FormCreate
+  Position = poScreenCenter
+  LCLVersion = '0.9.26.2'
+  object btnAceptar: TBitBtn
+    Left = 368
+    Height = 33
+    Top = 408
+    Width = 89
+    Caption = '&OK'
+    Kind = bkOK
+    ModalResult = 1
+    NumGlyphs = 0
+    OnClick = btnAceptarClick
+    TabOrder = 0
+  end
+  object btnCancelar: TBitBtn
+    Left = 272
+    Height = 33
+    Top = 408
+    Width = 89
+    Caption = '&Cancel'
+    Kind = bkCancel
+    ModalResult = 2
+    NumGlyphs = 0
+    TabOrder = 1
+  end
+  object PageControl1: TPageControl
+    Left = 8
+    Height = 385
+    Top = 8
+    Width = 449
+    ActivePage = TabSheet1
+    TabIndex = 0
+    TabOrder = 2
+    object TabSheet1: TTabSheet
+      Caption = '&Timing'
+      ClientHeight = 385
+      ClientWidth = 449
+      object GroupBox1: TGroupBox
+        Left = 8
+        Height = 73
+        Top = 3
+        Width = 425
+        Caption = 'Autosave'
+        ClientHeight = 52
+        ClientWidth = 421
+        TabOrder = 0
+        object Label1: TLabel
+          Left = 164
+          Height = 17
+          Top = 32
+          Width = 45
+          Caption = 'cycles'
+          ParentColor = False
+        end
+        object chkAutoGuardado: TCheckBox
+          Left = 8
+          Height = 26
+          Top = 2
+          Width = 285
+          Caption = 'Auto&save (as environment file) each'
+          OnClick = chkAutoGuardadoClick
+          TabOrder = 0
+        end
+        object sedCiclos: TSpinEdit
+          Left = 31
+          Height = 22
+          Top = 24
+          Width = 113
+          MaxValue = 1000000
+          MinValue = 1
+          TabOrder = 1
+          Value = 100
+        end
+      end
+      object GroupBox4: TGroupBox
+        Left = 8
+        Height = 72
+        Top = 82
+        Width = 425
+        Caption = 'Information'
+        ClientHeight = 51
+        ClientWidth = 421
+        TabOrder = 2
+        object Label7: TLabel
+          Left = 164
+          Height = 17
+          Top = 32
+          Width = 45
+          Caption = 'cycles'
+          ParentColor = False
+        end
+        object chkInformar: TCheckBox
+          Left = 8
+          Height = 24
+          Hint = 'Open project|Open a project file'
+          Top = 6
+          Width = 190
+          Caption = 'Show information each'
+          OnClick = chkInformarClick
+          TabOrder = 0
+        end
+        object sedInformar: TSpinEdit
+          Left = 31
+          Height = 22
+          Top = 24
+          Width = 113
+          MaxValue = 1000000
+          MinValue = 1
+          TabOrder = 1
+          Value = 100
+        end
+      end
+      object GroupBox5: TGroupBox
+        Left = 6
+        Height = 81
+        Top = 242
+        Width = 425
+        Caption = 'Stop'
+        ClientHeight = 60
+        ClientWidth = 421
+        TabOrder = 3
+        object Label8: TLabel
+          Left = 166
+          Height = 17
+          Top = 36
+          Width = 45
+          Caption = 'cycles'
+          ParentColor = False
+        end
+        object chkDetener: TCheckBox
+          Left = 20
+          Height = 24
+          Hint = 'Open project|Open a project file'
+          Top = 2
+          Width = 212
+          Caption = 'Stop running simulation at'
+          OnClick = chkDetenerClick
+          TabOrder = 0
+        end
+        object sedDetener: TSpinEdit
+          Left = 36
+          Height = 22
+          Top = 25
+          Width = 113
+          MaxValue = 1000000
+          MinValue = 1
+          TabOrder = 1
+          Value = 100
+        end
+      end
+      object GroupBox6: TGroupBox
+        Left = 6
+        Height = 73
+        Top = 162
+        Width = 425
+        Caption = 'Save output files'
+        ClientHeight = 56
+        ClientWidth = 421
+        TabOrder = 1
+        object Label10: TLabel
+          Left = 166
+          Height = 11
+          Top = 32
+          Width = 33
+          Caption = 'cycles'
+          ParentColor = False
+        end
+        object Label11: TLabel
+          Left = 22
+          Height = 11
+          Top = 8
+          Width = 109
+          Caption = 'Save output files each'
+          ParentColor = False
+        end
+        object sedSalida: TSpinEdit
+          Left = 33
+          Height = 22
+          Top = 24
+          Width = 113
+          MaxValue = 1000000
+          MinValue = 1
+          TabOrder = 0
+          Value = 100
+        end
+      end
+    end
+    object TabSheet2: TTabSheet
+      Caption = '&Directories'
+      ClientHeight = 385
+      ClientWidth = 449
+      ImageIndex = 1
+      OnContextPopup = TabSheet2ContextPopup
+      object GroupBox2: TGroupBox
+        Left = 6
+        Height = 226
+        Top = 8
+        Width = 425
+        Caption = 'Directories'
+        ClientHeight = 209
+        ClientWidth = 421
+        TabOrder = 0
+        object Label2: TLabel
+          Left = 4
+          Height = 11
+          Top = 27
+          Width = 64
+          Caption = '&Substrates:'
+          FocusControl = edtSustratos
+          ParentColor = False
+        end
+        object Label3: TLabel
+          Left = 8
+          Height = 11
+          Top = 56
+          Width = 45
+          Caption = 'S&tages:'
+          FocusControl = edtEscenarios
+          ParentColor = False
+        end
+        object Label4: TLabel
+          Left = 8
+          Height = 11
+          Top = 88
+          Width = 84
+          Caption = 'Sets of A&gents:'
+          FocusControl = edtAgentes
+          ParentColor = False
+        end
+        object Label5: TLabel
+          Left = 8
+          Height = 11
+          Top = 120
+          Width = 76
+          Caption = '&Environments:'
+          FocusControl = edtEntornos
+          ParentColor = False
+        end
+        object Label6: TLabel
+          Left = 8
+          Height = 11
+          Top = 152
+          Width = 50
+          Caption = '&Projects:'
+          FocusControl = edtProyectos
+          ParentColor = False
+        end
+        object Label9: TLabel
+          Left = 8
+          Height = 11
+          Top = 184
+          Width = 66
+          Caption = 'Output &files:'
+          FocusControl = edtSalida
+          ParentColor = False
+        end
+        object edtSustratos: TEdit
+          Left = 84
+          Height = 21
+          Top = 27
+          Width = 297
+          TabOrder = 0
+          Text = 'edtSustratos'
+        end
+        object edtEscenarios: TEdit
+          Left = 88
+          Height = 21
+          Top = 56
+          Width = 297
+          TabOrder = 1
+          Text = 'edtEscenarios'
+        end
+        object edtEntornos: TEdit
+          Left = 88
+          Height = 21
+          Top = 120
+          Width = 297
+          TabOrder = 3
+          Text = 'edtEntornos'
+        end
+        object edtProyectos: TEdit
+          Left = 88
+          Height = 21
+          Top = 152
+          Width = 297
+          TabOrder = 4
+          Text = 'edtProyectos'
+        end
+        object btnSustratos: TButton
+          Left = 392
+          Height = 25
+          Top = 24
+          Width = 25
+          Caption = '...'
+          Font.Height = -11
+          Font.Name = 'MS Sans Serif'
+          Font.Style = [fsBold]
+          OnClick = btnSustratosClick
+          ParentFont = False
+          TabOrder = 5
+        end
+        object btnEscenarios: TButton
+          Left = 392
+          Height = 25
+          Top = 56
+          Width = 25
+          Caption = '...'
+          Font.Height = -11
+          Font.Name = 'MS Sans Serif'
+          Font.Style = [fsBold]
+          OnClick = btnEscenariosClick
+          ParentFont = False
+          TabOrder = 6
+        end
+        object btnEntornos: TButton
+          Left = 392
+          Height = 25
+          Top = 120
+          Width = 25
+          Caption = '...'
+          Font.Height = -11
+          Font.Name = 'MS Sans Serif'
+          Font.Style = [fsBold]
+          OnClick = btnEntornosClick
+          ParentFont = False
+          TabOrder = 8
+        end
+        object btnProyectos: TButton
+          Left = 392
+          Height = 25
+          Top = 152
+          Width = 25
+          Caption = '...'
+          Font.Height = -11
+          Font.Name = 'MS Sans Serif'
+          Font.Style = [fsBold]
+          OnClick = btnProyectosClick
+          ParentFont = False
+          TabOrder = 9
+        end
+        object edtAgentes: TEdit
+          Left = 88
+          Height = 21
+          Top = 88
+          Width = 297
+          TabOrder = 2
+          Text = 'edtAgentes'
+        end
+        object btnAgentes: TButton
+          Left = 392
+          Height = 25
+          Top = 88
+          Width = 25
+          Caption = '...'
+          Font.Height = -11
+          Font.Name = 'MS Sans Serif'
+          Font.Style = [fsBold]
+          OnClick = btnAgentesClick
+          ParentFont = False
+          TabOrder = 7
+        end
+        object edtSalida: TEdit
+          Left = 88
+          Height = 21
+          Top = 184
+          Width = 297
+          TabOrder = 10
+          Text = 'edtSalida'
+        end
+        object btnSalida: TButton
+          Left = 392
+          Height = 25
+          Top = 184
+          Width = 25
+          Caption = '...'
+          Font.Height = -11
+          Font.Name = 'MS Sans Serif'
+          Font.Style = [fsBold]
+          OnClick = btnSalidaClick
+          ParentFont = False
+          TabOrder = 11
+        end
+      end
+      object GroupBox3: TGroupBox
+        Left = 6
+        Height = 64
+        Top = 242
+        Width = 425
+        Caption = 'Remember'
+        ClientHeight = 47
+        ClientWidth = 421
+        TabOrder = 1
+        object chkRecordar: TCheckBox
+          Left = 16
+          Height = 20
+          Top = 16
+          Width = 168
+          Caption = 'Remember last used directory'
+          Checked = True
+          State = cbChecked
+          TabOrder = 0
+        end
+      end
+    end
+  end
+end

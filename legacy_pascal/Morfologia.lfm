@@ -1,0 +1,135 @@
+object frmMorfologia: TfrmMorfologia
+  Left = 284
+  Height = 599
+  Top = 60
+  Width = 524
+  ActiveControl = BitBtn1
+  BorderStyle = bsDialog
+  Caption = 'Agents morphology'
+  ClientHeight = 599
+  ClientWidth = 524
+  Font.Height = -11
+  Font.Name = 'MS Sans Serif'
+  OnClose = FormClose
+  OnCreate = FormCreate
+  Position = poScreenCenter
+  ShowHint = True
+  LCLVersion = '0.9.26.2'
+  object spbNotas: TSpeedButton
+    Left = 16
+    Height = 33
+    Hint = 'Note Edit|Open Note Edit'
+    Top = 548
+    Width = 33
+    Color = clBtnFace
+    Glyph.Data = {
+      F6000000424DF600000000000000760000002800000010000000100000000100
+      0400000000008000000000000000000000001000000000000000000000000000
+      80000080000000808000800000008000800080800000C0C0C000808080000000
+      FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFFFF00333333000000
+      00003333330FFFFFFFF000300000FF0F00F0E00BFBFB0FFFFFF0E0BFBF000FFF
+      F0F0E0FBFBFBF0F00FF0E0BFBF00000B0FF0E0FBFBFBFBF0FFF0E0BF0000000F
+      FFF0000BFB00B0FF00F03330000B0FFFFFF0333330B0FFFF000033330B0FF00F
+      0FF03330B00FFFFF0F033309030FFFFF00333330330000000333
+    }
+    NumGlyphs = 0
+    OnClick = spbNotasClick
+  end
+  object BitBtn1: TBitBtn
+    Left = 424
+    Height = 33
+    Top = 552
+    Width = 89
+    Caption = '&OK'
+    Kind = bkOK
+    ModalResult = 1
+    NumGlyphs = 0
+    OnClick = BitBtn1Click
+    TabOrder = 0
+  end
+  object BitBtn2: TBitBtn
+    Left = 320
+    Height = 33
+    Top = 552
+    Width = 89
+    Caption = '&Cancel'
+    Kind = bkCancel
+    ModalResult = 2
+    NumGlyphs = 0
+    TabOrder = 1
+  end
+  object PageControl1: TPageControl
+    Left = 8
+    Height = 473
+    Top = 8
+    Width = 505
+    ActivePage = TabSheet1
+    TabIndex = 0
+    TabOrder = 2
+    object TabSheet1: TTabSheet
+      Caption = 'Co&ntinuous characters'
+      ClientHeight = 433
+      ClientWidth = 501
+      object stgContinuos: TStringGrid
+        Left = 8
+        Height = 425
+        Top = 8
+        Width = 481
+        ColCount = 3
+        Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goColSizing, goEditing, goTabs]
+        RowCount = 16
+        TabOrder = 0
+        TitleFont.Height = -11
+        TitleFont.Name = 'MS Sans Serif'
+        OnDblClick = stgContinuosDblClick
+        OnKeyPress = stgContinuosKeyPress
+        ColWidths = (
+          64
+          151
+          248
+        )
+      end
+    end
+    object TabSheet2: TTabSheet
+      Caption = '&Discretes characters'
+      ClientHeight = 473
+      ClientWidth = 505
+      ImageIndex = 1
+      object stgDiscretos: TStringGrid
+        Left = 8
+        Height = 425
+        Top = 8
+        Width = 481
+        ColCount = 3
+        Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goColSizing, goEditing, goTabs]
+        RowCount = 16
+        TabOrder = 0
+        TitleFont.Height = -11
+        TitleFont.Name = 'MS Sans Serif'
+        OnDblClick = stgDiscretosDblClick
+        OnKeyPress = stgDiscretosKeyPress
+        ColWidths = (
+          64
+          151
+          248
+        )
+      end
+    end
+  end
+  object chbInicializar: TCheckBox
+    Left = 16
+    Height = 20
+    Top = 512
+    Width = 256
+    Caption = 'Inicialize all existing prototypes with new values'
+    TabOrder = 3
+  end
+  object StaticText1: TStaticText
+    Left = 16
+    Height = 24
+    Top = 488
+    Width = 496
+    Caption = 'Double click on default column cells to open formula editor'
+    TabOrder = 4
+  end
+end

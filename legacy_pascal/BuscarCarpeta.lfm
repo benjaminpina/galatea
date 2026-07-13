@@ -1,0 +1,46 @@
+object frmBuscarCarpeta: TfrmBuscarCarpeta
+  Left = 262
+  Height = 219
+  Top = 117
+  Width = 313
+  ActiveControl = btnAceptar
+  BorderIcons = [biSystemMenu, biMaximize]
+  BorderStyle = bsDialog
+  Caption = 'Find folder'
+  ClientHeight = 219
+  ClientWidth = 313
+  Font.Height = -11
+  Font.Name = 'MS Sans Serif'
+  Position = poDefault
+  LCLVersion = '0.9.26.2'
+  object lblTitulo: TLabel
+    Left = 8
+    Height = 17
+    Top = 8
+    Width = 55
+    Caption = 'lblTitulo'
+    ParentColor = False
+  end
+  object btnAceptar: TBitBtn
+    Left = 253
+    Height = 33
+    Top = 442
+    Width = 89
+    Anchors = [akRight, akBottom]
+    Caption = '&OK'
+    Kind = bkOK
+    NumGlyphs = 0
+    TabOrder = 0
+  end
+  object btnCancelar: TBitBtn
+    Left = 149
+    Height = 33
+    Top = 442
+    Width = 89
+    Anchors = [akRight, akBottom]
+    Caption = '&Cancel'
+    Kind = bkCancel
+    NumGlyphs = 0
+    TabOrder = 1
+  end
+end

@@ -1,0 +1,28 @@
+{ Este es un archivo de recurso de Lazarus generado automáticamente }
+
+LazarusResources.Add('TfrmSitioOviposicion','FORMDATA',[
+  'TPF0'#20'TfrmSitioOviposicion'#19'frmSitioOviposicion'#4'Left'#3'"'#2#6'Heig'
+  +'ht'#3#237#0#3'Top'#3#10#1#5'Width'#3#227#0#13'ActiveControl'#7#10'edtCalida'
+  +'d'#7'Caption'#6#31'Set oviposition site properties'#12'ClientHeight'#3#237#0
+  +#11'ClientWidth'#3#227#0#11'Font.Height'#2#245#9'Font.Name'#6#13'MS Sans Ser'
+  +'if'#8'Position'#7#14'poScreenCenter'#10'LCLVersion'#6#8'0.9.26.2'#0#9'TGrou'
+  +'pBox'#9'GroupBox1'#4'Left'#2#8#6'Height'#3#176#0#3'Top'#2#8#5'Width'#3#210#0
+  +#12'ClientHeight'#3#176#0#11'ClientWidth'#3#210#0#8'TabOrder'#2#0#0#6'TLabel'
+  +#6'Label1'#4'Left'#2#8#6'Height'#2#18#3'Top'#2#2#5'Width'#2'-'#7'Caption'#6#6
+  +'Level:'#11'ParentColor'#8#0#0#6'TLabel'#6'Label2'#4'Left'#2#8#6'Height'#2#18
+  +#3'Top'#2'2'#5'Width'#2'E'#7'Caption'#6#9'&Quality:'#12'FocusControl'#7#10'e'
+  +'dtCalidad'#11'ParentColor'#8#0#0#6'TLabel'#6'Label5'#4'Left'#2#14#6'Height'
+  +#2#18#3'Top'#2'j'#5'Width'#2'T'#7'Caption'#6#9'&Maximun:'#11'ParentColor'#8#0
+  +#0#5'TEdit'#10'edtCalidad'#4'Left'#2#8#6'Height'#2#21#3'Top'#2'B'#5'Width'#3
+  +#185#0#10'OnKeyPress'#7#18'edtCalidadKeyPress'#8'TabOrder'#2#0#4'Text'#6#10
+  +'edtCalidad'#0#0#5'TEdit'#9'edtMaximo'#4'Left'#2#14#6'Height'#2#21#3'Top'#2
+  +'z'#5'Width'#3#185#0#10'OnKeyPress'#7#17'edtMaximoKeyPress'#8'TabOrder'#2#1#4
+  +'Text'#6#9'edtMaximo'#0#0#11'TStaticText'#8'sttNivel'#4'Left'#2#8#6'Height'#2
+  +#17#3'Top'#2#16#5'Width'#3#185#0#7'Caption'#6#8'sttNivel'#8'TabOrder'#2#2#0#0
+  +#0#7'TBitBtn'#11'btbCancelar'#4'Left'#2' '#6'Height'#2'!'#3'Top'#3#192#0#5'W'
+  +'idth'#2'Y'#7'Caption'#6#7'&Cancel'#4'Kind'#7#8'bkCancel'#11'ModalResult'#2#2
+  +#9'NumGlyphs'#2#0#8'TabOrder'#2#1#0#0#7'TBitBtn'#10'btbAceptar'#4'Left'#3#129
+  +#0#6'Height'#2'!'#3'Top'#3#192#0#5'Width'#2'Y'#7'Caption'#6#3'&OK'#4'Kind'#7
+  +#4'bkOK'#11'ModalResult'#2#1#9'NumGlyphs'#2#0#7'OnClick'#7#15'btbAceptarClic'
+  +'k'#8'TabOrder'#2#2#0#0#0
+]);

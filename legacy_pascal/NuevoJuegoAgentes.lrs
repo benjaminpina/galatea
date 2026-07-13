@@ -1,0 +1,23 @@
+{ Este es un archivo de recurso de Lazarus generado automáticamente }
+
+LazarusResources.Add('TfrmNuevoJuegoAgentes','FORMDATA',[
+  'TPF0'#21'TfrmNuevoJuegoAgentes'#20'frmNuevoJuegoAgentes'#4'Left'#3#18#1#6'He'
+  +'ight'#3#157#0#3'Top'#3#160#0#5'Width'#3'r'#1#13'ActiveControl'#7#9'edtTitul'
+  +'o'#11'BorderStyle'#7#8'bsDialog'#7'Caption'#6#17'New Set of Agents'#12'Clie'
+  +'ntHeight'#3#157#0#11'ClientWidth'#3'r'#1#11'Font.Height'#2#245#9'Font.Name'
+  +#6#13'MS Sans Serif'#8'OnCreate'#7#10'FormCreate'#8'Position'#7#14'poScreenC'
+  +'enter'#10'LCLVersion'#6#8'0.9.26.2'#0#6'TLabel'#6'Label1'#4'Left'#2#16#6'He'
+  +'ight'#2#17#3'Top'#2#8#5'Width'#2'.'#7'Caption'#6#7'&Title:'#12'FocusControl'
+  +#7#9'edtTitulo'#11'ParentColor'#8#0#0#6'TLabel'#6'Label3'#4'Left'#2#16#6'Hei'
+  +'ght'#2#17#3'Top'#2'('#5'Width'#2'R'#7'Caption'#6#9'C&oments:'#12'FocusContr'
+  +'ol'#7#14'memComentarios'#11'ParentColor'#8#0#0#5'TEdit'#9'edtTitulo'#4'Left'
+  +#2'X'#6'Height'#2#21#3'Top'#2#8#5'Width'#3#17#1#9'MaxLength'#2'P'#8'TabOrder'
+  +#2#0#4'Text'#6#9'edtTitulo'#0#0#5'TMemo'#14'memComentarios'#4'Left'#2'X'#6'H'
+  +'eight'#2'A'#3'Top'#2'('#5'Width'#3#17#1#13'Lines.Strings'#1#6#14'memComenta'
+  +'rios'#0#8'TabOrder'#2#1#0#0#7'TBitBtn'#11'btbCancelar'#4'Left'#3#168#0#6'He'
+  +'ight'#2'!'#3'Top'#2'p'#5'Width'#2'Y'#7'Caption'#6#7'&Cancel'#4'Kind'#7#8'bk'
+  +'Cancel'#11'ModalResult'#2#2#9'NumGlyphs'#2#0#8'TabOrder'#2#3#0#0#7'TBitBtn'
+  +#10'btbAceptar'#4'Left'#3#16#1#6'Height'#2'!'#3'Top'#2'p'#5'Width'#2'Y'#7'Ca'
+  +'ption'#6#3'&OK'#4'Kind'#7#4'bkOK'#11'ModalResult'#2#1#9'NumGlyphs'#2#0#7'On'
+  +'Click'#7#15'btbAceptarClick'#8'TabOrder'#2#2#0#0#0
+]);

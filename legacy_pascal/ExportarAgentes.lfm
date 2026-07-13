@@ -1,0 +1,102 @@
+object frmExportar: TfrmExportar
+  Left = 216
+  Height = 338
+  Top = 119
+  Width = 622
+  HorzScrollBar.Page = 621
+  VertScrollBar.Page = 337
+  ActiveControl = btbCancelar
+  BorderStyle = bsDialog
+  Caption = 'Export data'
+  ClientHeight = 338
+  ClientWidth = 622
+  Font.Height = -11
+  Font.Name = 'MS Sans Serif'
+  OnCloseQuery = FormCloseQuery
+  OnCreate = FormCreate
+  Position = poScreenCenter
+  object btbCancelar: TBitBtn
+    Left = 416
+    Height = 33
+    Top = 280
+    Width = 89
+    Caption = '&Cancel'
+    Kind = bkCancel
+    ModalResult = 2
+    NumGlyphs = 0
+    TabOrder = 0
+  end
+  object btbAceptar: TBitBtn
+    Left = 520
+    Height = 33
+    Top = 280
+    Width = 89
+    Caption = '&OK'
+    Kind = bkOK
+    ModalResult = 1
+    NumGlyphs = 0
+    OnClick = btbAceptarClick
+    TabOrder = 1
+  end
+  object GroupBox1: TGroupBox
+    Left = 8
+    Height = 128
+    Top = 8
+    Width = 601
+    Caption = 'Important notes'
+    ClientHeight = 104
+    ClientWidth = 597
+    TabOrder = 2
+    object StaticText1: TStaticText
+      Left = 9
+      Height = 17
+      Top = 24
+      Width = 402
+      Caption = 'For data export is indispensable you must install Microsoft Excel version XP or higher.'
+      TabOrder = 0
+    end
+    object StaticText2: TStaticText
+      Left = 8
+      Height = 17
+      Top = 56
+      Width = 258
+      Caption = 'Excel is a trademark propertie of Microsoft Corporation'
+      TabOrder = 1
+    end
+  end
+  object grbPlantilla: TGroupBox
+    Left = 16
+    Height = 81
+    Top = 184
+    Width = 601
+    ClientHeight = 57
+    ClientWidth = 597
+    TabOrder = 3
+    object Label1: TLabel
+      Left = 8
+      Height = 18
+      Top = 24
+      Width = 86
+      Caption = '&Template:'
+      FocusControl = edtPlantilla
+      ParentColor = False
+    end
+    object edtPlantilla: TEdit
+      Left = 88
+      Height = 21
+      Top = 24
+      Width = 497
+      TabOrder = 0
+      Text = 'edtPlantilla'
+    end
+  end
+  object chbPlantilla: TCheckBox
+    Left = 24
+    Height = 27
+    Top = 152
+    Width = 160
+    Caption = 'Export to template'
+    OnClick = chbPlantillaClick
+    TabOrder = 4
+  end
+end

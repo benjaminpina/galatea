@@ -1,0 +1,190 @@
+{ This is an automatically generated lazarus resource file }
+
+LazarusResources.Add('TfrmEditorAgentes','FORMDATA',[
+  'TPF0'#17'TfrmEditorAgentes'#16'frmEditorAgentes'#4'Left'#3#8#1#6'Height'#2'9'
+  +#3'Top'#2'}'#5'Width'#3'I'#2#11'BorderIcons'#11#12'biSystemMenu'#10'biMinimi'
+  +'ze'#0#11'BorderStyle'#7#8'bsSingle'#7'Caption'#6#20'Galatea Agent Editor'#12
+  +'ClientHeight'#2'9'#11'ClientWidth'#3'I'#2#11'Font.Height'#2#245#9'Font.Name'
+  +#6#13'MS Sans Serif'#4'Menu'#7#9'MainMenu1'#7'OnClose'#7#9'FormClose'#12'OnC'
+  +'loseQuery'#7#14'FormCloseQuery'#8'OnCreate'#7#10'FormCreate'#8'Position'#7#9
+  +'poDefault'#8'ShowHint'#9#10'LCLVersion'#6#7'3.2.0.0'#0#8'TToolBar'#8'ToolBa'
+  +'r1'#6'Cursor'#7#11'crHandPoint'#4'Left'#2#0#6'Height'#2#29#3'Top'#2#0#5'Wid'
+  +'th'#3'I'#2#7'Caption'#6#8'ToolBar1'#6'Images'#7#10'ImageList1'#8'TabOrder'#2
+  +#0#0#11'TToolButton'#11'ToolButton1'#4'Left'#2#1#3'Top'#2#2#6'Action'#7#8'ac'
+  +'tNuevo'#0#0#11'TToolButton'#11'ToolButton2'#4'Left'#2#24#3'Top'#2#2#6'Actio'
+  +'n'#7#8'actAbrir'#0#0#11'TToolButton'#11'ToolButton3'#4'Left'#2'/'#3'Top'#2#2
+  +#6'Action'#7#10'actGuardar'#0#0#11'TToolButton'#11'ToolButton4'#4'Left'#2'F'
+  +#6'Height'#2#22#3'Top'#2#2#7'Caption'#6#11'ToolButton4'#10'ImageIndex'#2#3#5
+  +'Style'#7#12'tbsSeparator'#0#0#11'TToolButton'#12'ToolButton20'#4'Left'#2'N'
+  +#3'Top'#2#2#6'Action'#7#11'actExportar'#0#0#11'TToolButton'#12'ToolButton19'
+  +#4'Left'#2'e'#6'Height'#2#22#3'Top'#2#2#7'Caption'#6#12'ToolButton19'#10'Ima'
+  +'geIndex'#2#5#5'Style'#7#12'tbsSeparator'#0#0#11'TToolButton'#12'ToolButton1'
+  +'6'#4'Left'#2'm'#3'Top'#2#2#6'Action'#7#11'actGenetica'#0#0#11'TToolButton'
+  +#11'ToolButton5'#4'Left'#3#132#0#3'Top'#2#2#6'Action'#7#13'actMorfologia'#0#0
+  +#11'TToolButton'#11'ToolButton6'#4'Left'#3#155#0#3'Top'#2#2#6'Action'#7#13'a'
+  +'ctFisiologia'#0#0#11'TToolButton'#12'ToolButton10'#4'Left'#3#178#0#6'Height'
+  +#2#22#3'Top'#2#2#7'Caption'#6#12'ToolButton10'#10'ImageIndex'#2#8#5'Style'#7
+  +#12'tbsSeparator'#0#0#11'TToolButton'#12'ToolButton11'#4'Left'#3#186#0#3'Top'
+  +#2#2#6'Action'#7#13'actPrototipos'#0#0#11'TToolButton'#11'ToolButton7'#4'Lef'
+  +'t'#3#209#0#3'Top'#2#2#6'Action'#7#11'actEstadios'#0#0#11'TToolButton'#12'To'
+  +'olButton17'#4'Left'#3#232#0#3'Top'#2#2#6'Action'#7#13'actAsignacion'#0#0#11
+  +'TToolButton'#12'ToolButton12'#4'Left'#3#255#0#6'Height'#2#22#3'Top'#2#2#7'C'
+  +'aption'#6#12'ToolButton12'#10'ImageIndex'#2#9#5'Style'#7#12'tbsSeparator'#0
+  +#0#11'TToolButton'#11'ToolButton9'#4'Left'#3#7#1#3'Top'#2#2#6'Action'#7#11'a'
+  +'ctMatrices'#0#0#11'TToolButton'#12'ToolButton18'#4'Left'#3#30#1#3'Top'#2#2#6
+  +'Action'#7#10'actMemoria'#0#0#11'TToolButton'#11'ToolButton8'#4'Left'#3'5'#1
+  +#6'Height'#2#22#3'Top'#2#2#7'Caption'#6#11'ToolButton8'#10'ImageIndex'#2#5#5
+  +'Style'#7#12'tbsSeparator'#0#0#11'TToolButton'#12'ToolButton13'#4'Left'#3'='
+  +#1#3'Top'#2#2#6'Action'#7#8'actAyuda'#0#0#11'TToolButton'#12'ToolButton14'#4
+  +'Left'#3'T'#1#6'Height'#2#22#3'Top'#2#2#7'Caption'#6#12'ToolButton14'#10'Ima'
+  +'geIndex'#2#10#5'Style'#7#12'tbsSeparator'#0#0#11'TToolButton'#12'ToolButton'
+  +'15'#4'Left'#3'\'#1#3'Top'#2#2#6'Action'#7#8'actSalir'#0#0#0#10'TStatusBar'
+  +#10'StatusBar1'#4'Left'#2#0#6'Height'#2#23#3'Top'#2'"'#5'Width'#3'I'#2#6'Pan'
+  +'els'#14#1#5'Width'#3','#1#0#1#5'Width'#2'2'#0#0#0#0#11'TActionList'#11'Acti'
+  +'onList1'#6'Images'#7#10'ImageList1'#4'Left'#2'('#3'Top'#2' '#0#7'TAction'#8
+  +'actNuevo'#7'Caption'#6#18'&New Set of Agents'#4'Hint'#6#30'New|Create a new'
+  +' Set of Agents'#10'ImageIndex'#2#0#9'OnExecute'#7#15'actNuevoExecute'#8'Sho'
+  +'rtCut'#3'N@'#0#0#7'TAction'#8'actAbrir'#7'Caption'#6#19'&Open Set of Agents'
+  +#4'Hint'#6'#Open|Open an existing Set of Agents'#10'ImageIndex'#2#1#9'OnExec'
+  +'ute'#7#15'actAbrirExecute'#8'ShortCut'#3'O@'#0#0#7'TAction'#10'actGuardar'#7
+  +'Caption'#6#19'&Save Set of Agents'#4'Hint'#6'#Save|Save the current Set of '
+  +'Agents'#10'ImageIndex'#2#2#9'OnExecute'#7#17'actGuardarExecute'#8'ShortCut'
+  +#3'S@'#0#0#7'TAction'#14'actGuardarComo'#7'Caption'#6#22'S&ave Set of Agents'
+  +' as'#4'Hint'#6'4Save as|Save the current Set of Agents as a new file'#10'Im'
+  +'ageIndex'#2#3#9'OnExecute'#7#21'actGuardarComoExecute'#0#0#7'TAction'#9'act'
+  +'Cerrar'#7'Caption'#6#20'C&lose Set of Agents'#4'Hint'#6'%Close|Close the cu'
+  +'rrent Set of Agents'#10'ImageIndex'#2#6#9'OnExecute'#7#16'actCerrarExecute'
+  +#0#0#7'TAction'#8'actSalir'#7'Caption'#6#5'E&xit'#4'Hint'#6#30'Exit|Exit Gal'
+  +'atea Agent Editor'#10'ImageIndex'#2#4#9'OnExecute'#7#15'actSalirExecute'#0#0
+  +#7'TAction'#13'actMorfologia'#7'Caption'#6#11'&Morphology'#4'Hint'#6',Morpho'
+  +'logy|Set agents morphologycal features'#10'ImageIndex'#2#7#9'OnExecute'#7#20
+  +'actMorfologiaExecute'#0#0#7'TAction'#13'actFisiologia'#7'Caption'#6#11'&Phy'
+  +'siology'#4'Hint'#6',Physiology|Set agents physiological features'#10'ImageI'
+  +'ndex'#2#8#9'OnExecute'#7#20'actFisiologiaExecute'#0#0#7'TAction'#11'actEsta'
+  +'dios'#7'Caption'#6#12'&Life stages'#4'Hint'#6'&Life stages|Setting agents l'
+  +'ife stages'#10'ImageIndex'#2#9#9'OnExecute'#7#18'actEstadiosExecute'#0#0#7
+  +'TAction'#11'actMatrices'#7'Caption'#6#21'&Interaction matrices'#4'Hint'#6'/'
+  +'Interactions matrices|Edit interaction matrices'#10'ImageIndex'#2#15#9'OnEx'
+  ,'ecute'#7#18'actMatricesExecute'#0#0#7'TAction'#13'actPrototipos'#7'Caption'
+  +#6#20'&Edit prototype list'#4'Hint'#6#30'Prototypes|Edit prototype list'#10
+  +'ImageIndex'#2#14#9'OnExecute'#7#20'actPrototiposExecute'#0#0#7'TAction'#8'a'
+  +'ctAyuda'#7'Caption'#6#9'&Contents'#4'Hint'#6#24'Help|Show help constents'#10
+  +'ImageIndex'#2#5#8'ShortCut'#2'p'#0#0#7'TAction'#9'actAcerca'#7'Caption'#6#10
+  +'&About ...'#4'Hint'#6'"About ...|Show program information'#9'OnExecute'#7#16
+  +'actAcercaExecute'#0#0#7'TAction'#14'actPropiedades'#7'Caption'#6#25'Set of '
+  +'Agents &properties'#4'Hint'#6'3Properties|Show Set of Agents properties dia'
+  +'log box'#10'ImageIndex'#2#10#9'OnExecute'#7#21'actPropiedadesExecute'#0#0#7
+  +'TAction'#12'actGenerales'#7'Caption'#6#16'&General options'#4'Hint'#6'#Gene'
+  +'ral options|Set general options'#10'ImageIndex'#2#11#9'OnExecute'#7#19'actG'
+  +'eneralesExecute'#0#0#7'TAction'#10'actMemoria'#7'Caption'#6#18'Behavioral &'
+  +'memory'#4'Hint'#6'/Behavioral memory|Edit behavioral memory matrix'#10'Imag'
+  +'eIndex'#2#16#9'OnExecute'#7#17'actMemoriaExecute'#0#0#7'TAction'#11'actGene'
+  +'tica'#7'Caption'#6#12'&Loci values'#4'Hint'#6#20'Loci|Set loci values'#10'I'
+  +'mageIndex'#2#13#9'OnExecute'#7#18'actGeneticaExecute'#0#0#7'TAction'#13'act'
+  +'Asignacion'#7'Caption'#6#21'Prototype &allocation'#4'Hint'#6'6Prototype all'
+  +'ocation|Set prototype allocation criteria'#10'ImageIndex'#2#12#9'OnExecute'
+  +#7#20'actAsignacionExecute'#0#0#7'TAction'#11'actExportar'#7'Caption'#6#12'&'
+  +'Export data'#4'Hint'#6'#Export data|Export data to MS Excel'#10'ImageIndex'
+  +#2#17#9'OnExecute'#7#18'actExportarExecute'#0#0#0#10'TImageList'#10'ImageLis'
+  +'t1'#7'BkColor'#7#6'clForm'#4'Left'#3#136#0#3'Top'#2' '#6'Bitmap'#10#216#4#0
+  +#0'Lz'#18#0#0#0#16#0#0#0#16#0#0#0#194#4#0#0#0#0#0#0'x'#218#237'['#137#145#235
+  +' '#12#165#12#183#178#173#164#149#212#150#218#244'C'#226'C'#8#29#143#195#201
+  +#230'o'#152'al'#131#159#144#4#18' '#236'DD'#201'J^'#29#175#207'W'#237#221#150
+  +#242#231#179#149'c'#154'{m'#153#10#26'>'#214#196#239't"}8x'#198'K3'#222#213
+  +'G)'#23'Ei'#151'C'#203#173'x'#128#127#13#127#189'^'#225#254#251#24#188'?~'
+  +#203#172#141#253#181','#211#222#242'V'#206#203'xyBRd'#223'_'#251#175#240#249
+  +'z'#187#221#222'f'#255#27#207#239#178#127#217#158#170#135#19#237#223#146#255
+  +'k'#255''''#216'?bs'#253's'#214#163#186#206#13'6'#183#166#167#206'U'#26#13'6'
+  +'g'#227'1'#155#195#218#175#249#241'2hs'#182#30'1'#155#239#144'?'#247#135#236
+  +#192'u'#208#172#247')'#244'9^'#253','#252'`'#14#199#247#12'|'#214'%'#207'=xN'
+  +#167#21#191#250#172#195#135#148#190#168#223#254'W_4b'#255#27#141#17#251#231
+  +'|'#140#216#127#26#180#255'$x'#233#181#127')O'#171#253'Wx'#201#7#149'x'#213
+  +#255'm'#186#244#236#223'ZK'#0'k'#146')'#248#255#193#254#3#249'C'#251#7#240
+  +#166#253#227'rF2'#223#203#175'{'#203'f'#223#2#248'|'#237#197#31#249#205'xk|'
+  +#127#10#255#127#29#239#219#147#143#143#237#209#198#3#254#176#211'OA>'#139#248
+  +#188#193#231#18'p#'#144#148#249#14#161'!'#177#246's'#192'3'#155#223#212'g#'
+  +#30'a'#203']'#182'O'#10#158#132#175#173#231'[g'#239#199#247'aJ'#187'uy'#221
+  +#127#155'?'#151'zx'#204#19'T'#241'^'#237'_'#247#249'@'#188#155#203#149'q'#160
+  +#237#127#139'u'#135#165'wmM'#198'y'#167'@'#239#218#30'\'#195#147#224'?'#216
+  +#195#23'e'#156#222'.'#191'R'#199'd0'#231#247#237'}o'#238#183#22#134'|'#190
+  +#183#222'q'#22#28#240#187#211#226#127#173#241'E^>+~'#216'['#214#226'C'#29','
+  +#239'w-'#177#190'7'#241'|'#140#196#251#249#210#127#240'8'#138'X'#227#217#178
+  +#24#235#236'm/'#230#174#215';bw-q'#164'P'#238#158#249'/'#24#171'Q'#252#173'i'
+  +'L'#161#229#163#246'3'#18#255'[.enM'#15#204#242#204#146#198#146#203#214#172
+  +#247#151#130'_'#168#194#233'4'#14#188#150'+>'#3#252#229#210#167#139#13'{Qh '
+  +#233'"'#240#23#129#247'd'#207'W'#19#191#232#186#132#240'J'#155'M'#248#137#242
+  +#143#224'='#185#17#249#17#252#18#240#142#224#23'Gn'#221'v'#202#241#23#141#185
+  +#136#198'H2'#237';'#243#178'eY'#22#241#200#223#211#238'#'#26#178'^'#226#216
+  +#189#230'gT'#153'4Y'#20#249'9'#173'^}'#22#248#188#22#184#213'k'#254'{Y'#206
+  +#129#157'2|'#201#191#139'/d'#234#192#171#252#175#248#251#210'('#231'n'#254'='
+  +'|'#143#206'%'#222#158#175#192#254#242'l'#162#193'~'#206#180'Y'#207#143'r'
+  +#159#232#221#143'`'#143#251'9'#248#243'R'#207'y'#232#12'|s'#236#230#167#214
+  +'GS'#220''''#227#3#26#9#193#27'4<'#25'+'#252'O'#220#183#20#225#29'z'#134'<'
+  +#17'~'#247#127#20#204'/'#132'?K'#26'\'#174#232#217#215''''#240'<'#26'C'#180
+  +#215#244#206#134#131#159'['#5'x'#209'V}'#238'u'#208#244#218#183#207#205#2#158
+  +'(8'#187#212#206#4#201'n'#215#146'5:'#31'$K'#231#228#203'h'#182'k'#232#202'k'
+  +'S'#147#15#233#255#224#220#215#237'?S'#15')'#238'?H'#7#160#254'S'#160#255'.'
+  +#221#167#198#177#146'@[k'#182'_'#194#6#224#180#156'b'#3'S0T'#156';Kz'#232#183
+  +'7J<'#201#13'<i'#231#24#26'^'#171#143#176#26#158#191#23'a=<'#130#149#242'['
+  +#234#247#232'q'#237'!X'#11'o'#181#131#233#223#162#141#234#191#189']O'#255'('
+  +#22#209'?'#16#15#245#230#215#143'J'#209'y'#133'<'#8#149#216'='#206'\^w'#236
+  +'QO'#252#234#250'!'#171'm'#201#195#187#241#163#250#155#161#255'^'#254'c'#255
+  ,#31#30#136#31#237']'#159#217#194#239#223'DM'#196#255#150#254#251'&x'#143#243
+  +#10'<ub-'#30#16#186#192'>'#1#222#183'E'#223#134#181#224#169'Q6'#2#202#190#227
+  +#255#133's'#175#231#127#176'u~'#187#255'G'#241#163#252#127#186#252#191'A'#127
+  +#19'c'#172#158#15#163#147#252#192#159'n_'#251'6'#9')'#179'r+>'#13'~'#191'm'
+  +#208#203#31#134#233's`.'#223#234#238'W'#21#207#234#211#246#29#141#192#21'u'
+  +#179#249'/'#233#167'J&V'#231#202#175#241#207#245'r'#22#255'R'#207'zY'#172#127
+  +#206'#'#231#191#166'=_'#255'V'#251#162#31#194#254#243#248#127#197#248#137#219
+  +#7#157'T'#228#255#237#248'e'#188#255#241'c'#167#163#248'Q'#254'G'#231'?d'#255
+  +'7'#130'G'#246#142'V'#252'#'#138#157#204'X'#255#204'X'#127'N'#193'+'#223'.'
+  +#194#252#235#223#226#191#14'o'#240'?C'#127''''#173'_`'#188#255#255'0'#134'O'
+  +#193#255#195#173#237#159#240#207#254#208'?'#231#202#249#151#217#190#141'Wi'#4
+  +#239#199#231'p'#186#252#132#210#232'h'#191'<'#155#235#195#167'`'#253#0#203#15
+  +#15#211'~'#236'~N:'#26#155#170#210'?'#155#135#172'a'#0#0#9'TMainMenu'#9'Main'
+  +'Menu1'#6'Images'#7#10'ImageList1'#4'Left'#2'X'#3'Top'#2' '#0#9'TMenuItem'#5
+  +'File1'#7'Caption'#6#5'&File'#0#9'TMenuItem'#15'NewSetofAgents1'#6'Action'#7
+  +#8'actNuevo'#7'OnClick'#7#15'actNuevoExecute'#0#0#9'TMenuItem'#16'OpenSetofA'
+  +'gents1'#6'Action'#7#8'actAbrir'#7'OnClick'#7#15'actAbrirExecute'#0#0#9'TMen'
+  +'uItem'#16'SaveSetofAgents1'#6'Action'#7#10'actGuardar'#7'OnClick'#7#17'actG'
+  +'uardarExecute'#0#0#9'TMenuItem'#18'SaveSetofAgentsas1'#6'Action'#7#14'actGu'
+  +'ardarComo'#7'OnClick'#7#21'actGuardarComoExecute'#0#0#9'TMenuItem'#17'Close'
+  +'SetofAgents1'#6'Action'#7#9'actCerrar'#7'OnClick'#7#16'actCerrarExecute'#0#0
+  +#9'TMenuItem'#2'N3'#7'Caption'#6#1'-'#0#0#9'TMenuItem'#11'Exportdata1'#6'Act'
+  +'ion'#7#11'actExportar'#7'OnClick'#7#18'actExportarExecute'#0#0#9'TMenuItem'
+  +#2'N1'#7'Caption'#6#1'-'#0#0#9'TMenuItem'#3'R11'#7'Caption'#6#2'R1'#7'Visibl'
+  +'e'#8#7'OnClick'#7#8'R11Click'#0#0#9'TMenuItem'#3'R21'#7'Caption'#6#2'R2'#7
+  +'Visible'#8#7'OnClick'#7#8'R21Click'#0#0#9'TMenuItem'#3'R31'#7'Caption'#6#2
+  +'R3'#7'Visible'#8#7'OnClick'#7#8'R31Click'#0#0#9'TMenuItem'#3'R41'#7'Caption'
+  +#6#2'R4'#7'Visible'#8#7'OnClick'#7#8'R41Click'#0#0#9'TMenuItem'#3'R51'#7'Cap'
+  +'tion'#6#2'R5'#7'Visible'#8#7'OnClick'#7#8'R51Click'#0#0#9'TMenuItem'#2'N2'#7
+  +'Caption'#6#1'-'#7'Visible'#8#0#0#9'TMenuItem'#23'ExitGalateaAgentEditor1'#6
+  +'Action'#7#8'actSalir'#7'OnClick'#7#15'actSalirExecute'#0#0#0#9'TMenuItem'#9
+  +'Genotype1'#7'Caption'#6#9'&Genotype'#0#9'TMenuItem'#5'Loci1'#6'Action'#7#11
+  +'actGenetica'#7'OnClick'#7#18'actGeneticaExecute'#0#0#0#9'TMenuItem'#10'Phen'
+  +'otype1'#7'Caption'#6#10'&Phenotype'#0#9'TMenuItem'#11'Morphology1'#6'Action'
+  +#7#13'actMorfologia'#7'OnClick'#7#20'actMorfologiaExecute'#0#0#9'TMenuItem'
+  +#11'Physiology1'#6'Action'#7#13'actFisiologia'#7'OnClick'#7#20'actFisiologia'
+  +'Execute'#0#0#0#9'TMenuItem'#11'Prototypes1'#7'Caption'#6#11'P&rototypes'#0#9
+  +'TMenuItem'#18'Editprototypelist1'#6'Action'#7#13'actPrototipos'#7'OnClick'#7
+  +#20'actPrototiposExecute'#0#0#9'TMenuItem'#13'Stagesoflife1'#6'Action'#7#11
+  +'actEstadios'#7'OnClick'#7#18'actEstadiosExecute'#0#0#9'TMenuItem'#20'Protot'
+  +'ypeallocation1'#6'Action'#7#13'actAsignacion'#7'OnClick'#7#20'actAsignacion'
+  +'Execute'#0#0#0#9'TMenuItem'#9'Conducts1'#7'Caption'#6#9'&Matrices'#0#9'TMen'
+  +'uItem'#20'Interactionmatrixes1'#6'Action'#7#11'actMatrices'#7'OnClick'#7#18
+  +'actMatricesExecute'#0#0#9'TMenuItem'#15'Conductsmemory1'#6'Action'#7#10'act'
+  +'Memoria'#7'OnClick'#7#17'actMemoriaExecute'#0#0#0#9'TMenuItem'#8'Options1'#7
+  +'Caption'#6#8'&Options'#0#9'TMenuItem'#22'SetofAgentsproperties1'#6'Action'#7
+  +#14'actPropiedades'#7'OnClick'#7#21'actPropiedadesExecute'#0#0#9'TMenuItem'
+  +#15'Generaloptions1'#6'Action'#7#12'actGenerales'#7'OnClick'#7#19'actGeneral'
+  +'esExecute'#0#0#0#9'TMenuItem'#5'Help1'#7'Caption'#6#5'&Help'#0#9'TMenuItem'
+  +#9'Contents1'#6'Action'#7#8'actAyuda'#0#0#9'TMenuItem'#6'About1'#6'Action'#7
+  +#9'actAcerca'#7'OnClick'#7#16'actAcercaExecute'#0#0#0#0#11'TOpenDialog'#15'd'
+  +'lgAbrirAgentes'#5'Title'#6#26'Open Galatea Set of Agents'#6'Filter'#6'#Gala'
+  +'tea Set of Agents (*.agl)|*.agl'#7'Options'#11#14'ofHideReadOnly'#15'ofPath'
+  +'MustExist'#15'ofFileMustExist'#14'ofEnableSizing'#0#4'Left'#3#232#0#3'Top'#2
+  +' '#0#0#11'TSaveDialog'#17'dlgGuardarAgentes'#5'Title'#6#29'Save Galatea Set'
+  +' of Agents as'#6'Filter'#6'#Galatea Set of Agents (*.agl)|*.agl'#7'Options'
+  +#11#17'ofOverwritePrompt'#14'ofHideReadOnly'#15'ofPathMustExist'#14'ofEnable'
+  +'Sizing'#0#4'Left'#3#24#1#3'Top'#2' '#0#0#0
+]);

@@ -1,0 +1,77 @@
+object frmOpcionesProyecto: TfrmOpcionesProyecto
+  Left = 306
+  Height = 252
+  Top = 229
+  Width = 300
+  ActiveControl = edtTitulo
+  BorderStyle = bsDialog
+  Caption = 'Galatea Project Options'
+  ClientHeight = 252
+  ClientWidth = 300
+  Font.Height = -11
+  Font.Name = 'MS Sans Serif'
+  OnCloseQuery = FormCloseQuery
+  OnCreate = FormCreate
+  Position = poScreenCenter
+  LCLVersion = '0.9.26.2'
+  object Label1: TLabel
+    Left = 16
+    Height = 17
+    Top = 8
+    Width = 46
+    Caption = '&Title:'
+    FocusControl = edtTitulo
+    ParentColor = False
+  end
+  object Label3: TLabel
+    Left = 16
+    Height = 17
+    Top = 64
+    Width = 82
+    Caption = 'C&oments:'
+    FocusControl = memComentarios
+    ParentColor = False
+  end
+  object edtTitulo: TEdit
+    Left = 16
+    Height = 21
+    Top = 24
+    Width = 273
+    MaxLength = 80
+    TabOrder = 0
+    Text = 'edtTitulo'
+  end
+  object memComentarios: TMemo
+    Left = 16
+    Height = 113
+    Top = 80
+    Width = 273
+    Lines.Strings = (
+      'memComentarios'
+    )
+    TabOrder = 1
+  end
+  object btbAceptar: TBitBtn
+    Left = 200
+    Height = 33
+    Top = 208
+    Width = 89
+    Caption = '&OK'
+    Kind = bkOK
+    ModalResult = 1
+    NumGlyphs = 0
+    OnClick = btbAceptarClick
+    TabOrder = 2
+  end
+  object btbCancelar: TBitBtn
+    Left = 96
+    Height = 33
+    Top = 208
+    Width = 89
+    Caption = '&Cancel'
+    Kind = bkCancel
+    ModalResult = 2
+    NumGlyphs = 0
+    TabOrder = 3
+  end
+end

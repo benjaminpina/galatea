@@ -1,0 +1,436 @@
+object frmEditorFormulas: TfrmEditorFormulas
+  Left = 300
+  Height = 607
+  Top = 54
+  Width = 690
+  ActiveControl = edtFormula
+  BorderStyle = bsDialog
+  Caption = 'Formula Editor'
+  ClientHeight = 607
+  ClientWidth = 690
+  Font.Height = -11
+  Font.Name = 'MS Sans Serif'
+  OnClose = FormClose
+  OnCreate = FormCreate
+  OnShow = FormShow
+  Position = poScreenCenter
+  ShowHint = True
+  LCLVersion = '0.9.30'
+  object Label1: TLabel
+    Left = 16
+    Height = 15
+    Top = 392
+    Width = 350
+    Caption = 'Double click over variable row for insert variable into formula'
+    ParentColor = False
+  end
+  object btbAceptar: TBitBtn
+    Left = 587
+    Height = 33
+    Top = 560
+    Width = 89
+    Caption = '&OK'
+    Kind = bkOK
+    ModalResult = 1
+    NumGlyphs = 0
+    TabOrder = 1
+  end
+  object btbCancelar: TBitBtn
+    Left = 488
+    Height = 33
+    Top = 560
+    Width = 89
+    Caption = '&Cancel'
+    Kind = bkCancel
+    ModalResult = 2
+    NumGlyphs = 0
+    TabOrder = 2
+  end
+  object GroupBox2: TGroupBox
+    Left = 11
+    Height = 136
+    Top = 416
+    Width = 665
+    Caption = 'Formula'
+    ClientHeight = 120
+    ClientWidth = 661
+    TabOrder = 0
+    object spbEvaluar: TSpeedButton
+      Left = 520
+      Height = 33
+      Top = 66
+      Width = 129
+      Caption = 'Evaluate'
+      Glyph.Data = {
+        F6000000424DF600000000000000760000002800000010000000100000000100
+        0400000000008000000000000000000000001000000000000000000000000000
+        80000080000000808000800000008000800080800000C0C0C000808080000000
+        FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFFFF00333300000000
+        000033330FFFFFFFFFF033330F000F0F00F033330FFFFFFFFFF033330F00F00F
+        00F033330FFFFFFFFFF0333300FFFF00F0F03330FB00F0F0FFF0330FB0BF0FB0
+        F0F030FBFBF0FB0FFFF030BFBF0FB0FFFFF000FBFBFB0FFF0000E0BFBFB000FF
+        0FF0EE0BFB0BFB0F0F03EEE0BFBF00FF0033EEEE000000000333
+      }
+      NumGlyphs = 0
+      OnClick = spbEvaluarClick
+    end
+    object spbBorrar: TSpeedButton
+      Left = 384
+      Height = 33
+      Top = 66
+      Width = 121
+      Caption = 'Clear'
+      Glyph.Data = {
+        F6000000424DF600000000000000760000002800000010000000100000000100
+        0400000000008000000000000000000000001000000000000000000000000000
+        80000080000000808000800000008000800080800000C0C0C000808080000000
+        FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFFFF00500005000555
+        5555000000005550555500550005505555550055500555555555500550050055
+        5555550050501105555555550509991055555005550999910555500505509990
+        305555005055090B03055555555550B0B03055550555550B0B33555555555550
+        BBB35550555555550BBB55555555555550BB555555555555550B
+      }
+      NumGlyphs = 0
+      OnClick = spbBorrarClick
+    end
+    object edtFormula: TEdit
+      Left = 8
+      Height = 22
+      Top = 34
+      Width = 641
+      TabOrder = 0
+      Text = 'edtFormula'
+    end
+    object btnSuma: TButton
+      Left = 332
+      Height = 25
+      Hint = 'Addition operator'
+      Top = 2
+      Width = 25
+      Caption = '+'
+      Font.Height = -11
+      Font.Name = 'MS Sans Serif'
+      Font.Style = [fsBold]
+      OnClick = btnSumaClick
+      ParentFont = False
+      TabOrder = 1
+    end
+    object btnResta: TButton
+      Left = 364
+      Height = 25
+      Hint = 'Subtract operator'
+      Top = 2
+      Width = 25
+      Caption = '-'
+      Font.Height = -11
+      Font.Name = 'MS Sans Serif'
+      Font.Style = [fsBold]
+      OnClick = btnRestaClick
+      ParentFont = False
+      TabOrder = 2
+    end
+    object btnMultiplicacion: TButton
+      Left = 396
+      Height = 25
+      Hint = 'Multiplication operator'
+      Top = 2
+      Width = 25
+      Caption = '*'
+      Font.Height = -11
+      Font.Name = 'MS Sans Serif'
+      Font.Style = [fsBold]
+      OnClick = btnMultiplicacionClick
+      ParentFont = False
+      TabOrder = 3
+    end
+    object btnDivision: TButton
+      Left = 428
+      Height = 25
+      Hint = 'Division operator'
+      Top = 2
+      Width = 25
+      Caption = '/'
+      Font.Height = -11
+      Font.Name = 'MS Sans Serif'
+      Font.Style = [fsBold]
+      OnClick = btnDivisionClick
+      ParentFont = False
+      TabOrder = 4
+    end
+    object btnModulo: TButton
+      Left = 460
+      Height = 25
+      Hint = 'Modulus operator'
+      Top = 2
+      Width = 25
+      Caption = '%'
+      Font.Height = -11
+      Font.Name = 'MS Sans Serif'
+      Font.Style = [fsBold]
+      OnClick = btnModuloClick
+      ParentFont = False
+      TabOrder = 5
+    end
+    object btnExponente: TButton
+      Left = 494
+      Height = 25
+      Hint = 'Exponent operator'
+      Top = 2
+      Width = 25
+      Caption = '^'
+      Font.Height = -11
+      Font.Name = 'MS Sans Serif'
+      Font.Style = [fsBold]
+      OnClick = btnExponenteClick
+      ParentFont = False
+      TabOrder = 6
+    end
+    object btnAleatoria: TButton
+      Left = 540
+      Height = 25
+      Hint = 'Random variable'
+      Top = 2
+      Width = 25
+      Caption = '#'
+      Font.Height = -11
+      Font.Name = 'MS Sans Serif'
+      Font.Style = [fsBold]
+      OnClick = btnAleatoriaClick
+      ParentFont = False
+      TabOrder = 7
+    end
+    object btnAbreParentesis: TButton
+      Left = 588
+      Height = 25
+      Hint = 'Open bracket'
+      Top = 2
+      Width = 25
+      Caption = '('
+      Font.Height = -11
+      Font.Name = 'MS Sans Serif'
+      Font.Style = [fsBold]
+      OnClick = btnAbreParentesisClick
+      ParentFont = False
+      TabOrder = 8
+    end
+    object btnCierraParentesis: TButton
+      Left = 620
+      Height = 25
+      Hint = 'Close bracket'
+      Top = 2
+      Width = 25
+      Caption = ')'
+      Font.Height = -11
+      Font.Name = 'MS Sans Serif'
+      Font.Style = [fsBold]
+      OnClick = btnCierraParentesisClick
+      ParentFont = False
+      TabOrder = 9
+    end
+  end
+  object PageControl1: TPageControl
+    Left = 8
+    Height = 376
+    Top = 8
+    Width = 665
+    ActivePage = tbsTiempo
+    TabIndex = 0
+    TabOrder = 3
+    OnChange = PageControl1Change
+    object tbsTiempo: TTabSheet
+      Caption = '&Time var'
+      ClientHeight = 339
+      ClientWidth = 657
+      object GroupBox3: TGroupBox
+        Left = 8
+        Height = 315
+        Top = 8
+        Width = 641
+        ClientHeight = 311
+        ClientWidth = 637
+        TabOrder = 0
+        object stgTiempo: TStringGrid
+          Left = 12
+          Height = 273
+          Top = 5
+          Width = 617
+          ColCount = 2
+          Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goColSizing, goEditing]
+          TabOrder = 0
+          TitleFont.Height = -11
+          TitleFont.Name = 'MS Sans Serif'
+          OnDblClick = stgTiempoDblClick
+          OnKeyPress = stgTiempoKeyPress
+        end
+      end
+    end
+    object tbsGenetica: TTabSheet
+      Caption = '&Genetic var'
+      ClientHeight = 339
+      ClientWidth = 657
+      ImageIndex = 1
+      object GroupBox1: TGroupBox
+        Left = 8
+        Height = 315
+        Top = 8
+        Width = 641
+        ClientHeight = 311
+        ClientWidth = 637
+        TabOrder = 0
+        object stgGenetica: TStringGrid
+          Left = 8
+          Height = 273
+          Top = 5
+          Width = 617
+          ColCount = 2
+          Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goColSizing, goEditing]
+          TabOrder = 0
+          TitleFont.Height = -11
+          TitleFont.Name = 'MS Sans Serif'
+          OnDblClick = stgGeneticaDblClick
+          OnKeyPress = stgTiempoKeyPress
+        end
+      end
+    end
+    object tbsMorfologia: TTabSheet
+      Caption = 'M&orphological var'
+      ClientHeight = 339
+      ClientWidth = 657
+      ImageIndex = 2
+      object GroupBox4: TGroupBox
+        Left = 8
+        Height = 315
+        Top = 8
+        Width = 641
+        ClientHeight = 311
+        ClientWidth = 637
+        TabOrder = 0
+        object stgMorfologia: TStringGrid
+          Left = 4
+          Height = 273
+          Top = 5
+          Width = 617
+          ColCount = 2
+          Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goColSizing, goEditing]
+          TabOrder = 0
+          TitleFont.Height = -11
+          TitleFont.Name = 'MS Sans Serif'
+          OnDblClick = stgMorfologiaDblClick
+          OnKeyPress = stgTiempoKeyPress
+        end
+      end
+    end
+    object tbsFisiologia: TTabSheet
+      Caption = '&Physiological var'
+      ClientHeight = 339
+      ClientWidth = 657
+      ImageIndex = 3
+      object GroupBox5: TGroupBox
+        Left = 8
+        Height = 323
+        Top = 8
+        Width = 641
+        ClientHeight = 319
+        ClientWidth = 637
+        TabOrder = 0
+        object stgFisiologia: TStringGrid
+          Left = 8
+          Height = 281
+          Top = 5
+          Width = 617
+          ColCount = 2
+          Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goColSizing, goEditing]
+          TabOrder = 0
+          TitleFont.Height = -11
+          TitleFont.Name = 'MS Sans Serif'
+          OnDblClick = stgFisiologiaDblClick
+          OnKeyPress = stgTiempoKeyPress
+        end
+      end
+    end
+    object tbsReproduccion: TTabSheet
+      Caption = '&Reproductive var'
+      ClientHeight = 339
+      ClientWidth = 657
+      ImageIndex = 4
+      object GroupBox6: TGroupBox
+        Left = 8
+        Height = 315
+        Top = 8
+        Width = 641
+        ClientHeight = 311
+        ClientWidth = 637
+        TabOrder = 0
+        object stgReproduccion: TStringGrid
+          Left = 12
+          Height = 273
+          Top = 5
+          Width = 617
+          ColCount = 2
+          Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goColSizing, goEditing]
+          TabOrder = 0
+          TitleFont.Height = -11
+          TitleFont.Name = 'MS Sans Serif'
+          OnDblClick = stgReproduccionDblClick
+          OnKeyPress = stgTiempoKeyPress
+        end
+      end
+    end
+    object tbsMemoria: TTabSheet
+      Caption = '&Memory var'
+      ClientHeight = 339
+      ClientWidth = 657
+      ImageIndex = 5
+      object GroupBox7: TGroupBox
+        Left = 8
+        Height = 315
+        Top = 8
+        Width = 641
+        ClientHeight = 311
+        ClientWidth = 637
+        TabOrder = 0
+        object stgMemoria: TStringGrid
+          Left = 8
+          Height = 273
+          Top = 5
+          Width = 617
+          ColCount = 2
+          Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goColSizing, goEditing]
+          TabOrder = 0
+          TitleFont.Height = -11
+          TitleFont.Name = 'MS Sans Serif'
+          OnDblClick = stgMemoriaDblClick
+          OnKeyPress = stgTiempoKeyPress
+        end
+      end
+    end
+    object tbsDinamicos: TTabSheet
+      Caption = 'Contender/&Dinamyc element var'
+      ClientHeight = 339
+      ClientWidth = 657
+      ImageIndex = 6
+      object GroupBox8: TGroupBox
+        Left = 8
+        Height = 315
+        Top = 8
+        Width = 641
+        ClientHeight = 311
+        ClientWidth = 637
+        TabOrder = 0
+        object stgElementos: TStringGrid
+          Left = 8
+          Height = 273
+          Top = 5
+          Width = 617
+          ColCount = 2
+          Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goColSizing, goEditing]
+          TabOrder = 0
+          TitleFont.Height = -11
+          TitleFont.Name = 'MS Sans Serif'
+          OnDblClick = stgElementosDblClick
+          OnKeyPress = stgTiempoKeyPress
+        end
+      end
+    end
+  end
+end

@@ -1,0 +1,227 @@
+{ Este es un archivo de recurso de Lazarus generado automáticamente }
+
+LazarusResources.Add('TfrmMatricesInteraccion','FORMDATA',[
+  'TPF0'#23'TfrmMatricesInteraccion'#22'frmMatricesInteraccion'#4'Left'#3#22#1#6
+  +'Height'#3#208#1#3'Top'#3#134#0#5'Width'#3#30#3#13'ActiveControl'#7#12'stgSu'
+  +'stratos'#11'BorderStyle'#7#8'bsDialog'#7'Caption'#6#20'Interaction matrices'
+  +#12'ClientHeight'#3#208#1#11'ClientWidth'#3#30#3#11'Font.Height'#2#245#9'Fon'
+  +'t.Name'#6#13'MS Sans Serif'#7'OnClose'#7#9'FormClose'#8'OnCreate'#7#10'Form'
+  +'Create'#8'Position'#7#14'poScreenCenter'#8'ShowHint'#9#10'LCLVersion'#6#8'0'
+  +'.9.26.2'#0#12'TSpeedButton'#8'spbNotas'#4'Left'#3'p'#1#6'Height'#2'!'#4'Hin'
+  +'t'#6#24'Note Edit|Open Note Edit'#3'Top'#3#152#1#5'Width'#2'!'#5'Color'#7#9
+  +'clBtnFace'#10'Glyph.Data'#10#250#0#0#0#246#0#0#0'BM'#246#0#0#0#0#0#0#0'v'#0
+  +#0#0'('#0#0#0#16#0#0#0#16#0#0#0#1#0#4#0#0#0#0#0#128#0#0#0#0#0#0#0#0#0#0#0#16
+  +#0#0#0#0#0#0#0#0#0#0#0#0#0#128#0#0#128#0#0#0#128#128#0#128#0#0#0#128#0#128#0
+  +#128#128#0#0#192#192#192#0#128#128#128#0#0#0#255#0#0#255#0#0#0#255#255#0#255
+  +#0#0#0#255#0#255#0#255#255#0#0#255#255#255#0'333'#0#0#0#0#0'333'#15#255#255
+  +#255#240#0'0'#0#0#255#15#0#240#224#11#251#251#15#255#255#240#224#191#191#0#15
+  +#255#240#240#224#251#251#251#240#240#15#240#224#191#191#0#0#11#15#240#224#251
+  +#251#251#251#240#255#240#224#191#0#0#0#15#255#240#0#11#251#0#176#255#0#240'3'
+  +'0'#0#11#15#255#255#240'330'#176#255#255#0#0'33'#11#15#240#15#15#240'30'#176
+  +#15#255#255#15#3'3'#9#3#15#255#255#0'3303'#0#0#0#3'3'#9'NumGlyphs'#2#0#7'OnC'
+  +'lick'#7#13'spbNotasClick'#0#0#12'TPageControl'#12'PageControl1'#4'Left'#2#16
+  +#6'Height'#3'`'#1#3'Top'#2#8#5'Width'#3#1#3#10'ActivePage'#7#9'TabSheet1'#9
+  +'PopupMenu'#7#12'pumMatricesA'#8'TabIndex'#2#0#8'TabOrder'#2#0#0#9'TTabSheet'
+  +#9'TabSheet1'#7'Caption'#6#11'&Substrates'#12'ClientHeight'#3'`'#1#11'Client'
+  +'Width'#3#1#3#0#6'TLabel'#8'lblClicS'#4'Left'#2#8#6'Height'#2#17#3'Top'#3#232
+  +#0#5'Width'#3#197#0#7'Caption'#6#29'Double click for cell editing'#11'Parent'
+  +'Color'#8#0#0#11'TStringGrid'#12'stgSustratos'#4'Left'#2#8#6'Height'#3#201#0
+  +#3'Top'#2#16#5'Width'#3#233#2#8'ColCount'#2#8#7'Options'#11#15'goFixedVertLi'
+  +'ne'#15'goFixedHorzLine'#10'goVertLine'#10'goHorzLine'#11'goRowSizing'#11'go'
+  +'ColSizing'#6'goTabs'#0#9'PopupMenu'#7#11'pumMatrices'#8'RowCount'#2#7#8'Tab'
+  +'Order'#2#0#16'TitleFont.Height'#2#245#14'TitleFont.Name'#6#13'MS Sans Serif'
+  +#10'OnDblClick'#7#20'stgSustratosDblClick'#12'OnSelectCell'#7#22'stgSustrato'
+  +'sSelectCell'#0#0#7'TButton'#11'btnImportar'#4'Left'#3'>'#1#6'Height'#2'!'#3
+  +'Top'#3#7#1#5'Width'#3#217#0#7'Caption'#6#23'I&mport subtrates names'#7'OnCl'
+  +'ick'#7#16'btnImportarClick'#8'TabOrder'#2#1#0#0#11'TStringGrid'#13'stgSustr'
+  +'atosA'#4'Left'#2#8#6'Height'#3#201#0#3'Top'#2' '#5'Width'#3#233#2#8'ColCoun'
+  +'t'#2#8#7'Options'#11#15'goFixedVertLine'#15'goFixedHorzLine'#10'goVertLine'
+  +#10'goHorzLine'#11'goRowSizing'#11'goColSizing'#6'goTabs'#0#9'PopupMenu'#7#12
+  +'pumMatricesA'#8'RowCount'#2#7#8'TabOrder'#2#2#16'TitleFont.Height'#2#245#14
+  +'TitleFont.Name'#6#13'MS Sans Serif'#10'OnDblClick'#7#21'stgSustratosADblCli'
+  +'ck'#12'OnSelectCell'#7#23'stgSustratosASelectCell'#0#0#11'TStringGrid'#13's'
+  +'tgSustratosM'#4'Left'#2#8#6'Height'#3#201#0#3'Top'#2'0'#5'Width'#3#233#2#5
+  +'Color'#7#7'clCream'#8'ColCount'#2#8#7'Options'#11#15'goFixedVertLine'#15'go'
+  +'FixedHorzLine'#10'goVertLine'#10'goHorzLine'#11'goRowSizing'#11'goColSizing'
+  +#9'goEditing'#6'goTabs'#18'goAlwaysShowEditor'#0#9'PopupMenu'#7#12'pumMatric'
+  +'esM'#8'RowCount'#2#7#8'TabOrder'#2#3#16'TitleFont.Height'#2#245#14'TitleFon'
+  +'t.Name'#6#13'MS Sans Serif'#10'OnDblClick'#7#21'stgSustratosMDblClick'#12'O'
+  +'nSelectCell'#7#23'stgSustratosMSelectCell'#0#0#7'TButton'#15'btnInicializar'
+  +'S'#4'Left'#3'&'#2#6'Height'#2'!'#3'Top'#3#7#1#5'Width'#3#203#0#7'Caption'#6
+  +#29'&Initialize all cells with...'#7'OnClick'#7#20'btnInicializarSClick'#8'T'
+  +'abOrder'#2#4#7'Visible'#8#0#0#0#9'TTabSheet'#9'TabSheet2'#7'Caption'#6#17'&'
+  +'Dynamic elements'#12'ClientHeight'#3'`'#1#11'ClientWidth'#3#1#3#10'ImageInd'
+  +'ex'#2#1#0#6'TLabel'#8'lblClicD'#4'Left'#2#8#6'Height'#2#17#3'Top'#3#232#0#5
+  +'Width'#3#197#0#7'Caption'#6#29'Double click for cell editing'#11'ParentColo'
+  +'r'#8#0#0#11'TStringGrid'#12'stgDinamicos'#4'Left'#2#8#6'Height'#3#201#0#3'T'
+  +'op'#2#16#5'Width'#3#233#2#8'ColCount'#2#6#7'Options'#11#15'goFixedVertLine'
+  +#15'goFixedHorzLine'#10'goVertLine'#10'goHorzLine'#11'goRowSizing'#11'goColS'
+  +'izing'#6'goTabs'#0#9'PopupMenu'#7#11'pumMatrices'#8'RowCount'#2#7#8'TabOrde'
+  +'r'#2#0#16'TitleFont.Height'#2#245#14'TitleFont.Name'#6#13'MS Sans Serif'#10
+  +'OnDblClick'#7#20'stgDinamicosDblClick'#12'OnSelectCell'#7#22'stgDinamicosSe'
+  +'lectCell'#0#0#11'TStringGrid'#13'stgDinamicosA'#4'Left'#2#8#6'Height'#3#201
+  +#0#3'Top'#2' '#5'Width'#3#233#2#8'ColCount'#2#6#7'Options'#11#15'goFixedVert'
+  +'Line'#15'goFixedHorzLine'#10'goVertLine'#10'goHorzLine'#11'goRowSizing'#11
+  +'goColSizing'#6'goTabs'#0#9'PopupMenu'#7#12'pumMatricesA'#8'RowCount'#2#7#8
+  +'TabOrder'#2#1#16'TitleFont.Height'#2#245#14'TitleFont.Name'#6#13'MS Sans Se'
+  +'rif'#10'OnDblClick'#7#21'stgDinamicosADblClick'#12'OnSelectCell'#7#23'stgDi'
+  ,'namicosASelectCell'#0#0#11'TStringGrid'#13'stgDinamicosM'#4'Left'#2#8#6'Hei'
+  +'ght'#3#201#0#3'Top'#2'0'#5'Width'#3#233#2#5'Color'#7#7'clCream'#8'ColCount'
+  +#2#6#7'Options'#11#15'goFixedVertLine'#15'goFixedHorzLine'#10'goVertLine'#10
+  +'goHorzLine'#11'goRowSizing'#11'goColSizing'#9'goEditing'#6'goTabs'#18'goAlw'
+  +'aysShowEditor'#0#9'PopupMenu'#7#12'pumMatricesM'#8'RowCount'#2#7#8'TabOrder'
+  +#2#2#16'TitleFont.Height'#2#245#14'TitleFont.Name'#6#13'MS Sans Serif'#10'On'
+  +'DblClick'#7#21'stgDinamicosMDblClick'#12'OnSelectCell'#7#23'stgDinamicosMSe'
+  +'lectCell'#0#0#7'TButton'#15'btnInicializarD'#4'Left'#3'&'#2#6'Height'#2'!'#3
+  +'Top'#3#7#1#5'Width'#3#203#0#7'Caption'#6#29'&Initialize all cells with...'#7
+  +'OnClick'#7#20'btnInicializarDClick'#8'TabOrder'#2#3#7'Visible'#8#0#0#0#9'TT'
+  +'abSheet'#9'TabSheet3'#7'Caption'#6#7'A&gents'#12'ClientHeight'#3'`'#1#11'Cl'
+  +'ientWidth'#3#1#3#10'ImageIndex'#2#2#0#6'TLabel'#8'lblClicA'#4'Left'#2#8#6'H'
+  +'eight'#2#17#3'Top'#3#232#0#5'Width'#3#197#0#7'Caption'#6#29'Double click fo'
+  +'r cell editing'#11'ParentColor'#8#0#0#11'TStringGrid'#10'stgAgentes'#4'Left'
+  +#2#8#6'Height'#3#201#0#3'Top'#2#16#5'Width'#3#233#2#8'ColCount'#2#7#7'Option'
+  +'s'#11#15'goFixedVertLine'#15'goFixedHorzLine'#10'goVertLine'#10'goHorzLine'
+  +#19'goDrawFocusSelected'#11'goRowSizing'#11'goColSizing'#6'goTabs'#0#9'Popup'
+  +'Menu'#7#11'pumMatrices'#8'RowCount'#2#7#8'TabOrder'#2#0#16'TitleFont.Height'
+  +#2#245#14'TitleFont.Name'#6#13'MS Sans Serif'#10'OnDblClick'#7#18'stgAgentes'
+  +'DblClick'#12'OnSelectCell'#7#20'stgAgentesSelectCell'#0#0#11'TStringGrid'#11
+  +'stgAgentesA'#4'Left'#2#8#6'Height'#3#201#0#3'Top'#2' '#5'Width'#3#233#2#8'C'
+  +'olCount'#2#7#7'Options'#11#15'goFixedVertLine'#15'goFixedHorzLine'#10'goVer'
+  +'tLine'#10'goHorzLine'#19'goDrawFocusSelected'#11'goRowSizing'#11'goColSizin'
+  +'g'#6'goTabs'#0#9'PopupMenu'#7#12'pumMatricesA'#8'RowCount'#2#7#8'TabOrder'#2
+  +#1#16'TitleFont.Height'#2#245#14'TitleFont.Name'#6#13'MS Sans Serif'#10'OnDb'
+  +'lClick'#7#19'stgAgentesADblClick'#12'OnSelectCell'#7#21'stgAgentesASelectCe'
+  +'ll'#0#0#11'TStringGrid'#11'stgAgentesM'#4'Left'#2#8#6'Height'#3#201#0#3'Top'
+  +#2'0'#5'Width'#3#233#2#5'Color'#7#7'clCream'#8'ColCount'#2#7#7'Options'#11#15
+  +'goFixedVertLine'#15'goFixedHorzLine'#10'goVertLine'#10'goHorzLine'#19'goDra'
+  +'wFocusSelected'#11'goRowSizing'#11'goColSizing'#9'goEditing'#6'goTabs'#18'g'
+  +'oAlwaysShowEditor'#0#9'PopupMenu'#7#12'pumMatricesM'#8'RowCount'#2#7#8'TabO'
+  +'rder'#2#2#16'TitleFont.Height'#2#245#14'TitleFont.Name'#6#13'MS Sans Serif'
+  +#10'OnDblClick'#7#19'stgAgentesMDblClick'#12'OnSelectCell'#7#21'stgAgentesMS'
+  +'electCell'#0#0#7'TButton'#15'btnInicializarA'#4'Left'#3'&'#2#6'Height'#2'!'
+  +#3'Top'#3#7#1#5'Width'#3#203#0#7'Caption'#6#29'&Initialize all cells with...'
+  +#7'OnClick'#7#20'btnInicializarAClick'#8'TabOrder'#2#3#7'Visible'#8#0#0#0#0#9
+  +'TGroupBox'#9'GroupBox1'#4'Left'#2#16#6'Height'#2'A'#3'Top'#3#128#1#5'Width'
+  +#3'Q'#1#7'Caption'#6#13'View matrices'#12'ClientHeight'#2','#11'ClientWidth'
+  +#3'M'#1#8'TabOrder'#2#1#0#12'TRadioButton'#14'rdbInteraccion'#4'Left'#2#6#6
+  +'Height'#2#26#3'Top'#2#2#5'Width'#2'c'#7'Caption'#6#12'I&nteraction'#7'Check'
+  +'ed'#9#7'OnClick'#7#19'rdbInteraccionClick'#5'State'#7#9'cbChecked'#8'TabOrd'
+  +'er'#2#0#0#0#12'TRadioButton'#15'rdbAtractividad'#4'Left'#2'n'#6'Height'#2#26
+  +#3'Top'#2#2#5'Width'#2'c'#7'Caption'#6#13'A&ttractivity'#7'OnClick'#7#20'rdb'
+  +'AtractividadClick'#8'TabOrder'#2#1#0#0#12'TRadioButton'#10'rdbMemoria'#4'Le'
+  +'ft'#3#214#0#6'Height'#2#26#3'Top'#2#2#5'Width'#2'R'#7'Caption'#6#7'&Memory'
+  +#7'OnClick'#7#15'rdbMemoriaClick'#8'TabOrder'#2#2#0#0#0#7'TBitBtn'#11'btbCan'
+  +'celar'#4'Left'#3'P'#2#6'Height'#2'!'#3'Top'#3#160#1#5'Width'#2'Y'#7'Caption'
+  +#6#7'&Cancel'#4'Kind'#7#8'bkCancel'#11'ModalResult'#2#2#9'NumGlyphs'#2#0#8'T'
+  +'abOrder'#2#2#0#0#7'TBitBtn'#10'btbAceptar'#4'Left'#3#184#2#6'Height'#2'!'#3
+  +'Top'#3#160#1#5'Width'#2'Y'#7'Caption'#6#3'&OK'#4'Kind'#7#4'bkOK'#11'ModalRe'
+  +'sult'#2#1#9'NumGlyphs'#2#0#7'OnClick'#7#15'btbAceptarClick'#8'TabOrder'#2#3
+  +#0#0#11'TActionList'#11'ActionList1'#6'Images'#7#10'ImageList1'#4'left'#3'h'
+  +#1#3'top'#3'p'#1#0#7'TAction'#9'actCopiar'#7'Caption'#6#5'&Copy'#18'DisableI'
+  +'fNoHandler'#9#4'Hint'#6'''Copy cell|Copy cel content to clipboard'#10'Image'
+  +'Index'#2#0#9'OnExecute'#7#16'actCopiarExecute'#0#0#7'TAction'#8'actPegar'#7
+  +'Caption'#6#6'&Paste'#18'DisableIfNoHandler'#9#4'Hint'#6'%Paste|Paste clipbo'
+  +'ard content to cell'#10'ImageIndex'#2#1#9'OnExecute'#7#15'actPegarExecute'#0
+  +#0#7'TAction'#10'actCopiarA'#7'Caption'#6#5'&Copy'#18'DisableIfNoHandler'#9
+  +#10'ImageIndex'#2#0#9'OnExecute'#7#17'actCopiarAExecute'#0#0#7'TAction'#9'ac'
+  +'tPegarA'#7'Caption'#6#6'&Paste'#18'DisableIfNoHandler'#9#10'ImageIndex'#2#1
+  +#9'OnExecute'#7#16'actPegarAExecute'#0#0#7'TAction'#10'actCopiarM'#7'Caption'
+  +#6#5'&Copy'#18'DisableIfNoHandler'#9#4'Hint'#6'''Copy cell|Copy cel content '
+  +'to clipboard'#10'ImageIndex'#2#0#9'OnExecute'#7#17'actCopiarMExecute'#0#0#7
+  +'TAction'#9'actPegarM'#7'Caption'#6#6'&Paste'#18'DisableIfNoHandler'#9#4'Hin'
+  ,'t'#6'%Paste|Paste clipboard content to cell'#10'ImageIndex'#2#1#9'OnExecute'
+  +#7#16'actPegarMExecute'#0#0#0#10'TImageList'#10'ImageList1'#7'BkColor'#7#12
+  +'clForeground'#4'left'#3#144#1#3'top'#3'p'#1#6'Bitmap'#10#14#8#0#0'Li'#2#0#0
+  +#0#16#0#0#0#16#0#0#0#0#0#0#255#0#0#0#255#0#0#0#255#0#0#0#255#0#0#0#255#0#0#0
+  +#255#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0
+  +#0#0#0#0#0#0#0#255#255#255#255#255#255#255#255#255#255#255#255#255#255#255
+  +#255#255#0#0#0#255#0#0#0#255#0#0#0#0#0#0#255#255#0#0#255#255#0#0#255#255#0#0
+  +#255#255#0#0#255#255#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#255#255#255#255#255#0#0#0
+  +#255#189#189#189#255#255#255#255#255#0#0#0#255#255#255#255#255#0#0#0#255#0#0
+  +#0#0#0#0#0#0'{{{'#255#0#0#255#255#0#0#255#255#0#0#255#255#0#0#0#0#0#0#0#0#0#0
+  +#0#255#255#255#255#255#255#255#255#255#255#255#255#255#255#255#255#255#0#0#0
+  +#255#255#255#255#255#255#255#255#255#0#0#0#255#0#0#0#0#0#0#0#0#0#0#255#255#0
+  +#0#255#255#0#0#255#255#0#0#0#0#0#0#0#0#0#0#0#255#255#255#255#255#0#0#0#255#0
+  +#0#0#255#255#255#255#255#0#0#0#255#0#0#0#255#0#0#0#255#0#0#0#255#0#0#0#255#0
+  +#0#0#0#0#0#255#255#0#0#255#255#0#0#255#255#0#0#0#0#0#0#0#0#0#0#0#255#255#255
+  +#255#255#255#255#255#255#255#255#255#255#255#255#255#255#255#255#255#255#255
+  +#255#255#255#255#255#255#255#255#255#255#255#0#0#255#255#0#0#255#255#0#0#255
+  +#255#0#0#255#255#0#0#255#255#0#0#255#255#0#0#255#255#0#0#0#255#255#255#255
+  +#255#0#0#0#255#0#0#0#255#0#0#0#255#0#0#0#255#255#255#255#255#0#0#0#255#255
+  +#255#255#255#0#0#0#255#0#0#255#255#0#0#255#255#0#0#255#255#0#0#255#255#0#0
+  +#255#255#0#0#0#0#0#0#0#255#255#255#255#255#255#255#255#255#255#255#255#255
+  +#255#255#255#255#255#255#255#255#255#255#255#255#255#255#255#255#255#255#255
+  +#255#0#0#0#255#0#0#0#0#0#0#255#255#0#0#255#255#0#0#255#255#0#0#0#0#0#0#0#0#0
+  +#0#0#255#255#255#255#255#0#0#0#255#0#0#0#255#255#255#255#255#0#0#0#255#0#0#0
+  +#255#0#0#0#255#255#255#255#255#0#0#0#255#0#0#0#255#0#0#0#255#0#0#255#255#0#0
+  +#0#255#0#0#0#255'{{{'#255#0#0#0#255#255#255#255#255#255#255#255#255#255#255
+  +#255#255#255#255#255#255#255#255#255#255#255#255#255#255#255#255#255#255#255
+  +#255#255#255#0#0#0#255#0#0#0#255#0#0#0#255'{{{'#255#0#255#255#255#0#255#255
+  +#255#0#0#0#255#0#0#0#255#255#255#255#255#255#255#255#255#255#255#255#255#255
+  +#255#255#255#255#255#255#255#255#255#255#255#255#255#255#255#255#255#255#255
+  +#0#0#0#255#0#0#0#255#0#0#0#255'{{{'#255'{{{'#255#0#255#255#255#0#0#0#255#0#0
+  +#0#255#0#0#0#255#0#0#0#255#0#0#0#255#0#0#0#255#0#0#0#255#0#0#0#255#0#0#0#255
+  +#0#0#0#255#0#0#0#255'{{{'#255'{{{'#255#0#0#0#255#0#0#0#255'{{{'#255#0#0#0#255
+  +#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#255#0#255#255#255'{{{'
+  +#255#255#255#255#255#255#255#255#255#255#255#255#255#255#255#255#255#255#255
+  +#255#255#0#255#255#255#0#0#0#255#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0
+  +#0#0#0#0#0#255#0#255#255#255'{{{'#255#255#255#255#255#255#255#255#255#255#255
+  +#255#255#255#255#255#255#255#255#255#255#0#255#255#255#0#0#0#255#0#0#0#0#0#0
+  +#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#255#0#255#255#255'{{{'#255#255#255
+  +#255#255#255#255#255#255#255#255#255#255#255#255#255#255#255#255#255#255#0
+  +#255#255#255#0#0#0#255#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0
+  +#255#0#255#255#255'{{{'#255#255#255#255#255#255#255#255#255#255#255#255#255
+  +#255#255#255#255#255#255#255#255#0#255#255#255#0#0#0#255'{{{'#255#0#0#0#255#0
+  +#0#0#255#0#0#0#255#0#0#0#255#0#0#0#255#0#0#0#255#0#0#0#255#0#0#0#255'{{{'#255
+  +#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#255#0#255#255#255#0
+  +#255#255#255'{{{'#255#0#0#0#255#0#0#0#255'{{{'#255#0#255#255#255#0#255#255
+  +#255#0#0#255#255#0#0#255#255#0#0#255#255#0#0#255#255#0#0#0#0#0#0#0#0#0#0#0#0
+  +#0#0#0#255#0#255#255#255'{{{'#255'{{{'#255#0#0#0#255#0#0#0#255'{{{'#255'{{{'
+  +#255#0#255#255#255#0#0#0#255#0#0#0#0#0#0#255#255#0#0#255#255#0#0#255#255#0#0
+  +#0#0#0#0#0#0#0#0#0#255'{{{'#255#0#0#0#255#0#0#0#255'{{{'#255'{{{'#255#0#0#0
+  +#255#0#0#0#255'{{{'#255#0#0#0#255#0#0#0#0#0#0#255#255#0#0#255#255#0#0#255#255
+  +#0#0#0#0#0#0#0#0#0#0#0#255#0#255#255#255'{{{'#255#255#255#255#255#255#255#255
+  +#255#255#255#255#255#255#255#255#255#255#255#255#255#0#255#255#255#0#0#0#255
+  +#0#0#0#0#0#0#255#255#0#0#255#255#0#0#255#255#0#0#0#0#0#0#0#0#0#0#0#255#0#255
+  +#255#255'{{{'#255#255#255#255#255#255#255#255#255#255#255#255#255#255#255#255
+  +#255#255#255#255#255#0#255#255#255#0#0#255#255#0#0#255#255#0#0#255#255#0#0
+  +#255#255#0#0#255#255#0#0#255#255#0#0#255#255#0#0#0#255#0#255#255#255'{{{'#255
+  +#255#255#255#255#255#255#255#255#255#255#255#255#255#255#255#255#255#255#255
+  +#255#0#255#255#255#0#0#0#255#0#0#255#255#0#0#255#255#0#0#255#255#0#0#255#255
+  +#0#0#255#255#0#0#0#0#0#0#0#255#0#255#255#255'{{{'#255#255#255#255#255#255#255
+  +#255#255#255#255#255#255#255#255#255#255#255#255#255#255#0#255#255#255#0#0#0
+  +#255#0#0#0#0#0#0#255#255#0#0#255#255#0#0#255#255#0#0#0#0#0#0#0#0#0#0#0#255#0
+  +#255#255#255'{{{'#255#255#255#255#255#255#255#255#255#255#255#255#255#255#255
+  +#255#255#255#255#255#255#0#255#255#255#0#0#0#255#0#0#0#255#0#0#0#255#0#0#255
+  ,#255#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#255#0#255#255#255'{{{'#255#255#255#255#255
+  +#255#255#255#255#255#255#255#255#255#255#255#255#255#255#255#255#0#255#255
+  +#255#0#0#0#255#255#255#255#255#0#0#0#255#0#0#0#255#0#0#0#0#0#0#0#0#0#0#0#0#0
+  +#0#0#255#0#255#255#255'{{{'#255'{{{'#255'{{{'#255'{{{'#255'{{{'#255#0#255#255
+  +#255#0#255#255#255#0#0#0#255#255#255#255#255#0#0#0#255#255#255#255#255#0#0#0
+  +#255#0#0#0#0#0#0#0#0#0#0#0#255#0#255#255#255#0#255#255#255#0#255#255#255#0
+  +#255#255#255#0#255#255#255#0#255#255#255#0#255#255#255#0#255#255#255#0#0#0
+  +#255#255#255#255#255#0#0#0#255#255#255#255#255#255#255#255#255#0#0#0#255#0#0
+  +#0#0'{{{'#255#0#0#0#255#0#0#0#255#0#0#0#255#0#0#0#255#0#0#0#255#0#0#0#255#0#0
+  +#0#255#0#0#0#255'{{{'#255#255#255#255#255#0#0#0#255#0#0#0#255#0#0#0#255#0#0#0
+  +#255#0#0#0#255#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#255#255
+  +#255#255#255#255#255#255#255#255#255#255#255#255#255#255#255#255#255#255#255
+  +#255#255#255#255#255#255#255#255#255#255#255#255#0#0#0#255#0#0#0#0#0#0#0#0#0
+  +#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#255#255#255#255#255#0#0#0#255#0#0#0#255
+  +#0#0#0#255#0#0#0#255#255#255#255#255#0#0#0#255#255#255#255#255#0#0#0#255#0#0
+  +#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#255#255#255#255#255#255
+  +#255#255#255#255#255#255#255#255#255#255#255#255#255#255#255#255#255#255#255
+  +#255#255#255#255#255#255#255#255#0#0#0#255#0#0#10'TPopupMenu'#11'pumMatrices'
+  +#6'Images'#7#10'ImageList1'#4'left'#3#184#1#3'top'#3'p'#1#0#9'TMenuItem'#5'C'
+  +'opy1'#6'Action'#7#9'actCopiar'#7'OnClick'#7#16'actCopiarExecute'#0#0#9'TMen'
+  +'uItem'#6'Paste1'#6'Action'#7#8'actPegar'#7'OnClick'#7#15'actPegarExecute'#0
+  +#0#0#10'TPopupMenu'#12'pumMatricesA'#6'Images'#7#10'ImageList1'#4'left'#3#224
+  +#1#3'top'#3'p'#1#0#9'TMenuItem'#11'actCopiarA1'#6'Action'#7#10'actCopiarA'#7
+  +'OnClick'#7#17'actCopiarAExecute'#0#0#9'TMenuItem'#10'actPegarA1'#6'Action'#7
+  +#9'actPegarA'#7'OnClick'#7#16'actPegarAExecute'#0#0#0#10'TPopupMenu'#12'pumM'
+  +'atricesM'#6'Images'#7#10'ImageList1'#4'left'#3#8#2#3'top'#3'p'#1#0#9'TMenuI'
+  +'tem'#5'Copy2'#6'Action'#7#10'actCopiarM'#7'OnClick'#7#17'actCopiarMExecute'
+  +#0#0#9'TMenuItem'#6'Paste2'#6'Action'#7#9'actPegarM'#7'OnClick'#7#16'actPega'
+  +'rMExecute'#0#0#0#11'TOpenDialog'#11'OpenDialog1'#6'Filter'#6#31'Galatea Set'
+  +' of Substrates|*.sgl'#7'Options'#11#15'ofFileMustExist'#14'ofEnableSizing'
+  +#12'ofViewDetail'#0#4'left'#3'0'#2#3'top'#3'p'#1#0#0#0
+]);

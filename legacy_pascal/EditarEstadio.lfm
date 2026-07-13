@@ -1,0 +1,680 @@
+object frmEditarEstadio: TfrmEditarEstadio
+  Left = 300
+  Height = 584
+  Top = 100
+  Width = 448
+  ActiveControl = BitBtn1
+  BorderStyle = bsDialog
+  Caption = 'Edit life stage'
+  ClientHeight = 584
+  ClientWidth = 448
+  Font.Height = -11
+  Font.Name = 'MS Sans Serif'
+  OnClose = FormClose
+  OnCreate = FormCreate
+  Position = poScreenCenter
+  ShowHint = True
+  LCLVersion = '0.9.30'
+  object Label16: TLabel
+    Left = 8
+    Height = 15
+    Top = 512
+    Width = 332
+    Caption = 'Double click over blue controls for opening formula editor.'
+    ParentColor = False
+  end
+  object spbNotas: TSpeedButton
+    Left = 8
+    Height = 33
+    Hint = 'Note Edit|Open Note Edit'
+    Top = 532
+    Width = 33
+    Glyph.Data = {
+      F6000000424DF600000000000000760000002800000010000000100000000100
+      0400000000008000000000000000000000001000000000000000000000000000
+      80000080000000808000800000008000800080800000C0C0C000808080000000
+      FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFFFF00333333000000
+      00003333330FFFFFFFF000300000FF0F00F0E00BFBFB0FFFFFF0E0BFBF000FFF
+      F0F0E0FBFBFBF0F00FF0E0BFBF00000B0FF0E0FBFBFBFBF0FFF0E0BF0000000F
+      FFF0000BFB00B0FF00F03330000B0FFFFFF0333330B0FFFF000033330B0FF00F
+      0FF03330B00FFFFF0F033309030FFFFF00333330330000000333
+    }
+    NumGlyphs = 0
+    OnClick = spbNotasClick
+  end
+  object BitBtn1: TBitBtn
+    Left = 343
+    Height = 33
+    Top = 535
+    Width = 89
+    Caption = '&OK'
+    Kind = bkOK
+    ModalResult = 1
+    NumGlyphs = 0
+    TabOrder = 0
+  end
+  object BitBtn2: TBitBtn
+    Left = 240
+    Height = 33
+    Top = 535
+    Width = 89
+    Caption = '&Cancel'
+    Kind = bkCancel
+    ModalResult = 2
+    NumGlyphs = 0
+    TabOrder = 1
+  end
+  object PageControl1: TPageControl
+    Left = 11
+    Height = 488
+    Top = 16
+    Width = 424
+    ActivePage = TabSheet1
+    TabIndex = 0
+    TabOrder = 2
+    object TabSheet1: TTabSheet
+      Caption = '&General'
+      ClientHeight = 451
+      ClientWidth = 416
+      object Label1: TLabel
+        Left = 14
+        Height = 15
+        Top = 11
+        Width = 38
+        Caption = 'Name:'
+        FocusControl = edtNombre
+        ParentColor = False
+      end
+      object edtNombre: TEdit
+        Left = 14
+        Height = 22
+        Top = 35
+        Width = 377
+        MaxLength = 30
+        TabOrder = 0
+        Text = 'edtNombre'
+      end
+      object grbLigar: TGroupBox
+        Left = 8
+        Height = 96
+        Top = 59
+        Width = 405
+        Caption = 'Linking'
+        ClientHeight = 80
+        ClientWidth = 401
+        TabOrder = 1
+        object Label6: TLabel
+          Left = 8
+          Height = 15
+          Top = 18
+          Width = 157
+          Caption = 'Link life stage to prototype:'
+          ParentColor = False
+        end
+        object cmbPrototipos: TComboBox
+          Left = 8
+          Height = 27
+          Top = 42
+          Width = 220
+          ItemHeight = 0
+          MaxLength = 65535
+          Style = csDropDownList
+          TabOrder = 0
+        end
+      end
+      object grbColor: TGroupBox
+        Left = 8
+        Height = 96
+        Top = 171
+        Width = 407
+        Caption = 'Color'
+        ClientHeight = 80
+        ClientWidth = 403
+        TabOrder = 2
+        object shpColor: TShape
+          Left = 16
+          Height = 33
+          Top = 24
+          Width = 185
+        end
+        object btnColor: TButton
+          Left = 216
+          Height = 33
+          Top = 24
+          Width = 121
+          Caption = 'Choose co&lor'
+          OnClick = btnColorClick
+          TabOrder = 0
+        end
+      end
+    end
+    object TabSheet2: TTabSheet
+      Caption = 'Change life &stage'
+      ClientHeight = 451
+      ClientWidth = 416
+      ImageIndex = 1
+      object GroupBox2: TGroupBox
+        Left = 3
+        Height = 171
+        Top = 10
+        Width = 409
+        Caption = 'Conditions for change of life stage'
+        ClientHeight = 155
+        ClientWidth = 405
+        TabOrder = 0
+        object Label2: TLabel
+          Left = 8
+          Height = 15
+          Top = 5
+          Width = 203
+          Caption = 'Change to next life stage at age (A)'
+          ParentColor = False
+        end
+        object Label3: TLabel
+          Left = 230
+          Height = 15
+          Top = 24
+          Width = 40
+          Caption = 'cycles,'
+          ParentColor = False
+        end
+        object Label4: TLabel
+          Left = 8
+          Height = 13
+          Top = 48
+          Width = 337
+          AutoSize = False
+          Caption = 'when requirements indicated are covered (R),'
+          ParentColor = False
+        end
+        object Label5: TLabel
+          Left = 8
+          Height = 15
+          Top = 72
+          Width = 90
+          Caption = 'condition 1 (C1)'
+          ParentColor = False
+        end
+        object Label7: TLabel
+          Left = 9
+          Height = 15
+          Top = 96
+          Width = 144
+          Caption = 'condition 2 (C2) are true.'
+          ParentColor = False
+        end
+        object Label8: TLabel
+          Left = 86
+          Height = 15
+          Top = 129
+          Width = 208
+          Caption = 'A and/or R and/or (C1 and/or C2)'
+          Font.Height = -11
+          Font.Name = 'MS Sans Serif'
+          Font.Style = [fsBold]
+          ParentColor = False
+          ParentFont = False
+        end
+        object edtCiclos: TEdit
+          Left = 10
+          Height = 22
+          Top = 24
+          Width = 199
+          Color = clSkyBlue
+          OnDblClick = edtCiclosDblClick
+          OnMouseUp = edtCiclosMouseUp
+          TabOrder = 0
+          Text = 'edtCiclos'
+        end
+        object cmbY_O: TComboBox
+          Left = 350
+          Height = 27
+          Top = 17
+          Width = 49
+          ItemHeight = 0
+          ItemIndex = 0
+          Items.Strings = (
+            'and'
+            'or'
+          )
+          MaxLength = 65535
+          Style = csDropDownList
+          TabOrder = 1
+          Text = 'and'
+        end
+        object cmbY_OR: TComboBox
+          Left = 350
+          Height = 27
+          Top = 41
+          Width = 49
+          ItemHeight = 0
+          ItemIndex = 1
+          Items.Strings = (
+            'and'
+            'or'
+          )
+          MaxLength = 65535
+          Style = csDropDownList
+          TabOrder = 2
+          Text = 'or'
+        end
+        object cmbY_OC1C2: TComboBox
+          Left = 350
+          Height = 27
+          Top = 64
+          Width = 49
+          ItemHeight = 0
+          ItemIndex = 1
+          Items.Strings = (
+            'and'
+            'or'
+          )
+          MaxLength = 65535
+          Style = csDropDownList
+          TabOrder = 3
+          Text = 'or'
+        end
+      end
+      object GroupBox1: TGroupBox
+        Left = 6
+        Height = 129
+        Top = 195
+        Width = 393
+        Caption = 'Requirements for change of life stage'
+        ClientHeight = 113
+        ClientWidth = 389
+        TabOrder = 1
+        object stgCostos: TStringGrid
+          Left = 7
+          Height = 89
+          Top = 2
+          Width = 364
+          Color = clSkyBlue
+          Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goColSizing, goEditing, goTabs, goAlwaysShowEditor]
+          RowCount = 3
+          TabOrder = 0
+          TitleFont.Height = -11
+          TitleFont.Name = 'MS Sans Serif'
+          OnDblClick = stgCostosDblClick
+        end
+      end
+      object GroupBox5: TGroupBox
+        Left = 5
+        Height = 121
+        Top = 323
+        Width = 396
+        Caption = 'Conditions for change of life stage'
+        ClientHeight = 105
+        ClientWidth = 392
+        TabOrder = 2
+        object stgCondiciones: TStringGrid
+          Left = 8
+          Height = 89
+          Top = 2
+          Width = 369
+          ColCount = 4
+          Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goColSizing, goEditing, goTabs]
+          RowCount = 3
+          TabOrder = 0
+          TitleFont.Height = -11
+          TitleFont.Name = 'MS Sans Serif'
+          OnDblClick = stgCondicionesDblClick
+          OnKeyPress = stgCondicionesKeyPress
+          ColWidths = (
+            64
+            103
+            38
+            128
+          )
+        end
+      end
+    end
+    object tbsMoviemiento: TTabSheet
+      Caption = '&Movement'
+      ClientHeight = 451
+      ClientWidth = 416
+      ImageIndex = 2
+      object grbMovimiento: TGroupBox
+        Left = 8
+        Height = 418
+        Top = 16
+        Width = 361
+        Caption = 'Motion tendencies'
+        ClientHeight = 402
+        ClientWidth = 357
+        TabOrder = 0
+        object Label9: TLabel
+          Left = 32
+          Height = 15
+          Top = 48
+          Width = 21
+          Caption = 'NW:'
+          ParentColor = False
+        end
+        object Label10: TLabel
+          Left = 144
+          Height = 15
+          Top = 48
+          Width = 13
+          Caption = 'N:'
+          ParentColor = False
+        end
+        object Label11: TLabel
+          Left = 232
+          Height = 15
+          Top = 48
+          Width = 20
+          Caption = 'NE:'
+          ParentColor = False
+        end
+        object Image1: TImage
+          Left = 136
+          Height = 16
+          Top = 80
+          Width = 16
+          AutoSize = True
+          Picture.Data = {
+            07544269746D6170F6000000424DF60000000000000076000000280000001000
+            0000100000000100040000000000800000000000000000000000100000000000
+            000000000000000080000080000000808000800000008000800080800000C0C0
+            C000808080000000FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFF
+            FF00333333333333333333333333333808333333333333809033333338333809
+            0833333330038090833333333090090833333333099990833333333309999033
+            3333333099999903333333309999900833333309999003333333330990033333
+            3333309003333333333330033333333333333333333333333333333333333333
+            3333
+          }
+        end
+        object Image2: TImage
+          Left = 168
+          Height = 16
+          Top = 80
+          Width = 16
+          AutoSize = True
+          Picture.Data = {
+            07544269746D6170F6000000424DF60000000000000076000000280000001000
+            0000100000000100040000000000800000000000000000000000100000000000
+            000000000000000080000080000000808000800000008000800080800000C0C0
+            C000808080000000FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFF
+            FF00333333000333333333333309033333333333330903333333333333090333
+            3333333333090333333333333309033333333330000900003333333099999990
+            3333333309999903333333330999990333333333309990333333333330999033
+            3333333333090333333333333309033333333333333033333333333333303333
+            3333
+          }
+        end
+        object Image3: TImage
+          Left = 200
+          Height = 16
+          Top = 80
+          Width = 16
+          AutoSize = True
+          Picture.Data = {
+            07544269746D6170F6000000424DF60000000000000076000000280000001000
+            0000100000000100040000000000800000000000000000000000100000000000
+            000000000000000080000080000000808000800000008000800080800000C0C0
+            C000808080000000FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFF
+            FF00333333333333333333333333333333333808333333333333309083333333
+            3333380908333833333333809083003333333338090090333333333380999903
+            3333333330999903333333330999999033333338009999903333333333009999
+            0333333333330099033333333333330090333333333333330033333333333333
+            3333
+          }
+        end
+        object Label12: TLabel
+          Left = 32
+          Height = 15
+          Top = 112
+          Width = 13
+          Caption = 'W:'
+          ParentColor = False
+        end
+        object Image4: TImage
+          Left = 136
+          Height = 16
+          Top = 112
+          Width = 16
+          AutoSize = True
+          Picture.Data = {
+            07544269746D6170F6000000424DF60000000000000076000000280000001000
+            0000100000000100040000000000800000000000000000000000100000000000
+            000000000000000080000080000000808000800000008000800080800000C0C0
+            C000808080000000FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFF
+            FF00333333333333333333333333333333333333333333333333333333330033
+            3333333333009033333333330099903333333300999990000000009999999999
+            9990330099999000000033330099903333333333330090333333333333330033
+            3333333333333333333333333333333333333333333333333333333333333333
+            3333
+          }
+        end
+        object Image5: TImage
+          Left = 200
+          Height = 16
+          Top = 112
+          Width = 16
+          AutoSize = True
+          Picture.Data = {
+            07544269746D6170F6000000424DF60000000000000076000000280000001000
+            0000100000000100040000000000800000000000000000000000100000000000
+            000000000000000080000080000000808000800000008000800080800000C0C0
+            C000808080000000FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFF
+            FF00333333333333333333333333333333333333333333333333333333333333
+            3333333333003333333333333309003333333333330999003333000000099999
+            0033099999999999990000000009999900333333330999003333333333090033
+            3333333333003333333333333333333333333333333333333333333333333333
+            3333
+          }
+        end
+        object Label13: TLabel
+          Left = 232
+          Height = 15
+          Top = 112
+          Width = 12
+          Caption = 'E:'
+          ParentColor = False
+        end
+        object Image6: TImage
+          Left = 136
+          Height = 16
+          Top = 144
+          Width = 16
+          AutoSize = True
+          Picture.Data = {
+            07544269746D6170F6000000424DF60000000000000076000000280000001000
+            0000100000000100040000000000800000000000000000000000100000000000
+            000000000000000080000080000000808000800000008000800080800000C0C0
+            C000808080000000FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFF
+            FF00333333333333333333333333333333333003333333333333309003333333
+            3333330990033333333333099990033333333330999990083333333099999903
+            3333333309999033333333330999908333333333309009083333333330038090
+            8333333338333809083333333333338090333333333333380833333333333333
+            3333
+          }
+        end
+        object Image7: TImage
+          Left = 168
+          Height = 16
+          Top = 144
+          Width = 16
+          AutoSize = True
+          Picture.Data = {
+            07544269746D6170F6000000424DF60000000000000076000000280000001000
+            0000100000000100040000000000800000000000000000000000100000000000
+            000000000000000080000080000000808000800000008000800080800000C0C0
+            C000808080000000FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFF
+            FF00333333303333333333333330333333333333330903333333333333090333
+            3333333330999033333333333099903333333333099999033333333309999903
+            3333333099999990333333300009000033333333330903333333333333090333
+            3333333333090333333333333309033333333333330903333333333333000333
+            3333
+          }
+        end
+        object Image8: TImage
+          Left = 200
+          Height = 16
+          Top = 144
+          Width = 16
+          AutoSize = True
+          Picture.Data = {
+            07544269746D6170F6000000424DF60000000000000076000000280000001000
+            0000100000000100040000000000800000000000000000000000100000000000
+            000000000000000080000080000000808000800000008000800080800000C0C0
+            C000808080000000FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFF
+            FF00333333333333333333333333333333333333333333330033333333333300
+            9033333333330099033333333300999903333338009999903333333309999990
+            3333333330999903333333338099990333333338090090333333338090830033
+            3333380908333833333330908333333333333808333333333333333333333333
+            3333
+          }
+        end
+        object Label14: TLabel
+          Left = 32
+          Height = 15
+          Top = 176
+          Width = 21
+          Caption = 'SW:'
+          ParentColor = False
+        end
+        object Label15: TLabel
+          Left = 144
+          Height = 15
+          Top = 176
+          Width = 13
+          Caption = 'S:'
+          ParentColor = False
+        end
+        object Label17: TLabel
+          Left = 232
+          Height = 15
+          Top = 176
+          Width = 20
+          Caption = 'SE:'
+          ParentColor = False
+        end
+        object edtNO: TEdit
+          Left = 64
+          Height = 22
+          Top = 48
+          Width = 57
+          Color = clSkyBlue
+          MaxLength = 4
+          OnDblClick = edtNODblClick
+          TabOrder = 0
+          Text = 'edtN'
+        end
+        object edtN: TEdit
+          Left = 160
+          Height = 22
+          Top = 48
+          Width = 57
+          Color = clSkyBlue
+          MaxLength = 4
+          OnDblClick = edtNDblClick
+          TabOrder = 1
+          Text = 'edtN'
+        end
+        object edtNE: TEdit
+          Left = 256
+          Height = 22
+          Top = 48
+          Width = 57
+          Color = clSkyBlue
+          MaxLength = 4
+          OnDblClick = edtNEDblClick
+          TabOrder = 2
+          Text = 'edtN'
+        end
+        object edtO: TEdit
+          Left = 64
+          Height = 22
+          Top = 112
+          Width = 57
+          Color = clSkyBlue
+          MaxLength = 4
+          OnDblClick = edtODblClick
+          TabOrder = 3
+          Text = 'edtO'
+        end
+        object edtE: TEdit
+          Left = 256
+          Height = 22
+          Top = 112
+          Width = 57
+          Color = clSkyBlue
+          MaxLength = 4
+          OnDblClick = edtEDblClick
+          TabOrder = 4
+          Text = 'edtE'
+        end
+        object edtSO: TEdit
+          Left = 64
+          Height = 22
+          Top = 176
+          Width = 57
+          Color = clSkyBlue
+          MaxLength = 4
+          OnDblClick = edtSODblClick
+          TabOrder = 5
+          Text = 'edtS'
+        end
+        object edtS: TEdit
+          Left = 160
+          Height = 22
+          Top = 176
+          Width = 57
+          Color = clSkyBlue
+          MaxLength = 4
+          OnDblClick = edtSDblClick
+          TabOrder = 6
+          Text = 'edtS'
+        end
+        object edtSE: TEdit
+          Left = 256
+          Height = 22
+          Top = 176
+          Width = 57
+          Color = clSkyBlue
+          MaxLength = 4
+          OnDblClick = edtSEDblClick
+          TabOrder = 7
+          Text = 'edtS'
+        end
+        object StaticText2: TStaticText
+          Left = 17
+          Height = 57
+          Top = 265
+          Width = 321
+          Caption = 'Movement tendencies are relative to the present direction, for example, the'#10'tendency of going north is in fact a tendency to conserve the current direction,'#10'and a tendency to go south is a tendency to change the current address by 180'
+          TabOrder = 8
+        end
+      end
+    end
+  end
+  object dlgColor: TColorDialog
+    Color = clBlack
+    CustomColors.Strings = (
+      'ColorA=000000'
+      'ColorB=000080'
+      'ColorC=008000'
+      'ColorD=008080'
+      'ColorE=800000'
+      'ColorF=800080'
+      'ColorG=808000'
+      'ColorH=808080'
+      'ColorI=C0C0C0'
+      'ColorJ=0000FF'
+      'ColorK=00FF00'
+      'ColorL=00FFFF'
+      'ColorM=FF0000'
+      'ColorN=FF00FF'
+      'ColorO=FFFF00'
+      'ColorP=FFFFFF'
+      'ColorQ=C0DCC0'
+      'ColorR=F0CAA6'
+      'ColorS=F0FBFF'
+      'ColorT=A4A0A0'
+    )
+    left = 88
+    top = 528
+  end
+end

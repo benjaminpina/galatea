@@ -1,0 +1,34 @@
+{ Este es un archivo de recurso de Lazarus generado automáticamente }
+
+LazarusResources.Add('TfrmSeleccionaPrototipo','FORMDATA',[
+  'TPF0'#23'TfrmSeleccionaPrototipo'#22'frmSeleccionaPrototipo'#4'Left'#3#0#1#6
+  +'Height'#3#157#1#3'Top'#2'o'#5'Width'#3'V'#1#13'ActiveControl'#7#10'btbAcept'
+  +'ar'#11'BorderStyle'#7#8'bsDialog'#7'Caption'#6#12'Select Agent'#12'ClientHe'
+  +'ight'#3#157#1#11'ClientWidth'#3'V'#1#11'Font.Height'#2#245#9'Font.Name'#6#13
+  +'MS Sans Serif'#8'OnCreate'#7#10'FormCreate'#8'Position'#7#14'poScreenCenter'
+  +#10'LCLVersion'#6#8'0.9.26.2'#0#6'TLabel'#6'Label1'#4'Left'#2#8#6'Height'#2
+  +#17#3'Top'#3#184#0#5'Width'#2':'#7'Caption'#6#7'&Males:'#12'FocusControl'#7#9
+  +'lstMachos'#11'ParentColor'#8#0#0#6'TLabel'#6'Label2'#4'Left'#2#8#6'Height'#2
+  +#17#3'Top'#3#16#1#5'Width'#2'N'#7'Caption'#6#9'&Females:'#12'FocusControl'#7
+  +#10'lstHembras'#11'ParentColor'#8#0#0#6'TLabel'#6'Label3'#4'Left'#2#8#6'Heig'
+  +'ht'#2#17#3'Top'#2#8#5'Width'#3#133#0#7'Caption'#6#16'I&mmature males:'#12'F'
+  +'ocusControl'#7#12'lstMachosInm'#11'ParentColor'#8#0#0#6'TLabel'#6'Label4'#4
+  +'Left'#2#8#6'Height'#2#17#3'Top'#2'`'#5'Width'#3#147#0#7'Caption'#6#18'Imm&a'
+  +'ture females:'#12'FocusControl'#7#13'lstHembrasInm'#11'ParentColor'#8#0#0#8
+  +'TListBox'#9'lstMachos'#4'Left'#2#8#6'Height'#2'A'#3'Top'#3#200#0#5'Width'#3
+  +'A'#1#7'OnClick'#7#14'lstMachosClick'#10'OnDblClick'#7#17'lstMachosDblClick'
+  +#8'TabOrder'#2#2#8'TopIndex'#2#255#0#0#7'TBitBtn'#10'btbAceptar'#4'Left'#3
+  +#240#0#6'Height'#2'!'#3'Top'#3'p'#1#5'Width'#2'Y'#7'Caption'#6#3'&OK'#4'Kind'
+  +#7#4'bkOK'#11'ModalResult'#2#1#9'NumGlyphs'#2#0#8'TabOrder'#2#4#0#0#7'TBitBt'
+  +'n'#11'btbCancelar'#4'Left'#3#136#0#6'Height'#2'!'#3'Top'#3'p'#1#5'Width'#2
+  +'Y'#7'Caption'#6#7'&Cancel'#4'Kind'#7#8'bkCancel'#11'ModalResult'#2#2#9'NumG'
+  +'lyphs'#2#0#7'OnClick'#7#16'btbCancelarClick'#8'TabOrder'#2#5#0#0#8'TListBox'
+  +#10'lstHembras'#4'Left'#2#8#6'Height'#2'A'#3'Top'#3' '#1#5'Width'#3'A'#1#7'O'
+  +'nClick'#7#15'lstHembrasClick'#10'OnDblClick'#7#18'lstHembrasDblClick'#8'Tab'
+  +'Order'#2#3#8'TopIndex'#2#255#0#0#8'TListBox'#12'lstMachosInm'#4'Left'#2#8#6
+  +'Height'#2'A'#3'Top'#2#24#5'Width'#3'A'#1#7'OnClick'#7#17'lstMachosInmClick'
+  +#10'OnDblClick'#7#20'lstMachosInmDblClick'#8'TabOrder'#2#0#8'TopIndex'#2#255
+  +#0#0#8'TListBox'#13'lstHembrasInm'#4'Left'#2#8#6'Height'#2'A'#3'Top'#2'p'#5
+  +'Width'#3'A'#1#7'OnClick'#7#18'lstHembrasInmClick'#10'OnDblClick'#7#21'lstHe'
+  +'mbrasInmDblClick'#8'TabOrder'#2#1#8'TopIndex'#2#255#0#0#0
+]);

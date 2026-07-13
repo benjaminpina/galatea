@@ -1,0 +1,35 @@
+{ Este es un archivo de recurso de Lazarus generado automáticamente }
+
+LazarusResources.Add('TfrmSeleccionarJuegoAgentes','FORMDATA',[
+  'TPF0'#27'TfrmSeleccionarJuegoAgentes'#26'frmSeleccionarJuegoAgentes'#4'Left'
+  +#3#230#0#6'Height'#3#175#1#3'Top'#2'S'#5'Width'#3'V'#1#13'ActiveControl'#7#7
+  +'BitBtn2'#11'BorderStyle'#7#8'bsDialog'#7'Caption'#6#20'Select set of Agents'
+  +#12'ClientHeight'#3#175#1#11'ClientWidth'#3'V'#1#11'Font.Height'#2#245#9'Fon'
+  +'t.Name'#6#13'MS Sans Serif'#7'OnClose'#7#9'FormClose'#8'OnCreate'#7#10'Form'
+  +'Create'#8'Position'#7#14'poScreenCenter'#10'LCLVersion'#6#8'0.9.26.2'#0#6'T'
+  +'Label'#6'Label1'#4'Left'#2#8#6'Height'#2#17#3'Top'#3#224#0#5'Width'#2'#'#7
+  +'Caption'#6#6'Title:'#11'ParentColor'#8#0#0#6'TLabel'#6'Label2'#4'Left'#2#8#6
+  +'Height'#2#17#3'Top'#3#248#0#5'Width'#2'G'#7'Caption'#6#8'Coments:'#11'Paren'
+  +'tColor'#8#0#0#6'TLabel'#6'Label3'#4'Left'#2#8#6'Height'#2#17#3'Top'#3'@'#1#5
+  +'Width'#2'P'#7'Caption'#6#11'Life stages'#11'ParentColor'#8#0#0#6'TLabel'#6
+  +'Label4'#4'Left'#2'x'#6'Height'#2#17#3'Top'#3'@'#1#5'Width'#2'+'#7'Caption'#6
+  +#5'Males'#11'ParentColor'#8#0#0#6'TLabel'#6'Label5'#4'Left'#3#232#0#6'Height'
+  +#2#17#3'Top'#3'@'#1#5'Width'#2'?'#7'Caption'#6#7'Females'#11'ParentColor'#8#0
+  +#0#12'TFileListBox'#12'FileListBox1'#4'Left'#3#176#0#6'Height'#3#209#0#3'Top'
+  +#2#8#5'Width'#3#153#0#9'Directory'#6#14'/home/benjamin'#4'Mask'#6#5'*.agl'#8
+  +'OnChange'#7#18'FileListBox1Change'#8'TabOrder'#2#0#8'TopIndex'#2#255#0#0#11
+  +'TStaticText'#9'sttTitulo'#4'Left'#2'('#6'Height'#2#17#3'Top'#3#224#0#5'Widt'
+  +'h'#3'!'#1#7'Caption'#6#9'sttTitulo'#8'TabOrder'#2#1#0#0#11'TStaticText'#14
+  +'sttComentarios'#4'Left'#2#8#6'Height'#2'1'#3'Top'#3#8#1#5'Width'#3'A'#1#7'C'
+  +'aption'#6#14'sttComentarios'#8'TabOrder'#2#2#0#0#7'TBitBtn'#7'BitBtn2'#4'Le'
+  +'ft'#3#136#0#6'Height'#2#30#3'Top'#3#134#1#5'Width'#2'Y'#7'Caption'#6#7'&Can'
+  +'cel'#4'Kind'#7#8'bkCancel'#11'ModalResult'#2#2#9'NumGlyphs'#2#0#8'TabOrder'
+  +#2#3#0#0#7'TBitBtn'#7'BitBtn1'#4'Left'#3#240#0#6'Height'#2#30#3'Top'#3#134#1
+  +#5'Width'#2'Y'#7'Caption'#6#3'&OK'#4'Kind'#7#4'bkOK'#11'ModalResult'#2#1#9'N'
+  +'umGlyphs'#2#0#8'TabOrder'#2#5#0#0#8'TListBox'#11'lstEstadios'#4'Left'#2#8#6
+  +'Height'#2')'#3'Top'#3'P'#1#5'Width'#2'a'#8'TabOrder'#2#7#8'TopIndex'#2#255#0
+  +#0#8'TListBox'#9'lstMachos'#4'Left'#2'x'#6'Height'#2')'#3'Top'#3'P'#1#5'Widt'
+  +'h'#2'i'#8'TabOrder'#2#4#8'TopIndex'#2#255#0#0#8'TListBox'#10'lstHembras'#4
+  +'Left'#3#232#0#6'Height'#2')'#3'Top'#3'P'#1#5'Width'#2'a'#8'TabOrder'#2#6#8
+  +'TopIndex'#2#255#0#0#0
+]);

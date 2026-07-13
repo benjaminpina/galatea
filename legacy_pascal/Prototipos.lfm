@@ -1,0 +1,218 @@
+object frmPrototipos: TfrmPrototipos
+  Left = 403
+  Height = 280
+  Top = 195
+  Width = 356
+  HorzScrollBar.Page = 355
+  VertScrollBar.Page = 279
+  ActiveControl = btbAceptar
+  BorderStyle = bsDialog
+  Caption = 'Prototype list'
+  ClientHeight = 280
+  ClientWidth = 356
+  Font.Height = -11
+  Font.Name = 'MS Sans Serif'
+  OnCreate = FormCreate
+  Position = poScreenCenter
+  object btbAceptar: TBitBtn
+    Left = 256
+    Height = 33
+    Top = 239
+    Width = 89
+    Caption = '&OK'
+    Kind = bkOK
+    ModalResult = 1
+    NumGlyphs = 0
+    TabOrder = 0
+  end
+  object PageControl1: TPageControl
+    Left = 8
+    Height = 217
+    Top = 8
+    Width = 337
+    ActivePage = TabSheet1
+    TabIndex = 0
+    TabOrder = 1
+    object TabSheet1: TTabSheet
+      Caption = '&Males'
+      ClientHeight = 177
+      ClientWidth = 333
+      object sbtAgregarM: TSpeedButton
+        Left = 232
+        Height = 33
+        Top = 16
+        Width = 97
+        Caption = 'Add'
+        Color = clBtnFace
+        Glyph.Data = {
+          DE000000424DDE0000000000000076000000280000000D0000000D0000000100
+          0400000000006800000000000000000000001000000000000000000000000000
+          8000008000000080800080000000800080008080000080808000C0C0C0000000
+          FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFFFF00FFFFFFFFFFFF
+          F000FFFFFFFFFFFFF000FFFFF000FFFFF000FFFFF0F0FFFFF000FFFFF0F0FFFF
+          F000FF0000F0000FF000FF0FFFFFFF0FF000FF0000F0000FF000FFFFF0F0FFFF
+          F000FFFFF0F0FFFFF000FFFFF000FFFFF000FFFFFFFFFFFFF000FFFFFFFFFFFF
+          F000
+        }
+        NumGlyphs = 0
+        OnClick = sbtAgregarMClick
+      end
+      object sbtEliminarM: TSpeedButton
+        Left = 232
+        Height = 33
+        Top = 56
+        Width = 97
+        Caption = 'Remove'
+        Color = clBtnFace
+        Glyph.Data = {
+          DE000000424DDE0000000000000076000000280000000D0000000D0000000100
+          0400000000006800000000000000000000001000000000000000000000000000
+          8000008000000080800080000000800080008080000080808000C0C0C0000000
+          FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFFFF00FFFFFFFFFFFF
+          F000FFFFFFFFFFFFF000FFFFFFFFFFFFF000FFFFFFFFFFFFF000FFFFFFFFFFFF
+          F000FF000000000FF000FF0FFFFFFF0FF000FF000000000FF000FFFFFFFFFFFF
+          F000FFFFFFFFFFFFF000FFFFFFFFFFFFF000FFFFFFFFFFFFF000FFFFFFFFFFFF
+          F000
+        }
+        NumGlyphs = 0
+        OnClick = sbtEliminarMClick
+      end
+      object sbtModificarM: TSpeedButton
+        Left = 232
+        Height = 33
+        Top = 96
+        Width = 97
+        Caption = 'Modify'
+        Color = clBtnFace
+        Glyph.Data = {
+          F6000000424DF600000000000000760000002800000010000000100000000100
+          0400000000008000000000000000000000001000000000000000000000000000
+          80000080000000808000800000008000800080800000C0C0C000808080000000
+          FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFFFF00333333000000
+          00003333330FFFFFFFF000300000FF0F00F0E00BFBFB0FFFFFF0E0BFBF000FFF
+          F0F0E0FBFBFBF0F00FF0E0BFBF00000B0FF0E0FBFBFBFBF0FFF0E0BF0000000F
+          FFF0000BFB00B0FF00F03330000B0FFFFFF0333330B0FFFF000033330B0FF00F
+          0FF03330B00FFFFF0F033309030FFFFF00333330330000000333
+        }
+        NumGlyphs = 0
+        OnClick = sbtModificarMClick
+      end
+      object Label3: TLabel
+        Left = 8
+        Height = 17
+        Top = 144
+        Width = 45
+        Caption = 'Color:'
+        ParentColor = False
+      end
+      object shpColorMacho: TShape
+        Left = 62
+        Height = 41
+        Top = 136
+        Width = 155
+      end
+      object lstMachos: TListBox
+        Left = 8
+        Height = 113
+        Top = 16
+        Width = 209
+        ItemHeight = 13
+        OnClick = lstMachosClick
+        OnDblClick = lstMachosDblClick
+        TabOrder = 0
+        TopIndex = -1
+      end
+    end
+    object TabSheet2: TTabSheet
+      Caption = '&Females'
+      ClientHeight = 177
+      ClientWidth = 333
+      ImageIndex = 1
+      object sbtAgregarH: TSpeedButton
+        Left = 232
+        Height = 33
+        Top = 16
+        Width = 89
+        Caption = 'Add'
+        Color = clBtnFace
+        Glyph.Data = {
+          DE000000424DDE0000000000000076000000280000000D0000000D0000000100
+          0400000000006800000000000000000000001000000000000000000000000000
+          8000008000000080800080000000800080008080000080808000C0C0C0000000
+          FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFFFF00FFFFFFFFFFFF
+          F000FFFFFFFFFFFFF000FFFFF000FFFFF000FFFFF0F0FFFFF000FFFFF0F0FFFF
+          F000FF0000F0000FF000FF0FFFFFFF0FF000FF0000F0000FF000FFFFF0F0FFFF
+          F000FFFFF0F0FFFFF000FFFFF000FFFFF000FFFFFFFFFFFFF000FFFFFFFFFFFF
+          F000
+        }
+        NumGlyphs = 0
+        OnClick = sbtAgregarHClick
+      end
+      object sbtEliminarH: TSpeedButton
+        Left = 232
+        Height = 33
+        Top = 56
+        Width = 89
+        Caption = 'Remove'
+        Color = clBtnFace
+        Glyph.Data = {
+          DE000000424DDE0000000000000076000000280000000D0000000D0000000100
+          0400000000006800000000000000000000001000000000000000000000000000
+          8000008000000080800080000000800080008080000080808000C0C0C0000000
+          FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFFFF00FFFFFFFFFFFF
+          F000FFFFFFFFFFFFF000FFFFFFFFFFFFF000FFFFFFFFFFFFF000FFFFFFFFFFFF
+          F000FF000000000FF000FF0FFFFFFF0FF000FF000000000FF000FFFFFFFFFFFF
+          F000FFFFFFFFFFFFF000FFFFFFFFFFFFF000FFFFFFFFFFFFF000FFFFFFFFFFFF
+          F000
+        }
+        NumGlyphs = 0
+        OnClick = sbtEliminarHClick
+      end
+      object sbtModificarH: TSpeedButton
+        Left = 232
+        Height = 33
+        Top = 96
+        Width = 89
+        Caption = 'Modify'
+        Color = clBtnFace
+        Glyph.Data = {
+          F6000000424DF600000000000000760000002800000010000000100000000100
+          0400000000008000000000000000000000001000000000000000000000000000
+          80000080000000808000800000008000800080800000C0C0C000808080000000
+          FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFFFF00333333000000
+          00003333330FFFFFFFF000300000FF0F00F0E00BFBFB0FFFFFF0E0BFBF000FFF
+          F0F0E0FBFBFBF0F00FF0E0BFBF00000B0FF0E0FBFBFBFBF0FFF0E0BF0000000F
+          FFF0000BFB00B0FF00F03330000B0FFFFFF0333330B0FFFF000033330B0FF00F
+          0FF03330B00FFFFF0F033309030FFFFF00333330330000000333
+        }
+        NumGlyphs = 0
+        OnClick = sbtModificarHClick
+      end
+      object Label1: TLabel
+        Left = 8
+        Height = 17
+        Top = 144
+        Width = 45
+        Caption = 'Color:'
+        ParentColor = False
+      end
+      object shpColorHembra: TShape
+        Left = 62
+        Height = 41
+        Top = 136
+        Width = 155
+      end
+      object lstHembras: TListBox
+        Left = 8
+        Height = 113
+        Top = 16
+        Width = 209
+        ItemHeight = 13
+        OnClick = lstHembrasClick
+        OnDblClick = lstHembrasDblClick
+        TabOrder = 0
+        TopIndex = -1
+      end
+    end
+  end
+end

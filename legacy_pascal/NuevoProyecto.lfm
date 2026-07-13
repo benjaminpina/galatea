@@ -1,0 +1,114 @@
+object frmNuevoProyecto: TfrmNuevoProyecto
+  Left = 508
+  Height = 260
+  Top = 250
+  Width = 302
+  ActiveControl = edtTitulo
+  BorderStyle = bsDialog
+  Caption = 'New Galatea Project'
+  ClientHeight = 260
+  ClientWidth = 302
+  Font.Height = -11
+  Font.Name = 'MS Sans Serif'
+  OnCloseQuery = FormCloseQuery
+  OnCreate = FormCreate
+  Position = poScreenCenter
+  LCLVersion = '0.9.26.2'
+  object Label1: TLabel
+    Left = 16
+    Height = 17
+    Top = 8
+    Width = 46
+    Caption = '&Title:'
+    FocusControl = edtTitulo
+    ParentColor = False
+  end
+  object Label2: TLabel
+    Left = 16
+    Height = 17
+    Top = 64
+    Width = 107
+    Caption = '&Environment:'
+    FocusControl = edtEntorno
+    ParentColor = False
+  end
+  object Label3: TLabel
+    Left = 16
+    Height = 17
+    Top = 120
+    Width = 82
+    Caption = 'C&oments:'
+    FocusControl = memComentarios
+    ParentColor = False
+  end
+  object edtTitulo: TEdit
+    Left = 16
+    Height = 21
+    Top = 24
+    Width = 273
+    MaxLength = 80
+    TabOrder = 0
+    Text = 'edtTitulo'
+  end
+  object edtEntorno: TEdit
+    Left = 16
+    Height = 21
+    Top = 80
+    Width = 241
+    TabOrder = 1
+    Text = 'edtEntorno'
+  end
+  object memComentarios: TMemo
+    Left = 16
+    Height = 65
+    Top = 136
+    Width = 273
+    Lines.Strings = (
+      'memComentarios'
+    )
+    TabOrder = 2
+  end
+  object btnEntorno: TButton
+    Left = 264
+    Height = 25
+    Top = 80
+    Width = 25
+    Caption = '...'
+    Font.Height = -11
+    Font.Name = 'MS Sans Serif'
+    Font.Style = [fsBold]
+    OnClick = btnEntornoClick
+    ParentFont = False
+    TabOrder = 3
+  end
+  object btbAceptar: TBitBtn
+    Left = 200
+    Height = 33
+    Top = 216
+    Width = 89
+    Caption = '&OK'
+    Kind = bkOK
+    ModalResult = 1
+    NumGlyphs = 0
+    OnClick = btbAceptarClick
+    TabOrder = 4
+  end
+  object btbCancelar: TBitBtn
+    Left = 96
+    Height = 33
+    Top = 216
+    Width = 89
+    Caption = '&Cancel'
+    Kind = bkCancel
+    ModalResult = 2
+    NumGlyphs = 0
+    TabOrder = 5
+  end
+  object OpenDialog1: TOpenDialog
+    Title = 'Open Galatea Environment File'
+    Filter = 'Galatea Environment|*.ngl'
+    Options = [ofFileMustExist, ofEnableSizing, ofViewDetail]
+    left = 32
+    top = 216
+  end
+end

@@ -1,0 +1,106 @@
+{ Este es un archivo de recurso de Lazarus generado automáticamente }
+
+LazarusResources.Add('TfrmGenerales','FORMDATA',[
+  'TPF0'#13'TfrmGenerales'#12'frmGenerales'#4'Left'#3'E'#1#6'Height'#3#192#1#3
+  +'Top'#3#153#0#5'Width'#3#209#1#13'ActiveControl'#7#12'PageControl1'#11'Borde'
+  +'rStyle'#7#8'bsDialog'#7'Caption'#6#15'General options'#12'ClientHeight'#3
+  +#192#1#11'ClientWidth'#3#209#1#11'Font.Height'#2#245#9'Font.Name'#6#13'MS Sa'
+  +'ns Serif'#8'OnCreate'#7#10'FormCreate'#8'Position'#7#14'poScreenCenter'#10
+  +'LCLVersion'#6#8'0.9.26.2'#0#7'TBitBtn'#10'btnAceptar'#4'Left'#3'p'#1#6'Heig'
+  +'ht'#2'!'#3'Top'#3#152#1#5'Width'#2'Y'#7'Caption'#6#3'&OK'#4'Kind'#7#4'bkOK'
+  +#11'ModalResult'#2#1#9'NumGlyphs'#2#0#7'OnClick'#7#15'btnAceptarClick'#8'Tab'
+  +'Order'#2#0#0#0#7'TBitBtn'#11'btnCancelar'#4'Left'#3#16#1#6'Height'#2'!'#3'T'
+  +'op'#3#152#1#5'Width'#2'Y'#7'Caption'#6#7'&Cancel'#4'Kind'#7#8'bkCancel'#11
+  +'ModalResult'#2#2#9'NumGlyphs'#2#0#8'TabOrder'#2#1#0#0#12'TPageControl'#12'P'
+  +'ageControl1'#4'Left'#2#8#6'Height'#3#129#1#3'Top'#2#8#5'Width'#3#193#1#10'A'
+  +'ctivePage'#7#9'TabSheet1'#8'TabIndex'#2#0#8'TabOrder'#2#2#0#9'TTabSheet'#9
+  +'TabSheet1'#7'Caption'#6#7'&Timing'#12'ClientHeight'#3#129#1#11'ClientWidth'
+  +#3#193#1#0#9'TGroupBox'#9'GroupBox1'#4'Left'#2#8#6'Height'#2'I'#3'Top'#2#3#5
+  +'Width'#3#169#1#7'Caption'#6#8'Autosave'#12'ClientHeight'#2'4'#11'ClientWidt'
+  +'h'#3#165#1#8'TabOrder'#2#0#0#6'TLabel'#6'Label1'#4'Left'#3#164#0#6'Height'#2
+  +#17#3'Top'#2' '#5'Width'#2'-'#7'Caption'#6#6'cycles'#11'ParentColor'#8#0#0#9
+  +'TCheckBox'#15'chkAutoGuardado'#4'Left'#2#8#6'Height'#2#26#3'Top'#2#2#5'Widt'
+  +'h'#3#29#1#7'Caption'#6'$Auto&save (as environment file) each'#7'OnClick'#7
+  +#20'chkAutoGuardadoClick'#8'TabOrder'#2#0#0#0#9'TSpinEdit'#9'sedCiclos'#4'Le'
+  +'ft'#2#31#6'Height'#2#22#3'Top'#2#24#5'Width'#2'q'#8'MaxValue'#4'@B'#15#0#8
+  +'MinValue'#2#1#8'TabOrder'#2#1#5'Value'#2'd'#0#0#0#9'TGroupBox'#9'GroupBox4'
+  +#4'Left'#2#8#6'Height'#2'H'#3'Top'#2'R'#5'Width'#3#169#1#7'Caption'#6#11'Inf'
+  +'ormation'#12'ClientHeight'#2'3'#11'ClientWidth'#3#165#1#8'TabOrder'#2#2#0#6
+  +'TLabel'#6'Label7'#4'Left'#3#164#0#6'Height'#2#17#3'Top'#2' '#5'Width'#2'-'#7
+  +'Caption'#6#6'cycles'#11'ParentColor'#8#0#0#9'TCheckBox'#11'chkInformar'#4'L'
+  +'eft'#2#8#6'Height'#2#24#4'Hint'#6' Open project|Open a project file'#3'Top'
+  +#2#6#5'Width'#3#190#0#7'Caption'#6#21'Show information each'#7'OnClick'#7#16
+  +'chkInformarClick'#8'TabOrder'#2#0#0#0#9'TSpinEdit'#11'sedInformar'#4'Left'#2
+  +#31#6'Height'#2#22#3'Top'#2#24#5'Width'#2'q'#8'MaxValue'#4'@B'#15#0#8'MinVal'
+  +'ue'#2#1#8'TabOrder'#2#1#5'Value'#2'd'#0#0#0#9'TGroupBox'#9'GroupBox5'#4'Lef'
+  +'t'#2#6#6'Height'#2'Q'#3'Top'#3#242#0#5'Width'#3#169#1#7'Caption'#6#4'Stop'
+  +#12'ClientHeight'#2'<'#11'ClientWidth'#3#165#1#8'TabOrder'#2#3#0#6'TLabel'#6
+  +'Label8'#4'Left'#3#166#0#6'Height'#2#17#3'Top'#2'$'#5'Width'#2'-'#7'Caption'
+  +#6#6'cycles'#11'ParentColor'#8#0#0#9'TCheckBox'#10'chkDetener'#4'Left'#2#20#6
+  +'Height'#2#24#4'Hint'#6' Open project|Open a project file'#3'Top'#2#2#5'Widt'
+  +'h'#3#212#0#7'Caption'#6#26'Stop running simulation at'#7'OnClick'#7#15'chkD'
+  +'etenerClick'#8'TabOrder'#2#0#0#0#9'TSpinEdit'#10'sedDetener'#4'Left'#2'$'#6
+  +'Height'#2#22#3'Top'#2#25#5'Width'#2'q'#8'MaxValue'#4'@B'#15#0#8'MinValue'#2
+  +#1#8'TabOrder'#2#1#5'Value'#2'd'#0#0#0#9'TGroupBox'#9'GroupBox6'#4'Left'#2#6
+  +#6'Height'#2'I'#3'Top'#3#162#0#5'Width'#3#169#1#7'Caption'#6#17'Save output '
+  +'files'#12'ClientHeight'#2'8'#11'ClientWidth'#3#165#1#8'TabOrder'#2#1#0#6'TL'
+  +'abel'#7'Label10'#4'Left'#3#166#0#6'Height'#2#11#3'Top'#2' '#5'Width'#2'!'#7
+  +'Caption'#6#6'cycles'#11'ParentColor'#8#0#0#6'TLabel'#7'Label11'#4'Left'#2#22
+  +#6'Height'#2#11#3'Top'#2#8#5'Width'#2'm'#7'Caption'#6#22'Save output files e'
+  +'ach'#11'ParentColor'#8#0#0#9'TSpinEdit'#9'sedSalida'#4'Left'#2'!'#6'Height'
+  +#2#22#3'Top'#2#24#5'Width'#2'q'#8'MaxValue'#4'@B'#15#0#8'MinValue'#2#1#8'Tab'
+  +'Order'#2#0#5'Value'#2'd'#0#0#0#0#9'TTabSheet'#9'TabSheet2'#7'Caption'#6#12
+  +'&Directories'#12'ClientHeight'#3#129#1#11'ClientWidth'#3#193#1#10'ImageInde'
+  +'x'#2#1#14'OnContextPopup'#7#21'TabSheet2ContextPopup'#0#9'TGroupBox'#9'Grou'
+  +'pBox2'#4'Left'#2#6#6'Height'#3#226#0#3'Top'#2#8#5'Width'#3#169#1#7'Caption'
+  +#6#11'Directories'#12'ClientHeight'#3#209#0#11'ClientWidth'#3#165#1#8'TabOrd'
+  +'er'#2#0#0#6'TLabel'#6'Label2'#4'Left'#2#4#6'Height'#2#11#3'Top'#2#27#5'Widt'
+  +'h'#2'@'#7'Caption'#6#12'&Substrates:'#12'FocusControl'#7#12'edtSustratos'#11
+  +'ParentColor'#8#0#0#6'TLabel'#6'Label3'#4'Left'#2#8#6'Height'#2#11#3'Top'#2
+  +'8'#5'Width'#2'-'#7'Caption'#6#8'S&tages:'#12'FocusControl'#7#13'edtEscenari'
+  +'os'#11'ParentColor'#8#0#0#6'TLabel'#6'Label4'#4'Left'#2#8#6'Height'#2#11#3
+  +'Top'#2'X'#5'Width'#2'T'#7'Caption'#6#16'Sets of A&gents:'#12'FocusControl'#7
+  +#10'edtAgentes'#11'ParentColor'#8#0#0#6'TLabel'#6'Label5'#4'Left'#2#8#6'Heig'
+  +'ht'#2#11#3'Top'#2'x'#5'Width'#2'L'#7'Caption'#6#14'&Environments:'#12'Focus'
+  +'Control'#7#11'edtEntornos'#11'ParentColor'#8#0#0#6'TLabel'#6'Label6'#4'Left'
+  +#2#8#6'Height'#2#11#3'Top'#3#152#0#5'Width'#2'2'#7'Caption'#6#10'&Projects:'
+  +#12'FocusControl'#7#12'edtProyectos'#11'ParentColor'#8#0#0#6'TLabel'#6'Label'
+  ,'9'#4'Left'#2#8#6'Height'#2#11#3'Top'#3#184#0#5'Width'#2'B'#7'Caption'#6#14
+  +'Output &files:'#12'FocusControl'#7#9'edtSalida'#11'ParentColor'#8#0#0#5'TEd'
+  +'it'#12'edtSustratos'#4'Left'#2'T'#6'Height'#2#21#3'Top'#2#27#5'Width'#3')'#1
+  +#8'TabOrder'#2#0#4'Text'#6#12'edtSustratos'#0#0#5'TEdit'#13'edtEscenarios'#4
+  +'Left'#2'X'#6'Height'#2#21#3'Top'#2'8'#5'Width'#3')'#1#8'TabOrder'#2#1#4'Tex'
+  +'t'#6#13'edtEscenarios'#0#0#5'TEdit'#11'edtEntornos'#4'Left'#2'X'#6'Height'#2
+  +#21#3'Top'#2'x'#5'Width'#3')'#1#8'TabOrder'#2#3#4'Text'#6#11'edtEntornos'#0#0
+  +#5'TEdit'#12'edtProyectos'#4'Left'#2'X'#6'Height'#2#21#3'Top'#3#152#0#5'Widt'
+  +'h'#3')'#1#8'TabOrder'#2#4#4'Text'#6#12'edtProyectos'#0#0#7'TButton'#12'btnS'
+  +'ustratos'#4'Left'#3#136#1#6'Height'#2#25#3'Top'#2#24#5'Width'#2#25#7'Captio'
+  +'n'#6#3'...'#11'Font.Height'#2#245#9'Font.Name'#6#13'MS Sans Serif'#10'Font.'
+  +'Style'#11#6'fsBold'#0#7'OnClick'#7#17'btnSustratosClick'#10'ParentFont'#8#8
+  +'TabOrder'#2#5#0#0#7'TButton'#13'btnEscenarios'#4'Left'#3#136#1#6'Height'#2
+  +#25#3'Top'#2'8'#5'Width'#2#25#7'Caption'#6#3'...'#11'Font.Height'#2#245#9'Fo'
+  +'nt.Name'#6#13'MS Sans Serif'#10'Font.Style'#11#6'fsBold'#0#7'OnClick'#7#18
+  +'btnEscenariosClick'#10'ParentFont'#8#8'TabOrder'#2#6#0#0#7'TButton'#11'btnE'
+  +'ntornos'#4'Left'#3#136#1#6'Height'#2#25#3'Top'#2'x'#5'Width'#2#25#7'Caption'
+  +#6#3'...'#11'Font.Height'#2#245#9'Font.Name'#6#13'MS Sans Serif'#10'Font.Sty'
+  +'le'#11#6'fsBold'#0#7'OnClick'#7#16'btnEntornosClick'#10'ParentFont'#8#8'Tab'
+  +'Order'#2#8#0#0#7'TButton'#12'btnProyectos'#4'Left'#3#136#1#6'Height'#2#25#3
+  +'Top'#3#152#0#5'Width'#2#25#7'Caption'#6#3'...'#11'Font.Height'#2#245#9'Font'
+  +'.Name'#6#13'MS Sans Serif'#10'Font.Style'#11#6'fsBold'#0#7'OnClick'#7#17'bt'
+  +'nProyectosClick'#10'ParentFont'#8#8'TabOrder'#2#9#0#0#5'TEdit'#10'edtAgente'
+  +'s'#4'Left'#2'X'#6'Height'#2#21#3'Top'#2'X'#5'Width'#3')'#1#8'TabOrder'#2#2#4
+  +'Text'#6#10'edtAgentes'#0#0#7'TButton'#10'btnAgentes'#4'Left'#3#136#1#6'Heig'
+  +'ht'#2#25#3'Top'#2'X'#5'Width'#2#25#7'Caption'#6#3'...'#11'Font.Height'#2#245
+  +#9'Font.Name'#6#13'MS Sans Serif'#10'Font.Style'#11#6'fsBold'#0#7'OnClick'#7
+  +#15'btnAgentesClick'#10'ParentFont'#8#8'TabOrder'#2#7#0#0#5'TEdit'#9'edtSali'
+  +'da'#4'Left'#2'X'#6'Height'#2#21#3'Top'#3#184#0#5'Width'#3')'#1#8'TabOrder'#2
+  +#10#4'Text'#6#9'edtSalida'#0#0#7'TButton'#9'btnSalida'#4'Left'#3#136#1#6'Hei'
+  +'ght'#2#25#3'Top'#3#184#0#5'Width'#2#25#7'Caption'#6#3'...'#11'Font.Height'#2
+  +#245#9'Font.Name'#6#13'MS Sans Serif'#10'Font.Style'#11#6'fsBold'#0#7'OnClic'
+  +'k'#7#14'btnSalidaClick'#10'ParentFont'#8#8'TabOrder'#2#11#0#0#0#9'TGroupBox'
+  +#9'GroupBox3'#4'Left'#2#6#6'Height'#2'@'#3'Top'#3#242#0#5'Width'#3#169#1#7'C'
+  +'aption'#6#8'Remember'#12'ClientHeight'#2'/'#11'ClientWidth'#3#165#1#8'TabOr'
+  +'der'#2#1#0#9'TCheckBox'#11'chkRecordar'#4'Left'#2#16#6'Height'#2#20#3'Top'#2
+  +#16#5'Width'#3#168#0#7'Caption'#6#28'Remember last used directory'#7'Checked'
+  +#9#5'State'#7#9'cbChecked'#8'TabOrder'#2#0#0#0#0#0#0#0
+]);

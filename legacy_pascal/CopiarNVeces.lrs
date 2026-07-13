@@ -1,0 +1,54 @@
+{ Este es un archivo de recurso de Lazarus generado automáticamente }
+
+LazarusResources.Add('TfrmCopiarNVeces','FORMDATA',[
+  'TPF0'#16'TfrmCopiarNVeces'#15'frmCopiarNVeces'#4'Left'#3'W'#1#6'Height'#3#173
+  +#1#3'Top'#3#133#0#5'Width'#3#156#1#13'ActiveControl'#7#8'edtVeces'#11'Border'
+  +'Style'#7#8'bsDialog'#7'Caption'#6#12'Copy N times'#12'ClientHeight'#3#173#1
+  +#11'ClientWidth'#3#156#1#11'Font.Height'#2#245#9'Font.Name'#6#13'MS Sans Ser'
+  +'if'#12'OnCloseQuery'#7#14'FormCloseQuery'#8'OnCreate'#7#10'FormCreate'#6'On'
+  +'Show'#7#8'FormShow'#8'Position'#7#14'poScreenCenter'#10'LCLVersion'#6#8'0.9'
+  +'.26.2'#0#9'TGroupBox'#9'GroupBox1'#4'Left'#2#8#6'Height'#2'9'#3'Top'#2#8#5
+  +'Width'#3#137#1#7'Caption'#6#7'Element'#12'ClientHeight'#2'!'#11'ClientWidth'
+  +#3#133#1#8'TabOrder'#2#0#0#6'TLabel'#6'Label1'#4'Left'#2#16#6'Height'#2#18#3
+  +'Top'#2#2#5'Width'#2'2'#7'Caption'#6#5'Name:'#11'ParentColor'#8#0#0#11'TStat'
+  +'icText'#9'sttNombre'#4'Left'#2'N'#6'Height'#2#17#3'Top'#2#2#5'Width'#3'1'#1
+  +#7'Caption'#6#9'sttNombre'#8'TabOrder'#2#0#0#0#0#9'TGroupBox'#9'GroupBox2'#4
+  +'Left'#2#8#6'Height'#2'9'#3'Top'#2'P'#5'Width'#3#137#1#7'Caption'#6#16'Numbe'
+  +'r of copies'#12'ClientHeight'#2'!'#11'ClientWidth'#3#133#1#8'TabOrder'#2#1#0
+  +#6'TLabel'#6'Label2'#4'Left'#2#16#6'Height'#2#18#3'Top'#2#5#5'Width'#3#134#0
+  +#7'Caption'#6#17'Copy this element'#11'ParentColor'#8#0#0#6'TLabel'#6'Label3'
+  +#4'Left'#3#30#1#6'Height'#2#18#3'Top'#2#5#5'Width'#2'.'#7'Caption'#6#6'times'
+  +'.'#11'ParentColor'#8#0#0#5'TEdit'#8'edtVeces'#4'Left'#3#158#0#6'Height'#2#21
+  +#3'Top'#2#2#5'Width'#2'a'#10'OnKeyPress'#7#16'edtVecesKeyPress'#8'TabOrder'#2
+  +#1#4'Text'#6#1'1'#0#0#7'TUpDown'#7'UpDown1'#4'Left'#3#255#0#6'Height'#2#21#3
+  +'Top'#2#2#5'Width'#2#16#9'Associate'#7#8'edtVeces'#3'Min'#2#1#8'Position'#2#1
+  +#8'TabOrder'#2#0#0#0#0#7'TBitBtn'#11'btbCancelar'#4'Left'#3#208#0#6'Height'#2
+  +'!'#3'Top'#3#128#1#5'Width'#2'Y'#7'Caption'#6#7'&Cancel'#4'Kind'#7#8'bkCance'
+  +'l'#11'ModalResult'#2#2#9'NumGlyphs'#2#0#8'TabOrder'#2#2#0#0#7'TBitBtn'#10'b'
+  +'tbAceptar'#4'Left'#3'3'#1#6'Height'#2'!'#3'Top'#3#128#1#5'Width'#2'Y'#7'Cap'
+  +'tion'#6#3'&OK'#4'Kind'#7#4'bkOK'#11'ModalResult'#2#1#9'NumGlyphs'#2#0#7'OnC'
+  +'lick'#7#15'btbAceptarClick'#8'TabOrder'#2#3#0#0#9'TGroupBox'#9'GroupBox3'#4
+  +'Left'#2#8#6'Height'#3#224#0#3'Top'#3#144#0#5'Width'#3#137#1#7'Caption'#6#18
+  +'Allowed substrates'#12'ClientHeight'#3#203#0#11'ClientWidth'#3#133#1#8'TabO'
+  +'rder'#2#4#0#9'TCheckBox'#12'chkSustrato1'#4'Left'#2#16#6'Height'#2#24#3'Top'
+  +#2#10#5'Width'#2'w'#7'Caption'#6#12'chkSustrato1'#7'Checked'#9#5'State'#7#9
+  +'cbChecked'#8'TabOrder'#2#0#0#0#9'TCheckBox'#12'chkSustrato2'#4'Left'#2#16#6
+  +'Height'#2#24#3'Top'#2'('#5'Width'#2'w'#7'Caption'#6#12'chkSustrato2'#7'Chec'
+  +'ked'#9#5'State'#7#9'cbChecked'#8'TabOrder'#2#1#0#0#9'TCheckBox'#12'chkSustr'
+  +'ato3'#4'Left'#2#16#6'Height'#2#24#3'Top'#2'B'#5'Width'#2'w'#7'Caption'#6#12
+  +'chkSustrato3'#7'Checked'#9#5'State'#7#9'cbChecked'#8'TabOrder'#2#2#0#0#9'TC'
+  +'heckBox'#12'chkSustrato4'#4'Left'#2#16#6'Height'#2#24#3'Top'#2'Z'#5'Width'#2
+  +'w'#7'Caption'#6#12'chkSustrato4'#7'Checked'#9#5'State'#7#9'cbChecked'#8'Tab'
+  +'Order'#2#3#0#0#9'TCheckBox'#12'chkSustrato5'#4'Left'#2#14#6'Height'#2#24#3
+  +'Top'#2'r'#5'Width'#2'w'#7'Caption'#6#12'chkSustrato5'#7'Checked'#9#5'State'
+  +#7#9'cbChecked'#8'TabOrder'#2#4#0#0#9'TCheckBox'#12'chkSustrato6'#4'Left'#2
+  +#16#6'Height'#2#24#3'Top'#3#144#0#5'Width'#2'w'#7'Caption'#6#12'chkSustrato6'
+  +#7'Checked'#9#5'State'#7#9'cbChecked'#8'TabOrder'#2#5#0#0#9'TCheckBox'#12'ch'
+  +'kSustrato7'#4'Left'#2#16#6'Height'#2#24#3'Top'#3#168#0#5'Width'#2'w'#7'Capt'
+  +'ion'#6#12'chkSustrato7'#7'Checked'#9#5'State'#7#9'cbChecked'#8'TabOrder'#2#6
+  +#0#0#7'TButton'#8'btnTodos'#4'Left'#3#208#0#6'Height'#2'!'#3'Top'#2'('#5'Wid'
+  +'th'#2'y'#7'Caption'#6#10'Select all'#7'OnClick'#7#13'btnTodosClick'#8'TabOr'
+  +'der'#2#7#0#0#7'TButton'#10'btnNinguno'#4'Left'#3#208#0#6'Height'#2'!'#3'Top'
+  +#2'`'#5'Width'#2'y'#7'Caption'#6#11'Select none'#7'OnClick'#7#15'btnNingunoC'
+  +'lick'#8'TabOrder'#2#8#0#0#0#0
+]);

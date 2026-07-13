@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <ProjectOptions>
+    <Version Value="12"/>
+    <General>
+      <Flags>
+        <LRSInOutputDirectory Value="False"/>
+        <CompatibilityMode Value="True"/>
+      </Flags>
+      <Title Value="galateac"/>
+    </General>
+    <BuildModes Count="1">
+      <Item1 Name="default" Default="True"/>
+    </BuildModes>
+    <PublishOptions>
+      <Version Value="2"/>
+    </PublishOptions>
+    <RunParams>
+      <local>
+        <CommandLineParams Value="-f Environments/JonssonPruebas.ngl -c 10"/>
+        <LaunchingApplication PathPlusParams="/usr/X11R6/bin/xterm -T &apos;Lazarus Run Output&apos; -e $(LazarusDir)/tools/runwait.sh $(TargetCmdLine)"/>
+      </local>
+      <FormatVersion Value="2"/>
+      <Modes Count="1">
+        <Mode0 Name="default">
+          <local>
+            <CommandLineParams Value="-f Environments/JonssonPruebas.ngl -c 10"/>
+            <LaunchingApplication PathPlusParams="/usr/X11R6/bin/xterm -T &apos;Lazarus Run Output&apos; -e $(LazarusDir)/tools/runwait.sh $(TargetCmdLine)"/>
+          </local>
+        </Mode0>
+      </Modes>
+    </RunParams>
+    <Units Count="18">
+      <Unit0>
+        <Filename Value="galateac.lpr"/>
+        <IsPartOfProject Value="True"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="68" Y="20"/>
+        <UsageCount Value="59"/>
+        <Bookmarks Count="1">
+          <Item0 X="18" Y="170" ID="1"/>
+        </Bookmarks>
+        <LoadedDesigner Value="True"/>
+      </Unit0>
+      <Unit1>
+        <Filename Value="../../../usr/share/fpcsrc/2.2.2/packages/fcl-base/src/custapp.pp"/>
+        <UnitName Value="CustApp"/>
+        <TopLine Value="48"/>
+        <CursorPos X="77" Y="63"/>
+        <UsageCount Value="7"/>
+      </Unit1>
+      <Unit2>
+        <Filename Value="Principal.pas"/>
+        <ComponentName Value="frmPrincipal"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <CursorPos X="17" Y="3"/>
+        <UsageCount Value="13"/>
+      </Unit2>
+      <Unit3>
+        <Filename Value="Proyectos.pas"/>
+        <CursorPos Y="113"/>
+        <UsageCount Value="28"/>
+        <Bookmarks Count="2">
+          <Item0 X="12" Y="217"/>
+          <Item1 X="24" Y="405" ID="5"/>
+        </Bookmarks>
+        <Loaded Value="True"/>
+      </Unit3>
+      <Unit4>
+        <Filename Value="Escenarios.pas"/>
+        <EditorIndex Value="6"/>
+        <TopLine Value="37"/>
+        <CursorPos X="3" Y="211"/>
+        <UsageCount Value="13"/>
+        <Loaded Value="True"/>
+      </Unit4>
+      <Unit5>
+        <Filename Value="Sustratos.pas"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="16"/>
+        <CursorPos X="51" Y="45"/>
+        <UsageCount Value="13"/>
+        <Loaded Value="True"/>
+      </Unit5>
+      <Unit6>
+        <Filename Value="Entornos.pas"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="2077"/>
+        <CursorPos X="3" Y="2067"/>
+        <UsageCount Value="16"/>
+        <Loaded Value="True"/>
+      </Unit6>
+      <Unit7>
+        <Filename Value="JuegoAgentes.pas"/>
+        <TopLine Value="1276"/>
+        <CursorPos Y="1291"/>
+        <UsageCount Value="15"/>
+      </Unit7>
+      <Unit8>
+        <Filename Value="Comunes.pas"/>
+        <EditorIndex Value="3"/>
+        <TopLine Value="31"/>
+        <CursorPos X="3" Y="49"/>
+        <UsageCount Value="21"/>
+        <Loaded Value="True"/>
+      </Unit8>
+      <Unit9>
+        <Filename Value="Elementos.pas"/>
+        <EditorIndex Value="5"/>
+        <CursorPos X="69" Y="17"/>
+        <UsageCount Value="19"/>
+        <Loaded Value="True"/>
+      </Unit9>
+      <Unit10>
+        <Filename Value="Agentes.pas"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="4"/>
+        <TopLine Value="40"/>
+        <CursorPos X="79" Y="59"/>
+        <UsageCount Value="23"/>
+        <Bookmarks Count="1">
+          <Item0 X="19" Y="1180" ID="2"/>
+        </Bookmarks>
+        <Loaded Value="True"/>
+      </Unit10>
+      <Unit11>
+        <Filename Value="FuncElementosCadenas.pas"/>
+        <UsageCount Value="7"/>
+      </Unit11>
+      <Unit12>
+        <Filename Value="Mediadores.pas"/>
+        <TopLine Value="110"/>
+        <CursorPos X="3" Y="126"/>
+        <UsageCount Value="15"/>
+      </Unit12>
+      <Unit13>
+        <Filename Value="Cruzadores.pas"/>
+        <TopLine Value="71"/>
+        <CursorPos X="14" Y="80"/>
+        <UsageCount Value="12"/>
+      </Unit13>
+      <Unit14>
+        <Filename Value="ArchivosSalida.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="27"/>
+        <CursorPos X="14" Y="42"/>
+        <UsageCount Value="9"/>
+      </Unit14>
+      <Unit15>
+        <Filename Value="Carruseles.pas"/>
+        <TopLine Value="56"/>
+        <CursorPos Y="89"/>
+        <UsageCount Value="8"/>
+      </Unit15>
+      <Unit16>
+        <Filename Value="Calculate.pas"/>
+        <TopLine Value="344"/>
+        <CursorPos Y="359"/>
+        <UsageCount Value="15"/>
+      </Unit16>
+      <Unit17>
+        <Filename Value="/usr/share/fpcsrc/2.2.2/packages/fcl-base/src/custapp.pp"/>
+        <UnitName Value="CustApp"/>
+        <TopLine Value="36"/>
+        <CursorPos X="15" Y="51"/>
+        <UsageCount Value="8"/>
+      </Unit17>
+    </Units>
+    <JumpHistory Count="18" HistoryIndex="17">
+      <Position1>
+        <Filename Value="Agentes.pas"/>
+      </Position1>
+      <Position2>
+        <Filename Value="Proyectos.pas"/>
+        <Caret Line="113"/>
+      </Position2>
+      <Position3>
+        <Filename Value="Entornos.pas"/>
+      </Position3>
+      <Position4>
+        <Filename Value="Sustratos.pas"/>
+        <Caret Line="19" Column="41"/>
+      </Position4>
+      <Position5>
+        <Filename Value="Sustratos.pas"/>
+        <Caret Line="35" Column="55" TopLine="16"/>
+      </Position5>
+      <Position6>
+        <Filename Value="Sustratos.pas"/>
+        <Caret Line="30" Column="15" TopLine="16"/>
+      </Position6>
+      <Position7>
+        <Filename Value="Elementos.pas"/>
+        <Caret Line="29" Column="19" TopLine="10"/>
+      </Position7>
+      <Position8>
+        <Filename Value="Elementos.pas"/>
+        <Caret Line="19" Column="14" TopLine="10"/>
+      </Position8>
+      <Position9>
+        <Filename Value="Elementos.pas"/>
+        <Caret Line="29" Column="68" TopLine="10"/>
+      </Position9>
+      <Position10>
+        <Filename Value="Escenarios.pas"/>
+        <Caret Line="57" Column="61" TopLine="29"/>
+      </Position10>
+      <Position11>
+        <Filename Value="Escenarios.pas"/>
+        <Caret Line="31" Column="15" TopLine="30"/>
+      </Position11>
+      <Position12>
+        <Filename Value="Escenarios.pas"/>
+        <Caret Line="185" Column="3" TopLine="181"/>
+      </Position12>
+      <Position13>
+        <Filename Value="Escenarios.pas"/>
+        <Caret Line="224" TopLine="35"/>
+      </Position13>
+      <Position14>
+        <Filename Value="Escenarios.pas"/>
+        <Caret Line="28" Column="18" TopLine="19"/>
+      </Position14>
+      <Position15>
+        <Filename Value="Escenarios.pas"/>
+        <Caret Line="121" Column="3" TopLine="116"/>
+      </Position15>
+      <Position16>
+        <Filename Value="Escenarios.pas"/>
+        <Caret Line="40" Column="28" TopLine="29"/>
+      </Position16>
+      <Position17>
+        <Filename Value="Entornos.pas"/>
+        <Caret TopLine="82"/>
+      </Position17>
+      <Position18>
+        <Filename Value="Entornos.pas"/>
+        <Caret Line="84" Column="20" TopLine="66"/>
+      </Position18>
+    </JumpHistory>
+  </ProjectOptions>
+  <CompilerOptions>
+    <Version Value="11"/>
+    <Parsing>
+      <SyntaxOptions>
+        <CStyleOperator Value="False"/>
+        <UseAnsiStrings Value="False"/>
+      </SyntaxOptions>
+    </Parsing>
+    <Linking>
+      <Debugging>
+        <DebugInfoType Value="dsStabs"/>
+        <UseExternalDbgSyms Value="True"/>
+      </Debugging>
+    </Linking>
+  </CompilerOptions>
+  <Debugging>
+    <Exceptions Count="3" IgnoreAll="True">
+      <Item1>
+        <Name Value="ECodetoolError"/>
+        <Enabled Value="False"/>
+      </Item1>
+      <Item2>
+        <Name Value="EFOpenError"/>
+        <Enabled Value="False"/>
+      </Item2>
+      <Item3>
+        <Name Value="EConvertError"/>
+      </Item3>
+    </Exceptions>
+  </Debugging>
+</CONFIG>
