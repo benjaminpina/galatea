@@ -113,3 +113,8 @@ workspaces/*/resultados/*.log
 # Allow results folders to exist in the repository via .gitkeep
 !workspaces/**/results/.gitkeep
 !workspaces/**/resultados/.gitkeep
+
+# ... (reglas anteriores)
+
+# Ignore compiled binaries in engine_go
+engine_go/bin/
