@@ -122,11 +122,12 @@ func (g *Grid) Move(agentIdx int32, newX, newY float64) {
 	g.agentCell[agentIdx] = newKey
 }
 
-// QueryRadius returns all agent indices within the given radius of point (cx, cy).
+// QueryRadius returns all agent indices whose cells fall within the given radius
+// of point (cx, cy). This is a broad-phase query; results may include agents
+// slightly outside the exact radius. Use QueryRadiusExact for precise filtering.
 // The returned slice is internal and must be consumed before the next query call.
 func (g *Grid) QueryRadius(cx, cy, radius float64) []int32 {
 	g.resultBuf = g.resultBuf[:0]
-	radiusSq := radius * radius
 
 	// Determine the range of cells that could contain agents within radius.
 	minCX := int32(math.Floor((cx - radius) * g.invCell))
@@ -137,10 +138,7 @@ func (g *Grid) QueryRadius(cx, cy, radius float64) []int32 {
 	for cellX := minCX; cellX <= maxCX; cellX++ {
 		for cellY := minCY; cellY <= maxCY; cellY++ {
 			bucket := g.cells[cellKey{cellX, cellY}]
-			for _, idx := range bucket {
-				_ = radiusSq // Caller must filter by actual distance using positions.
-				g.resultBuf = append(g.resultBuf, idx)
-			}
+			g.resultBuf = append(g.resultBuf, bucket...)
 		}
 	}
 

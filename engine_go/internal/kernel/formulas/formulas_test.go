@@ -325,8 +325,6 @@ func TestPerformance(t *testing.T) {
 	eval.SetInt("Age", 100)
 	eval.SetFloat("CL1", 1.5)
 
-	const iterations = 100000
-
 	// Warm up.
 	for i := 0; i < 100; i++ {
 		eval.RunProgramInt(reg.Get("perf.formula"))

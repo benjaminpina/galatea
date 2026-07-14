@@ -1,6 +1,7 @@
 package formulas
 
 import (
+	"galatea/engine/internal/kernel/util"
 	"galatea/engine/internal/kernel/world"
 )
 
@@ -43,7 +44,7 @@ func (b *EnvBuilder) SetAgentVars(w *world.World, idx int) {
 	// Physiology: reserves
 	for n := 0; n < cfg.NumNutrients; n++ {
 		reserveIdx := idx*cfg.NumNutrients + n
-		b.eval.SetInt("Reserve"+itoa(n+1), int(a.Reserves[reserveIdx]))
+		b.eval.SetInt("Reserve"+util.Itoa(n+1), int(a.Reserves[reserveIdx]))
 	}
 
 	// Genetics: loci (expressed values = phenotype)
@@ -54,14 +55,14 @@ func (b *EnvBuilder) SetAgentVars(w *world.World, idx int) {
 			a.GenotypeCont[locusBase], a.GenotypeCont[locusBase+1],
 			a.DominanceCont[locusBase], a.DominanceCont[locusBase+1],
 		)
-		b.eval.SetFloat("CL"+itoa(l+1), expressed)
+		b.eval.SetFloat("CL"+util.Itoa(l+1), expressed)
 
 		// Discrete loci expression
 		expressedDisc := expressLocusDisc(
 			a.GenotypeDisc[locusBase], a.GenotypeDisc[locusBase+1],
 			a.DominanceDisc[locusBase], a.DominanceDisc[locusBase+1],
 		)
-		b.eval.SetInt("DL"+itoa(l+1), expressedDisc)
+		b.eval.SetInt("DL"+util.Itoa(l+1), expressedDisc)
 	}
 
 	// Reproduction
@@ -75,25 +76,25 @@ func (b *EnvBuilder) SetAgentVars(w *world.World, idx int) {
 	memPerceptionSlots := cfg.NumSubstrates + cfg.NumResourceTypes + cfg.NumPrototypes
 	memBase := idx * memPerceptionSlots
 	for s := 0; s < memPerceptionSlots; s++ {
-		b.eval.SetInt("MemoryLastPer"+itoa(s+1), int(a.MemoryLastPerceived[memBase+s]))
-		b.eval.SetInt("MemoryNumPer"+itoa(s+1), int(a.MemoryNumPerceived[memBase+s]))
-		b.eval.SetInt("MemoryLastInt"+itoa(s+1), int(a.MemoryLastInteracted[memBase+s]))
-		b.eval.SetInt("MemoryNumInt"+itoa(s+1), int(a.MemoryNumInteracted[memBase+s]))
+		b.eval.SetInt("MemoryLastPer"+util.Itoa(s+1), int(a.MemoryLastPerceived[memBase+s]))
+		b.eval.SetInt("MemoryNumPer"+util.Itoa(s+1), int(a.MemoryNumPerceived[memBase+s]))
+		b.eval.SetInt("MemoryLastInt"+util.Itoa(s+1), int(a.MemoryLastInteracted[memBase+s]))
+		b.eval.SetInt("MemoryNumInt"+util.Itoa(s+1), int(a.MemoryNumInteracted[memBase+s]))
 	}
 
 	// Memory: last behavior
 	memBehaviorBase := idx * cfg.NumBehaviors
 	for bh := 0; bh < cfg.NumBehaviors; bh++ {
-		b.eval.SetInt("MemoryLastBehavior"+itoa(bh+1), int(a.MemoryLastBehavior[memBehaviorBase+bh]))
-		b.eval.SetInt("MemoryNumBehavior"+itoa(bh+1), int(a.MemoryNumBehavior[memBehaviorBase+bh]))
+		b.eval.SetInt("MemoryLastBehavior"+util.Itoa(bh+1), int(a.MemoryLastBehavior[memBehaviorBase+bh]))
+		b.eval.SetInt("MemoryNumBehavior"+util.Itoa(bh+1), int(a.MemoryNumBehavior[memBehaviorBase+bh]))
 	}
 
 	// Morphology (fixed adult traits)
 	if a.MorphologyFixed[idx] {
 		for l := 0; l < cfg.NumLoci; l++ {
 			morphBase := idx*cfg.NumLoci + l
-			b.eval.SetFloat("Morphology"+itoa(l+1), a.MorphologyCont[morphBase])
-			b.eval.SetInt("MorphologyDisc"+itoa(l+1), int(a.MorphologyDisc[morphBase]))
+			b.eval.SetFloat("Morphology"+util.Itoa(l+1), a.MorphologyCont[morphBase])
+			b.eval.SetInt("MorphologyDisc"+util.Itoa(l+1), int(a.MorphologyDisc[morphBase]))
 		}
 	}
 }
@@ -111,8 +112,8 @@ func (b *EnvBuilder) SetContenderVars(w *world.World, contenderIdx int) {
 	if a.MorphologyFixed[contenderIdx] {
 		for l := 0; l < cfg.NumLoci; l++ {
 			morphBase := contenderIdx*cfg.NumLoci + l
-			b.eval.SetFloat("ContenderMorphology"+itoa(l+1), a.MorphologyCont[morphBase])
-			b.eval.SetInt("ContenderMorphologyDisc"+itoa(l+1), int(a.MorphologyDisc[morphBase]))
+			b.eval.SetFloat("ContenderMorphology"+util.Itoa(l+1), a.MorphologyCont[morphBase])
+			b.eval.SetInt("ContenderMorphologyDisc"+util.Itoa(l+1), int(a.MorphologyDisc[morphBase]))
 		}
 	}
 
@@ -123,7 +124,7 @@ func (b *EnvBuilder) SetContenderVars(w *world.World, contenderIdx int) {
 			a.GenotypeCont[locusBase], a.GenotypeCont[locusBase+1],
 			a.DominanceCont[locusBase], a.DominanceCont[locusBase+1],
 		)
-		b.eval.SetFloat("ContenderCL"+itoa(l+1), expressed)
+		b.eval.SetFloat("ContenderCL"+util.Itoa(l+1), expressed)
 	}
 }
 
@@ -162,15 +163,4 @@ func expressLocusDisc(patVal, matVal int32, patDom, matDom uint8) int {
 		return int(patVal)
 	}
 	return int(matVal)
-}
-
-// itoa is a minimal int-to-string for small positive numbers (avoids strconv import).
-func itoa(n int) string {
-	if n < 0 {
-		return "-" + itoa(-n)
-	}
-	if n < 10 {
-		return string(rune('0' + n))
-	}
-	return itoa(n/10) + string(rune('0'+n%10))
 }
