@@ -321,7 +321,8 @@ func TestDirectionDelta(t *testing.T) {
 		{8, 1, 1},   // SE
 	}
 	for _, tc := range cases {
-		dx, dy := directionDelta(tc.dir)
+		dx := dirDeltaX[tc.dir]
+		dy := dirDeltaY[tc.dir]
 		if dx != tc.dx || dy != tc.dy {
 			t.Fatalf("dir %d: expected (%d,%d), got (%d,%d)", tc.dir, tc.dx, tc.dy, dx, dy)
 		}
