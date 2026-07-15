@@ -35,9 +35,8 @@ func run() error {
 
 	// --- Phase 1: Storage Layer ---
 	fmt.Println("━━━ Phase 1: Storage Layer ━━━")
-	wsDir := filepath.Join(".", "demo_workspace", "integration_test")
-	dbPath := filepath.Join(wsDir, "galatea.db")
-	os.RemoveAll(filepath.Join(".", "demo_workspace"))
+	dbPath := filepath.Join(".", "demo_integration_test.db")
+	os.Remove(dbPath)
 
 	db, err := storage.Open(dbPath)
 	if err != nil {
@@ -310,7 +309,7 @@ func run() error {
 	fmt.Println("╚══════════════════════════════════════════════════════════════════╝")
 
 	// Cleanup.
-	os.RemoveAll(filepath.Join(".", "demo_workspace"))
+	os.Remove(dbPath)
 	fmt.Println("\nDemo workspace cleaned. All systems operational.")
 
 	return nil

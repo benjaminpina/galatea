@@ -483,9 +483,8 @@ func runFromDB(dbPath string) error {
 
 // runDemo creates a self-contained demo world and launches the visualizer.
 func runDemo() {
-	wsDir := filepath.Join(os.TempDir(), "galatea_demo")
-	dbPath := filepath.Join(wsDir, "galatea.db")
-	os.RemoveAll(wsDir)
+	dbPath := filepath.Join(os.TempDir(), "galatea_demo.db")
+	os.Remove(dbPath)
 
 	db, err := storage.Open(dbPath)
 	if err != nil {
@@ -493,7 +492,7 @@ func runDemo() {
 	}
 	defer func() {
 		db.Close()
-		os.RemoveAll(wsDir)
+		os.Remove(dbPath)
 	}()
 
 	populateDemoProject(db)

@@ -10,8 +10,9 @@ This repository is the complete architectural re-engineering of the legacy Galat
 Galatea/
 ├── docs/                    # Architecture docs, thesis PDFs
 ├── legacy_pascal/           # Historical FreePascal code (read-only reference)
-├── workspaces/              # Simulation project databases (one folder per project)
-│   └── <project>/galatea.db
+├── workspaces/              # Simulation project databases (one .db file per project)
+│   ├── aedes_aegypti.db
+│   └── drosophila_model.db
 ├── engine_go/               # Go simulation engine + 2D visualizer
 │   ├── cmd/cli/             # galateac — headless simulation runner
 │   ├── cmd/gui/             # galatea — Ebitengine 2D visualizer

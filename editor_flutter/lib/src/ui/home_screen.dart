@@ -1,4 +1,4 @@
-import 'dart:io';
+
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -21,7 +21,11 @@ class HomeScreen extends ConsumerWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.science, size: 80, color: Theme.of(context).colorScheme.primary),
+            Icon(
+              Icons.science,
+              size: 80,
+              color: Theme.of(context).colorScheme.primary,
+            ),
             const SizedBox(height: 24),
             Text(
               'Galatea Studio',
@@ -31,8 +35,8 @@ class HomeScreen extends ConsumerWidget {
             Text(
               'Simulation Scenario Editor',
               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
             ),
             const SizedBox(height: 48),
             FilledButton.icon(
@@ -77,8 +81,14 @@ class HomeScreen extends ConsumerWidget {
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
-          FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Create')),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Create'),
+          ),
         ],
       ),
     );
@@ -87,21 +97,20 @@ class HomeScreen extends ConsumerWidget {
 
     // Let user pick a directory for the workspace.
     final dirPath = await FilePicker.platform.getDirectoryPath(
-      dialogTitle: 'Select workspace directory',
+      dialogTitle: 'Select directory to save project',
     );
     if (dirPath == null) return;
 
     final projectName = nameController.text.trim().isEmpty
         ? 'Untitled'
         : nameController.text.trim();
-    final folderName = projectName.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]+'), '_');
-    final wsDir = p.join(dirPath, folderName);
-    final dbPath = p.join(wsDir, 'galatea.db');
+    final fileName = projectName.toLowerCase().replaceAll(
+      RegExp(r'[^a-z0-9]+'),
+      '_',
+    );
+    final dbPath = p.join(dirPath, '$fileName.db');
 
-    // Create directory.
-    await Directory(wsDir).create(recursive: true);
-
-    // Initialize database.
+    // Initialize database (directory already exists since user picked it).
     final db = AppDatabase(dbPath);
     final dao = ProjectInfoDao(db);
     await dao.init(projectName, descController.text.trim());
