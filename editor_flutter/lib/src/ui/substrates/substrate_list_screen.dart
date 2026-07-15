@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../providers/database_provider.dart';
@@ -25,7 +26,9 @@ class SubstrateListScreen extends ConsumerWidget {
       body: substrates.when(
         data: (list) {
           if (list.isEmpty) {
-            return const Center(child: Text('No substrates defined. Tap + to add one.'));
+            return const Center(
+              child: Text('No substrates defined. Tap + to add one.'),
+            );
           }
           return ListView.builder(
             padding: const EdgeInsets.all(16),
@@ -78,8 +81,14 @@ class SubstrateListScreen extends ConsumerWidget {
             ],
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
-            FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Add')),
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              child: const Text('Add'),
+            ),
           ],
         ),
       ),
@@ -95,45 +104,7 @@ class SubstrateListScreen extends ConsumerWidget {
     final existing = await dao.getAll();
     await dao.add(name, selectedColor, false, existing.length + 1);
   }
-
-  static Future<Color?> pickColor(BuildContext context, Color current) async {
-    final colors = [
-      Colors.green, Colors.lightGreen, Colors.teal,
-      Colors.blue, Colors.lightBlue, Colors.cyan,
-      Colors.amber, Colors.orange, Colors.brown,
-      Colors.red, Colors.pink, Colors.purple,
-      Colors.grey, Colors.blueGrey, Colors.lime,
-      const Color(0xFF228B22), const Color(0xFFC2B280), const Color(0xFF1E90FF),
-      const Color(0xFF696969), const Color(0xFF006400), const Color(0xFFDEB887),
-    ];
-
-    return showDialog<Color>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Pick Color'),
-        content: Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: colors.map((c) {
-            return GestureDetector(
-              onTap: () => Navigator.pop(ctx, c),
-              child: Container(
-                width: 40, height: 40,
-                decoration: BoxDecoration(
-                  color: c,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(
-                    color: c == current ? Colors.white : Colors.transparent,
-                    width: 3,
-                  ),
-                ),
-              ),
-            );
-          }).toList(),
-        ),
-      ),
-    );
-  }
+ static Future<Color?> pickColor(BuildContext context, Color current) async { Color pickedColor = current;  final result = await showDialog<bool>( context: context, builder: (ctx) => AlertDialog( title: const Text('Pick Color'), content: SingleChildScrollView( child: ColorPicker( pickerColor: current, onColorChanged: (color) => pickedColor = color, enableAlpha: false, hexInputBar: true, labelTypes: const [ColorLabelType.rgb, ColorLabelType.hex], pickerAreaHeightPercent: 0.7, ), ), actions: [ TextButton( onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel'), ), FilledButton( onPressed: () => Navigator.pop(ctx, true), child: const Text('Select'), ), ], ), );  if (result == true) return pickedColor; return null; }
 }
 
 class _SubstrateTile extends ConsumerWidget {
@@ -146,7 +117,8 @@ class _SubstrateTile extends ConsumerWidget {
     return Card(
       child: ListTile(
         leading: Container(
-          width: 36, height: 36,
+          width: 36,
+          height: 36,
           decoration: BoxDecoration(
             color: Color(substrate.color),
             borderRadius: BorderRadius.circular(6),
@@ -195,7 +167,10 @@ class _SubstrateTile extends ConsumerWidget {
                   _ColorChip(
                     color: Color(selectedColor),
                     onTap: () async {
-                      final picked = await SubstrateListScreen.pickColor(ctx, Color(selectedColor));
+                      final picked = await SubstrateListScreen.pickColor(
+                        ctx,
+                        Color(selectedColor),
+                      );
                       if (picked != null) {
                         setState(() => selectedColor = picked.toARGB32());
                       }
@@ -206,8 +181,14 @@ class _SubstrateTile extends ConsumerWidget {
             ],
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
-            FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Save')),
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              child: const Text('Save'),
+            ),
           ],
         ),
       ),
@@ -228,7 +209,10 @@ class _SubstrateTile extends ConsumerWidget {
         title: const Text('Delete Substrate'),
         content: Text('Delete "${substrate.name}"? This cannot be undone.'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancel'),
+          ),
           FilledButton(
             style: FilledButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () => Navigator.pop(ctx, true),
@@ -256,7 +240,8 @@ class _ColorChip extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 48, height: 32,
+        width: 48,
+        height: 32,
         decoration: BoxDecoration(
           color: color,
           borderRadius: BorderRadius.circular(6),
