@@ -5,6 +5,15 @@ go 1.26.4
 require modernc.org/sqlite v1.53.0
 
 require (
+	github.com/ebitengine/gomobile v0.0.0-20250923094054-ea854a63cce1 // indirect
+	github.com/ebitengine/hideconsole v1.0.0 // indirect
+	github.com/ebitengine/purego v0.9.0 // indirect
+	github.com/hajimehoshi/ebiten/v2 v2.9.9 // indirect
+	github.com/jezek/xgb v1.1.1 // indirect
+	golang.org/x/sync v0.20.0 // indirect
+)
+
+require (
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/expr-lang/expr v1.17.8
 	github.com/google/uuid v1.6.0 // indirect
