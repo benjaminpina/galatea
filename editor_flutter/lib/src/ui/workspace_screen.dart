@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../providers/database_provider.dart';
+import 'substrates/substrate_list_screen.dart';
+import 'substrates/map_editor_screen.dart';
 
 /// Main workspace screen shown when a project is open.
-/// Displays navigation to all editors (nutrients, substrates, prototypes, etc.).
 class WorkspaceScreen extends ConsumerWidget {
   const WorkspaceScreen({super.key});
 
@@ -57,6 +58,12 @@ class WorkspaceScreen extends ConsumerWidget {
                     icon: Icons.terrain,
                     label: 'Substrates',
                     count: substrates.valueOrNull?.length ?? 0,
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const SubstrateListScreen(),
+                      ),
+                    ),
                   ),
                   _SummaryCard(
                     icon: Icons.biotech,
@@ -82,12 +89,29 @@ class WorkspaceScreen extends ConsumerWidget {
                     icon: Icons.map,
                     label: 'Environments',
                     count: environments.valueOrNull?.length ?? 0,
+                    onTap: () => _openMapEditor(context, ref),
                   ),
                 ],
               ),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  void _openMapEditor(BuildContext context, WidgetRef ref) {
+    final envs = ref.read(environmentsProvider).valueOrNull;
+    if (envs == null || envs.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Create an environment first.')),
+      );
+      return;
+    }
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => MapEditorScreen(environmentId: envs.first.id),
       ),
     );
   }
@@ -98,19 +122,19 @@ class _SummaryCard extends StatelessWidget {
     required this.icon,
     required this.label,
     required this.count,
+    this.onTap,
   });
 
   final IconData icon;
   final String label;
   final int count;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     return Card(
       child: InkWell(
-        onTap: () {
-          // TODO: Navigate to entity editor.
-        },
+        onTap: onTap,
         borderRadius: BorderRadius.circular(12),
         child: Padding(
           padding: const EdgeInsets.all(16),

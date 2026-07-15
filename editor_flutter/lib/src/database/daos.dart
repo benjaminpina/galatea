@@ -81,6 +81,11 @@ class SubstrateDao extends DatabaseAccessor<AppDatabase>
   Future<void> remove(int id) =>
       (delete(substrates)..where((t) => t.id.equals(id))).go();
 
+  Future<void> updateSubstrate(int id, String name, int color) =>
+      (update(substrates)..where((t) => t.id.equals(id))).write(
+        SubstratesCompanion(name: Value(name), color: Value(color)),
+      );
+
   Future<void> addComposition(int mixedId, int simpleId, int percentage) =>
       into(substrateCompositions).insert(
         SubstrateCompositionsCompanion.insert(
