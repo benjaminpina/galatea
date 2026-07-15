@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:file_picker/file_picker.dart';
 
+import '../exchange/exporter.dart';
+import '../exchange/importer.dart';
 import '../providers/database_provider.dart';
 import 'genetics/loci_list_screen.dart';
 import 'ontogeny/stage_list_screen.dart';
@@ -26,6 +29,38 @@ class WorkspaceScreen extends ConsumerWidget {
       appBar: AppBar(
         title: const Text('Galatea Studio'),
         actions: [
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.upload_file),
+            tooltip: 'Export',
+            onSelected: (value) => _export(context, ref, value),
+            itemBuilder: (_) => const [
+              PopupMenuItem(
+                value: 'substrates',
+                child: Text('Export Substrates'),
+              ),
+              PopupMenuItem(value: 'loci', child: Text('Export Loci')),
+              PopupMenuItem(
+                value: 'prototypes',
+                child: Text('Export Prototypes'),
+              ),
+            ],
+          ),
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.download),
+            tooltip: 'Import',
+            onSelected: (value) => _import(context, ref, value),
+            itemBuilder: (_) => const [
+              PopupMenuItem(
+                value: 'substrates',
+                child: Text('Import Substrates'),
+              ),
+              PopupMenuItem(value: 'loci', child: Text('Import Loci')),
+              PopupMenuItem(
+                value: 'prototypes',
+                child: Text('Import Prototypes'),
+              ),
+            ],
+          ),
           IconButton(
             icon: const Icon(Icons.close),
             tooltip: 'Close project',
@@ -117,6 +152,68 @@ class WorkspaceScreen extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  void _export(BuildContext context, WidgetRef ref, String type) async {
+    final db = ref.read(databaseProvider);
+    if (db == null) return;
+
+    final outputPath = await FilePicker.platform.saveFile(
+      dialogTitle: 'Export $type',
+      fileName: '${type}_export.json',
+      type: FileType.custom,
+      allowedExtensions: ['json'],
+    );
+    if (outputPath == null) return;
+
+    final exporter = JsonExporter(db);
+    switch (type) {
+      case 'substrates':
+        await exporter.exportSubstrates(outputPath);
+      case 'loci':
+        await exporter.exportLoci(outputPath);
+      case 'prototypes':
+        await exporter.exportPrototypes(outputPath);
+    }
+
+    if (context.mounted) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Exported $type to $outputPath')));
+    }
+  }
+
+  void _import(BuildContext context, WidgetRef ref, String type) async {
+    final db = ref.read(databaseProvider);
+    if (db == null) return;
+
+    final result = await FilePicker.platform.pickFiles(
+      dialogTitle: 'Import $type',
+      type: FileType.custom,
+      allowedExtensions: ['json'],
+    );
+    if (result == null || result.files.isEmpty) return;
+    final filePath = result.files.single.path;
+    if (filePath == null) return;
+
+    final importer = JsonImporter(db);
+    ImportResult importResult;
+    switch (type) {
+      case 'substrates':
+        importResult = await importer.importSubstrates(filePath);
+      case 'loci':
+        importResult = await importer.importLoci(filePath);
+      case 'prototypes':
+        importResult = await importer.importPrototypes(filePath);
+      default:
+        return;
+    }
+
+    if (context.mounted) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Import: $importResult')));
+    }
   }
 
   void _openMapEditor(BuildContext context, WidgetRef ref) {
