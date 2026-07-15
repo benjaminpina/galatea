@@ -108,6 +108,21 @@ class SubstrateDao extends DatabaseAccessor<AppDatabase>
   Future<List<SubstrateComposition>> getCompositions(int mixedId) => (select(
     substrateCompositions,
   )..where((t) => t.mixedSubstrateId.equals(mixedId))).get();
+
+  /// Deletes all existing compositions for a mixed substrate and inserts new ones.
+  Future<void> replaceCompositions(
+    int mixedId,
+    Map<int, int> percentages,
+  ) async {
+    await (delete(
+      substrateCompositions,
+    )..where((t) => t.mixedSubstrateId.equals(mixedId))).go();
+    for (final entry in percentages.entries) {
+      if (entry.value > 0) {
+        await addComposition(mixedId, entry.key, entry.value);
+      }
+    }
+  }
 }
 
 @DriftAccessor(tables: [Loci])
