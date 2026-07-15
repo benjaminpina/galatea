@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../providers/database_provider.dart';
+import 'genetics/loci_list_screen.dart';
+import 'ontogeny/stage_list_screen.dart';
+import 'prototypes/prototype_list_screen.dart';
 import 'substrates/substrate_list_screen.dart';
 import 'substrates/map_editor_screen.dart';
 
@@ -69,16 +72,32 @@ class WorkspaceScreen extends ConsumerWidget {
                     icon: Icons.biotech,
                     label: 'Loci',
                     count: loci.valueOrNull?.length ?? 0,
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const LociListScreen()),
+                    ),
                   ),
                   _SummaryCard(
                     icon: Icons.timeline,
                     label: 'Stages',
                     count: stages.valueOrNull?.length ?? 0,
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const StageListScreen(),
+                      ),
+                    ),
                   ),
                   _SummaryCard(
                     icon: Icons.person,
                     label: 'Prototypes',
                     count: prototypes.valueOrNull?.length ?? 0,
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const PrototypeListScreen(),
+                      ),
+                    ),
                   ),
                   _SummaryCard(
                     icon: Icons.park,
