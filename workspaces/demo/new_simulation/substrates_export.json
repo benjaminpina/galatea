@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "type": "substrate_set",
+  "substrates": [
+    {
+      "name": "Pasto",
+      "color": 4283215696,
+      "is_mixed": false,
+      "sort_order": 1
+    },
+    {
+      "name": "Agua",
+      "color": 4278430196,
+      "is_mixed": false,
+      "sort_order": 2
+    },
+    {
+      "name": "Tierra",
+      "color": 4286141768,
+      "is_mixed": false,
+      "sort_order": 3
+    }
+  ],
+  "compositions": []
+}
