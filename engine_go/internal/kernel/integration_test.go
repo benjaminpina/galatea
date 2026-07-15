@@ -138,10 +138,10 @@ func populateReferenceProject(t *testing.T, db *storage.DB) {
 	projRepo.Init("Reference Project", "End-to-end integration test")
 
 	nutRepo := storage.NewNutrientRepo(db)
-	nutRepo.Create("Water", 1)
-	nutRepo.Create("Carbohydrates", 2)
-	nutRepo.Create("Lipids", 3)
-	nutRepo.Create("Protein", 4)
+	nutRepo.Create("Water", 0, 1)
+	nutRepo.Create("Carbohydrates", 0, 2)
+	nutRepo.Create("Lipids", 0, 3)
+	nutRepo.Create("Protein", 0, 4)
 
 	subRepo := storage.NewSubstrateRepo(db)
 	subRepo.Create("Grass", 0x228B22, false, 1)
@@ -197,31 +197,26 @@ func populateReferenceProject(t *testing.T, db *storage.DB) {
 		SexRatioMalesFormula: "50", SexRatioFemalesFormula: "50", SortOrder: 2,
 	})
 
-	nutID1, nutID2, nutID3 := int64(1), int64(2), int64(3)
-	rtRepo := storage.NewResourceTypeRepo(db)
-	rtRepo.Create(&storage.ResourceType{Name: "WaterPool", NutrientID: &nutID1, SortOrder: 1})
-	rtRepo.Create(&storage.ResourceType{Name: "NectarFlower", NutrientID: &nutID2, SortOrder: 2})
-	rtRepo.Create(&storage.ResourceType{Name: "FruitTree", NutrientID: &nutID3, SortOrder: 3})
 
 	envRepo := storage.NewEnvironmentRepo(db)
 	envID, _ := envRepo.Create("ReferenceArena", 80, 80, "80x80 reference environment")
 
 	// Place resources.
 	for i := 0; i < 12; i++ {
-		envRepo.PlaceResource(&storage.EnvironmentResource{
-			EnvironmentID: envID, ResourceTypeID: 1, Name: "water_" + itoa(i),
+		envRepo.PlaceSource(&storage.EnvironmentSource{
+			EnvironmentID: envID, NutrientID: 1, Name: "water_" + itoa(i),
 			PosX: 5 + i*6, PosY: 40, Quality: 10, Level: 150, MaxLevel: 300, RegenRate: 1.05,
 		})
 	}
 	for i := 0; i < 10; i++ {
-		envRepo.PlaceResource(&storage.EnvironmentResource{
-			EnvironmentID: envID, ResourceTypeID: 2, Name: "flower_" + itoa(i),
+		envRepo.PlaceSource(&storage.EnvironmentSource{
+			EnvironmentID: envID, NutrientID: 2, Name: "flower_" + itoa(i),
 			PosX: 40, PosY: 5 + i*7, Quality: 8, Level: 100, MaxLevel: 200, RegenRate: 1.1,
 		})
 	}
 	for i := 0; i < 8; i++ {
-		envRepo.PlaceResource(&storage.EnvironmentResource{
-			EnvironmentID: envID, ResourceTypeID: 3, Name: "tree_" + itoa(i),
+		envRepo.PlaceSource(&storage.EnvironmentSource{
+			EnvironmentID: envID, NutrientID: 3, Name: "tree_" + itoa(i),
 			PosX: 10 + i*9, PosY: 65, Quality: 12, Level: 120, MaxLevel: 250, RegenRate: 1.06,
 		})
 	}

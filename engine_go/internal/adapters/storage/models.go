@@ -8,10 +8,12 @@ type ProjectInfo struct {
 	UpdatedAt   string
 }
 
-// Nutrient represents a user-defined nutrient type (e.g., Water, Sugar, Fat).
+// Nutrient represents a user-defined nutrient type.
+// Each nutrient implicitly defines its corresponding resource source in the environment.
 type Nutrient struct {
 	ID        int64
 	Name      string
+	Color     int // Render color for nutrient sources in the visualizer.
 	SortOrder int
 }
 
@@ -80,16 +82,6 @@ type Prototype struct {
 	SortOrder                  int
 }
 
-// ResourceType represents a type of dynamic element in the environment.
-type ResourceType struct {
-	ID            int64
-	Name          string
-	NutrientID    *int64
-	IsOviposition bool
-	Color         int
-	SortOrder     int
-}
-
 // Environment represents a configured simulation environment.
 type Environment struct {
 	ID          int64
@@ -101,18 +93,30 @@ type Environment struct {
 	UpdatedAt   string
 }
 
-// EnvironmentResource represents a resource instance placed in the environment.
-type EnvironmentResource struct {
-	ID             int64
-	EnvironmentID  int64
-	ResourceTypeID int64
-	Name           string
-	PosX           int
-	PosY           int
-	Quality        int
-	Level          int
-	MaxLevel       int
-	RegenRate      float64
+// EnvironmentSource represents a nutrient source instance placed in the environment.
+// Each source provides exactly one nutrient (identified by NutrientID).
+type EnvironmentSource struct {
+	ID            int64
+	EnvironmentID int64
+	NutrientID    int64
+	Name          string
+	PosX          int
+	PosY          int
+	Quality       int
+	Level         int
+	MaxLevel      int
+	RegenRate     float64
+}
+
+// OvipositionSite represents an oviposition site placed in the environment.
+type OvipositionSite struct {
+	ID            int64
+	EnvironmentID int64
+	Name          string
+	PosX          int
+	PosY          int
+	Quality       int
+	Capacity      int
 }
 
 // EnvironmentAgent represents an initial agent in the environment.

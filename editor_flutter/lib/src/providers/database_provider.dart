@@ -5,14 +5,7 @@ import '../database/daos.dart';
 
 // Re-export data classes for convenient use in UI layer.
 export '../database/database.dart'
-    show
-        Nutrient,
-        Substrate,
-        LociData,
-        Stage,
-        Prototype,
-        ResourceType,
-        Environment;
+    show Nutrient, Substrate, LociData, Stage, Prototype, Environment;
 
 /// The workspace database path. Must be set before accessing the database.
 final workspacePathProvider = StateProvider<String?>((ref) => null);
@@ -26,7 +19,7 @@ final databaseProvider = Provider<AppDatabase?>((ref) {
   return db;
 });
 
-/// DAO providers — only accessible when database is open.
+/// DAO providers.
 final projectInfoDaoProvider = Provider<ProjectInfoDao?>((ref) {
   final db = ref.watch(databaseProvider);
   if (db == null) return null;
@@ -63,12 +56,6 @@ final prototypeDaoProvider = Provider<PrototypeDao?>((ref) {
   return PrototypeDao(db);
 });
 
-final resourceTypeDaoProvider = Provider<ResourceTypeDao?>((ref) {
-  final db = ref.watch(databaseProvider);
-  if (db == null) return null;
-  return ResourceTypeDao(db);
-});
-
 final environmentDaoProvider = Provider<EnvironmentDao?>((ref) {
   final db = ref.watch(databaseProvider);
   if (db == null) return null;
@@ -102,12 +89,6 @@ final stagesProvider = StreamProvider<List<Stage>>((ref) {
 
 final prototypesProvider = StreamProvider<List<Prototype>>((ref) {
   final dao = ref.watch(prototypeDaoProvider);
-  if (dao == null) return const Stream.empty();
-  return dao.watchAll();
-});
-
-final resourceTypesProvider = StreamProvider<List<ResourceType>>((ref) {
-  final dao = ref.watch(resourceTypeDaoProvider);
   if (dao == null) return const Stream.empty();
   return dao.watchAll();
 });

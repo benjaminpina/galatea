@@ -377,6 +377,16 @@ class $NutrientsTable extends Nutrients
     requiredDuringInsert: true,
     defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'),
   );
+  static const VerificationMeta _colorMeta = const VerificationMeta('color');
+  @override
+  late final GeneratedColumn<int> color = GeneratedColumn<int>(
+    'color',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
   static const VerificationMeta _sortOrderMeta = const VerificationMeta(
     'sortOrder',
   );
@@ -390,7 +400,7 @@ class $NutrientsTable extends Nutrients
     defaultValue: const Constant(0),
   );
   @override
-  List<GeneratedColumn> get $columns => [id, name, sortOrder];
+  List<GeneratedColumn> get $columns => [id, name, color, sortOrder];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -413,6 +423,12 @@ class $NutrientsTable extends Nutrients
       );
     } else if (isInserting) {
       context.missing(_nameMeta);
+    }
+    if (data.containsKey('color')) {
+      context.handle(
+        _colorMeta,
+        color.isAcceptableOrUnknown(data['color']!, _colorMeta),
+      );
     }
     if (data.containsKey('sort_order')) {
       context.handle(
@@ -437,6 +453,10 @@ class $NutrientsTable extends Nutrients
         DriftSqlType.string,
         data['${effectivePrefix}name'],
       )!,
+      color: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}color'],
+      )!,
       sortOrder: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}sort_order'],
@@ -453,10 +473,12 @@ class $NutrientsTable extends Nutrients
 class Nutrient extends DataClass implements Insertable<Nutrient> {
   final int id;
   final String name;
+  final int color;
   final int sortOrder;
   const Nutrient({
     required this.id,
     required this.name,
+    required this.color,
     required this.sortOrder,
   });
   @override
@@ -464,6 +486,7 @@ class Nutrient extends DataClass implements Insertable<Nutrient> {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
     map['name'] = Variable<String>(name);
+    map['color'] = Variable<int>(color);
     map['sort_order'] = Variable<int>(sortOrder);
     return map;
   }
@@ -472,6 +495,7 @@ class Nutrient extends DataClass implements Insertable<Nutrient> {
     return NutrientsCompanion(
       id: Value(id),
       name: Value(name),
+      color: Value(color),
       sortOrder: Value(sortOrder),
     );
   }
@@ -484,6 +508,7 @@ class Nutrient extends DataClass implements Insertable<Nutrient> {
     return Nutrient(
       id: serializer.fromJson<int>(json['id']),
       name: serializer.fromJson<String>(json['name']),
+      color: serializer.fromJson<int>(json['color']),
       sortOrder: serializer.fromJson<int>(json['sortOrder']),
     );
   }
@@ -493,19 +518,23 @@ class Nutrient extends DataClass implements Insertable<Nutrient> {
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
       'name': serializer.toJson<String>(name),
+      'color': serializer.toJson<int>(color),
       'sortOrder': serializer.toJson<int>(sortOrder),
     };
   }
 
-  Nutrient copyWith({int? id, String? name, int? sortOrder}) => Nutrient(
-    id: id ?? this.id,
-    name: name ?? this.name,
-    sortOrder: sortOrder ?? this.sortOrder,
-  );
+  Nutrient copyWith({int? id, String? name, int? color, int? sortOrder}) =>
+      Nutrient(
+        id: id ?? this.id,
+        name: name ?? this.name,
+        color: color ?? this.color,
+        sortOrder: sortOrder ?? this.sortOrder,
+      );
   Nutrient copyWithCompanion(NutrientsCompanion data) {
     return Nutrient(
       id: data.id.present ? data.id.value : this.id,
       name: data.name.present ? data.name.value : this.name,
+      color: data.color.present ? data.color.value : this.color,
       sortOrder: data.sortOrder.present ? data.sortOrder.value : this.sortOrder,
     );
   }
@@ -515,44 +544,51 @@ class Nutrient extends DataClass implements Insertable<Nutrient> {
     return (StringBuffer('Nutrient(')
           ..write('id: $id, ')
           ..write('name: $name, ')
+          ..write('color: $color, ')
           ..write('sortOrder: $sortOrder')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, name, sortOrder);
+  int get hashCode => Object.hash(id, name, color, sortOrder);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is Nutrient &&
           other.id == this.id &&
           other.name == this.name &&
+          other.color == this.color &&
           other.sortOrder == this.sortOrder);
 }
 
 class NutrientsCompanion extends UpdateCompanion<Nutrient> {
   final Value<int> id;
   final Value<String> name;
+  final Value<int> color;
   final Value<int> sortOrder;
   const NutrientsCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
+    this.color = const Value.absent(),
     this.sortOrder = const Value.absent(),
   });
   NutrientsCompanion.insert({
     this.id = const Value.absent(),
     required String name,
+    this.color = const Value.absent(),
     this.sortOrder = const Value.absent(),
   }) : name = Value(name);
   static Insertable<Nutrient> custom({
     Expression<int>? id,
     Expression<String>? name,
+    Expression<int>? color,
     Expression<int>? sortOrder,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (name != null) 'name': name,
+      if (color != null) 'color': color,
       if (sortOrder != null) 'sort_order': sortOrder,
     });
   }
@@ -560,11 +596,13 @@ class NutrientsCompanion extends UpdateCompanion<Nutrient> {
   NutrientsCompanion copyWith({
     Value<int>? id,
     Value<String>? name,
+    Value<int>? color,
     Value<int>? sortOrder,
   }) {
     return NutrientsCompanion(
       id: id ?? this.id,
       name: name ?? this.name,
+      color: color ?? this.color,
       sortOrder: sortOrder ?? this.sortOrder,
     );
   }
@@ -578,6 +616,9 @@ class NutrientsCompanion extends UpdateCompanion<Nutrient> {
     if (name.present) {
       map['name'] = Variable<String>(name.value);
     }
+    if (color.present) {
+      map['color'] = Variable<int>(color.value);
+    }
     if (sortOrder.present) {
       map['sort_order'] = Variable<int>(sortOrder.value);
     }
@@ -589,6 +630,7 @@ class NutrientsCompanion extends UpdateCompanion<Nutrient> {
     return (StringBuffer('NutrientsCompanion(')
           ..write('id: $id, ')
           ..write('name: $name, ')
+          ..write('color: $color, ')
           ..write('sortOrder: $sortOrder')
           ..write(')'))
         .toString();
@@ -3439,411 +3481,6 @@ class PrototypesCompanion extends UpdateCompanion<Prototype> {
   }
 }
 
-class $ResourceTypesTable extends ResourceTypes
-    with TableInfo<$ResourceTypesTable, ResourceType> {
-  @override
-  final GeneratedDatabase attachedDatabase;
-  final String? _alias;
-  $ResourceTypesTable(this.attachedDatabase, [this._alias]);
-  static const VerificationMeta _idMeta = const VerificationMeta('id');
-  @override
-  late final GeneratedColumn<int> id = GeneratedColumn<int>(
-    'id',
-    aliasedName,
-    false,
-    hasAutoIncrement: true,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'PRIMARY KEY AUTOINCREMENT',
-    ),
-  );
-  static const VerificationMeta _nameMeta = const VerificationMeta('name');
-  @override
-  late final GeneratedColumn<String> name = GeneratedColumn<String>(
-    'name',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-    defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'),
-  );
-  static const VerificationMeta _nutrientIdMeta = const VerificationMeta(
-    'nutrientId',
-  );
-  @override
-  late final GeneratedColumn<int> nutrientId = GeneratedColumn<int>(
-    'nutrient_id',
-    aliasedName,
-    true,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES nutrients (id)',
-    ),
-  );
-  static const VerificationMeta _isOvipositionMeta = const VerificationMeta(
-    'isOviposition',
-  );
-  @override
-  late final GeneratedColumn<bool> isOviposition = GeneratedColumn<bool>(
-    'is_oviposition',
-    aliasedName,
-    false,
-    type: DriftSqlType.bool,
-    requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'CHECK ("is_oviposition" IN (0, 1))',
-    ),
-    defaultValue: const Constant(false),
-  );
-  static const VerificationMeta _colorMeta = const VerificationMeta('color');
-  @override
-  late final GeneratedColumn<int> color = GeneratedColumn<int>(
-    'color',
-    aliasedName,
-    false,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
-    defaultValue: const Constant(0),
-  );
-  static const VerificationMeta _sortOrderMeta = const VerificationMeta(
-    'sortOrder',
-  );
-  @override
-  late final GeneratedColumn<int> sortOrder = GeneratedColumn<int>(
-    'sort_order',
-    aliasedName,
-    false,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
-    defaultValue: const Constant(0),
-  );
-  @override
-  List<GeneratedColumn> get $columns => [
-    id,
-    name,
-    nutrientId,
-    isOviposition,
-    color,
-    sortOrder,
-  ];
-  @override
-  String get aliasedName => _alias ?? actualTableName;
-  @override
-  String get actualTableName => $name;
-  static const String $name = 'resource_types';
-  @override
-  VerificationContext validateIntegrity(
-    Insertable<ResourceType> instance, {
-    bool isInserting = false,
-  }) {
-    final context = VerificationContext();
-    final data = instance.toColumns(true);
-    if (data.containsKey('id')) {
-      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
-    }
-    if (data.containsKey('name')) {
-      context.handle(
-        _nameMeta,
-        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
-      );
-    } else if (isInserting) {
-      context.missing(_nameMeta);
-    }
-    if (data.containsKey('nutrient_id')) {
-      context.handle(
-        _nutrientIdMeta,
-        nutrientId.isAcceptableOrUnknown(data['nutrient_id']!, _nutrientIdMeta),
-      );
-    }
-    if (data.containsKey('is_oviposition')) {
-      context.handle(
-        _isOvipositionMeta,
-        isOviposition.isAcceptableOrUnknown(
-          data['is_oviposition']!,
-          _isOvipositionMeta,
-        ),
-      );
-    }
-    if (data.containsKey('color')) {
-      context.handle(
-        _colorMeta,
-        color.isAcceptableOrUnknown(data['color']!, _colorMeta),
-      );
-    }
-    if (data.containsKey('sort_order')) {
-      context.handle(
-        _sortOrderMeta,
-        sortOrder.isAcceptableOrUnknown(data['sort_order']!, _sortOrderMeta),
-      );
-    }
-    return context;
-  }
-
-  @override
-  Set<GeneratedColumn> get $primaryKey => {id};
-  @override
-  ResourceType map(Map<String, dynamic> data, {String? tablePrefix}) {
-    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return ResourceType(
-      id: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}id'],
-      )!,
-      name: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}name'],
-      )!,
-      nutrientId: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}nutrient_id'],
-      ),
-      isOviposition: attachedDatabase.typeMapping.read(
-        DriftSqlType.bool,
-        data['${effectivePrefix}is_oviposition'],
-      )!,
-      color: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}color'],
-      )!,
-      sortOrder: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}sort_order'],
-      )!,
-    );
-  }
-
-  @override
-  $ResourceTypesTable createAlias(String alias) {
-    return $ResourceTypesTable(attachedDatabase, alias);
-  }
-}
-
-class ResourceType extends DataClass implements Insertable<ResourceType> {
-  final int id;
-  final String name;
-  final int? nutrientId;
-  final bool isOviposition;
-  final int color;
-  final int sortOrder;
-  const ResourceType({
-    required this.id,
-    required this.name,
-    this.nutrientId,
-    required this.isOviposition,
-    required this.color,
-    required this.sortOrder,
-  });
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    map['id'] = Variable<int>(id);
-    map['name'] = Variable<String>(name);
-    if (!nullToAbsent || nutrientId != null) {
-      map['nutrient_id'] = Variable<int>(nutrientId);
-    }
-    map['is_oviposition'] = Variable<bool>(isOviposition);
-    map['color'] = Variable<int>(color);
-    map['sort_order'] = Variable<int>(sortOrder);
-    return map;
-  }
-
-  ResourceTypesCompanion toCompanion(bool nullToAbsent) {
-    return ResourceTypesCompanion(
-      id: Value(id),
-      name: Value(name),
-      nutrientId: nutrientId == null && nullToAbsent
-          ? const Value.absent()
-          : Value(nutrientId),
-      isOviposition: Value(isOviposition),
-      color: Value(color),
-      sortOrder: Value(sortOrder),
-    );
-  }
-
-  factory ResourceType.fromJson(
-    Map<String, dynamic> json, {
-    ValueSerializer? serializer,
-  }) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return ResourceType(
-      id: serializer.fromJson<int>(json['id']),
-      name: serializer.fromJson<String>(json['name']),
-      nutrientId: serializer.fromJson<int?>(json['nutrientId']),
-      isOviposition: serializer.fromJson<bool>(json['isOviposition']),
-      color: serializer.fromJson<int>(json['color']),
-      sortOrder: serializer.fromJson<int>(json['sortOrder']),
-    );
-  }
-  @override
-  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return <String, dynamic>{
-      'id': serializer.toJson<int>(id),
-      'name': serializer.toJson<String>(name),
-      'nutrientId': serializer.toJson<int?>(nutrientId),
-      'isOviposition': serializer.toJson<bool>(isOviposition),
-      'color': serializer.toJson<int>(color),
-      'sortOrder': serializer.toJson<int>(sortOrder),
-    };
-  }
-
-  ResourceType copyWith({
-    int? id,
-    String? name,
-    Value<int?> nutrientId = const Value.absent(),
-    bool? isOviposition,
-    int? color,
-    int? sortOrder,
-  }) => ResourceType(
-    id: id ?? this.id,
-    name: name ?? this.name,
-    nutrientId: nutrientId.present ? nutrientId.value : this.nutrientId,
-    isOviposition: isOviposition ?? this.isOviposition,
-    color: color ?? this.color,
-    sortOrder: sortOrder ?? this.sortOrder,
-  );
-  ResourceType copyWithCompanion(ResourceTypesCompanion data) {
-    return ResourceType(
-      id: data.id.present ? data.id.value : this.id,
-      name: data.name.present ? data.name.value : this.name,
-      nutrientId: data.nutrientId.present
-          ? data.nutrientId.value
-          : this.nutrientId,
-      isOviposition: data.isOviposition.present
-          ? data.isOviposition.value
-          : this.isOviposition,
-      color: data.color.present ? data.color.value : this.color,
-      sortOrder: data.sortOrder.present ? data.sortOrder.value : this.sortOrder,
-    );
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('ResourceType(')
-          ..write('id: $id, ')
-          ..write('name: $name, ')
-          ..write('nutrientId: $nutrientId, ')
-          ..write('isOviposition: $isOviposition, ')
-          ..write('color: $color, ')
-          ..write('sortOrder: $sortOrder')
-          ..write(')'))
-        .toString();
-  }
-
-  @override
-  int get hashCode =>
-      Object.hash(id, name, nutrientId, isOviposition, color, sortOrder);
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is ResourceType &&
-          other.id == this.id &&
-          other.name == this.name &&
-          other.nutrientId == this.nutrientId &&
-          other.isOviposition == this.isOviposition &&
-          other.color == this.color &&
-          other.sortOrder == this.sortOrder);
-}
-
-class ResourceTypesCompanion extends UpdateCompanion<ResourceType> {
-  final Value<int> id;
-  final Value<String> name;
-  final Value<int?> nutrientId;
-  final Value<bool> isOviposition;
-  final Value<int> color;
-  final Value<int> sortOrder;
-  const ResourceTypesCompanion({
-    this.id = const Value.absent(),
-    this.name = const Value.absent(),
-    this.nutrientId = const Value.absent(),
-    this.isOviposition = const Value.absent(),
-    this.color = const Value.absent(),
-    this.sortOrder = const Value.absent(),
-  });
-  ResourceTypesCompanion.insert({
-    this.id = const Value.absent(),
-    required String name,
-    this.nutrientId = const Value.absent(),
-    this.isOviposition = const Value.absent(),
-    this.color = const Value.absent(),
-    this.sortOrder = const Value.absent(),
-  }) : name = Value(name);
-  static Insertable<ResourceType> custom({
-    Expression<int>? id,
-    Expression<String>? name,
-    Expression<int>? nutrientId,
-    Expression<bool>? isOviposition,
-    Expression<int>? color,
-    Expression<int>? sortOrder,
-  }) {
-    return RawValuesInsertable({
-      if (id != null) 'id': id,
-      if (name != null) 'name': name,
-      if (nutrientId != null) 'nutrient_id': nutrientId,
-      if (isOviposition != null) 'is_oviposition': isOviposition,
-      if (color != null) 'color': color,
-      if (sortOrder != null) 'sort_order': sortOrder,
-    });
-  }
-
-  ResourceTypesCompanion copyWith({
-    Value<int>? id,
-    Value<String>? name,
-    Value<int?>? nutrientId,
-    Value<bool>? isOviposition,
-    Value<int>? color,
-    Value<int>? sortOrder,
-  }) {
-    return ResourceTypesCompanion(
-      id: id ?? this.id,
-      name: name ?? this.name,
-      nutrientId: nutrientId ?? this.nutrientId,
-      isOviposition: isOviposition ?? this.isOviposition,
-      color: color ?? this.color,
-      sortOrder: sortOrder ?? this.sortOrder,
-    );
-  }
-
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    if (id.present) {
-      map['id'] = Variable<int>(id.value);
-    }
-    if (name.present) {
-      map['name'] = Variable<String>(name.value);
-    }
-    if (nutrientId.present) {
-      map['nutrient_id'] = Variable<int>(nutrientId.value);
-    }
-    if (isOviposition.present) {
-      map['is_oviposition'] = Variable<bool>(isOviposition.value);
-    }
-    if (color.present) {
-      map['color'] = Variable<int>(color.value);
-    }
-    if (sortOrder.present) {
-      map['sort_order'] = Variable<int>(sortOrder.value);
-    }
-    return map;
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('ResourceTypesCompanion(')
-          ..write('id: $id, ')
-          ..write('name: $name, ')
-          ..write('nutrientId: $nutrientId, ')
-          ..write('isOviposition: $isOviposition, ')
-          ..write('color: $color, ')
-          ..write('sortOrder: $sortOrder')
-          ..write(')'))
-        .toString();
-  }
-}
-
 class $EnvironmentsTable extends Environments
     with TableInfo<$EnvironmentsTable, Environment> {
   @override
@@ -4595,12 +4232,12 @@ class SubstrateMapRowsCompanion extends UpdateCompanion<SubstrateMapRow> {
   }
 }
 
-class $EnvironmentResourcesTable extends EnvironmentResources
-    with TableInfo<$EnvironmentResourcesTable, EnvironmentResource> {
+class $EnvironmentSourcesTable extends EnvironmentSources
+    with TableInfo<$EnvironmentSourcesTable, EnvironmentSource> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
-  $EnvironmentResourcesTable(this.attachedDatabase, [this._alias]);
+  $EnvironmentSourcesTable(this.attachedDatabase, [this._alias]);
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
@@ -4628,18 +4265,18 @@ class $EnvironmentResourcesTable extends EnvironmentResources
       'REFERENCES environments (id)',
     ),
   );
-  static const VerificationMeta _resourceTypeIdMeta = const VerificationMeta(
-    'resourceTypeId',
+  static const VerificationMeta _nutrientIdMeta = const VerificationMeta(
+    'nutrientId',
   );
   @override
-  late final GeneratedColumn<int> resourceTypeId = GeneratedColumn<int>(
-    'resource_type_id',
+  late final GeneratedColumn<int> nutrientId = GeneratedColumn<int>(
+    'nutrient_id',
     aliasedName,
     false,
     type: DriftSqlType.int,
     requiredDuringInsert: true,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES resource_types (id)',
+      'REFERENCES nutrients (id)',
     ),
   );
   static const VerificationMeta _nameMeta = const VerificationMeta('name');
@@ -4719,7 +4356,7 @@ class $EnvironmentResourcesTable extends EnvironmentResources
   List<GeneratedColumn> get $columns => [
     id,
     environmentId,
-    resourceTypeId,
+    nutrientId,
     name,
     posX,
     posY,
@@ -4732,10 +4369,10 @@ class $EnvironmentResourcesTable extends EnvironmentResources
   String get aliasedName => _alias ?? actualTableName;
   @override
   String get actualTableName => $name;
-  static const String $name = 'environment_resources';
+  static const String $name = 'environment_sources';
   @override
   VerificationContext validateIntegrity(
-    Insertable<EnvironmentResource> instance, {
+    Insertable<EnvironmentSource> instance, {
     bool isInserting = false,
   }) {
     final context = VerificationContext();
@@ -4754,16 +4391,13 @@ class $EnvironmentResourcesTable extends EnvironmentResources
     } else if (isInserting) {
       context.missing(_environmentIdMeta);
     }
-    if (data.containsKey('resource_type_id')) {
+    if (data.containsKey('nutrient_id')) {
       context.handle(
-        _resourceTypeIdMeta,
-        resourceTypeId.isAcceptableOrUnknown(
-          data['resource_type_id']!,
-          _resourceTypeIdMeta,
-        ),
+        _nutrientIdMeta,
+        nutrientId.isAcceptableOrUnknown(data['nutrient_id']!, _nutrientIdMeta),
       );
     } else if (isInserting) {
-      context.missing(_resourceTypeIdMeta);
+      context.missing(_nutrientIdMeta);
     }
     if (data.containsKey('name')) {
       context.handle(
@@ -4819,9 +4453,9 @@ class $EnvironmentResourcesTable extends EnvironmentResources
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  EnvironmentResource map(Map<String, dynamic> data, {String? tablePrefix}) {
+  EnvironmentSource map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return EnvironmentResource(
+    return EnvironmentSource(
       id: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}id'],
@@ -4830,9 +4464,9 @@ class $EnvironmentResourcesTable extends EnvironmentResources
         DriftSqlType.int,
         data['${effectivePrefix}environment_id'],
       )!,
-      resourceTypeId: attachedDatabase.typeMapping.read(
+      nutrientId: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
-        data['${effectivePrefix}resource_type_id'],
+        data['${effectivePrefix}nutrient_id'],
       )!,
       name: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
@@ -4866,16 +4500,16 @@ class $EnvironmentResourcesTable extends EnvironmentResources
   }
 
   @override
-  $EnvironmentResourcesTable createAlias(String alias) {
-    return $EnvironmentResourcesTable(attachedDatabase, alias);
+  $EnvironmentSourcesTable createAlias(String alias) {
+    return $EnvironmentSourcesTable(attachedDatabase, alias);
   }
 }
 
-class EnvironmentResource extends DataClass
-    implements Insertable<EnvironmentResource> {
+class EnvironmentSource extends DataClass
+    implements Insertable<EnvironmentSource> {
   final int id;
   final int environmentId;
-  final int resourceTypeId;
+  final int nutrientId;
   final String name;
   final int posX;
   final int posY;
@@ -4883,10 +4517,10 @@ class EnvironmentResource extends DataClass
   final int level;
   final int maxLevel;
   final double regenRate;
-  const EnvironmentResource({
+  const EnvironmentSource({
     required this.id,
     required this.environmentId,
-    required this.resourceTypeId,
+    required this.nutrientId,
     required this.name,
     required this.posX,
     required this.posY,
@@ -4900,7 +4534,7 @@ class EnvironmentResource extends DataClass
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
     map['environment_id'] = Variable<int>(environmentId);
-    map['resource_type_id'] = Variable<int>(resourceTypeId);
+    map['nutrient_id'] = Variable<int>(nutrientId);
     map['name'] = Variable<String>(name);
     map['pos_x'] = Variable<int>(posX);
     map['pos_y'] = Variable<int>(posY);
@@ -4911,11 +4545,11 @@ class EnvironmentResource extends DataClass
     return map;
   }
 
-  EnvironmentResourcesCompanion toCompanion(bool nullToAbsent) {
-    return EnvironmentResourcesCompanion(
+  EnvironmentSourcesCompanion toCompanion(bool nullToAbsent) {
+    return EnvironmentSourcesCompanion(
       id: Value(id),
       environmentId: Value(environmentId),
-      resourceTypeId: Value(resourceTypeId),
+      nutrientId: Value(nutrientId),
       name: Value(name),
       posX: Value(posX),
       posY: Value(posY),
@@ -4926,15 +4560,15 @@ class EnvironmentResource extends DataClass
     );
   }
 
-  factory EnvironmentResource.fromJson(
+  factory EnvironmentSource.fromJson(
     Map<String, dynamic> json, {
     ValueSerializer? serializer,
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return EnvironmentResource(
+    return EnvironmentSource(
       id: serializer.fromJson<int>(json['id']),
       environmentId: serializer.fromJson<int>(json['environmentId']),
-      resourceTypeId: serializer.fromJson<int>(json['resourceTypeId']),
+      nutrientId: serializer.fromJson<int>(json['nutrientId']),
       name: serializer.fromJson<String>(json['name']),
       posX: serializer.fromJson<int>(json['posX']),
       posY: serializer.fromJson<int>(json['posY']),
@@ -4950,7 +4584,7 @@ class EnvironmentResource extends DataClass
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
       'environmentId': serializer.toJson<int>(environmentId),
-      'resourceTypeId': serializer.toJson<int>(resourceTypeId),
+      'nutrientId': serializer.toJson<int>(nutrientId),
       'name': serializer.toJson<String>(name),
       'posX': serializer.toJson<int>(posX),
       'posY': serializer.toJson<int>(posY),
@@ -4961,10 +4595,10 @@ class EnvironmentResource extends DataClass
     };
   }
 
-  EnvironmentResource copyWith({
+  EnvironmentSource copyWith({
     int? id,
     int? environmentId,
-    int? resourceTypeId,
+    int? nutrientId,
     String? name,
     int? posX,
     int? posY,
@@ -4972,10 +4606,10 @@ class EnvironmentResource extends DataClass
     int? level,
     int? maxLevel,
     double? regenRate,
-  }) => EnvironmentResource(
+  }) => EnvironmentSource(
     id: id ?? this.id,
     environmentId: environmentId ?? this.environmentId,
-    resourceTypeId: resourceTypeId ?? this.resourceTypeId,
+    nutrientId: nutrientId ?? this.nutrientId,
     name: name ?? this.name,
     posX: posX ?? this.posX,
     posY: posY ?? this.posY,
@@ -4984,15 +4618,15 @@ class EnvironmentResource extends DataClass
     maxLevel: maxLevel ?? this.maxLevel,
     regenRate: regenRate ?? this.regenRate,
   );
-  EnvironmentResource copyWithCompanion(EnvironmentResourcesCompanion data) {
-    return EnvironmentResource(
+  EnvironmentSource copyWithCompanion(EnvironmentSourcesCompanion data) {
+    return EnvironmentSource(
       id: data.id.present ? data.id.value : this.id,
       environmentId: data.environmentId.present
           ? data.environmentId.value
           : this.environmentId,
-      resourceTypeId: data.resourceTypeId.present
-          ? data.resourceTypeId.value
-          : this.resourceTypeId,
+      nutrientId: data.nutrientId.present
+          ? data.nutrientId.value
+          : this.nutrientId,
       name: data.name.present ? data.name.value : this.name,
       posX: data.posX.present ? data.posX.value : this.posX,
       posY: data.posY.present ? data.posY.value : this.posY,
@@ -5005,10 +4639,10 @@ class EnvironmentResource extends DataClass
 
   @override
   String toString() {
-    return (StringBuffer('EnvironmentResource(')
+    return (StringBuffer('EnvironmentSource(')
           ..write('id: $id, ')
           ..write('environmentId: $environmentId, ')
-          ..write('resourceTypeId: $resourceTypeId, ')
+          ..write('nutrientId: $nutrientId, ')
           ..write('name: $name, ')
           ..write('posX: $posX, ')
           ..write('posY: $posY, ')
@@ -5024,7 +4658,7 @@ class EnvironmentResource extends DataClass
   int get hashCode => Object.hash(
     id,
     environmentId,
-    resourceTypeId,
+    nutrientId,
     name,
     posX,
     posY,
@@ -5036,10 +4670,10 @@ class EnvironmentResource extends DataClass
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is EnvironmentResource &&
+      (other is EnvironmentSource &&
           other.id == this.id &&
           other.environmentId == this.environmentId &&
-          other.resourceTypeId == this.resourceTypeId &&
+          other.nutrientId == this.nutrientId &&
           other.name == this.name &&
           other.posX == this.posX &&
           other.posY == this.posY &&
@@ -5049,11 +4683,10 @@ class EnvironmentResource extends DataClass
           other.regenRate == this.regenRate);
 }
 
-class EnvironmentResourcesCompanion
-    extends UpdateCompanion<EnvironmentResource> {
+class EnvironmentSourcesCompanion extends UpdateCompanion<EnvironmentSource> {
   final Value<int> id;
   final Value<int> environmentId;
-  final Value<int> resourceTypeId;
+  final Value<int> nutrientId;
   final Value<String> name;
   final Value<int> posX;
   final Value<int> posY;
@@ -5061,10 +4694,10 @@ class EnvironmentResourcesCompanion
   final Value<int> level;
   final Value<int> maxLevel;
   final Value<double> regenRate;
-  const EnvironmentResourcesCompanion({
+  const EnvironmentSourcesCompanion({
     this.id = const Value.absent(),
     this.environmentId = const Value.absent(),
-    this.resourceTypeId = const Value.absent(),
+    this.nutrientId = const Value.absent(),
     this.name = const Value.absent(),
     this.posX = const Value.absent(),
     this.posY = const Value.absent(),
@@ -5073,10 +4706,10 @@ class EnvironmentResourcesCompanion
     this.maxLevel = const Value.absent(),
     this.regenRate = const Value.absent(),
   });
-  EnvironmentResourcesCompanion.insert({
+  EnvironmentSourcesCompanion.insert({
     this.id = const Value.absent(),
     required int environmentId,
-    required int resourceTypeId,
+    required int nutrientId,
     required String name,
     required int posX,
     required int posY,
@@ -5085,14 +4718,14 @@ class EnvironmentResourcesCompanion
     this.maxLevel = const Value.absent(),
     this.regenRate = const Value.absent(),
   }) : environmentId = Value(environmentId),
-       resourceTypeId = Value(resourceTypeId),
+       nutrientId = Value(nutrientId),
        name = Value(name),
        posX = Value(posX),
        posY = Value(posY);
-  static Insertable<EnvironmentResource> custom({
+  static Insertable<EnvironmentSource> custom({
     Expression<int>? id,
     Expression<int>? environmentId,
-    Expression<int>? resourceTypeId,
+    Expression<int>? nutrientId,
     Expression<String>? name,
     Expression<int>? posX,
     Expression<int>? posY,
@@ -5104,7 +4737,7 @@ class EnvironmentResourcesCompanion
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (environmentId != null) 'environment_id': environmentId,
-      if (resourceTypeId != null) 'resource_type_id': resourceTypeId,
+      if (nutrientId != null) 'nutrient_id': nutrientId,
       if (name != null) 'name': name,
       if (posX != null) 'pos_x': posX,
       if (posY != null) 'pos_y': posY,
@@ -5115,10 +4748,10 @@ class EnvironmentResourcesCompanion
     });
   }
 
-  EnvironmentResourcesCompanion copyWith({
+  EnvironmentSourcesCompanion copyWith({
     Value<int>? id,
     Value<int>? environmentId,
-    Value<int>? resourceTypeId,
+    Value<int>? nutrientId,
     Value<String>? name,
     Value<int>? posX,
     Value<int>? posY,
@@ -5127,10 +4760,10 @@ class EnvironmentResourcesCompanion
     Value<int>? maxLevel,
     Value<double>? regenRate,
   }) {
-    return EnvironmentResourcesCompanion(
+    return EnvironmentSourcesCompanion(
       id: id ?? this.id,
       environmentId: environmentId ?? this.environmentId,
-      resourceTypeId: resourceTypeId ?? this.resourceTypeId,
+      nutrientId: nutrientId ?? this.nutrientId,
       name: name ?? this.name,
       posX: posX ?? this.posX,
       posY: posY ?? this.posY,
@@ -5150,8 +4783,8 @@ class EnvironmentResourcesCompanion
     if (environmentId.present) {
       map['environment_id'] = Variable<int>(environmentId.value);
     }
-    if (resourceTypeId.present) {
-      map['resource_type_id'] = Variable<int>(resourceTypeId.value);
+    if (nutrientId.present) {
+      map['nutrient_id'] = Variable<int>(nutrientId.value);
     }
     if (name.present) {
       map['name'] = Variable<String>(name.value);
@@ -5179,10 +4812,10 @@ class EnvironmentResourcesCompanion
 
   @override
   String toString() {
-    return (StringBuffer('EnvironmentResourcesCompanion(')
+    return (StringBuffer('EnvironmentSourcesCompanion(')
           ..write('id: $id, ')
           ..write('environmentId: $environmentId, ')
-          ..write('resourceTypeId: $resourceTypeId, ')
+          ..write('nutrientId: $nutrientId, ')
           ..write('name: $name, ')
           ..write('posX: $posX, ')
           ..write('posY: $posY, ')
@@ -5190,6 +4823,462 @@ class EnvironmentResourcesCompanion
           ..write('level: $level, ')
           ..write('maxLevel: $maxLevel, ')
           ..write('regenRate: $regenRate')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $EnvironmentOvipositionSitesTable extends EnvironmentOvipositionSites
+    with
+        TableInfo<
+          $EnvironmentOvipositionSitesTable,
+          EnvironmentOvipositionSite
+        > {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $EnvironmentOvipositionSitesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _environmentIdMeta = const VerificationMeta(
+    'environmentId',
+  );
+  @override
+  late final GeneratedColumn<int> environmentId = GeneratedColumn<int>(
+    'environment_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES environments (id)',
+    ),
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _posXMeta = const VerificationMeta('posX');
+  @override
+  late final GeneratedColumn<int> posX = GeneratedColumn<int>(
+    'pos_x',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _posYMeta = const VerificationMeta('posY');
+  @override
+  late final GeneratedColumn<int> posY = GeneratedColumn<int>(
+    'pos_y',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _qualityMeta = const VerificationMeta(
+    'quality',
+  );
+  @override
+  late final GeneratedColumn<int> quality = GeneratedColumn<int>(
+    'quality',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(10),
+  );
+  static const VerificationMeta _capacityMeta = const VerificationMeta(
+    'capacity',
+  );
+  @override
+  late final GeneratedColumn<int> capacity = GeneratedColumn<int>(
+    'capacity',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(50),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    environmentId,
+    name,
+    posX,
+    posY,
+    quality,
+    capacity,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'environment_oviposition_sites';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<EnvironmentOvipositionSite> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('environment_id')) {
+      context.handle(
+        _environmentIdMeta,
+        environmentId.isAcceptableOrUnknown(
+          data['environment_id']!,
+          _environmentIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_environmentIdMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('pos_x')) {
+      context.handle(
+        _posXMeta,
+        posX.isAcceptableOrUnknown(data['pos_x']!, _posXMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_posXMeta);
+    }
+    if (data.containsKey('pos_y')) {
+      context.handle(
+        _posYMeta,
+        posY.isAcceptableOrUnknown(data['pos_y']!, _posYMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_posYMeta);
+    }
+    if (data.containsKey('quality')) {
+      context.handle(
+        _qualityMeta,
+        quality.isAcceptableOrUnknown(data['quality']!, _qualityMeta),
+      );
+    }
+    if (data.containsKey('capacity')) {
+      context.handle(
+        _capacityMeta,
+        capacity.isAcceptableOrUnknown(data['capacity']!, _capacityMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  EnvironmentOvipositionSite map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return EnvironmentOvipositionSite(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      environmentId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}environment_id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      posX: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}pos_x'],
+      )!,
+      posY: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}pos_y'],
+      )!,
+      quality: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}quality'],
+      )!,
+      capacity: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}capacity'],
+      )!,
+    );
+  }
+
+  @override
+  $EnvironmentOvipositionSitesTable createAlias(String alias) {
+    return $EnvironmentOvipositionSitesTable(attachedDatabase, alias);
+  }
+}
+
+class EnvironmentOvipositionSite extends DataClass
+    implements Insertable<EnvironmentOvipositionSite> {
+  final int id;
+  final int environmentId;
+  final String name;
+  final int posX;
+  final int posY;
+  final int quality;
+  final int capacity;
+  const EnvironmentOvipositionSite({
+    required this.id,
+    required this.environmentId,
+    required this.name,
+    required this.posX,
+    required this.posY,
+    required this.quality,
+    required this.capacity,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['environment_id'] = Variable<int>(environmentId);
+    map['name'] = Variable<String>(name);
+    map['pos_x'] = Variable<int>(posX);
+    map['pos_y'] = Variable<int>(posY);
+    map['quality'] = Variable<int>(quality);
+    map['capacity'] = Variable<int>(capacity);
+    return map;
+  }
+
+  EnvironmentOvipositionSitesCompanion toCompanion(bool nullToAbsent) {
+    return EnvironmentOvipositionSitesCompanion(
+      id: Value(id),
+      environmentId: Value(environmentId),
+      name: Value(name),
+      posX: Value(posX),
+      posY: Value(posY),
+      quality: Value(quality),
+      capacity: Value(capacity),
+    );
+  }
+
+  factory EnvironmentOvipositionSite.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return EnvironmentOvipositionSite(
+      id: serializer.fromJson<int>(json['id']),
+      environmentId: serializer.fromJson<int>(json['environmentId']),
+      name: serializer.fromJson<String>(json['name']),
+      posX: serializer.fromJson<int>(json['posX']),
+      posY: serializer.fromJson<int>(json['posY']),
+      quality: serializer.fromJson<int>(json['quality']),
+      capacity: serializer.fromJson<int>(json['capacity']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'environmentId': serializer.toJson<int>(environmentId),
+      'name': serializer.toJson<String>(name),
+      'posX': serializer.toJson<int>(posX),
+      'posY': serializer.toJson<int>(posY),
+      'quality': serializer.toJson<int>(quality),
+      'capacity': serializer.toJson<int>(capacity),
+    };
+  }
+
+  EnvironmentOvipositionSite copyWith({
+    int? id,
+    int? environmentId,
+    String? name,
+    int? posX,
+    int? posY,
+    int? quality,
+    int? capacity,
+  }) => EnvironmentOvipositionSite(
+    id: id ?? this.id,
+    environmentId: environmentId ?? this.environmentId,
+    name: name ?? this.name,
+    posX: posX ?? this.posX,
+    posY: posY ?? this.posY,
+    quality: quality ?? this.quality,
+    capacity: capacity ?? this.capacity,
+  );
+  EnvironmentOvipositionSite copyWithCompanion(
+    EnvironmentOvipositionSitesCompanion data,
+  ) {
+    return EnvironmentOvipositionSite(
+      id: data.id.present ? data.id.value : this.id,
+      environmentId: data.environmentId.present
+          ? data.environmentId.value
+          : this.environmentId,
+      name: data.name.present ? data.name.value : this.name,
+      posX: data.posX.present ? data.posX.value : this.posX,
+      posY: data.posY.present ? data.posY.value : this.posY,
+      quality: data.quality.present ? data.quality.value : this.quality,
+      capacity: data.capacity.present ? data.capacity.value : this.capacity,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('EnvironmentOvipositionSite(')
+          ..write('id: $id, ')
+          ..write('environmentId: $environmentId, ')
+          ..write('name: $name, ')
+          ..write('posX: $posX, ')
+          ..write('posY: $posY, ')
+          ..write('quality: $quality, ')
+          ..write('capacity: $capacity')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, environmentId, name, posX, posY, quality, capacity);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is EnvironmentOvipositionSite &&
+          other.id == this.id &&
+          other.environmentId == this.environmentId &&
+          other.name == this.name &&
+          other.posX == this.posX &&
+          other.posY == this.posY &&
+          other.quality == this.quality &&
+          other.capacity == this.capacity);
+}
+
+class EnvironmentOvipositionSitesCompanion
+    extends UpdateCompanion<EnvironmentOvipositionSite> {
+  final Value<int> id;
+  final Value<int> environmentId;
+  final Value<String> name;
+  final Value<int> posX;
+  final Value<int> posY;
+  final Value<int> quality;
+  final Value<int> capacity;
+  const EnvironmentOvipositionSitesCompanion({
+    this.id = const Value.absent(),
+    this.environmentId = const Value.absent(),
+    this.name = const Value.absent(),
+    this.posX = const Value.absent(),
+    this.posY = const Value.absent(),
+    this.quality = const Value.absent(),
+    this.capacity = const Value.absent(),
+  });
+  EnvironmentOvipositionSitesCompanion.insert({
+    this.id = const Value.absent(),
+    required int environmentId,
+    required String name,
+    required int posX,
+    required int posY,
+    this.quality = const Value.absent(),
+    this.capacity = const Value.absent(),
+  }) : environmentId = Value(environmentId),
+       name = Value(name),
+       posX = Value(posX),
+       posY = Value(posY);
+  static Insertable<EnvironmentOvipositionSite> custom({
+    Expression<int>? id,
+    Expression<int>? environmentId,
+    Expression<String>? name,
+    Expression<int>? posX,
+    Expression<int>? posY,
+    Expression<int>? quality,
+    Expression<int>? capacity,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (environmentId != null) 'environment_id': environmentId,
+      if (name != null) 'name': name,
+      if (posX != null) 'pos_x': posX,
+      if (posY != null) 'pos_y': posY,
+      if (quality != null) 'quality': quality,
+      if (capacity != null) 'capacity': capacity,
+    });
+  }
+
+  EnvironmentOvipositionSitesCompanion copyWith({
+    Value<int>? id,
+    Value<int>? environmentId,
+    Value<String>? name,
+    Value<int>? posX,
+    Value<int>? posY,
+    Value<int>? quality,
+    Value<int>? capacity,
+  }) {
+    return EnvironmentOvipositionSitesCompanion(
+      id: id ?? this.id,
+      environmentId: environmentId ?? this.environmentId,
+      name: name ?? this.name,
+      posX: posX ?? this.posX,
+      posY: posY ?? this.posY,
+      quality: quality ?? this.quality,
+      capacity: capacity ?? this.capacity,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (environmentId.present) {
+      map['environment_id'] = Variable<int>(environmentId.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (posX.present) {
+      map['pos_x'] = Variable<int>(posX.value);
+    }
+    if (posY.present) {
+      map['pos_y'] = Variable<int>(posY.value);
+    }
+    if (quality.present) {
+      map['quality'] = Variable<int>(quality.value);
+    }
+    if (capacity.present) {
+      map['capacity'] = Variable<int>(capacity.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('EnvironmentOvipositionSitesCompanion(')
+          ..write('id: $id, ')
+          ..write('environmentId: $environmentId, ')
+          ..write('name: $name, ')
+          ..write('posX: $posX, ')
+          ..write('posY: $posY, ')
+          ..write('quality: $quality, ')
+          ..write('capacity: $capacity')
           ..write(')'))
         .toString();
   }
@@ -7025,13 +7114,14 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $LociTable loci = $LociTable(this);
   late final $StagesTable stages = $StagesTable(this);
   late final $PrototypesTable prototypes = $PrototypesTable(this);
-  late final $ResourceTypesTable resourceTypes = $ResourceTypesTable(this);
   late final $EnvironmentsTable environments = $EnvironmentsTable(this);
   late final $SubstrateMapRowsTable substrateMapRows = $SubstrateMapRowsTable(
     this,
   );
-  late final $EnvironmentResourcesTable environmentResources =
-      $EnvironmentResourcesTable(this);
+  late final $EnvironmentSourcesTable environmentSources =
+      $EnvironmentSourcesTable(this);
+  late final $EnvironmentOvipositionSitesTable environmentOvipositionSites =
+      $EnvironmentOvipositionSitesTable(this);
   late final $EnvironmentAgentsTable environmentAgents =
       $EnvironmentAgentsTable(this);
   late final $MetabolismTable metabolism = $MetabolismTable(this);
@@ -7044,9 +7134,6 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final LocusDao locusDao = LocusDao(this as AppDatabase);
   late final StageDao stageDao = StageDao(this as AppDatabase);
   late final PrototypeDao prototypeDao = PrototypeDao(this as AppDatabase);
-  late final ResourceTypeDao resourceTypeDao = ResourceTypeDao(
-    this as AppDatabase,
-  );
   late final EnvironmentDao environmentDao = EnvironmentDao(
     this as AppDatabase,
   );
@@ -7062,10 +7149,10 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     loci,
     stages,
     prototypes,
-    resourceTypes,
     environments,
     substrateMapRows,
-    environmentResources,
+    environmentSources,
+    environmentOvipositionSites,
     environmentAgents,
     metabolism,
     reproduction,
@@ -7272,12 +7359,14 @@ typedef $$NutrientsTableCreateCompanionBuilder =
     NutrientsCompanion Function({
       Value<int> id,
       required String name,
+      Value<int> color,
       Value<int> sortOrder,
     });
 typedef $$NutrientsTableUpdateCompanionBuilder =
     NutrientsCompanion Function({
       Value<int> id,
       Value<String> name,
+      Value<int> color,
       Value<int> sortOrder,
     });
 
@@ -7285,19 +7374,22 @@ final class $$NutrientsTableReferences
     extends BaseReferences<_$AppDatabase, $NutrientsTable, Nutrient> {
   $$NutrientsTableReferences(super.$_db, super.$_table, super.$_typedResult);
 
-  static MultiTypedResultKey<$ResourceTypesTable, List<ResourceType>>
-  _resourceTypesRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
-    db.resourceTypes,
-    aliasName: 'nutrients__id__resource_types__nutrient_id',
-  );
+  static MultiTypedResultKey<$EnvironmentSourcesTable, List<EnvironmentSource>>
+  _environmentSourcesRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.environmentSources,
+        aliasName: 'nutrients__id__environment_sources__nutrient_id',
+      );
 
-  $$ResourceTypesTableProcessedTableManager get resourceTypesRefs {
-    final manager = $$ResourceTypesTableTableManager(
+  $$EnvironmentSourcesTableProcessedTableManager get environmentSourcesRefs {
+    final manager = $$EnvironmentSourcesTableTableManager(
       $_db,
-      $_db.resourceTypes,
+      $_db.environmentSources,
     ).filter((f) => f.nutrientId.id.sqlEquals($_itemColumn<int>('id')!));
 
-    final cache = $_typedResult.readTableOrNull(_resourceTypesRefsTable($_db));
+    final cache = $_typedResult.readTableOrNull(
+      _environmentSourcesRefsTable($_db),
+    );
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
     );
@@ -7341,27 +7433,32 @@ class $$NutrientsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<int> get color => $composableBuilder(
+    column: $table.color,
+    builder: (column) => ColumnFilters(column),
+  );
+
   ColumnFilters<int> get sortOrder => $composableBuilder(
     column: $table.sortOrder,
     builder: (column) => ColumnFilters(column),
   );
 
-  Expression<bool> resourceTypesRefs(
-    Expression<bool> Function($$ResourceTypesTableFilterComposer f) f,
+  Expression<bool> environmentSourcesRefs(
+    Expression<bool> Function($$EnvironmentSourcesTableFilterComposer f) f,
   ) {
-    final $$ResourceTypesTableFilterComposer composer = $composerBuilder(
+    final $$EnvironmentSourcesTableFilterComposer composer = $composerBuilder(
       composer: this,
       getCurrentColumn: (t) => t.id,
-      referencedTable: $db.resourceTypes,
+      referencedTable: $db.environmentSources,
       getReferencedColumn: (t) => t.nutrientId,
       builder:
           (
             joinBuilder, {
             $addJoinBuilderToRootComposer,
             $removeJoinBuilderFromRootComposer,
-          }) => $$ResourceTypesTableFilterComposer(
+          }) => $$EnvironmentSourcesTableFilterComposer(
             $db: $db,
-            $table: $db.resourceTypes,
+            $table: $db.environmentSources,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -7416,6 +7513,11 @@ class $$NutrientsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<int> get color => $composableBuilder(
+    column: $table.color,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<int> get sortOrder => $composableBuilder(
     column: $table.sortOrder,
     builder: (column) => ColumnOrderings(column),
@@ -7437,31 +7539,35 @@ class $$NutrientsTableAnnotationComposer
   GeneratedColumn<String> get name =>
       $composableBuilder(column: $table.name, builder: (column) => column);
 
+  GeneratedColumn<int> get color =>
+      $composableBuilder(column: $table.color, builder: (column) => column);
+
   GeneratedColumn<int> get sortOrder =>
       $composableBuilder(column: $table.sortOrder, builder: (column) => column);
 
-  Expression<T> resourceTypesRefs<T extends Object>(
-    Expression<T> Function($$ResourceTypesTableAnnotationComposer a) f,
+  Expression<T> environmentSourcesRefs<T extends Object>(
+    Expression<T> Function($$EnvironmentSourcesTableAnnotationComposer a) f,
   ) {
-    final $$ResourceTypesTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.resourceTypes,
-      getReferencedColumn: (t) => t.nutrientId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$ResourceTypesTableAnnotationComposer(
-            $db: $db,
-            $table: $db.resourceTypes,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
+    final $$EnvironmentSourcesTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.environmentSources,
+          getReferencedColumn: (t) => t.nutrientId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
                 $removeJoinBuilderFromRootComposer,
-          ),
-    );
+              }) => $$EnvironmentSourcesTableAnnotationComposer(
+                $db: $db,
+                $table: $db.environmentSources,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
     return f(composer);
   }
 
@@ -7504,7 +7610,10 @@ class $$NutrientsTableTableManager
           $$NutrientsTableUpdateCompanionBuilder,
           (Nutrient, $$NutrientsTableReferences),
           Nutrient,
-          PrefetchHooks Function({bool resourceTypesRefs, bool metabolismRefs})
+          PrefetchHooks Function({
+            bool environmentSourcesRefs,
+            bool metabolismRefs,
+          })
         > {
   $$NutrientsTableTableManager(_$AppDatabase db, $NutrientsTable table)
     : super(
@@ -7521,17 +7630,24 @@ class $$NutrientsTableTableManager
               ({
                 Value<int> id = const Value.absent(),
                 Value<String> name = const Value.absent(),
+                Value<int> color = const Value.absent(),
                 Value<int> sortOrder = const Value.absent(),
-              }) =>
-                  NutrientsCompanion(id: id, name: name, sortOrder: sortOrder),
+              }) => NutrientsCompanion(
+                id: id,
+                name: name,
+                color: color,
+                sortOrder: sortOrder,
+              ),
           createCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
                 required String name,
+                Value<int> color = const Value.absent(),
                 Value<int> sortOrder = const Value.absent(),
               }) => NutrientsCompanion.insert(
                 id: id,
                 name: name,
+                color: color,
                 sortOrder: sortOrder,
               ),
           withReferenceMapper: (p0) => p0
@@ -7543,31 +7659,31 @@ class $$NutrientsTableTableManager
               )
               .toList(),
           prefetchHooksCallback:
-              ({resourceTypesRefs = false, metabolismRefs = false}) {
+              ({environmentSourcesRefs = false, metabolismRefs = false}) {
                 return PrefetchHooks(
                   db: db,
                   explicitlyWatchedTables: [
-                    if (resourceTypesRefs) db.resourceTypes,
+                    if (environmentSourcesRefs) db.environmentSources,
                     if (metabolismRefs) db.metabolism,
                   ],
                   addJoins: null,
                   getPrefetchedDataCallback: (items) async {
                     return [
-                      if (resourceTypesRefs)
+                      if (environmentSourcesRefs)
                         await $_getPrefetchedData<
                           Nutrient,
                           $NutrientsTable,
-                          ResourceType
+                          EnvironmentSource
                         >(
                           currentTable: table,
                           referencedTable: $$NutrientsTableReferences
-                              ._resourceTypesRefsTable(db),
+                              ._environmentSourcesRefsTable(db),
                           managerFromTypedResult: (p0) =>
                               $$NutrientsTableReferences(
                                 db,
                                 table,
                                 p0,
-                              ).resourceTypesRefs,
+                              ).environmentSourcesRefs,
                           referencedItemsForCurrentItem:
                               (item, referencedItems) => referencedItems.where(
                                 (e) => e.nutrientId == item.id,
@@ -7615,7 +7731,7 @@ typedef $$NutrientsTableProcessedTableManager =
       $$NutrientsTableUpdateCompanionBuilder,
       (Nutrient, $$NutrientsTableReferences),
       Nutrient,
-      PrefetchHooks Function({bool resourceTypesRefs, bool metabolismRefs})
+      PrefetchHooks Function({bool environmentSourcesRefs, bool metabolismRefs})
     >;
 typedef $$SubstratesTableCreateCompanionBuilder =
     SubstratesCompanion Function({
@@ -9681,449 +9797,6 @@ typedef $$PrototypesTableProcessedTableManager =
       Prototype,
       PrefetchHooks Function({bool environmentAgentsRefs})
     >;
-typedef $$ResourceTypesTableCreateCompanionBuilder =
-    ResourceTypesCompanion Function({
-      Value<int> id,
-      required String name,
-      Value<int?> nutrientId,
-      Value<bool> isOviposition,
-      Value<int> color,
-      Value<int> sortOrder,
-    });
-typedef $$ResourceTypesTableUpdateCompanionBuilder =
-    ResourceTypesCompanion Function({
-      Value<int> id,
-      Value<String> name,
-      Value<int?> nutrientId,
-      Value<bool> isOviposition,
-      Value<int> color,
-      Value<int> sortOrder,
-    });
-
-final class $$ResourceTypesTableReferences
-    extends BaseReferences<_$AppDatabase, $ResourceTypesTable, ResourceType> {
-  $$ResourceTypesTableReferences(
-    super.$_db,
-    super.$_table,
-    super.$_typedResult,
-  );
-
-  static $NutrientsTable _nutrientIdTable(_$AppDatabase db) =>
-      db.nutrients.createAlias('resource_types__nutrient_id__nutrients__id');
-
-  $$NutrientsTableProcessedTableManager? get nutrientId {
-    final $_column = $_itemColumn<int>('nutrient_id');
-    if ($_column == null) return null;
-    final manager = $$NutrientsTableTableManager(
-      $_db,
-      $_db.nutrients,
-    ).filter((f) => f.id.sqlEquals($_column));
-    final item = $_typedResult.readTableOrNull(_nutrientIdTable($_db));
-    if (item == null) return manager;
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: [item]),
-    );
-  }
-
-  static MultiTypedResultKey<
-    $EnvironmentResourcesTable,
-    List<EnvironmentResource>
-  >
-  _environmentResourcesRefsTable(_$AppDatabase db) =>
-      MultiTypedResultKey.fromTable(
-        db.environmentResources,
-        aliasName:
-            'resource_types__id__environment_resources__resource_type_id',
-      );
-
-  $$EnvironmentResourcesTableProcessedTableManager
-  get environmentResourcesRefs {
-    final manager = $$EnvironmentResourcesTableTableManager(
-      $_db,
-      $_db.environmentResources,
-    ).filter((f) => f.resourceTypeId.id.sqlEquals($_itemColumn<int>('id')!));
-
-    final cache = $_typedResult.readTableOrNull(
-      _environmentResourcesRefsTable($_db),
-    );
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: cache),
-    );
-  }
-}
-
-class $$ResourceTypesTableFilterComposer
-    extends Composer<_$AppDatabase, $ResourceTypesTable> {
-  $$ResourceTypesTableFilterComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  ColumnFilters<int> get id => $composableBuilder(
-    column: $table.id,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get name => $composableBuilder(
-    column: $table.name,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<bool> get isOviposition => $composableBuilder(
-    column: $table.isOviposition,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<int> get color => $composableBuilder(
-    column: $table.color,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<int> get sortOrder => $composableBuilder(
-    column: $table.sortOrder,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  $$NutrientsTableFilterComposer get nutrientId {
-    final $$NutrientsTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.nutrientId,
-      referencedTable: $db.nutrients,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$NutrientsTableFilterComposer(
-            $db: $db,
-            $table: $db.nutrients,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
-
-  Expression<bool> environmentResourcesRefs(
-    Expression<bool> Function($$EnvironmentResourcesTableFilterComposer f) f,
-  ) {
-    final $$EnvironmentResourcesTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.environmentResources,
-      getReferencedColumn: (t) => t.resourceTypeId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$EnvironmentResourcesTableFilterComposer(
-            $db: $db,
-            $table: $db.environmentResources,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
-}
-
-class $$ResourceTypesTableOrderingComposer
-    extends Composer<_$AppDatabase, $ResourceTypesTable> {
-  $$ResourceTypesTableOrderingComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  ColumnOrderings<int> get id => $composableBuilder(
-    column: $table.id,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get name => $composableBuilder(
-    column: $table.name,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<bool> get isOviposition => $composableBuilder(
-    column: $table.isOviposition,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<int> get color => $composableBuilder(
-    column: $table.color,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<int> get sortOrder => $composableBuilder(
-    column: $table.sortOrder,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  $$NutrientsTableOrderingComposer get nutrientId {
-    final $$NutrientsTableOrderingComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.nutrientId,
-      referencedTable: $db.nutrients,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$NutrientsTableOrderingComposer(
-            $db: $db,
-            $table: $db.nutrients,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
-}
-
-class $$ResourceTypesTableAnnotationComposer
-    extends Composer<_$AppDatabase, $ResourceTypesTable> {
-  $$ResourceTypesTableAnnotationComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  GeneratedColumn<int> get id =>
-      $composableBuilder(column: $table.id, builder: (column) => column);
-
-  GeneratedColumn<String> get name =>
-      $composableBuilder(column: $table.name, builder: (column) => column);
-
-  GeneratedColumn<bool> get isOviposition => $composableBuilder(
-    column: $table.isOviposition,
-    builder: (column) => column,
-  );
-
-  GeneratedColumn<int> get color =>
-      $composableBuilder(column: $table.color, builder: (column) => column);
-
-  GeneratedColumn<int> get sortOrder =>
-      $composableBuilder(column: $table.sortOrder, builder: (column) => column);
-
-  $$NutrientsTableAnnotationComposer get nutrientId {
-    final $$NutrientsTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.nutrientId,
-      referencedTable: $db.nutrients,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$NutrientsTableAnnotationComposer(
-            $db: $db,
-            $table: $db.nutrients,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
-
-  Expression<T> environmentResourcesRefs<T extends Object>(
-    Expression<T> Function($$EnvironmentResourcesTableAnnotationComposer a) f,
-  ) {
-    final $$EnvironmentResourcesTableAnnotationComposer composer =
-        $composerBuilder(
-          composer: this,
-          getCurrentColumn: (t) => t.id,
-          referencedTable: $db.environmentResources,
-          getReferencedColumn: (t) => t.resourceTypeId,
-          builder:
-              (
-                joinBuilder, {
-                $addJoinBuilderToRootComposer,
-                $removeJoinBuilderFromRootComposer,
-              }) => $$EnvironmentResourcesTableAnnotationComposer(
-                $db: $db,
-                $table: $db.environmentResources,
-                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-                joinBuilder: joinBuilder,
-                $removeJoinBuilderFromRootComposer:
-                    $removeJoinBuilderFromRootComposer,
-              ),
-        );
-    return f(composer);
-  }
-}
-
-class $$ResourceTypesTableTableManager
-    extends
-        RootTableManager<
-          _$AppDatabase,
-          $ResourceTypesTable,
-          ResourceType,
-          $$ResourceTypesTableFilterComposer,
-          $$ResourceTypesTableOrderingComposer,
-          $$ResourceTypesTableAnnotationComposer,
-          $$ResourceTypesTableCreateCompanionBuilder,
-          $$ResourceTypesTableUpdateCompanionBuilder,
-          (ResourceType, $$ResourceTypesTableReferences),
-          ResourceType,
-          PrefetchHooks Function({
-            bool nutrientId,
-            bool environmentResourcesRefs,
-          })
-        > {
-  $$ResourceTypesTableTableManager(_$AppDatabase db, $ResourceTypesTable table)
-    : super(
-        TableManagerState(
-          db: db,
-          table: table,
-          createFilteringComposer: () =>
-              $$ResourceTypesTableFilterComposer($db: db, $table: table),
-          createOrderingComposer: () =>
-              $$ResourceTypesTableOrderingComposer($db: db, $table: table),
-          createComputedFieldComposer: () =>
-              $$ResourceTypesTableAnnotationComposer($db: db, $table: table),
-          updateCompanionCallback:
-              ({
-                Value<int> id = const Value.absent(),
-                Value<String> name = const Value.absent(),
-                Value<int?> nutrientId = const Value.absent(),
-                Value<bool> isOviposition = const Value.absent(),
-                Value<int> color = const Value.absent(),
-                Value<int> sortOrder = const Value.absent(),
-              }) => ResourceTypesCompanion(
-                id: id,
-                name: name,
-                nutrientId: nutrientId,
-                isOviposition: isOviposition,
-                color: color,
-                sortOrder: sortOrder,
-              ),
-          createCompanionCallback:
-              ({
-                Value<int> id = const Value.absent(),
-                required String name,
-                Value<int?> nutrientId = const Value.absent(),
-                Value<bool> isOviposition = const Value.absent(),
-                Value<int> color = const Value.absent(),
-                Value<int> sortOrder = const Value.absent(),
-              }) => ResourceTypesCompanion.insert(
-                id: id,
-                name: name,
-                nutrientId: nutrientId,
-                isOviposition: isOviposition,
-                color: color,
-                sortOrder: sortOrder,
-              ),
-          withReferenceMapper: (p0) => p0
-              .map(
-                (e) => (
-                  e.readTable(table),
-                  $$ResourceTypesTableReferences(db, table, e),
-                ),
-              )
-              .toList(),
-          prefetchHooksCallback:
-              ({nutrientId = false, environmentResourcesRefs = false}) {
-                return PrefetchHooks(
-                  db: db,
-                  explicitlyWatchedTables: [
-                    if (environmentResourcesRefs) db.environmentResources,
-                  ],
-                  addJoins:
-                      <
-                        T extends TableManagerState<
-                          dynamic,
-                          dynamic,
-                          dynamic,
-                          dynamic,
-                          dynamic,
-                          dynamic,
-                          dynamic,
-                          dynamic,
-                          dynamic,
-                          dynamic,
-                          dynamic
-                        >
-                      >(state) {
-                        if (nutrientId) {
-                          state =
-                              state.withJoin(
-                                    currentTable: table,
-                                    currentColumn: table.nutrientId,
-                                    referencedTable:
-                                        $$ResourceTypesTableReferences
-                                            ._nutrientIdTable(db),
-                                    referencedColumn:
-                                        $$ResourceTypesTableReferences
-                                            ._nutrientIdTable(db)
-                                            .id,
-                                  )
-                                  as T;
-                        }
-
-                        return state;
-                      },
-                  getPrefetchedDataCallback: (items) async {
-                    return [
-                      if (environmentResourcesRefs)
-                        await $_getPrefetchedData<
-                          ResourceType,
-                          $ResourceTypesTable,
-                          EnvironmentResource
-                        >(
-                          currentTable: table,
-                          referencedTable: $$ResourceTypesTableReferences
-                              ._environmentResourcesRefsTable(db),
-                          managerFromTypedResult: (p0) =>
-                              $$ResourceTypesTableReferences(
-                                db,
-                                table,
-                                p0,
-                              ).environmentResourcesRefs,
-                          referencedItemsForCurrentItem:
-                              (item, referencedItems) => referencedItems.where(
-                                (e) => e.resourceTypeId == item.id,
-                              ),
-                          typedResults: items,
-                        ),
-                    ];
-                  },
-                );
-              },
-        ),
-      );
-}
-
-typedef $$ResourceTypesTableProcessedTableManager =
-    ProcessedTableManager<
-      _$AppDatabase,
-      $ResourceTypesTable,
-      ResourceType,
-      $$ResourceTypesTableFilterComposer,
-      $$ResourceTypesTableOrderingComposer,
-      $$ResourceTypesTableAnnotationComposer,
-      $$ResourceTypesTableCreateCompanionBuilder,
-      $$ResourceTypesTableUpdateCompanionBuilder,
-      (ResourceType, $$ResourceTypesTableReferences),
-      ResourceType,
-      PrefetchHooks Function({bool nutrientId, bool environmentResourcesRefs})
-    >;
 typedef $$EnvironmentsTableCreateCompanionBuilder =
     EnvironmentsCompanion Function({
       Value<int> id,
@@ -10169,25 +9842,47 @@ final class $$EnvironmentsTableReferences
     );
   }
 
-  static MultiTypedResultKey<
-    $EnvironmentResourcesTable,
-    List<EnvironmentResource>
-  >
-  _environmentResourcesRefsTable(_$AppDatabase db) =>
+  static MultiTypedResultKey<$EnvironmentSourcesTable, List<EnvironmentSource>>
+  _environmentSourcesRefsTable(_$AppDatabase db) =>
       MultiTypedResultKey.fromTable(
-        db.environmentResources,
-        aliasName: 'environments__id__environment_resources__environment_id',
+        db.environmentSources,
+        aliasName: 'environments__id__environment_sources__environment_id',
       );
 
-  $$EnvironmentResourcesTableProcessedTableManager
-  get environmentResourcesRefs {
-    final manager = $$EnvironmentResourcesTableTableManager(
+  $$EnvironmentSourcesTableProcessedTableManager get environmentSourcesRefs {
+    final manager = $$EnvironmentSourcesTableTableManager(
       $_db,
-      $_db.environmentResources,
+      $_db.environmentSources,
     ).filter((f) => f.environmentId.id.sqlEquals($_itemColumn<int>('id')!));
 
     final cache = $_typedResult.readTableOrNull(
-      _environmentResourcesRefsTable($_db),
+      _environmentSourcesRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $EnvironmentOvipositionSitesTable,
+    List<EnvironmentOvipositionSite>
+  >
+  _environmentOvipositionSitesRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.environmentOvipositionSites,
+        aliasName:
+            'environments__id__environment_oviposition_sites__environment_id',
+      );
+
+  $$EnvironmentOvipositionSitesTableProcessedTableManager
+  get environmentOvipositionSitesRefs {
+    final manager = $$EnvironmentOvipositionSitesTableTableManager(
+      $_db,
+      $_db.environmentOvipositionSites,
+    ).filter((f) => f.environmentId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _environmentOvipositionSitesRefsTable($_db),
     );
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
@@ -10285,28 +9980,57 @@ class $$EnvironmentsTableFilterComposer
     return f(composer);
   }
 
-  Expression<bool> environmentResourcesRefs(
-    Expression<bool> Function($$EnvironmentResourcesTableFilterComposer f) f,
+  Expression<bool> environmentSourcesRefs(
+    Expression<bool> Function($$EnvironmentSourcesTableFilterComposer f) f,
   ) {
-    final $$EnvironmentResourcesTableFilterComposer composer = $composerBuilder(
+    final $$EnvironmentSourcesTableFilterComposer composer = $composerBuilder(
       composer: this,
       getCurrentColumn: (t) => t.id,
-      referencedTable: $db.environmentResources,
+      referencedTable: $db.environmentSources,
       getReferencedColumn: (t) => t.environmentId,
       builder:
           (
             joinBuilder, {
             $addJoinBuilderToRootComposer,
             $removeJoinBuilderFromRootComposer,
-          }) => $$EnvironmentResourcesTableFilterComposer(
+          }) => $$EnvironmentSourcesTableFilterComposer(
             $db: $db,
-            $table: $db.environmentResources,
+            $table: $db.environmentSources,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
                 $removeJoinBuilderFromRootComposer,
           ),
     );
+    return f(composer);
+  }
+
+  Expression<bool> environmentOvipositionSitesRefs(
+    Expression<bool> Function(
+      $$EnvironmentOvipositionSitesTableFilterComposer f,
+    )
+    f,
+  ) {
+    final $$EnvironmentOvipositionSitesTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.environmentOvipositionSites,
+          getReferencedColumn: (t) => t.environmentId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$EnvironmentOvipositionSitesTableFilterComposer(
+                $db: $db,
+                $table: $db.environmentOvipositionSites,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
     return f(composer);
   }
 
@@ -10438,23 +10162,52 @@ class $$EnvironmentsTableAnnotationComposer
     return f(composer);
   }
 
-  Expression<T> environmentResourcesRefs<T extends Object>(
-    Expression<T> Function($$EnvironmentResourcesTableAnnotationComposer a) f,
+  Expression<T> environmentSourcesRefs<T extends Object>(
+    Expression<T> Function($$EnvironmentSourcesTableAnnotationComposer a) f,
   ) {
-    final $$EnvironmentResourcesTableAnnotationComposer composer =
+    final $$EnvironmentSourcesTableAnnotationComposer composer =
         $composerBuilder(
           composer: this,
           getCurrentColumn: (t) => t.id,
-          referencedTable: $db.environmentResources,
+          referencedTable: $db.environmentSources,
           getReferencedColumn: (t) => t.environmentId,
           builder:
               (
                 joinBuilder, {
                 $addJoinBuilderToRootComposer,
                 $removeJoinBuilderFromRootComposer,
-              }) => $$EnvironmentResourcesTableAnnotationComposer(
+              }) => $$EnvironmentSourcesTableAnnotationComposer(
                 $db: $db,
-                $table: $db.environmentResources,
+                $table: $db.environmentSources,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<T> environmentOvipositionSitesRefs<T extends Object>(
+    Expression<T> Function(
+      $$EnvironmentOvipositionSitesTableAnnotationComposer a,
+    )
+    f,
+  ) {
+    final $$EnvironmentOvipositionSitesTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.environmentOvipositionSites,
+          getReferencedColumn: (t) => t.environmentId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$EnvironmentOvipositionSitesTableAnnotationComposer(
+                $db: $db,
+                $table: $db.environmentOvipositionSites,
                 $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
                 joinBuilder: joinBuilder,
                 $removeJoinBuilderFromRootComposer:
@@ -10506,7 +10259,8 @@ class $$EnvironmentsTableTableManager
           Environment,
           PrefetchHooks Function({
             bool substrateMapRowsRefs,
-            bool environmentResourcesRefs,
+            bool environmentSourcesRefs,
+            bool environmentOvipositionSitesRefs,
             bool environmentAgentsRefs,
           })
         > {
@@ -10568,14 +10322,17 @@ class $$EnvironmentsTableTableManager
           prefetchHooksCallback:
               ({
                 substrateMapRowsRefs = false,
-                environmentResourcesRefs = false,
+                environmentSourcesRefs = false,
+                environmentOvipositionSitesRefs = false,
                 environmentAgentsRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
                   explicitlyWatchedTables: [
                     if (substrateMapRowsRefs) db.substrateMapRows,
-                    if (environmentResourcesRefs) db.environmentResources,
+                    if (environmentSourcesRefs) db.environmentSources,
+                    if (environmentOvipositionSitesRefs)
+                      db.environmentOvipositionSites,
                     if (environmentAgentsRefs) db.environmentAgents,
                   ],
                   addJoins: null,
@@ -10602,21 +10359,42 @@ class $$EnvironmentsTableTableManager
                               ),
                           typedResults: items,
                         ),
-                      if (environmentResourcesRefs)
+                      if (environmentSourcesRefs)
                         await $_getPrefetchedData<
                           Environment,
                           $EnvironmentsTable,
-                          EnvironmentResource
+                          EnvironmentSource
                         >(
                           currentTable: table,
                           referencedTable: $$EnvironmentsTableReferences
-                              ._environmentResourcesRefsTable(db),
+                              ._environmentSourcesRefsTable(db),
                           managerFromTypedResult: (p0) =>
                               $$EnvironmentsTableReferences(
                                 db,
                                 table,
                                 p0,
-                              ).environmentResourcesRefs,
+                              ).environmentSourcesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.environmentId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (environmentOvipositionSitesRefs)
+                        await $_getPrefetchedData<
+                          Environment,
+                          $EnvironmentsTable,
+                          EnvironmentOvipositionSite
+                        >(
+                          currentTable: table,
+                          referencedTable: $$EnvironmentsTableReferences
+                              ._environmentOvipositionSitesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$EnvironmentsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).environmentOvipositionSitesRefs,
                           referencedItemsForCurrentItem:
                               (item, referencedItems) => referencedItems.where(
                                 (e) => e.environmentId == item.id,
@@ -10666,7 +10444,8 @@ typedef $$EnvironmentsTableProcessedTableManager =
       Environment,
       PrefetchHooks Function({
         bool substrateMapRowsRefs,
-        bool environmentResourcesRefs,
+        bool environmentSourcesRefs,
+        bool environmentOvipositionSitesRefs,
         bool environmentAgentsRefs,
       })
     >;
@@ -10972,11 +10751,11 @@ typedef $$SubstrateMapRowsTableProcessedTableManager =
       SubstrateMapRow,
       PrefetchHooks Function({bool environmentId})
     >;
-typedef $$EnvironmentResourcesTableCreateCompanionBuilder =
-    EnvironmentResourcesCompanion Function({
+typedef $$EnvironmentSourcesTableCreateCompanionBuilder =
+    EnvironmentSourcesCompanion Function({
       Value<int> id,
       required int environmentId,
-      required int resourceTypeId,
+      required int nutrientId,
       required String name,
       required int posX,
       required int posY,
@@ -10985,11 +10764,11 @@ typedef $$EnvironmentResourcesTableCreateCompanionBuilder =
       Value<int> maxLevel,
       Value<double> regenRate,
     });
-typedef $$EnvironmentResourcesTableUpdateCompanionBuilder =
-    EnvironmentResourcesCompanion Function({
+typedef $$EnvironmentSourcesTableUpdateCompanionBuilder =
+    EnvironmentSourcesCompanion Function({
       Value<int> id,
       Value<int> environmentId,
-      Value<int> resourceTypeId,
+      Value<int> nutrientId,
       Value<String> name,
       Value<int> posX,
       Value<int> posY,
@@ -10999,14 +10778,14 @@ typedef $$EnvironmentResourcesTableUpdateCompanionBuilder =
       Value<double> regenRate,
     });
 
-final class $$EnvironmentResourcesTableReferences
+final class $$EnvironmentSourcesTableReferences
     extends
         BaseReferences<
           _$AppDatabase,
-          $EnvironmentResourcesTable,
-          EnvironmentResource
+          $EnvironmentSourcesTable,
+          EnvironmentSource
         > {
-  $$EnvironmentResourcesTableReferences(
+  $$EnvironmentSourcesTableReferences(
     super.$_db,
     super.$_table,
     super.$_typedResult,
@@ -11014,7 +10793,7 @@ final class $$EnvironmentResourcesTableReferences
 
   static $EnvironmentsTable _environmentIdTable(_$AppDatabase db) => db
       .environments
-      .createAlias('environment_resources__environment_id__environments__id');
+      .createAlias('environment_sources__environment_id__environments__id');
 
   $$EnvironmentsTableProcessedTableManager get environmentId {
     final $_column = $_itemColumn<int>('environment_id')!;
@@ -11030,19 +10809,17 @@ final class $$EnvironmentResourcesTableReferences
     );
   }
 
-  static $ResourceTypesTable _resourceTypeIdTable(_$AppDatabase db) =>
-      db.resourceTypes.createAlias(
-        'environment_resources__resource_type_id__resource_types__id',
-      );
+  static $NutrientsTable _nutrientIdTable(_$AppDatabase db) => db.nutrients
+      .createAlias('environment_sources__nutrient_id__nutrients__id');
 
-  $$ResourceTypesTableProcessedTableManager get resourceTypeId {
-    final $_column = $_itemColumn<int>('resource_type_id')!;
+  $$NutrientsTableProcessedTableManager get nutrientId {
+    final $_column = $_itemColumn<int>('nutrient_id')!;
 
-    final manager = $$ResourceTypesTableTableManager(
+    final manager = $$NutrientsTableTableManager(
       $_db,
-      $_db.resourceTypes,
+      $_db.nutrients,
     ).filter((f) => f.id.sqlEquals($_column));
-    final item = $_typedResult.readTableOrNull(_resourceTypeIdTable($_db));
+    final item = $_typedResult.readTableOrNull(_nutrientIdTable($_db));
     if (item == null) return manager;
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: [item]),
@@ -11050,9 +10827,9 @@ final class $$EnvironmentResourcesTableReferences
   }
 }
 
-class $$EnvironmentResourcesTableFilterComposer
-    extends Composer<_$AppDatabase, $EnvironmentResourcesTable> {
-  $$EnvironmentResourcesTableFilterComposer({
+class $$EnvironmentSourcesTableFilterComposer
+    extends Composer<_$AppDatabase, $EnvironmentSourcesTable> {
+  $$EnvironmentSourcesTableFilterComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -11122,20 +10899,20 @@ class $$EnvironmentResourcesTableFilterComposer
     return composer;
   }
 
-  $$ResourceTypesTableFilterComposer get resourceTypeId {
-    final $$ResourceTypesTableFilterComposer composer = $composerBuilder(
+  $$NutrientsTableFilterComposer get nutrientId {
+    final $$NutrientsTableFilterComposer composer = $composerBuilder(
       composer: this,
-      getCurrentColumn: (t) => t.resourceTypeId,
-      referencedTable: $db.resourceTypes,
+      getCurrentColumn: (t) => t.nutrientId,
+      referencedTable: $db.nutrients,
       getReferencedColumn: (t) => t.id,
       builder:
           (
             joinBuilder, {
             $addJoinBuilderToRootComposer,
             $removeJoinBuilderFromRootComposer,
-          }) => $$ResourceTypesTableFilterComposer(
+          }) => $$NutrientsTableFilterComposer(
             $db: $db,
-            $table: $db.resourceTypes,
+            $table: $db.nutrients,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -11146,9 +10923,9 @@ class $$EnvironmentResourcesTableFilterComposer
   }
 }
 
-class $$EnvironmentResourcesTableOrderingComposer
-    extends Composer<_$AppDatabase, $EnvironmentResourcesTable> {
-  $$EnvironmentResourcesTableOrderingComposer({
+class $$EnvironmentSourcesTableOrderingComposer
+    extends Composer<_$AppDatabase, $EnvironmentSourcesTable> {
+  $$EnvironmentSourcesTableOrderingComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -11218,20 +10995,20 @@ class $$EnvironmentResourcesTableOrderingComposer
     return composer;
   }
 
-  $$ResourceTypesTableOrderingComposer get resourceTypeId {
-    final $$ResourceTypesTableOrderingComposer composer = $composerBuilder(
+  $$NutrientsTableOrderingComposer get nutrientId {
+    final $$NutrientsTableOrderingComposer composer = $composerBuilder(
       composer: this,
-      getCurrentColumn: (t) => t.resourceTypeId,
-      referencedTable: $db.resourceTypes,
+      getCurrentColumn: (t) => t.nutrientId,
+      referencedTable: $db.nutrients,
       getReferencedColumn: (t) => t.id,
       builder:
           (
             joinBuilder, {
             $addJoinBuilderToRootComposer,
             $removeJoinBuilderFromRootComposer,
-          }) => $$ResourceTypesTableOrderingComposer(
+          }) => $$NutrientsTableOrderingComposer(
             $db: $db,
-            $table: $db.resourceTypes,
+            $table: $db.nutrients,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -11242,9 +11019,9 @@ class $$EnvironmentResourcesTableOrderingComposer
   }
 }
 
-class $$EnvironmentResourcesTableAnnotationComposer
-    extends Composer<_$AppDatabase, $EnvironmentResourcesTable> {
-  $$EnvironmentResourcesTableAnnotationComposer({
+class $$EnvironmentSourcesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $EnvironmentSourcesTable> {
+  $$EnvironmentSourcesTableAnnotationComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -11298,20 +11075,20 @@ class $$EnvironmentResourcesTableAnnotationComposer
     return composer;
   }
 
-  $$ResourceTypesTableAnnotationComposer get resourceTypeId {
-    final $$ResourceTypesTableAnnotationComposer composer = $composerBuilder(
+  $$NutrientsTableAnnotationComposer get nutrientId {
+    final $$NutrientsTableAnnotationComposer composer = $composerBuilder(
       composer: this,
-      getCurrentColumn: (t) => t.resourceTypeId,
-      referencedTable: $db.resourceTypes,
+      getCurrentColumn: (t) => t.nutrientId,
+      referencedTable: $db.nutrients,
       getReferencedColumn: (t) => t.id,
       builder:
           (
             joinBuilder, {
             $addJoinBuilderToRootComposer,
             $removeJoinBuilderFromRootComposer,
-          }) => $$ResourceTypesTableAnnotationComposer(
+          }) => $$NutrientsTableAnnotationComposer(
             $db: $db,
-            $table: $db.resourceTypes,
+            $table: $db.nutrients,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -11322,37 +11099,34 @@ class $$EnvironmentResourcesTableAnnotationComposer
   }
 }
 
-class $$EnvironmentResourcesTableTableManager
+class $$EnvironmentSourcesTableTableManager
     extends
         RootTableManager<
           _$AppDatabase,
-          $EnvironmentResourcesTable,
-          EnvironmentResource,
-          $$EnvironmentResourcesTableFilterComposer,
-          $$EnvironmentResourcesTableOrderingComposer,
-          $$EnvironmentResourcesTableAnnotationComposer,
-          $$EnvironmentResourcesTableCreateCompanionBuilder,
-          $$EnvironmentResourcesTableUpdateCompanionBuilder,
-          (EnvironmentResource, $$EnvironmentResourcesTableReferences),
-          EnvironmentResource,
-          PrefetchHooks Function({bool environmentId, bool resourceTypeId})
+          $EnvironmentSourcesTable,
+          EnvironmentSource,
+          $$EnvironmentSourcesTableFilterComposer,
+          $$EnvironmentSourcesTableOrderingComposer,
+          $$EnvironmentSourcesTableAnnotationComposer,
+          $$EnvironmentSourcesTableCreateCompanionBuilder,
+          $$EnvironmentSourcesTableUpdateCompanionBuilder,
+          (EnvironmentSource, $$EnvironmentSourcesTableReferences),
+          EnvironmentSource,
+          PrefetchHooks Function({bool environmentId, bool nutrientId})
         > {
-  $$EnvironmentResourcesTableTableManager(
+  $$EnvironmentSourcesTableTableManager(
     _$AppDatabase db,
-    $EnvironmentResourcesTable table,
+    $EnvironmentSourcesTable table,
   ) : super(
         TableManagerState(
           db: db,
           table: table,
           createFilteringComposer: () =>
-              $$EnvironmentResourcesTableFilterComposer($db: db, $table: table),
+              $$EnvironmentSourcesTableFilterComposer($db: db, $table: table),
           createOrderingComposer: () =>
-              $$EnvironmentResourcesTableOrderingComposer(
-                $db: db,
-                $table: table,
-              ),
+              $$EnvironmentSourcesTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
-              $$EnvironmentResourcesTableAnnotationComposer(
+              $$EnvironmentSourcesTableAnnotationComposer(
                 $db: db,
                 $table: table,
               ),
@@ -11360,7 +11134,7 @@ class $$EnvironmentResourcesTableTableManager
               ({
                 Value<int> id = const Value.absent(),
                 Value<int> environmentId = const Value.absent(),
-                Value<int> resourceTypeId = const Value.absent(),
+                Value<int> nutrientId = const Value.absent(),
                 Value<String> name = const Value.absent(),
                 Value<int> posX = const Value.absent(),
                 Value<int> posY = const Value.absent(),
@@ -11368,10 +11142,10 @@ class $$EnvironmentResourcesTableTableManager
                 Value<int> level = const Value.absent(),
                 Value<int> maxLevel = const Value.absent(),
                 Value<double> regenRate = const Value.absent(),
-              }) => EnvironmentResourcesCompanion(
+              }) => EnvironmentSourcesCompanion(
                 id: id,
                 environmentId: environmentId,
-                resourceTypeId: resourceTypeId,
+                nutrientId: nutrientId,
                 name: name,
                 posX: posX,
                 posY: posY,
@@ -11384,7 +11158,7 @@ class $$EnvironmentResourcesTableTableManager
               ({
                 Value<int> id = const Value.absent(),
                 required int environmentId,
-                required int resourceTypeId,
+                required int nutrientId,
                 required String name,
                 required int posX,
                 required int posY,
@@ -11392,10 +11166,10 @@ class $$EnvironmentResourcesTableTableManager
                 Value<int> level = const Value.absent(),
                 Value<int> maxLevel = const Value.absent(),
                 Value<double> regenRate = const Value.absent(),
-              }) => EnvironmentResourcesCompanion.insert(
+              }) => EnvironmentSourcesCompanion.insert(
                 id: id,
                 environmentId: environmentId,
-                resourceTypeId: resourceTypeId,
+                nutrientId: nutrientId,
                 name: name,
                 posX: posX,
                 posY: posY,
@@ -11408,86 +11182,464 @@ class $$EnvironmentResourcesTableTableManager
               .map(
                 (e) => (
                   e.readTable(table),
-                  $$EnvironmentResourcesTableReferences(db, table, e),
+                  $$EnvironmentSourcesTableReferences(db, table, e),
                 ),
               )
               .toList(),
-          prefetchHooksCallback:
-              ({environmentId = false, resourceTypeId = false}) {
-                return PrefetchHooks(
-                  db: db,
-                  explicitlyWatchedTables: [],
-                  addJoins:
-                      <
-                        T extends TableManagerState<
-                          dynamic,
-                          dynamic,
-                          dynamic,
-                          dynamic,
-                          dynamic,
-                          dynamic,
-                          dynamic,
-                          dynamic,
-                          dynamic,
-                          dynamic,
-                          dynamic
-                        >
-                      >(state) {
-                        if (environmentId) {
-                          state =
-                              state.withJoin(
-                                    currentTable: table,
-                                    currentColumn: table.environmentId,
-                                    referencedTable:
-                                        $$EnvironmentResourcesTableReferences
-                                            ._environmentIdTable(db),
-                                    referencedColumn:
-                                        $$EnvironmentResourcesTableReferences
-                                            ._environmentIdTable(db)
-                                            .id,
-                                  )
-                                  as T;
-                        }
-                        if (resourceTypeId) {
-                          state =
-                              state.withJoin(
-                                    currentTable: table,
-                                    currentColumn: table.resourceTypeId,
-                                    referencedTable:
-                                        $$EnvironmentResourcesTableReferences
-                                            ._resourceTypeIdTable(db),
-                                    referencedColumn:
-                                        $$EnvironmentResourcesTableReferences
-                                            ._resourceTypeIdTable(db)
-                                            .id,
-                                  )
-                                  as T;
-                        }
+          prefetchHooksCallback: ({environmentId = false, nutrientId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (environmentId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.environmentId,
+                                referencedTable:
+                                    $$EnvironmentSourcesTableReferences
+                                        ._environmentIdTable(db),
+                                referencedColumn:
+                                    $$EnvironmentSourcesTableReferences
+                                        ._environmentIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+                    if (nutrientId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.nutrientId,
+                                referencedTable:
+                                    $$EnvironmentSourcesTableReferences
+                                        ._nutrientIdTable(db),
+                                referencedColumn:
+                                    $$EnvironmentSourcesTableReferences
+                                        ._nutrientIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
 
-                        return state;
-                      },
-                  getPrefetchedDataCallback: (items) async {
-                    return [];
+                    return state;
                   },
-                );
+              getPrefetchedDataCallback: (items) async {
+                return [];
               },
+            );
+          },
         ),
       );
 }
 
-typedef $$EnvironmentResourcesTableProcessedTableManager =
+typedef $$EnvironmentSourcesTableProcessedTableManager =
     ProcessedTableManager<
       _$AppDatabase,
-      $EnvironmentResourcesTable,
-      EnvironmentResource,
-      $$EnvironmentResourcesTableFilterComposer,
-      $$EnvironmentResourcesTableOrderingComposer,
-      $$EnvironmentResourcesTableAnnotationComposer,
-      $$EnvironmentResourcesTableCreateCompanionBuilder,
-      $$EnvironmentResourcesTableUpdateCompanionBuilder,
-      (EnvironmentResource, $$EnvironmentResourcesTableReferences),
-      EnvironmentResource,
-      PrefetchHooks Function({bool environmentId, bool resourceTypeId})
+      $EnvironmentSourcesTable,
+      EnvironmentSource,
+      $$EnvironmentSourcesTableFilterComposer,
+      $$EnvironmentSourcesTableOrderingComposer,
+      $$EnvironmentSourcesTableAnnotationComposer,
+      $$EnvironmentSourcesTableCreateCompanionBuilder,
+      $$EnvironmentSourcesTableUpdateCompanionBuilder,
+      (EnvironmentSource, $$EnvironmentSourcesTableReferences),
+      EnvironmentSource,
+      PrefetchHooks Function({bool environmentId, bool nutrientId})
+    >;
+typedef $$EnvironmentOvipositionSitesTableCreateCompanionBuilder =
+    EnvironmentOvipositionSitesCompanion Function({
+      Value<int> id,
+      required int environmentId,
+      required String name,
+      required int posX,
+      required int posY,
+      Value<int> quality,
+      Value<int> capacity,
+    });
+typedef $$EnvironmentOvipositionSitesTableUpdateCompanionBuilder =
+    EnvironmentOvipositionSitesCompanion Function({
+      Value<int> id,
+      Value<int> environmentId,
+      Value<String> name,
+      Value<int> posX,
+      Value<int> posY,
+      Value<int> quality,
+      Value<int> capacity,
+    });
+
+final class $$EnvironmentOvipositionSitesTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $EnvironmentOvipositionSitesTable,
+          EnvironmentOvipositionSite
+        > {
+  $$EnvironmentOvipositionSitesTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $EnvironmentsTable _environmentIdTable(_$AppDatabase db) =>
+      db.environments.createAlias(
+        'environment_oviposition_sites__environment_id__environments__id',
+      );
+
+  $$EnvironmentsTableProcessedTableManager get environmentId {
+    final $_column = $_itemColumn<int>('environment_id')!;
+
+    final manager = $$EnvironmentsTableTableManager(
+      $_db,
+      $_db.environments,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_environmentIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$EnvironmentOvipositionSitesTableFilterComposer
+    extends Composer<_$AppDatabase, $EnvironmentOvipositionSitesTable> {
+  $$EnvironmentOvipositionSitesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get posX => $composableBuilder(
+    column: $table.posX,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get posY => $composableBuilder(
+    column: $table.posY,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get quality => $composableBuilder(
+    column: $table.quality,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get capacity => $composableBuilder(
+    column: $table.capacity,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$EnvironmentsTableFilterComposer get environmentId {
+    final $$EnvironmentsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.environmentId,
+      referencedTable: $db.environments,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$EnvironmentsTableFilterComposer(
+            $db: $db,
+            $table: $db.environments,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$EnvironmentOvipositionSitesTableOrderingComposer
+    extends Composer<_$AppDatabase, $EnvironmentOvipositionSitesTable> {
+  $$EnvironmentOvipositionSitesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get posX => $composableBuilder(
+    column: $table.posX,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get posY => $composableBuilder(
+    column: $table.posY,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get quality => $composableBuilder(
+    column: $table.quality,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get capacity => $composableBuilder(
+    column: $table.capacity,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$EnvironmentsTableOrderingComposer get environmentId {
+    final $$EnvironmentsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.environmentId,
+      referencedTable: $db.environments,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$EnvironmentsTableOrderingComposer(
+            $db: $db,
+            $table: $db.environments,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$EnvironmentOvipositionSitesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $EnvironmentOvipositionSitesTable> {
+  $$EnvironmentOvipositionSitesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<int> get posX =>
+      $composableBuilder(column: $table.posX, builder: (column) => column);
+
+  GeneratedColumn<int> get posY =>
+      $composableBuilder(column: $table.posY, builder: (column) => column);
+
+  GeneratedColumn<int> get quality =>
+      $composableBuilder(column: $table.quality, builder: (column) => column);
+
+  GeneratedColumn<int> get capacity =>
+      $composableBuilder(column: $table.capacity, builder: (column) => column);
+
+  $$EnvironmentsTableAnnotationComposer get environmentId {
+    final $$EnvironmentsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.environmentId,
+      referencedTable: $db.environments,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$EnvironmentsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.environments,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$EnvironmentOvipositionSitesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $EnvironmentOvipositionSitesTable,
+          EnvironmentOvipositionSite,
+          $$EnvironmentOvipositionSitesTableFilterComposer,
+          $$EnvironmentOvipositionSitesTableOrderingComposer,
+          $$EnvironmentOvipositionSitesTableAnnotationComposer,
+          $$EnvironmentOvipositionSitesTableCreateCompanionBuilder,
+          $$EnvironmentOvipositionSitesTableUpdateCompanionBuilder,
+          (
+            EnvironmentOvipositionSite,
+            $$EnvironmentOvipositionSitesTableReferences,
+          ),
+          EnvironmentOvipositionSite,
+          PrefetchHooks Function({bool environmentId})
+        > {
+  $$EnvironmentOvipositionSitesTableTableManager(
+    _$AppDatabase db,
+    $EnvironmentOvipositionSitesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$EnvironmentOvipositionSitesTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$EnvironmentOvipositionSitesTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$EnvironmentOvipositionSitesTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> environmentId = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<int> posX = const Value.absent(),
+                Value<int> posY = const Value.absent(),
+                Value<int> quality = const Value.absent(),
+                Value<int> capacity = const Value.absent(),
+              }) => EnvironmentOvipositionSitesCompanion(
+                id: id,
+                environmentId: environmentId,
+                name: name,
+                posX: posX,
+                posY: posY,
+                quality: quality,
+                capacity: capacity,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int environmentId,
+                required String name,
+                required int posX,
+                required int posY,
+                Value<int> quality = const Value.absent(),
+                Value<int> capacity = const Value.absent(),
+              }) => EnvironmentOvipositionSitesCompanion.insert(
+                id: id,
+                environmentId: environmentId,
+                name: name,
+                posX: posX,
+                posY: posY,
+                quality: quality,
+                capacity: capacity,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$EnvironmentOvipositionSitesTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({environmentId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (environmentId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.environmentId,
+                                referencedTable:
+                                    $$EnvironmentOvipositionSitesTableReferences
+                                        ._environmentIdTable(db),
+                                referencedColumn:
+                                    $$EnvironmentOvipositionSitesTableReferences
+                                        ._environmentIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$EnvironmentOvipositionSitesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $EnvironmentOvipositionSitesTable,
+      EnvironmentOvipositionSite,
+      $$EnvironmentOvipositionSitesTableFilterComposer,
+      $$EnvironmentOvipositionSitesTableOrderingComposer,
+      $$EnvironmentOvipositionSitesTableAnnotationComposer,
+      $$EnvironmentOvipositionSitesTableCreateCompanionBuilder,
+      $$EnvironmentOvipositionSitesTableUpdateCompanionBuilder,
+      (
+        EnvironmentOvipositionSite,
+        $$EnvironmentOvipositionSitesTableReferences,
+      ),
+      EnvironmentOvipositionSite,
+      PrefetchHooks Function({bool environmentId})
     >;
 typedef $$EnvironmentAgentsTableCreateCompanionBuilder =
     EnvironmentAgentsCompanion Function({
@@ -12803,14 +12955,18 @@ class $AppDatabaseManager {
       $$StagesTableTableManager(_db, _db.stages);
   $$PrototypesTableTableManager get prototypes =>
       $$PrototypesTableTableManager(_db, _db.prototypes);
-  $$ResourceTypesTableTableManager get resourceTypes =>
-      $$ResourceTypesTableTableManager(_db, _db.resourceTypes);
   $$EnvironmentsTableTableManager get environments =>
       $$EnvironmentsTableTableManager(_db, _db.environments);
   $$SubstrateMapRowsTableTableManager get substrateMapRows =>
       $$SubstrateMapRowsTableTableManager(_db, _db.substrateMapRows);
-  $$EnvironmentResourcesTableTableManager get environmentResources =>
-      $$EnvironmentResourcesTableTableManager(_db, _db.environmentResources);
+  $$EnvironmentSourcesTableTableManager get environmentSources =>
+      $$EnvironmentSourcesTableTableManager(_db, _db.environmentSources);
+  $$EnvironmentOvipositionSitesTableTableManager
+  get environmentOvipositionSites =>
+      $$EnvironmentOvipositionSitesTableTableManager(
+        _db,
+        _db.environmentOvipositionSites,
+      );
   $$EnvironmentAgentsTableTableManager get environmentAgents =>
       $$EnvironmentAgentsTableTableManager(_db, _db.environmentAgents);
   $$MetabolismTableTableManager get metabolism =>

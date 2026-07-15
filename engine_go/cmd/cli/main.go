@@ -322,10 +322,10 @@ func populateProject(db *storage.DB) {
 	projRepo.Init("Galatea Integration Test", "Full engine integration demo")
 
 	nutRepo := storage.NewNutrientRepo(db)
-	nutRepo.Create("Water", 1)
-	nutRepo.Create("Sugar", 2)
-	nutRepo.Create("Fat", 3)
-	nutRepo.Create("Protein", 4)
+	nutRepo.Create("Water", 0, 1)
+	nutRepo.Create("Sugar", 0, 2)
+	nutRepo.Create("Fat", 0, 3)
+	nutRepo.Create("Protein", 0, 4)
 
 	subRepo := storage.NewSubstrateRepo(db)
 	for i := 1; i <= 5; i++ {
@@ -364,25 +364,19 @@ func populateProject(db *storage.DB) {
 		SexRatioMalesFormula: "50", SexRatioFemalesFormula: "50", SortOrder: 1,
 	})
 
-	nutID1 := int64(1)
-	nutID2 := int64(2)
-	rtRepo := storage.NewResourceTypeRepo(db)
-	rtRepo.Create(&storage.ResourceType{Name: "WaterSource", NutrientID: &nutID1, SortOrder: 1})
-	rtRepo.Create(&storage.ResourceType{Name: "SugarSource", NutrientID: &nutID2, SortOrder: 2})
-
 	envRepo := storage.NewEnvironmentRepo(db)
 	envID, _ := envRepo.Create("Arena", 80, 80, "80x80 test arena")
 
-	// Resources scattered around.
+	// Nutrient sources scattered around (nutrient_id 1=Water, 2=Sugar).
 	for i := 0; i < 10; i++ {
-		envRepo.PlaceResource(&storage.EnvironmentResource{
-			EnvironmentID: envID, ResourceTypeID: 1, Name: fmt.Sprintf("water_%d", i),
+		envRepo.PlaceSource(&storage.EnvironmentSource{
+			EnvironmentID: envID, NutrientID: 1, Name: fmt.Sprintf("water_%d", i),
 			PosX: 5 + i*8, PosY: 40, Quality: 10, Level: 100, MaxLevel: 200, RegenRate: 1.05,
 		})
 	}
 	for i := 0; i < 10; i++ {
-		envRepo.PlaceResource(&storage.EnvironmentResource{
-			EnvironmentID: envID, ResourceTypeID: 2, Name: fmt.Sprintf("sugar_%d", i),
+		envRepo.PlaceSource(&storage.EnvironmentSource{
+			EnvironmentID: envID, NutrientID: 2, Name: fmt.Sprintf("sugar_%d", i),
 			PosX: 40, PosY: 5 + i*8, Quality: 8, Level: 80, MaxLevel: 150, RegenRate: 1.1,
 		})
 	}

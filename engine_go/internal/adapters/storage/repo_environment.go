@@ -74,40 +74,75 @@ func (r *EnvironmentRepo) Delete(id int64) error {
 	return nil
 }
 
-// PlaceResource adds a resource instance to an environment.
-func (r *EnvironmentRepo) PlaceResource(er *EnvironmentResource) (int64, error) {
+// PlaceSource adds a nutrient source instance to an environment.
+func (r *EnvironmentRepo) PlaceSource(s *EnvironmentSource) (int64, error) {
 	res, err := r.db.Conn.Exec(
-		`INSERT INTO environment_resources (environment_id, resource_type_id, name, pos_x, pos_y, quality, level, max_level, regen_rate)
+		`INSERT INTO environment_sources (environment_id, nutrient_id, name, pos_x, pos_y, quality, level, max_level, regen_rate)
 		 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-		er.EnvironmentID, er.ResourceTypeID, er.Name, er.PosX, er.PosY, er.Quality, er.Level, er.MaxLevel, er.RegenRate,
+		s.EnvironmentID, s.NutrientID, s.Name, s.PosX, s.PosY, s.Quality, s.Level, s.MaxLevel, s.RegenRate,
 	)
 	if err != nil {
-		return 0, fmt.Errorf("environment resource place: %w", err)
+		return 0, fmt.Errorf("environment source place: %w", err)
 	}
 	return res.LastInsertId()
 }
 
-// ListResources returns all resource instances in an environment.
-func (r *EnvironmentRepo) ListResources(environmentID int64) ([]EnvironmentResource, error) {
+// ListSources returns all nutrient source instances in an environment.
+func (r *EnvironmentRepo) ListSources(environmentID int64) ([]EnvironmentSource, error) {
 	rows, err := r.db.Conn.Query(
-		`SELECT id, environment_id, resource_type_id, name, pos_x, pos_y, quality, level, max_level, regen_rate
-		 FROM environment_resources WHERE environment_id = ? ORDER BY id`, environmentID,
+		`SELECT id, environment_id, nutrient_id, name, pos_x, pos_y, quality, level, max_level, regen_rate
+		 FROM environment_sources WHERE environment_id = ? ORDER BY id`, environmentID,
 	)
 	if err != nil {
-		return nil, fmt.Errorf("environment resources list: %w", err)
+		return nil, fmt.Errorf("environment sources list: %w", err)
 	}
 	defer rows.Close()
 
-	var resources []EnvironmentResource
+	var sources []EnvironmentSource
 	for rows.Next() {
-		var er EnvironmentResource
-		if err := rows.Scan(&er.ID, &er.EnvironmentID, &er.ResourceTypeID, &er.Name,
-			&er.PosX, &er.PosY, &er.Quality, &er.Level, &er.MaxLevel, &er.RegenRate); err != nil {
-			return nil, fmt.Errorf("environment resource scan: %w", err)
+		var s EnvironmentSource
+		if err := rows.Scan(&s.ID, &s.EnvironmentID, &s.NutrientID, &s.Name,
+			&s.PosX, &s.PosY, &s.Quality, &s.Level, &s.MaxLevel, &s.RegenRate); err != nil {
+			return nil, fmt.Errorf("environment source scan: %w", err)
 		}
-		resources = append(resources, er)
+		sources = append(sources, s)
 	}
-	return resources, rows.Err()
+	return sources, rows.Err()
+}
+
+// PlaceOvipositionSite adds an oviposition site to an environment.
+func (r *EnvironmentRepo) PlaceOvipositionSite(o *OvipositionSite) (int64, error) {
+	res, err := r.db.Conn.Exec(
+		`INSERT INTO environment_oviposition_sites (environment_id, name, pos_x, pos_y, quality, capacity)
+		 VALUES (?, ?, ?, ?, ?, ?)`,
+		o.EnvironmentID, o.Name, o.PosX, o.PosY, o.Quality, o.Capacity,
+	)
+	if err != nil {
+		return 0, fmt.Errorf("oviposition site place: %w", err)
+	}
+	return res.LastInsertId()
+}
+
+// ListOvipositionSites returns all oviposition sites in an environment.
+func (r *EnvironmentRepo) ListOvipositionSites(environmentID int64) ([]OvipositionSite, error) {
+	rows, err := r.db.Conn.Query(
+		`SELECT id, environment_id, name, pos_x, pos_y, quality, capacity
+		 FROM environment_oviposition_sites WHERE environment_id = ? ORDER BY id`, environmentID,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("oviposition sites list: %w", err)
+	}
+	defer rows.Close()
+
+	var sites []OvipositionSite
+	for rows.Next() {
+		var o OvipositionSite
+		if err := rows.Scan(&o.ID, &o.EnvironmentID, &o.Name, &o.PosX, &o.PosY, &o.Quality, &o.Capacity); err != nil {
+			return nil, fmt.Errorf("oviposition site scan: %w", err)
+		}
+		sites = append(sites, o)
+	}
+	return sites, rows.Err()
 }
 
 // PlaceAgent adds an initial agent to an environment.

@@ -80,12 +80,12 @@ func TestNutrientCRUD(t *testing.T) {
 	db := mustOpenMemory(t)
 	repo := NewNutrientRepo(db)
 
-	id1, err := repo.Create("Water", 1)
+	id1, err := repo.Create("Water", 0, 1)
 	if err != nil {
 		t.Fatalf("Create Water: %v", err)
 	}
-	id2, _ := repo.Create("Sugar", 2)
-	repo.Create("Fat", 3)
+	id2, _ := repo.Create("Sugar", 0, 2)
+	repo.Create("Fat", 0, 3)
 
 	// GetByID
 	n, err := repo.GetByID(id1)
@@ -219,10 +219,8 @@ func TestEnvironmentWithElements(t *testing.T) {
 	db := mustOpenMemory(t)
 
 	nutRepo := NewNutrientRepo(db)
-	nutID, _ := nutRepo.Create("Water", 1)
+	nutID, _ := nutRepo.Create("Water", 0, 1)
 
-	rtRepo := NewResourceTypeRepo(db)
-	rtID, _ := rtRepo.Create(&ResourceType{Name: "Water Source", NutrientID: &nutID, SortOrder: 1})
 
 	stageRepo := NewStageRepo(db)
 	stageID, _ := stageRepo.Create(&Stage{
@@ -239,8 +237,8 @@ func TestEnvironmentWithElements(t *testing.T) {
 	}
 
 	// Place resources
-	_, err = envRepo.PlaceResource(&EnvironmentResource{
-		EnvironmentID: envID, ResourceTypeID: rtID, Name: "Spring1",
+	_, err = envRepo.PlaceSource(&EnvironmentSource{
+		EnvironmentID: envID, NutrientID: nutID, Name: "Spring1",
 		PosX: 10, PosY: 20, Quality: 10, Level: 80, MaxLevel: 100, RegenRate: 1.1,
 	})
 	if err != nil {
@@ -257,7 +255,7 @@ func TestEnvironmentWithElements(t *testing.T) {
 	}
 
 	// Verify
-	resources, _ := envRepo.ListResources(envID)
+	resources, _ := envRepo.ListSources(envID)
 	if len(resources) != 1 {
 		t.Fatalf("expected 1 resource, got %d", len(resources))
 	}
@@ -275,7 +273,7 @@ func TestEnvironmentWithElements(t *testing.T) {
 
 	// Verify cascade delete
 	envRepo.Delete(envID)
-	resources, _ = envRepo.ListResources(envID)
+	resources, _ = envRepo.ListSources(envID)
 	if len(resources) != 0 {
 		t.Fatalf("expected 0 resources after delete, got %d", len(resources))
 	}

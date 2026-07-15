@@ -15,9 +15,11 @@ class ProjectInfo extends Table {
 }
 
 /// User-defined nutrient types (0..N).
+/// Each nutrient implicitly defines its corresponding resource source.
 class Nutrients extends Table {
   IntColumn get id => integer().autoIncrement()();
   TextColumn get name => text().unique()();
+  IntColumn get color => integer().withDefault(const Constant(0))();
   IntColumn get sortOrder => integer().withDefault(const Constant(0))();
 }
 
@@ -78,7 +80,7 @@ class Stages extends Table {
 class Prototypes extends Table {
   IntColumn get id => integer().autoIncrement()();
   TextColumn get name => text().unique()();
-  TextColumn get sex => text()(); // 'M' or 'F'
+  TextColumn get sex => text()();
   IntColumn get color => integer().withDefault(const Constant(0))();
   TextColumn get longevityFormula =>
       text().withDefault(const Constant('1000'))();
@@ -90,17 +92,6 @@ class Prototypes extends Table {
       text().withDefault(const Constant('50'))();
   TextColumn get sexRatioFemalesFormula =>
       text().withDefault(const Constant('50'))();
-  IntColumn get sortOrder => integer().withDefault(const Constant(0))();
-}
-
-/// Resource/dynamic element types (0..N).
-class ResourceTypes extends Table {
-  IntColumn get id => integer().autoIncrement()();
-  TextColumn get name => text().unique()();
-  IntColumn get nutrientId => integer().nullable().references(Nutrients, #id)();
-  BoolColumn get isOviposition =>
-      boolean().withDefault(const Constant(false))();
-  IntColumn get color => integer().withDefault(const Constant(0))();
   IntColumn get sortOrder => integer().withDefault(const Constant(0))();
 }
 
@@ -117,12 +108,12 @@ class Environments extends Table {
       text().withDefault(Constant(DateTime.now().toIso8601String()))();
 }
 
-/// Substrate map rows (one per Y coordinate in an environment).
+/// Substrate map rows.
 class SubstrateMapRows extends Table {
   IntColumn get id => integer().autoIncrement()();
   IntColumn get environmentId => integer().references(Environments, #id)();
   IntColumn get yCoord => integer()();
-  TextColumn get mapData => text()(); // Comma-separated substrate IDs.
+  TextColumn get mapData => text()();
 
   @override
   List<Set<Column>> get uniqueKeys => [
@@ -130,11 +121,12 @@ class SubstrateMapRows extends Table {
   ];
 }
 
-/// Resource instances placed in an environment.
-class EnvironmentResources extends Table {
+/// Nutrient source instances placed in an environment.
+/// Each source provides exactly one nutrient.
+class EnvironmentSources extends Table {
   IntColumn get id => integer().autoIncrement()();
   IntColumn get environmentId => integer().references(Environments, #id)();
-  IntColumn get resourceTypeId => integer().references(ResourceTypes, #id)();
+  IntColumn get nutrientId => integer().references(Nutrients, #id)();
   TextColumn get name => text()();
   IntColumn get posX => integer()();
   IntColumn get posY => integer()();
@@ -142,6 +134,17 @@ class EnvironmentResources extends Table {
   IntColumn get level => integer().withDefault(const Constant(50))();
   IntColumn get maxLevel => integer().withDefault(const Constant(100))();
   RealColumn get regenRate => real().withDefault(const Constant(1.1))();
+}
+
+/// Oviposition site instances placed in an environment.
+class EnvironmentOvipositionSites extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get environmentId => integer().references(Environments, #id)();
+  TextColumn get name => text()();
+  IntColumn get posX => integer()();
+  IntColumn get posY => integer()();
+  IntColumn get quality => integer().withDefault(const Constant(10))();
+  IntColumn get capacity => integer().withDefault(const Constant(50))();
 }
 
 /// Initial agent population in an environment.
@@ -154,7 +157,7 @@ class EnvironmentAgents extends Table {
   IntColumn get stageId => integer().nullable().references(Stages, #id)();
   IntColumn get prototypeId =>
       integer().nullable().references(Prototypes, #id)();
-  TextColumn get sex => text()(); // 'M', 'F', 'U'
+  TextColumn get sex => text()();
   IntColumn get age => integer().withDefault(const Constant(0))();
 }
 

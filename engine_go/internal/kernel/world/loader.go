@@ -84,13 +84,8 @@ func loadConfig(db *storage.DB, environmentID int64) (Config, error) {
 	cfg.NumPrototypesF = len(females)
 	cfg.NumPrototypes = cfg.NumStages + cfg.NumPrototypesM + cfg.NumPrototypesF
 
-	// Resource types.
-	rtRepo := storage.NewResourceTypeRepo(db)
-	resourceTypes, err := rtRepo.List()
-	if err != nil {
-		return cfg, err
-	}
-	cfg.NumResourceTypes = len(resourceTypes)
+	// Resource types: in unified model, NumResourceTypes = NumNutrients.
+	cfg.NumResourceTypes = cfg.NumNutrients
 
 	// Substrates.
 	subRepo := storage.NewSubstrateRepo(db)
@@ -161,15 +156,15 @@ func loadSubstrateMap(db *storage.DB, w *World, environmentID int64) error {
 	return rows.Err()
 }
 
-// loadResources reads environment_resources and populates ResourceArrays.
+// loadResources reads environment_sources and populates ResourceArrays.
 func loadResources(db *storage.DB, w *World, environmentID int64) error {
 	envRepo := storage.NewEnvironmentRepo(db)
-	resources, err := envRepo.ListResources(environmentID)
+	sources, err := envRepo.ListSources(environmentID)
 	if err != nil {
 		return err
 	}
 
-	for _, r := range resources {
+	for _, s := range sources {
 		idx := w.Resources.Count
 		if idx >= w.Resources.Cap {
 			// Grow resource arrays.
@@ -187,13 +182,13 @@ func loadResources(db *storage.DB, w *World, environmentID int64) error {
 			w.Resources.Cap = newCap
 		}
 
-		w.Resources.PosX[idx] = float64(r.PosX)
-		w.Resources.PosY[idx] = float64(r.PosY)
-		w.Resources.TypeID[idx] = int32(r.ResourceTypeID - 1) // Convert 1-based DB ID to 0-based index.
-		w.Resources.Level[idx] = int32(r.Level)
-		w.Resources.MaxLevel[idx] = int32(r.MaxLevel)
-		w.Resources.Quality[idx] = int32(r.Quality)
-		w.Resources.RegenRate[idx] = r.RegenRate
+		w.Resources.PosX[idx] = float64(s.PosX)
+		w.Resources.PosY[idx] = float64(s.PosY)
+		w.Resources.TypeID[idx] = int32(s.NutrientID - 1) // 1-based nutrient ID to 0-based index.
+		w.Resources.Level[idx] = int32(s.Level)
+		w.Resources.MaxLevel[idx] = int32(s.MaxLevel)
+		w.Resources.Quality[idx] = int32(s.Quality)
+		w.Resources.RegenRate[idx] = s.RegenRate
 		w.Resources.Count++
 	}
 

@@ -20,8 +20,8 @@ func setupTestDB(t *testing.T) *storage.DB {
 	projRepo.Init("EngineTest", "Integration test project")
 
 	nutRepo := storage.NewNutrientRepo(db)
-	nutRepo.Create("Water", 1)
-	nutRepo.Create("Sugar", 2)
+	nutRepo.Create("Water", 0, 1)
+	nutRepo.Create("Sugar", 0, 2)
 
 	subRepo := storage.NewSubstrateRepo(db)
 	subRepo.Create("Grass", 0x00FF00, false, 1)
@@ -52,23 +52,18 @@ func setupTestDB(t *testing.T) *storage.DB {
 		SexRatioMalesFormula: "50", SexRatioFemalesFormula: "50", SortOrder: 1,
 	})
 
-	rtRepo := storage.NewResourceTypeRepo(db)
-	nutID := int64(1)
-	rtRepo.Create(&storage.ResourceType{Name: "Spring", NutrientID: &nutID, SortOrder: 1})
-	nutID2 := int64(2)
-	rtRepo.Create(&storage.ResourceType{Name: "Flower", NutrientID: &nutID2, SortOrder: 2})
 
 	// Create environment 30x30.
 	envRepo := storage.NewEnvironmentRepo(db)
 	envID, _ := envRepo.Create("TestArena", 30, 30, "")
 
 	// Place resources.
-	envRepo.PlaceResource(&storage.EnvironmentResource{
-		EnvironmentID: envID, ResourceTypeID: 1, Name: "spring1",
+	envRepo.PlaceSource(&storage.EnvironmentSource{
+		EnvironmentID: envID, NutrientID: 1, Name: "spring1",
 		PosX: 10, PosY: 10, Quality: 10, Level: 100, MaxLevel: 200, RegenRate: 1.05,
 	})
-	envRepo.PlaceResource(&storage.EnvironmentResource{
-		EnvironmentID: envID, ResourceTypeID: 2, Name: "flower1",
+	envRepo.PlaceSource(&storage.EnvironmentSource{
+		EnvironmentID: envID, NutrientID: 2, Name: "flower1",
 		PosX: 20, PosY: 20, Quality: 8, Level: 80, MaxLevel: 150, RegenRate: 1.1,
 	})
 

@@ -82,27 +82,13 @@ class PrototypeDaoManager {
       $$PrototypesTableTableManager(_db.attachedDatabase, _db.prototypes);
 }
 
-mixin _$ResourceTypeDaoMixin on DatabaseAccessor<AppDatabase> {
-  $NutrientsTable get nutrients => attachedDatabase.nutrients;
-  $ResourceTypesTable get resourceTypes => attachedDatabase.resourceTypes;
-  ResourceTypeDaoManager get managers => ResourceTypeDaoManager(this);
-}
-
-class ResourceTypeDaoManager {
-  final _$ResourceTypeDaoMixin _db;
-  ResourceTypeDaoManager(this._db);
-  $$NutrientsTableTableManager get nutrients =>
-      $$NutrientsTableTableManager(_db.attachedDatabase, _db.nutrients);
-  $$ResourceTypesTableTableManager get resourceTypes =>
-      $$ResourceTypesTableTableManager(_db.attachedDatabase, _db.resourceTypes);
-}
-
 mixin _$EnvironmentDaoMixin on DatabaseAccessor<AppDatabase> {
   $EnvironmentsTable get environments => attachedDatabase.environments;
   $NutrientsTable get nutrients => attachedDatabase.nutrients;
-  $ResourceTypesTable get resourceTypes => attachedDatabase.resourceTypes;
-  $EnvironmentResourcesTable get environmentResources =>
-      attachedDatabase.environmentResources;
+  $EnvironmentSourcesTable get environmentSources =>
+      attachedDatabase.environmentSources;
+  $EnvironmentOvipositionSitesTable get environmentOvipositionSites =>
+      attachedDatabase.environmentOvipositionSites;
   $StagesTable get stages => attachedDatabase.stages;
   $PrototypesTable get prototypes => attachedDatabase.prototypes;
   $EnvironmentAgentsTable get environmentAgents =>
@@ -117,12 +103,16 @@ class EnvironmentDaoManager {
       $$EnvironmentsTableTableManager(_db.attachedDatabase, _db.environments);
   $$NutrientsTableTableManager get nutrients =>
       $$NutrientsTableTableManager(_db.attachedDatabase, _db.nutrients);
-  $$ResourceTypesTableTableManager get resourceTypes =>
-      $$ResourceTypesTableTableManager(_db.attachedDatabase, _db.resourceTypes);
-  $$EnvironmentResourcesTableTableManager get environmentResources =>
-      $$EnvironmentResourcesTableTableManager(
+  $$EnvironmentSourcesTableTableManager get environmentSources =>
+      $$EnvironmentSourcesTableTableManager(
         _db.attachedDatabase,
-        _db.environmentResources,
+        _db.environmentSources,
+      );
+  $$EnvironmentOvipositionSitesTableTableManager
+  get environmentOvipositionSites =>
+      $$EnvironmentOvipositionSitesTableTableManager(
+        _db.attachedDatabase,
+        _db.environmentOvipositionSites,
       );
   $$StagesTableTableManager get stages =>
       $$StagesTableTableManager(_db.attachedDatabase, _db.stages);

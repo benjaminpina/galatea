@@ -30,6 +30,7 @@ type Config struct {
 	NumPrototypes int
 
 	// NumResourceTypes is the number of resource/dynamic element types (0..N).
+	// In the unified model, this equals NumNutrients (each nutrient = its source type).
 	NumResourceTypes int
 
 	// NumSubstrates is the total number of substrate types (simple + mixed).

@@ -39,9 +39,14 @@ class NutrientDao extends DatabaseAccessor<AppDatabase>
     with _$NutrientDaoMixin {
   NutrientDao(super.db);
 
-  Future<int> add(String name, int sortOrder) => into(
-    nutrients,
-  ).insert(NutrientsCompanion.insert(name: name, sortOrder: Value(sortOrder)));
+  Future<int> add(String name, int color, int sortOrder) =>
+      into(nutrients).insert(
+        NutrientsCompanion.insert(
+          name: name,
+          color: Value(color),
+          sortOrder: Value(sortOrder),
+        ),
+      );
 
   Future<List<Nutrient>> getAll() => (select(
     nutrients,
@@ -50,6 +55,11 @@ class NutrientDao extends DatabaseAccessor<AppDatabase>
   Stream<List<Nutrient>> watchAll() => (select(
     nutrients,
   )..orderBy([(t) => OrderingTerm.asc(t.sortOrder)])).watch();
+
+  Future<void> updateNutrient(int id, String name, int color) =>
+      (update(nutrients)..where((t) => t.id.equals(id))).write(
+        NutrientsCompanion(name: Value(name), color: Value(color)),
+      );
 
   Future<void> remove(int id) =>
       (delete(nutrients)..where((t) => t.id.equals(id))).go();
@@ -78,13 +88,13 @@ class SubstrateDao extends DatabaseAccessor<AppDatabase>
     substrates,
   )..orderBy([(t) => OrderingTerm.asc(t.sortOrder)])).watch();
 
-  Future<void> remove(int id) =>
-      (delete(substrates)..where((t) => t.id.equals(id))).go();
-
   Future<void> updateSubstrate(int id, String name, int color) =>
       (update(substrates)..where((t) => t.id.equals(id))).write(
         SubstratesCompanion(name: Value(name), color: Value(color)),
       );
+
+  Future<void> remove(int id) =>
+      (delete(substrates)..where((t) => t.id.equals(id))).go();
 
   Future<void> addComposition(int mixedId, int simpleId, int percentage) =>
       into(substrateCompositions).insert(
@@ -163,27 +173,14 @@ class PrototypeDao extends DatabaseAccessor<AppDatabase>
       (delete(prototypes)..where((t) => t.id.equals(id))).go();
 }
 
-@DriftAccessor(tables: [ResourceTypes])
-class ResourceTypeDao extends DatabaseAccessor<AppDatabase>
-    with _$ResourceTypeDaoMixin {
-  ResourceTypeDao(super.db);
-
-  Future<int> add(ResourceTypesCompanion entry) =>
-      into(resourceTypes).insert(entry);
-
-  Future<List<ResourceType>> getAll() => (select(
-    resourceTypes,
-  )..orderBy([(t) => OrderingTerm.asc(t.sortOrder)])).get();
-
-  Stream<List<ResourceType>> watchAll() => (select(
-    resourceTypes,
-  )..orderBy([(t) => OrderingTerm.asc(t.sortOrder)])).watch();
-
-  Future<void> remove(int id) =>
-      (delete(resourceTypes)..where((t) => t.id.equals(id))).go();
-}
-
-@DriftAccessor(tables: [Environments, EnvironmentResources, EnvironmentAgents])
+@DriftAccessor(
+  tables: [
+    Environments,
+    EnvironmentSources,
+    EnvironmentOvipositionSites,
+    EnvironmentAgents,
+  ],
+)
 class EnvironmentDao extends DatabaseAccessor<AppDatabase>
     with _$EnvironmentDaoMixin {
   EnvironmentDao(super.db);
@@ -207,12 +204,21 @@ class EnvironmentDao extends DatabaseAccessor<AppDatabase>
   Future<void> remove(int id) =>
       (delete(environments)..where((t) => t.id.equals(id))).go();
 
-  Future<int> placeResource(EnvironmentResourcesCompanion entry) =>
-      into(environmentResources).insert(entry);
+  Future<int> placeSource(EnvironmentSourcesCompanion entry) =>
+      into(environmentSources).insert(entry);
 
-  Future<List<EnvironmentResource>> getResources(int envId) => (select(
-    environmentResources,
+  Future<List<EnvironmentSource>> getSources(int envId) => (select(
+    environmentSources,
   )..where((t) => t.environmentId.equals(envId))).get();
+
+  Future<int> placeOvipositionSite(
+    EnvironmentOvipositionSitesCompanion entry,
+  ) => into(environmentOvipositionSites).insert(entry);
+
+  Future<List<EnvironmentOvipositionSite>> getOvipositionSites(int envId) =>
+      (select(
+        environmentOvipositionSites,
+      )..where((t) => t.environmentId.equals(envId))).get();
 
   Future<int> placeAgent(EnvironmentAgentsCompanion entry) =>
       into(environmentAgents).insert(entry);

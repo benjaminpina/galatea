@@ -2,38 +2,48 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../providers/database_provider.dart';
+import '../substrates/substrate_list_screen.dart'; // Reuse _pickColor.
 
-/// Screen for managing simple and mixed substrates.
-class SubstrateListScreen extends ConsumerWidget {
-  const SubstrateListScreen({super.key});
+/// Screen for managing nutrients (and implicitly their resource sources).
+class NutrientListScreen extends ConsumerWidget {
+  const NutrientListScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final substrates = ref.watch(substratesProvider);
+    final nutrients = ref.watch(nutrientsProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Substrates'),
+        title: const Text('Nutrients'),
         actions: [
           IconButton(
             icon: const Icon(Icons.add),
-            tooltip: 'Add substrate',
+            tooltip: 'Add nutrient',
             onPressed: () => _showAddDialog(context, ref),
           ),
         ],
       ),
-      body: substrates.when(
+      body: nutrients.when(
         data: (list) {
           if (list.isEmpty) {
-            return const Center(child: Text('No substrates defined. Tap + to add one.'));
+            return const Center(
+              child: Padding(
+                padding: EdgeInsets.all(32),
+                child: Text(
+                  'No nutrients defined.\n\n'
+                  'Each nutrient you define automatically becomes a resource source '
+                  'that can be placed in environments. For example, defining "Water" '
+                  'means you can place water sources on the map.\n\n'
+                  'Tap + to add one.',
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            );
           }
           return ListView.builder(
             padding: const EdgeInsets.all(16),
             itemCount: list.length,
-            itemBuilder: (context, index) {
-              final sub = list[index];
-              return _SubstrateTile(substrate: sub);
-            },
+            itemBuilder: (context, index) => _NutrientTile(nutrient: list[index]),
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
@@ -43,37 +53,52 @@ class SubstrateListScreen extends ConsumerWidget {
   }
 
   Future<void> _showAddDialog(BuildContext context, WidgetRef ref) async {
-    final nameController = TextEditingController();
-    var selectedColor = Colors.green.toARGB32();
+    final nameCtrl = TextEditingController();
+    var selectedColor = Colors.cyan.toARGB32();
 
     final result = await showDialog<bool>(
       context: context,
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setState) => AlertDialog(
-          title: const Text('New Substrate'),
+          title: const Text('New Nutrient'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
-                controller: nameController,
-                decoration: const InputDecoration(labelText: 'Name'),
+                controller: nameCtrl,
+                decoration: const InputDecoration(
+                  labelText: 'Name',
+                  hintText: 'e.g., Water, Sugar, Protein',
+                ),
                 autofocus: true,
               ),
               const SizedBox(height: 16),
               Row(
                 children: [
-                  const Text('Color: '),
+                  const Text('Source color: '),
                   const SizedBox(width: 8),
-                  _ColorChip(
-                    color: Color(selectedColor),
+                  GestureDetector(
                     onTap: () async {
-                      final picked = await pickColor(ctx, Color(selectedColor));
+                      final picked = await SubstrateListScreen.pickColor(ctx, Color(selectedColor));
                       if (picked != null) {
                         setState(() => selectedColor = picked.toARGB32());
                       }
                     },
+                    child: Container(
+                      width: 48, height: 32,
+                      decoration: BoxDecoration(
+                        color: Color(selectedColor),
+                        borderRadius: BorderRadius.circular(6),
+                        border: Border.all(color: Colors.white24),
+                      ),
+                    ),
                   ),
                 ],
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'This color will be used to render sources of this nutrient in the visualizer.',
+                style: Theme.of(context).textTheme.bodySmall,
               ),
             ],
           ),
@@ -86,60 +111,21 @@ class SubstrateListScreen extends ConsumerWidget {
     );
 
     if (result != true) return;
-    final name = nameController.text.trim();
+    final name = nameCtrl.text.trim();
     if (name.isEmpty) return;
 
-    final dao = ref.read(substrateDaoProvider);
+    final dao = ref.read(nutrientDaoProvider);
     if (dao == null) return;
 
     final existing = await dao.getAll();
-    await dao.add(name, selectedColor, false, existing.length + 1);
-  }
-
-  static Future<Color?> pickColor(BuildContext context, Color current) async {
-    final colors = [
-      Colors.green, Colors.lightGreen, Colors.teal,
-      Colors.blue, Colors.lightBlue, Colors.cyan,
-      Colors.amber, Colors.orange, Colors.brown,
-      Colors.red, Colors.pink, Colors.purple,
-      Colors.grey, Colors.blueGrey, Colors.lime,
-      const Color(0xFF228B22), const Color(0xFFC2B280), const Color(0xFF1E90FF),
-      const Color(0xFF696969), const Color(0xFF006400), const Color(0xFFDEB887),
-    ];
-
-    return showDialog<Color>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Pick Color'),
-        content: Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: colors.map((c) {
-            return GestureDetector(
-              onTap: () => Navigator.pop(ctx, c),
-              child: Container(
-                width: 40, height: 40,
-                decoration: BoxDecoration(
-                  color: c,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(
-                    color: c == current ? Colors.white : Colors.transparent,
-                    width: 3,
-                  ),
-                ),
-              ),
-            );
-          }).toList(),
-        ),
-      ),
-    );
+    await dao.add(name, selectedColor, existing.length + 1);
   }
 }
 
-class _SubstrateTile extends ConsumerWidget {
-  const _SubstrateTile({required this.substrate});
+class _NutrientTile extends ConsumerWidget {
+  const _NutrientTile({required this.nutrient});
 
-  final Substrate substrate;
+  final Nutrient nutrient;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -148,12 +134,14 @@ class _SubstrateTile extends ConsumerWidget {
         leading: Container(
           width: 36, height: 36,
           decoration: BoxDecoration(
-            color: Color(substrate.color),
+            color: Color(nutrient.color),
             borderRadius: BorderRadius.circular(6),
+            border: Border.all(color: Colors.white24),
           ),
+          child: const Icon(Icons.water_drop, size: 20, color: Colors.white),
         ),
-        title: Text(substrate.name),
-        subtitle: Text(substrate.isMixed ? 'Mixed' : 'Simple'),
+        title: Text(nutrient.name),
+        subtitle: const Text('Nutrient + Source'),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -172,34 +160,38 @@ class _SubstrateTile extends ConsumerWidget {
   }
 
   Future<void> _showEditDialog(BuildContext context, WidgetRef ref) async {
-    final nameController = TextEditingController(text: substrate.name);
-    var selectedColor = substrate.color;
+    final nameCtrl = TextEditingController(text: nutrient.name);
+    var selectedColor = nutrient.color;
 
     final result = await showDialog<bool>(
       context: context,
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setState) => AlertDialog(
-          title: const Text('Edit Substrate'),
+          title: const Text('Edit Nutrient'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              TextField(
-                controller: nameController,
-                decoration: const InputDecoration(labelText: 'Name'),
-              ),
+              TextField(controller: nameCtrl, decoration: const InputDecoration(labelText: 'Name')),
               const SizedBox(height: 16),
               Row(
                 children: [
-                  const Text('Color: '),
+                  const Text('Source color: '),
                   const SizedBox(width: 8),
-                  _ColorChip(
-                    color: Color(selectedColor),
+                  GestureDetector(
                     onTap: () async {
                       final picked = await SubstrateListScreen.pickColor(ctx, Color(selectedColor));
                       if (picked != null) {
                         setState(() => selectedColor = picked.toARGB32());
                       }
                     },
+                    child: Container(
+                      width: 48, height: 32,
+                      decoration: BoxDecoration(
+                        color: Color(selectedColor),
+                        borderRadius: BorderRadius.circular(6),
+                        border: Border.all(color: Colors.white24),
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -214,19 +206,19 @@ class _SubstrateTile extends ConsumerWidget {
     );
 
     if (result != true) return;
-    final name = nameController.text.trim();
+    final name = nameCtrl.text.trim();
     if (name.isEmpty) return;
 
-    final dao = ref.read(substrateDaoProvider);
-    await dao?.updateSubstrate(substrate.id, name, selectedColor);
+    final dao = ref.read(nutrientDaoProvider);
+    await dao?.updateNutrient(nutrient.id, name, selectedColor);
   }
 
   Future<void> _confirmDelete(BuildContext context, WidgetRef ref) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Delete Substrate'),
-        content: Text('Delete "${substrate.name}"? This cannot be undone.'),
+        title: const Text('Delete Nutrient'),
+        content: Text('Delete "${nutrient.name}"? This will also remove all its sources from environments.'),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
           FilledButton(
@@ -239,30 +231,8 @@ class _SubstrateTile extends ConsumerWidget {
     );
 
     if (confirmed == true) {
-      final dao = ref.read(substrateDaoProvider);
-      await dao?.remove(substrate.id);
+      final dao = ref.read(nutrientDaoProvider);
+      await dao?.remove(nutrient.id);
     }
-  }
-}
-
-class _ColorChip extends StatelessWidget {
-  const _ColorChip({required this.color, required this.onTap});
-
-  final Color color;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 48, height: 32,
-        decoration: BoxDecoration(
-          color: color,
-          borderRadius: BorderRadius.circular(6),
-          border: Border.all(color: Colors.white24),
-        ),
-      ),
-    );
   }
 }

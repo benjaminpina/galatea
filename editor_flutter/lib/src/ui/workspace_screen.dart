@@ -6,6 +6,7 @@ import '../exchange/exporter.dart';
 import '../exchange/importer.dart';
 import '../providers/database_provider.dart';
 import 'genetics/loci_list_screen.dart';
+import 'nutrients/nutrient_list_screen.dart';
 import 'ontogeny/stage_list_screen.dart';
 import 'prototypes/prototype_list_screen.dart';
 import 'substrates/substrate_list_screen.dart';
@@ -22,7 +23,6 @@ class WorkspaceScreen extends ConsumerWidget {
     final loci = ref.watch(lociProvider);
     final stages = ref.watch(stagesProvider);
     final prototypes = ref.watch(prototypesProvider);
-    final resourceTypes = ref.watch(resourceTypesProvider);
     final environments = ref.watch(environmentsProvider);
 
     return Scaffold(
@@ -91,6 +91,12 @@ class WorkspaceScreen extends ConsumerWidget {
                     icon: Icons.water_drop,
                     label: 'Nutrients',
                     count: nutrients.valueOrNull?.length ?? 0,
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const NutrientListScreen(),
+                      ),
+                    ),
                   ),
                   _SummaryCard(
                     icon: Icons.terrain,
@@ -133,11 +139,6 @@ class WorkspaceScreen extends ConsumerWidget {
                         builder: (_) => const PrototypeListScreen(),
                       ),
                     ),
-                  ),
-                  _SummaryCard(
-                    icon: Icons.park,
-                    label: 'Resource Types',
-                    count: resourceTypes.valueOrNull?.length ?? 0,
                   ),
                   _SummaryCard(
                     icon: Icons.map,

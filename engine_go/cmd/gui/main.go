@@ -545,9 +545,9 @@ func populateDemoProject(db *storage.DB) {
 	projRepo.Init("Visual Demo", "Self-contained demo for the visualizer")
 
 	nutRepo := storage.NewNutrientRepo(db)
-	nutRepo.Create("Water", 1)
-	nutRepo.Create("Sugar", 2)
-	nutRepo.Create("Fat", 3)
+	nutRepo.Create("Water", 0, 1)
+	nutRepo.Create("Sugar", 0, 2)
+	nutRepo.Create("Fat", 0, 3)
 
 	subRepo := storage.NewSubstrateRepo(db)
 	subRepo.Create("Grass", 0x228B22, false, 1)
@@ -579,14 +579,6 @@ func populateDemoProject(db *storage.DB) {
 		RefractoryCombatFormula: "10", RefractoryCourtshipFormula: "15",
 		SexRatioMalesFormula: "50", SexRatioFemalesFormula: "50", SortOrder: 1,
 	})
-
-	nutID1 := int64(1)
-	nutID2 := int64(2)
-	nutID3 := int64(3)
-	rtRepo := storage.NewResourceTypeRepo(db)
-	rtRepo.Create(&storage.ResourceType{Name: "WaterPool", NutrientID: &nutID1, SortOrder: 1})
-	rtRepo.Create(&storage.ResourceType{Name: "Flower", NutrientID: &nutID2, SortOrder: 2})
-	rtRepo.Create(&storage.ResourceType{Name: "FruitTree", NutrientID: &nutID3, SortOrder: 3})
 
 	const gridSize = 60
 	envRepo := storage.NewEnvironmentRepo(db)
@@ -626,25 +618,25 @@ func populateDemoProject(db *storage.DB) {
 		)
 	}
 
-	// Place resources in appropriate zones.
-	// Water pools along the water band.
+	// Place nutrient sources in appropriate zones.
+	// Water sources along the water band (nutrient_id=1).
 	for i := 0; i < 10; i++ {
-		envRepo.PlaceResource(&storage.EnvironmentResource{
-			EnvironmentID: envID, ResourceTypeID: 1, Name: fmt.Sprintf("pool_%d", i),
+		envRepo.PlaceSource(&storage.EnvironmentSource{
+			EnvironmentID: envID, NutrientID: 1, Name: fmt.Sprintf("pool_%d", i),
 			PosX: 5 + i*6, PosY: 30, Quality: 10, Level: 200, MaxLevel: 300, RegenRate: 1.08,
 		})
 	}
-	// Flowers in the grass zone.
+	// Sugar sources in the grass zone (nutrient_id=2).
 	for i := 0; i < 10; i++ {
-		envRepo.PlaceResource(&storage.EnvironmentResource{
-			EnvironmentID: envID, ResourceTypeID: 2, Name: fmt.Sprintf("flower_%d", i),
+		envRepo.PlaceSource(&storage.EnvironmentSource{
+			EnvironmentID: envID, NutrientID: 2, Name: fmt.Sprintf("flower_%d", i),
 			PosX: 3 + i*3, PosY: 5 + i*2, Quality: 8, Level: 150, MaxLevel: 250, RegenRate: 1.1,
 		})
 	}
-	// Fruit trees in the forest zone.
+	// Fat sources in the forest zone (nutrient_id=3).
 	for i := 0; i < 8; i++ {
-		envRepo.PlaceResource(&storage.EnvironmentResource{
-			EnvironmentID: envID, ResourceTypeID: 3, Name: fmt.Sprintf("tree_%d", i),
+		envRepo.PlaceSource(&storage.EnvironmentSource{
+			EnvironmentID: envID, NutrientID: 3, Name: fmt.Sprintf("tree_%d", i),
 			PosX: 5 + i*3, PosY: 40 + i*2, Quality: 12, Level: 180, MaxLevel: 300, RegenRate: 1.06,
 		})
 	}

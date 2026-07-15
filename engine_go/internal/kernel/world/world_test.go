@@ -184,10 +184,10 @@ func setupTestDB(t *testing.T) *storage.DB {
 	projRepo.Init("LoadTest", "Testing the loader")
 
 	nutRepo := storage.NewNutrientRepo(db)
-	nutRepo.Create("Water", 1)
-	nutRepo.Create("Sugar", 2)
-	nutRepo.Create("Fat", 3)
-	nutRepo.Create("Protein", 4)
+	nutRepo.Create("Water", 0, 1)
+	nutRepo.Create("Sugar", 0, 2)
+	nutRepo.Create("Fat", 0, 3)
+	nutRepo.Create("Protein", 0, 4)
 
 	subRepo := storage.NewSubstrateRepo(db)
 	for i := 1; i <= 5; i++ {
@@ -229,23 +229,18 @@ func setupTestDB(t *testing.T) *storage.DB {
 		SexRatioMalesFormula: "50", SexRatioFemalesFormula: "50", SortOrder: 1,
 	})
 
-	rtRepo := storage.NewResourceTypeRepo(db)
-	nutID := int64(1)
-	rtRepo.Create(&storage.ResourceType{Name: "WaterSource", NutrientID: &nutID, SortOrder: 1})
-	nutID2 := int64(2)
-	rtRepo.Create(&storage.ResourceType{Name: "SugarSource", NutrientID: &nutID2, SortOrder: 2})
 
 	// Create environment.
 	envRepo := storage.NewEnvironmentRepo(db)
 	envID, _ := envRepo.Create("TestEnv", 20, 20, "")
 
 	// Place resources.
-	envRepo.PlaceResource(&storage.EnvironmentResource{
-		EnvironmentID: envID, ResourceTypeID: 1, Name: "spring1",
+	envRepo.PlaceSource(&storage.EnvironmentSource{
+		EnvironmentID: envID, NutrientID: 1, Name: "spring1",
 		PosX: 5, PosY: 5, Quality: 10, Level: 80, MaxLevel: 100, RegenRate: 1.1,
 	})
-	envRepo.PlaceResource(&storage.EnvironmentResource{
-		EnvironmentID: envID, ResourceTypeID: 2, Name: "flower1",
+	envRepo.PlaceSource(&storage.EnvironmentSource{
+		EnvironmentID: envID, NutrientID: 2, Name: "flower1",
 		PosX: 15, PosY: 15, Quality: 8, Level: 50, MaxLevel: 100, RegenRate: 1.2,
 	})
 
@@ -288,8 +283,8 @@ func TestLoadWorld(t *testing.T) {
 	if w.Config.NumPrototypesF != 1 {
 		t.Fatalf("expected 1 female prototype, got %d", w.Config.NumPrototypesF)
 	}
-	if w.Config.NumResourceTypes != 2 {
-		t.Fatalf("expected 2 resource types, got %d", w.Config.NumResourceTypes)
+	if w.Config.NumResourceTypes != 4 {
+		t.Fatalf("expected 4 resource types, got %d", w.Config.NumResourceTypes)
 	}
 	if w.Config.GridWidth != 20 || w.Config.GridHeight != 20 {
 		t.Fatalf("expected 20x20 grid, got %dx%d", w.Config.GridWidth, w.Config.GridHeight)
