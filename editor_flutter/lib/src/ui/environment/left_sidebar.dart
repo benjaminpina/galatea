@@ -27,6 +27,10 @@ class LeftSidebar extends StatelessWidget {
     required this.cellSize,
     required this.onZoomIn,
     required this.onZoomOut,
+    required this.brushShape,
+    required this.brushRadius,
+    required this.onBrushShapeChanged,
+    required this.onBrushRadiusChanged,
   });
 
   final EditorTool currentTool;
@@ -47,6 +51,10 @@ class LeftSidebar extends StatelessWidget {
   final double cellSize;
   final VoidCallback onZoomIn;
   final VoidCallback onZoomOut;
+  final BrushShape brushShape;
+  final int brushRadius;
+  final ValueChanged<BrushShape> onBrushShapeChanged;
+  final ValueChanged<int> onBrushRadiusChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -167,19 +175,88 @@ class LeftSidebar extends StatelessWidget {
   }
 
   Widget _buildSubstratePalette(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(12, 10, 12, 6),
+          padding: const EdgeInsets.fromLTRB(12, 10, 12, 4),
           child: Text(
             'Terrain Brush',
             style: Theme.of(context).textTheme.labelLarge,
           ),
         ),
+        // Brush shape selector.
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          child: Row(
+            children: [
+              _BrushShapeBtn(
+                icon: Icons.square_outlined,
+                tooltip: 'Square',
+                active: brushShape == BrushShape.square,
+                onTap: () => onBrushShapeChanged(BrushShape.square),
+              ),
+              _BrushShapeBtn(
+                icon: Icons.circle_outlined,
+                tooltip: 'Circle',
+                active: brushShape == BrushShape.circle,
+                onTap: () => onBrushShapeChanged(BrushShape.circle),
+              ),
+              _BrushShapeBtn(
+                icon: Icons.diamond_outlined,
+                tooltip: 'Diamond',
+                active: brushShape == BrushShape.diamondShape,
+                onTap: () => onBrushShapeChanged(BrushShape.diamondShape),
+              ),
+              _BrushShapeBtn(
+                icon: Icons.horizontal_rule,
+                tooltip: 'H-Line',
+                active: brushShape == BrushShape.hLine,
+                onTap: () => onBrushShapeChanged(BrushShape.hLine),
+              ),
+              _BrushShapeBtn(
+                icon: Icons.more_vert,
+                tooltip: 'V-Line',
+                active: brushShape == BrushShape.vLine,
+                onTap: () => onBrushShapeChanged(BrushShape.vLine),
+              ),
+            ],
+          ),
+        ),
+        // Brush size slider.
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          child: Row(
+            children: [
+              Text(
+                'Size:',
+                style: TextStyle(fontSize: 11, color: scheme.onSurfaceVariant),
+              ),
+              Expanded(
+                child: Slider(
+                  min: 1,
+                  max: 15,
+                  divisions: 14,
+                  value: brushRadius.toDouble(),
+                  onChanged: (v) => onBrushRadiusChanged(v.round()),
+                ),
+              ),
+              SizedBox(
+                width: 20,
+                child: Text(
+                  '$brushRadius',
+                  style: TextStyle(fontSize: 11, color: scheme.onSurface),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const Divider(height: 1),
+        // Substrate palette.
         Expanded(
           child: ListView(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             children: [
               _PaletteItem(
                 name: '(Erase)',
@@ -561,6 +638,47 @@ class _ToolChip extends StatelessWidget {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _BrushShapeBtn extends StatelessWidget {
+  const _BrushShapeBtn({
+    required this.icon,
+    required this.tooltip,
+    required this.active,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String tooltip;
+  final bool active;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Tooltip(
+      message: tooltip,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(4),
+        child: Container(
+          width: 28,
+          height: 28,
+          margin: const EdgeInsets.all(2),
+          decoration: BoxDecoration(
+            color: active ? scheme.primaryContainer : null,
+            borderRadius: BorderRadius.circular(4),
+            border: active ? null : Border.all(color: scheme.outlineVariant),
+          ),
+          child: Icon(
+            icon,
+            size: 16,
+            color: active ? scheme.onPrimaryContainer : scheme.onSurface,
+          ),
         ),
       ),
     );

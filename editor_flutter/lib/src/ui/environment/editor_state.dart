@@ -7,6 +7,52 @@ enum EditorTool {
   agentPlace,
 }
 
+/// Brush shapes for the substrate terrain tool.
+enum BrushShape { square, circle, diamondShape, hLine, vLine }
+
+/// Returns the list of (dx, dy) offsets for cells affected by a brush stroke
+/// centered at (0,0) with the given [shape] and [radius].
+List<(int, int)> brushFootprint(BrushShape shape, int radius) {
+  final cells = <(int, int)>[];
+  final r = radius - 1; // radius=1 means single cell
+
+  switch (shape) {
+    case BrushShape.square:
+      for (var dy = -r; dy <= r; dy++) {
+        for (var dx = -r; dx <= r; dx++) {
+          cells.add((dx, dy));
+        }
+      }
+    case BrushShape.circle:
+      final rSq = (r + 0.5) * (r + 0.5);
+      for (var dy = -r; dy <= r; dy++) {
+        for (var dx = -r; dx <= r; dx++) {
+          if (dx * dx + dy * dy <= rSq) {
+            cells.add((dx, dy));
+          }
+        }
+      }
+    case BrushShape.diamondShape:
+      for (var dy = -r; dy <= r; dy++) {
+        for (var dx = -r; dx <= r; dx++) {
+          if (dx.abs() + dy.abs() <= r) {
+            cells.add((dx, dy));
+          }
+        }
+      }
+    case BrushShape.hLine:
+      for (var dx = -r; dx <= r; dx++) {
+        cells.add((dx, 0));
+      }
+    case BrushShape.vLine:
+      for (var dy = -r; dy <= r; dy++) {
+        cells.add((0, dy));
+      }
+  }
+
+  return cells;
+}
+
 /// A placed element on the canvas that can be selected.
 sealed class PlacedElement {
   const PlacedElement();

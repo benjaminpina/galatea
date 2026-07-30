@@ -53,6 +53,10 @@ class _EnvironmentEditorScreenState
   int? _selectedPrototypeId;
   String _selectedSex = 'M';
 
+  // --- Brush state ---
+  BrushShape _brushShape = BrushShape.square;
+  int _brushRadius = 1; // 1 = single cell, up to 15
+
   // --- Placed elements ---
   List<PlacedSource> _sources = [];
   List<PlacedOvipositionSite> _oviSites = [];
@@ -261,9 +265,19 @@ class _EnvironmentEditorScreenState
   }
 
   void _paintSubstrate(int x, int y) {
-    if (_grid[y][x] != _selectedSubstrateId) {
-      setState(() => _grid[y][x] = _selectedSubstrateId);
+    final cells = brushFootprint(_brushShape, _brushRadius);
+    bool changed = false;
+    for (final (dx, dy) in cells) {
+      final cx = x + dx;
+      final cy = y + dy;
+      if (cx >= 0 && cx < _envWidth && cy >= 0 && cy < _envHeight) {
+        if (_grid[cy][cx] != _selectedSubstrateId) {
+          _grid[cy][cx] = _selectedSubstrateId;
+          changed = true;
+        }
+      }
     }
+    if (changed) setState(() {});
   }
 
   Future<void> _placeSource(int x, int y) async {
@@ -799,6 +813,11 @@ class _EnvironmentEditorScreenState
                     onZoomOut: () => setState(
                       () => _cellSize = (_cellSize - 2).clamp(4, 40),
                     ),
+                    brushShape: _brushShape,
+                    brushRadius: _brushRadius,
+                    onBrushShapeChanged: (s) => setState(() => _brushShape = s),
+                    onBrushRadiusChanged: (r) =>
+                        setState(() => _brushRadius = r),
                   ),
                 ),
                 const VerticalDivider(width: 1),
