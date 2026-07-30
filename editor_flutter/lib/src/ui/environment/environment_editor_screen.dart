@@ -15,22 +15,16 @@ import '../genetics/loci_list_screen.dart';
 import '../ontogeny/stage_list_screen.dart';
 import '../prototypes/prototype_list_screen.dart';
 
-/// The active section shown in the left panel.
-enum PanelSection {
-  tool, // tool-specific options (default when drawing)
-  nutrients,
-  substrates,
-  genetics,
-  stages,
-  prototypes,
-}
+/// Which configuration section is open in the right panel.
+enum ConfigSection { nutrients, substrates, genetics, stages, prototypes }
 
-/// Unified environment editor — the main working screen after project open.
+/// Unified environment editor — the main working screen.
 ///
 /// Layout:
-/// - Top: compact toolbar (save, drawing tools, project sections, zoom, close)
-/// - Left panel (200px): context-dependent (tool options OR project section editor)
+/// - Top: compact toolbar with project config section buttons + save/close
+/// - Left (200px): drawing tools + tool-specific options (always visible)
 /// - Center: canvas
+/// - Right (300px, togglable): project config editor for the selected section
 /// - Bottom: status bar
 class EnvironmentEditorScreen extends ConsumerStatefulWidget {
   const EnvironmentEditorScreen({super.key, required this.environmentId});
@@ -77,9 +71,8 @@ class _EnvironmentEditorScreenState
   int _hoverX = -1;
   int _hoverY = -1;
 
-  // --- Left panel ---
-  PanelSection _panelSection = PanelSection.tool;
-  bool _panelOpen = true;
+  // --- Right config panel ---
+  ConfigSection? _openSection;
 
   @override
   void initState() {
@@ -136,7 +129,6 @@ class _EnvironmentEditorScreenState
           ),
         )
         .toList();
-
     _oviSites = oviSites
         .map(
           (o) => PlacedOvipositionSite(
@@ -149,7 +141,6 @@ class _EnvironmentEditorScreenState
           ),
         )
         .toList();
-
     _agents = agents
         .map(
           (a) => PlacedAgent(
@@ -169,7 +160,6 @@ class _EnvironmentEditorScreenState
     if (nutrients != null && nutrients.isNotEmpty) {
       _selectedNutrientId = nutrients.first.id;
     }
-
     setState(() {});
   }
 
@@ -178,7 +168,6 @@ class _EnvironmentEditorScreenState
   Future<void> _saveAll() async {
     final db = ref.read(databaseProvider);
     if (db == null) return;
-
     await db.batch((batch) {
       batch.deleteWhere(
         db.substrateMapRows,
@@ -195,7 +184,6 @@ class _EnvironmentEditorScreenState
         );
       }
     });
-
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Saved'), duration: Duration(seconds: 1)),
@@ -223,7 +211,9 @@ class _EnvironmentEditorScreenState
 
   void _onCellDrag(int x, int y) {
     if (x < 0 || x >= _envWidth || y < 0 || y >= _envHeight) return;
-    if (_currentTool == EditorTool.substrateBrush) _paintSubstrate(x, y);
+    if (_currentTool == EditorTool.substrateBrush) {
+      _paintSubstrate(x, y);
+    }
   }
 
   void _paintSubstrate(int x, int y) {
@@ -432,33 +422,24 @@ class _EnvironmentEditorScreenState
 
   void _handleScroll(PointerSignalEvent e) {
     if (e is PointerScrollEvent) {
-      setState(
-        () => _cellSize = (_cellSize + (e.scrollDelta.dy > 0 ? -1.0 : 1.0))
-            .clamp(4.0, 40.0),
-      );
+      setState(() {
+        _cellSize = (_cellSize + (e.scrollDelta.dy > 0 ? -1.0 : 1.0)).clamp(
+          4.0,
+          40.0,
+        );
+      });
     }
   }
 
-  // --- Toolbar section toggle ---
+  // --- Config panel toggle ---
 
-  void _toggleSection(PanelSection section) {
+  void _toggleConfig(ConfigSection section) {
     setState(() {
-      if (_panelSection == section && _panelOpen) {
-        // Clicking the same section again closes the panel.
-        _panelOpen = false;
+      if (_openSection == section) {
+        _openSection = null; // close
       } else {
-        _panelSection = section;
-        _panelOpen = true;
+        _openSection = section;
       }
-    });
-  }
-
-  void _selectTool(EditorTool tool) {
-    setState(() {
-      _currentTool = tool;
-      _panelSection = PanelSection.tool;
-      _panelOpen = true;
-      if (tool != EditorTool.pointer) _selectedElement = null;
     });
   }
 
@@ -484,23 +465,58 @@ class _EnvironmentEditorScreenState
     return Scaffold(
       body: Column(
         children: [
-          // === TOP TOOLBAR ===
-          _buildToolbar(context, scheme),
+          // === TOP TOOLBAR (config sections + save/close) ===
+          _buildTopBar(scheme),
           // === MAIN AREA ===
           Expanded(
             child: Row(
               children: [
-                // --- Left panel ---
-                if (_panelOpen)
-                  SizedBox(
-                    width: 200,
-                    child: _buildLeftPanel(substrates, nutrients, prototypes),
+                // --- Left panel: drawing tools + options ---
+                SizedBox(
+                  width: 200,
+                  child: LeftSidebar(
+                    currentTool: _currentTool,
+                    onToolChanged: (tool) => setState(() {
+                      _currentTool = tool;
+                      if (tool != EditorTool.pointer) {
+                        _selectedElement = null;
+                      }
+                    }),
+                    substrates: substrates,
+                    nutrients: nutrients,
+                    prototypes: prototypes,
+                    selectedSubstrateId: _selectedSubstrateId,
+                    selectedNutrientId: _selectedNutrientId,
+                    selectedPrototypeId: _selectedPrototypeId,
+                    selectedSex: _selectedSex,
+                    selectedElement: _selectedElement,
+                    onSubstrateChanged: (id) =>
+                        setState(() => _selectedSubstrateId = id),
+                    onNutrientChanged: (id) =>
+                        setState(() => _selectedNutrientId = id),
+                    onPrototypeChanged: (id) =>
+                        setState(() => _selectedPrototypeId = id),
+                    onSexChanged: (sex) => setState(() => _selectedSex = sex),
+                    onDeleteElement: _deleteSelectedElement,
+                    cellSize: _cellSize,
+                    onZoomIn: () => setState(
+                      () => _cellSize = (_cellSize + 2).clamp(4, 40),
+                    ),
+                    onZoomOut: () => setState(
+                      () => _cellSize = (_cellSize - 2).clamp(4, 40),
+                    ),
                   ),
-                if (_panelOpen) const VerticalDivider(width: 1),
-                // --- Canvas ---
+                ),
+                const VerticalDivider(width: 1),
+                // --- Center: canvas ---
                 Expanded(
                   child: _buildCanvas(substrateColorMap, nutrientColorMap),
                 ),
+                // --- Right panel: config editor (togglable) ---
+                if (_openSection != null) ...[
+                  const VerticalDivider(width: 1),
+                  SizedBox(width: 300, child: _buildConfigPanel()),
+                ],
               ],
             ),
           ),
@@ -511,9 +527,10 @@ class _EnvironmentEditorScreenState
     );
   }
 
-  Widget _buildToolbar(BuildContext context, ColorScheme scheme) {
+  /// Compact top toolbar with labeled config section buttons.
+  Widget _buildTopBar(ColorScheme scheme) {
     return Container(
-      height: 38,
+      height: 36,
       padding: const EdgeInsets.symmetric(horizontal: 8),
       decoration: BoxDecoration(
         color: scheme.surfaceContainerLow,
@@ -521,110 +538,54 @@ class _EnvironmentEditorScreenState
       ),
       child: Row(
         children: [
-          // Save button.
-          _TBButton(icon: Icons.save, tooltip: 'Save', onTap: _saveAll),
-          const _TBDivider(),
-
-          // Drawing tools.
-          _TBButton(
-            icon: Icons.near_me,
-            tooltip: 'Pointer (select)',
-            active: _currentTool == EditorTool.pointer,
-            onTap: () => _selectTool(EditorTool.pointer),
-          ),
-          _TBButton(
-            icon: Icons.brush,
-            tooltip: 'Paint terrain',
-            active: _currentTool == EditorTool.substrateBrush,
-            onTap: () => _selectTool(EditorTool.substrateBrush),
-          ),
-          _TBButton(
-            icon: Icons.water_drop,
-            tooltip: 'Place nutrient source',
-            active: _currentTool == EditorTool.sourcePlace,
-            onTap: () => _selectTool(EditorTool.sourcePlace),
-          ),
-          _TBButton(
-            icon: Icons.egg,
-            tooltip: 'Place oviposition site',
-            active: _currentTool == EditorTool.ovipositionPlace,
-            onTap: () => _selectTool(EditorTool.ovipositionPlace),
-          ),
-          _TBButton(
-            icon: Icons.pest_control,
-            tooltip: 'Place agent',
-            active: _currentTool == EditorTool.agentPlace,
-            onTap: () => _selectTool(EditorTool.agentPlace),
-          ),
-          const _TBDivider(),
-
-          // Project sections.
-          _TBButton(
+          // Save.
+          _BarButton(icon: Icons.save, label: 'Save', onTap: _saveAll),
+          const SizedBox(width: 12),
+          // Separator.
+          Container(width: 1, height: 20, color: scheme.outlineVariant),
+          const SizedBox(width: 12),
+          // Config section buttons (labeled, clearly distinct from drawing tools).
+          _BarButton(
             icon: Icons.water_drop_outlined,
-            tooltip: 'Nutrients',
-            active: _panelSection == PanelSection.nutrients && _panelOpen,
-            onTap: () => _toggleSection(PanelSection.nutrients),
+            label: 'Nutrients',
+            active: _openSection == ConfigSection.nutrients,
+            onTap: () => _toggleConfig(ConfigSection.nutrients),
           ),
-          _TBButton(
+          _BarButton(
             icon: Icons.terrain,
-            tooltip: 'Substrates',
-            active: _panelSection == PanelSection.substrates && _panelOpen,
-            onTap: () => _toggleSection(PanelSection.substrates),
+            label: 'Substrates',
+            active: _openSection == ConfigSection.substrates,
+            onTap: () => _toggleConfig(ConfigSection.substrates),
           ),
-          _TBButton(
+          _BarButton(
             icon: Icons.biotech,
-            tooltip: 'Genetics',
-            active: _panelSection == PanelSection.genetics && _panelOpen,
-            onTap: () => _toggleSection(PanelSection.genetics),
+            label: 'Genetics',
+            active: _openSection == ConfigSection.genetics,
+            onTap: () => _toggleConfig(ConfigSection.genetics),
           ),
-          _TBButton(
+          _BarButton(
             icon: Icons.timeline,
-            tooltip: 'Life Stages',
-            active: _panelSection == PanelSection.stages && _panelOpen,
-            onTap: () => _toggleSection(PanelSection.stages),
+            label: 'Stages',
+            active: _openSection == ConfigSection.stages,
+            onTap: () => _toggleConfig(ConfigSection.stages),
           ),
-          _TBButton(
+          _BarButton(
             icon: Icons.person,
-            tooltip: 'Prototypes',
-            active: _panelSection == PanelSection.prototypes && _panelOpen,
-            onTap: () => _toggleSection(PanelSection.prototypes),
+            label: 'Prototypes',
+            active: _openSection == ConfigSection.prototypes,
+            onTap: () => _toggleConfig(ConfigSection.prototypes),
           ),
-          const _TBDivider(),
-
-          // Zoom.
-          _TBButton(
-            icon: Icons.zoom_out,
-            tooltip: 'Zoom out',
-            onTap: () =>
-                setState(() => _cellSize = (_cellSize - 2).clamp(4, 40)),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4),
-            child: Text(
-              '${_cellSize.round()}',
-              style: TextStyle(fontSize: 11, color: scheme.onSurface),
-            ),
-          ),
-          _TBButton(
-            icon: Icons.zoom_in,
-            tooltip: 'Zoom in',
-            onTap: () =>
-                setState(() => _cellSize = (_cellSize + 2).clamp(4, 40)),
-          ),
-
           const Spacer(),
-
-          // Project name.
+          // Environment name.
           Text(
             _envName,
             style: TextStyle(fontSize: 12, color: scheme.onSurfaceVariant),
           ),
-          const SizedBox(width: 8),
-
+          const SizedBox(width: 12),
           // Close project.
-          _TBButton(
+          _BarButton(
             icon: Icons.close,
-            tooltip: 'Close project',
+            label: 'Close',
             onTap: () => ref.read(workspacePathProvider.notifier).state = null,
           ),
         ],
@@ -632,39 +593,14 @@ class _EnvironmentEditorScreenState
     );
   }
 
-  Widget _buildLeftPanel(
-    List<Substrate> substrates,
-    List<Nutrient> nutrients,
-    List<Prototype> prototypes,
-  ) {
-    return switch (_panelSection) {
-      PanelSection.tool => LeftSidebar(
-        currentTool: _currentTool,
-        onToolChanged: _selectTool,
-        substrates: substrates,
-        nutrients: nutrients,
-        prototypes: prototypes,
-        selectedSubstrateId: _selectedSubstrateId,
-        selectedNutrientId: _selectedNutrientId,
-        selectedPrototypeId: _selectedPrototypeId,
-        selectedSex: _selectedSex,
-        selectedElement: _selectedElement,
-        onSubstrateChanged: (id) => setState(() => _selectedSubstrateId = id),
-        onNutrientChanged: (id) => setState(() => _selectedNutrientId = id),
-        onPrototypeChanged: (id) => setState(() => _selectedPrototypeId = id),
-        onSexChanged: (sex) => setState(() => _selectedSex = sex),
-        onDeleteElement: _deleteSelectedElement,
-        cellSize: _cellSize,
-        onZoomIn: () =>
-            setState(() => _cellSize = (_cellSize + 2).clamp(4, 40)),
-        onZoomOut: () =>
-            setState(() => _cellSize = (_cellSize - 2).clamp(4, 40)),
-      ),
-      PanelSection.nutrients => const NutrientListScreen(embedded: true),
-      PanelSection.substrates => const SubstrateListScreen(embedded: true),
-      PanelSection.genetics => const LociListScreen(embedded: true),
-      PanelSection.stages => const StageListScreen(embedded: true),
-      PanelSection.prototypes => const PrototypeListScreen(embedded: true),
+  /// Right panel content based on the selected config section.
+  Widget _buildConfigPanel() {
+    return switch (_openSection!) {
+      ConfigSection.nutrients => const NutrientListScreen(embedded: true),
+      ConfigSection.substrates => const SubstrateListScreen(embedded: true),
+      ConfigSection.genetics => const LociListScreen(embedded: true),
+      ConfigSection.stages => const StageListScreen(embedded: true),
+      ConfigSection.prototypes => const PrototypeListScreen(embedded: true),
     };
   }
 
@@ -675,7 +611,6 @@ class _EnvironmentEditorScreenState
     if (_envWidth == 0 || _envHeight == 0) {
       return const Center(child: CircularProgressIndicator());
     }
-
     return Listener(
       onPointerSignal: _handleScroll,
       onPointerHover: _handleHover,
@@ -760,57 +695,62 @@ class _EnvironmentEditorScreenState
   }
 }
 
-// --- Toolbar widgets ---
+// --- Toolbar button with icon + label ---
 
-class _TBButton extends StatelessWidget {
-  const _TBButton({
+class _BarButton extends StatelessWidget {
+  const _BarButton({
     required this.icon,
-    required this.tooltip,
+    required this.label,
     this.active = false,
     required this.onTap,
   });
+
   final IconData icon;
-  final String tooltip;
+  final String label;
   final bool active;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    return Tooltip(
-      message: tooltip,
-      waitDuration: const Duration(milliseconds: 400),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(4),
-        child: Container(
-          width: 30,
-          height: 30,
-          margin: const EdgeInsets.symmetric(horizontal: 1),
-          decoration: BoxDecoration(
-            color: active ? scheme.primaryContainer : null,
-            borderRadius: BorderRadius.circular(4),
-          ),
-          child: Icon(
-            icon,
-            size: 18,
-            color: active ? scheme.onPrimaryContainer : scheme.onSurface,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 2),
+      child: Tooltip(
+        message: label,
+        waitDuration: const Duration(milliseconds: 500),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(6),
+          child: Container(
+            height: 28,
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            decoration: BoxDecoration(
+              color: active ? scheme.primaryContainer : null,
+              borderRadius: BorderRadius.circular(6),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  icon,
+                  size: 16,
+                  color: active ? scheme.onPrimaryContainer : scheme.onSurface,
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: active
+                        ? scheme.onPrimaryContainer
+                        : scheme.onSurface,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
-    );
-  }
-}
-
-class _TBDivider extends StatelessWidget {
-  const _TBDivider();
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 1,
-      height: 20,
-      margin: const EdgeInsets.symmetric(horizontal: 6),
-      color: Theme.of(context).colorScheme.outlineVariant,
     );
   }
 }

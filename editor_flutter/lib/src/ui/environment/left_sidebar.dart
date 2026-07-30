@@ -50,6 +50,89 @@ class LeftSidebar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+
+    return Container(
+      color: scheme.surfaceContainerLow,
+      child: Column(
+        children: [
+          // --- Tool selection buttons ---
+          Padding(
+            padding: const EdgeInsets.all(8),
+            child: Wrap(
+              spacing: 4,
+              runSpacing: 4,
+              children: [
+                _ToolChip(
+                  icon: Icons.near_me,
+                  label: 'Pointer',
+                  active: currentTool == EditorTool.pointer,
+                  onTap: () => onToolChanged(EditorTool.pointer),
+                ),
+                _ToolChip(
+                  icon: Icons.brush,
+                  label: 'Terrain',
+                  active: currentTool == EditorTool.substrateBrush,
+                  onTap: () => onToolChanged(EditorTool.substrateBrush),
+                ),
+                _ToolChip(
+                  icon: Icons.water_drop,
+                  label: 'Source',
+                  active: currentTool == EditorTool.sourcePlace,
+                  onTap: () => onToolChanged(EditorTool.sourcePlace),
+                ),
+                _ToolChip(
+                  icon: Icons.egg,
+                  label: 'Ovipos.',
+                  active: currentTool == EditorTool.ovipositionPlace,
+                  onTap: () => onToolChanged(EditorTool.ovipositionPlace),
+                ),
+                _ToolChip(
+                  icon: Icons.pest_control,
+                  label: 'Agent',
+                  active: currentTool == EditorTool.agentPlace,
+                  onTap: () => onToolChanged(EditorTool.agentPlace),
+                ),
+              ],
+            ),
+          ),
+          const Divider(height: 1),
+          // --- Tool-specific options ---
+          Expanded(child: _buildToolOptions(context)),
+          // --- Zoom controls ---
+          const Divider(height: 1),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+            child: Row(
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.zoom_out, size: 18),
+                  onPressed: onZoomOut,
+                  visualDensity: VisualDensity.compact,
+                  tooltip: 'Zoom out',
+                ),
+                Expanded(
+                  child: Text(
+                    '${cellSize.round()}px',
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.zoom_in, size: 18),
+                  onPressed: onZoomIn,
+                  visualDensity: VisualDensity.compact,
+                  tooltip: 'Zoom in',
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildToolOptions(BuildContext context) {
     // If pointer tool has a selection, show element properties.
     if (currentTool == EditorTool.pointer && selectedElement != null) {
       return _buildSelectionProperties(context);
@@ -427,6 +510,54 @@ class _PaletteItem extends StatelessWidget {
                   color: selected ? scheme.onPrimaryContainer : null,
                 ),
                 overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ToolChip extends StatelessWidget {
+  const _ToolChip({
+    required this.icon,
+    required this.label,
+    required this.active,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String label;
+  final bool active;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(6),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+        decoration: BoxDecoration(
+          color: active ? scheme.primaryContainer : scheme.surfaceContainer,
+          borderRadius: BorderRadius.circular(6),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              size: 14,
+              color: active ? scheme.onPrimaryContainer : scheme.onSurface,
+            ),
+            const SizedBox(width: 4),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 11,
+                color: active ? scheme.onPrimaryContainer : scheme.onSurface,
               ),
             ),
           ],
