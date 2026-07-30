@@ -10,7 +10,7 @@ import 'nutrients/nutrient_list_screen.dart';
 import 'ontogeny/stage_list_screen.dart';
 import 'prototypes/prototype_list_screen.dart';
 import 'substrates/substrate_list_screen.dart';
-import 'substrates/map_editor_screen.dart';
+import 'environment/environment_editor_screen.dart';
 
 /// Main workspace screen shown when a project is open.
 class WorkspaceScreen extends ConsumerWidget {
@@ -217,20 +217,151 @@ class WorkspaceScreen extends ConsumerWidget {
     }
   }
 
-  void _openMapEditor(BuildContext context, WidgetRef ref) {
+  void _openMapEditor(BuildContext context, WidgetRef ref) async {
     final envs = ref.read(environmentsProvider).valueOrNull;
     if (envs == null || envs.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Create an environment first.')),
+      // No environments yet — offer to create one.
+      final created = await _showCreateEnvironmentDialog(context, ref);
+      if (!created || !context.mounted) return;
+      // Re-read after creation.
+      final updatedEnvs = ref.read(environmentsProvider).valueOrNull;
+      if (updatedEnvs == null || updatedEnvs.isEmpty) return;
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) =>
+              EnvironmentEditorScreen(environmentId: updatedEnvs.last.id),
+        ),
       );
       return;
     }
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => MapEditorScreen(environmentId: envs.first.id),
+
+    if (envs.length == 1) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => EnvironmentEditorScreen(environmentId: envs.first.id),
+        ),
+      );
+    } else {
+      // Multiple environments — let user choose or create new.
+      final selected = await showDialog<int>(
+        context: context,
+        builder: (ctx) => SimpleDialog(
+          title: const Text('Select Environment'),
+          children: [
+            ...envs.map(
+              (env) => SimpleDialogOption(
+                onPressed: () => Navigator.pop(ctx, env.id),
+                child: Text('${env.name} (${env.width}×${env.height})'),
+              ),
+            ),
+            const Divider(),
+            SimpleDialogOption(
+              onPressed: () => Navigator.pop(ctx, -1),
+              child: const Text('+ Create new environment'),
+            ),
+          ],
+        ),
+      );
+      if (selected == null || !context.mounted) return;
+      if (selected == -1) {
+        final created = await _showCreateEnvironmentDialog(context, ref);
+        if (!created || !context.mounted) return;
+        final updatedEnvs = ref.read(environmentsProvider).valueOrNull;
+        if (updatedEnvs == null || updatedEnvs.isEmpty) return;
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) =>
+                EnvironmentEditorScreen(environmentId: updatedEnvs.last.id),
+          ),
+        );
+      } else {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => EnvironmentEditorScreen(environmentId: selected),
+          ),
+        );
+      }
+    }
+  }
+
+  Future<bool> _showCreateEnvironmentDialog(
+    BuildContext context,
+    WidgetRef ref,
+  ) async {
+    final nameController = TextEditingController(text: 'Environment 1');
+    final widthController = TextEditingController(text: '50');
+    final heightController = TextEditingController(text: '50');
+
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Create Environment'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: nameController,
+              decoration: const InputDecoration(labelText: 'Name'),
+              autofocus: true,
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: widthController,
+                    decoration: const InputDecoration(labelText: 'Width'),
+                    keyboardType: TextInputType.number,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: TextField(
+                    controller: heightController,
+                    decoration: const InputDecoration(labelText: 'Height'),
+                    keyboardType: TextInputType.number,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Create'),
+          ),
+        ],
       ),
     );
+
+    if (result != true) return false;
+
+    final envDao = ref.read(environmentDaoProvider);
+    if (envDao == null) return false;
+
+    final name = nameController.text.trim().isEmpty
+        ? 'Environment'
+        : nameController.text.trim();
+    final width = int.tryParse(widthController.text.trim()) ?? 50;
+    final height = int.tryParse(heightController.text.trim()) ?? 50;
+
+    await envDao.add(name, width.clamp(5, 500), height.clamp(5, 500), '');
+
+    // Force provider refresh.
+    ref.invalidate(environmentsProvider);
+    // Small delay for the stream to emit.
+    await Future.delayed(const Duration(milliseconds: 100));
+
+    return true;
   }
 }
 

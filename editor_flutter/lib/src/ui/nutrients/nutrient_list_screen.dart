@@ -6,11 +6,65 @@ import '../substrates/substrate_list_screen.dart'; // Reuse _pickColor.
 
 /// Screen for managing nutrients (and implicitly their resource sources).
 class NutrientListScreen extends ConsumerWidget {
-  const NutrientListScreen({super.key});
+  const NutrientListScreen({super.key, this.embedded = false});
+
+  final bool embedded;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final nutrients = ref.watch(nutrientsProvider);
+
+    final body = nutrients.when(
+      data: (list) {
+        if (list.isEmpty) {
+          return const Center(
+            child: Padding(
+              padding: EdgeInsets.all(32),
+              child: Text(
+                'No nutrients defined.\n\n'
+                'Each nutrient you define automatically becomes a resource source '
+                'that can be placed in environments. For example, defining "Water" '
+                'means you can place water sources on the map.\n\n'
+                'Tap + to add one.',
+                textAlign: TextAlign.center,
+              ),
+            ),
+          );
+        }
+        return ListView.builder(
+          padding: const EdgeInsets.all(16),
+          itemCount: list.length,
+          itemBuilder: (context, index) => _NutrientTile(nutrient: list[index]),
+        );
+      },
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (e, _) => Center(child: Text('Error: $e')),
+    );
+
+    if (embedded) {
+      return Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8),
+            child: Row(
+              children: [
+                Text(
+                  'Nutrients',
+                  style: Theme.of(context).textTheme.titleSmall,
+                ),
+                const Spacer(),
+                IconButton(
+                  icon: const Icon(Icons.add, size: 20),
+                  tooltip: 'Add nutrient',
+                  onPressed: () => _showAddDialog(context, ref),
+                ),
+              ],
+            ),
+          ),
+          Expanded(child: body),
+        ],
+      );
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -23,32 +77,7 @@ class NutrientListScreen extends ConsumerWidget {
           ),
         ],
       ),
-      body: nutrients.when(
-        data: (list) {
-          if (list.isEmpty) {
-            return const Center(
-              child: Padding(
-                padding: EdgeInsets.all(32),
-                child: Text(
-                  'No nutrients defined.\n\n'
-                  'Each nutrient you define automatically becomes a resource source '
-                  'that can be placed in environments. For example, defining "Water" '
-                  'means you can place water sources on the map.\n\n'
-                  'Tap + to add one.',
-                  textAlign: TextAlign.center,
-                ),
-              ),
-            );
-          }
-          return ListView.builder(
-            padding: const EdgeInsets.all(16),
-            itemCount: list.length,
-            itemBuilder: (context, index) => _NutrientTile(nutrient: list[index]),
-          );
-        },
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Error: $e')),
-      ),
+      body: body,
     );
   }
 
@@ -79,13 +108,17 @@ class NutrientListScreen extends ConsumerWidget {
                   const SizedBox(width: 8),
                   GestureDetector(
                     onTap: () async {
-                      final picked = await SubstrateListScreen.pickColor(ctx, Color(selectedColor));
+                      final picked = await SubstrateListScreen.pickColor(
+                        ctx,
+                        Color(selectedColor),
+                      );
                       if (picked != null) {
                         setState(() => selectedColor = picked.toARGB32());
                       }
                     },
                     child: Container(
-                      width: 48, height: 32,
+                      width: 48,
+                      height: 32,
                       decoration: BoxDecoration(
                         color: Color(selectedColor),
                         borderRadius: BorderRadius.circular(6),
@@ -103,8 +136,14 @@ class NutrientListScreen extends ConsumerWidget {
             ],
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
-            FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Add')),
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              child: const Text('Add'),
+            ),
           ],
         ),
       ),
@@ -132,7 +171,8 @@ class _NutrientTile extends ConsumerWidget {
     return Card(
       child: ListTile(
         leading: Container(
-          width: 36, height: 36,
+          width: 36,
+          height: 36,
           decoration: BoxDecoration(
             color: Color(nutrient.color),
             borderRadius: BorderRadius.circular(6),
@@ -171,7 +211,10 @@ class _NutrientTile extends ConsumerWidget {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              TextField(controller: nameCtrl, decoration: const InputDecoration(labelText: 'Name')),
+              TextField(
+                controller: nameCtrl,
+                decoration: const InputDecoration(labelText: 'Name'),
+              ),
               const SizedBox(height: 16),
               Row(
                 children: [
@@ -179,13 +222,17 @@ class _NutrientTile extends ConsumerWidget {
                   const SizedBox(width: 8),
                   GestureDetector(
                     onTap: () async {
-                      final picked = await SubstrateListScreen.pickColor(ctx, Color(selectedColor));
+                      final picked = await SubstrateListScreen.pickColor(
+                        ctx,
+                        Color(selectedColor),
+                      );
                       if (picked != null) {
                         setState(() => selectedColor = picked.toARGB32());
                       }
                     },
                     child: Container(
-                      width: 48, height: 32,
+                      width: 48,
+                      height: 32,
                       decoration: BoxDecoration(
                         color: Color(selectedColor),
                         borderRadius: BorderRadius.circular(6),
@@ -198,8 +245,14 @@ class _NutrientTile extends ConsumerWidget {
             ],
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
-            FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Save')),
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              child: const Text('Save'),
+            ),
           ],
         ),
       ),
@@ -218,9 +271,14 @@ class _NutrientTile extends ConsumerWidget {
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Delete Nutrient'),
-        content: Text('Delete "${nutrient.name}"? This will also remove all its sources from environments.'),
+        content: Text(
+          'Delete "${nutrient.name}"? This will also remove all its sources from environments.',
+        ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancel'),
+          ),
           FilledButton(
             style: FilledButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () => Navigator.pop(ctx, true),

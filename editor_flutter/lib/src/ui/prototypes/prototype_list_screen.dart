@@ -7,11 +7,70 @@ import '../../providers/database_provider.dart';
 
 /// Screen for managing adult agent prototypes.
 class PrototypeListScreen extends ConsumerWidget {
-  const PrototypeListScreen({super.key});
+  const PrototypeListScreen({super.key, this.embedded = false});
+
+  final bool embedded;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final prototypes = ref.watch(prototypesProvider);
+
+    final body = prototypes.when(
+      data: (list) {
+        if (list.isEmpty) {
+          return const Center(
+            child: Text('No prototypes defined. Tap + to add one.'),
+          );
+        }
+        final males = list.where((p) => p.sex == 'M').toList();
+        final females = list.where((p) => p.sex == 'F').toList();
+
+        return ListView(
+          padding: const EdgeInsets.all(16),
+          children: [
+            if (males.isNotEmpty) ...[
+              Text('Males', style: Theme.of(context).textTheme.titleMedium),
+              const SizedBox(height: 8),
+              ...males.map((p) => _PrototypeTile(prototype: p)),
+              const SizedBox(height: 16),
+            ],
+            if (females.isNotEmpty) ...[
+              Text('Females', style: Theme.of(context).textTheme.titleMedium),
+              const SizedBox(height: 8),
+              ...females.map((p) => _PrototypeTile(prototype: p)),
+            ],
+          ],
+        );
+      },
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (e, _) => Center(child: Text('Error: $e')),
+    );
+
+    if (embedded) {
+      return Column(
+        children: [
+          Row(
+            children: [
+              const Expanded(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: Text(
+                    'Prototypes',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.add),
+                tooltip: 'Add prototype',
+                onPressed: () => _showAddDialog(context, ref),
+              ),
+            ],
+          ),
+          Expanded(child: body),
+        ],
+      );
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -24,34 +83,7 @@ class PrototypeListScreen extends ConsumerWidget {
           ),
         ],
       ),
-      body: prototypes.when(
-        data: (list) {
-          if (list.isEmpty) {
-            return const Center(child: Text('No prototypes defined. Tap + to add one.'));
-          }
-          final males = list.where((p) => p.sex == 'M').toList();
-          final females = list.where((p) => p.sex == 'F').toList();
-
-          return ListView(
-            padding: const EdgeInsets.all(16),
-            children: [
-              if (males.isNotEmpty) ...[
-                Text('Males', style: Theme.of(context).textTheme.titleMedium),
-                const SizedBox(height: 8),
-                ...males.map((p) => _PrototypeTile(prototype: p)),
-                const SizedBox(height: 16),
-              ],
-              if (females.isNotEmpty) ...[
-                Text('Females', style: Theme.of(context).textTheme.titleMedium),
-                const SizedBox(height: 8),
-                ...females.map((p) => _PrototypeTile(prototype: p)),
-              ],
-            ],
-          );
-        },
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Error: $e')),
-      ),
+      body: body,
     );
   }
 
@@ -71,7 +103,11 @@ class PrototypeListScreen extends ConsumerWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                TextField(controller: nameCtrl, decoration: const InputDecoration(labelText: 'Name'), autofocus: true),
+                TextField(
+                  controller: nameCtrl,
+                  decoration: const InputDecoration(labelText: 'Name'),
+                  autofocus: true,
+                ),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<String>(
                   initialValue: sex,
@@ -83,17 +119,38 @@ class PrototypeListScreen extends ConsumerWidget {
                   onChanged: (v) => setState(() => sex = v ?? 'M'),
                 ),
                 const SizedBox(height: 12),
-                TextField(controller: longevityCtrl, decoration: const InputDecoration(labelText: 'Longevity formula')),
+                TextField(
+                  controller: longevityCtrl,
+                  decoration: const InputDecoration(
+                    labelText: 'Longevity formula',
+                  ),
+                ),
                 const SizedBox(height: 8),
-                TextField(controller: refCombatCtrl, decoration: const InputDecoration(labelText: 'Refractory combat formula')),
+                TextField(
+                  controller: refCombatCtrl,
+                  decoration: const InputDecoration(
+                    labelText: 'Refractory combat formula',
+                  ),
+                ),
                 const SizedBox(height: 8),
-                TextField(controller: refCourtCtrl, decoration: const InputDecoration(labelText: 'Refractory courtship formula')),
+                TextField(
+                  controller: refCourtCtrl,
+                  decoration: const InputDecoration(
+                    labelText: 'Refractory courtship formula',
+                  ),
+                ),
               ],
             ),
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
-            FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Add')),
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              child: const Text('Add'),
+            ),
           ],
         ),
       ),
@@ -107,14 +164,16 @@ class PrototypeListScreen extends ConsumerWidget {
     if (dao == null) return;
 
     final existing = await dao.getAll();
-    await dao.add(PrototypesCompanion.insert(
-      name: name,
-      sex: sex,
-      longevityFormula: Value(longevityCtrl.text.trim()),
-      refractoryCombatFormula: Value(refCombatCtrl.text.trim()),
-      refractoryCourtshipFormula: Value(refCourtCtrl.text.trim()),
-      sortOrder: Value(existing.length + 1),
-    ));
+    await dao.add(
+      PrototypesCompanion.insert(
+        name: name,
+        sex: sex,
+        longevityFormula: Value(longevityCtrl.text.trim()),
+        refractoryCombatFormula: Value(refCombatCtrl.text.trim()),
+        refractoryCourtshipFormula: Value(refCourtCtrl.text.trim()),
+        sortOrder: Value(existing.length + 1),
+      ),
+    );
   }
 }
 

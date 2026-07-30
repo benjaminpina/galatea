@@ -7,11 +7,56 @@ import '../../providers/database_provider.dart';
 
 /// Screen for managing genetic loci definitions.
 class LociListScreen extends ConsumerWidget {
-  const LociListScreen({super.key});
+  const LociListScreen({super.key, this.embedded = false});
+
+  final bool embedded;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final loci = ref.watch(lociProvider);
+
+    final body = loci.when(
+      data: (list) {
+        if (list.isEmpty) {
+          return const Center(
+            child: Text('No loci defined. Tap + to add one.'),
+          );
+        }
+        return ListView.builder(
+          padding: const EdgeInsets.all(16),
+          itemCount: list.length,
+          itemBuilder: (context, index) => _LocusTile(locus: list[index]),
+        );
+      },
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (e, _) => Center(child: Text('Error: $e')),
+    );
+
+    if (embedded) {
+      return Column(
+        children: [
+          Row(
+            children: [
+              const Expanded(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: Text(
+                    'Genetic Loci',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.add),
+                tooltip: 'Add locus',
+                onPressed: () => _showAddDialog(context, ref),
+              ),
+            ],
+          ),
+          Expanded(child: body),
+        ],
+      );
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -24,20 +69,7 @@ class LociListScreen extends ConsumerWidget {
           ),
         ],
       ),
-      body: loci.when(
-        data: (list) {
-          if (list.isEmpty) {
-            return const Center(child: Text('No loci defined. Tap + to add one.'));
-          }
-          return ListView.builder(
-            padding: const EdgeInsets.all(16),
-            itemCount: list.length,
-            itemBuilder: (context, index) => _LocusTile(locus: list[index]),
-          );
-        },
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Error: $e')),
-      ),
+      body: body,
     );
   }
 
@@ -60,38 +92,104 @@ class LociListScreen extends ConsumerWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                TextField(controller: nameCtrl, decoration: const InputDecoration(labelText: 'Name'), autofocus: true),
+                TextField(
+                  controller: nameCtrl,
+                  decoration: const InputDecoration(labelText: 'Name'),
+                  autofocus: true,
+                ),
                 const SizedBox(height: 12),
                 SwitchListTile(
-                  title: Text(isContinuous ? 'Continuous (float)' : 'Discrete (int)'),
+                  title: Text(
+                    isContinuous ? 'Continuous (float)' : 'Discrete (int)',
+                  ),
                   value: isContinuous,
                   onChanged: (v) => setState(() => isContinuous = v),
                   contentPadding: EdgeInsets.zero,
                 ),
                 const SizedBox(height: 8),
-                Row(children: [
-                  Expanded(child: TextField(controller: domValCtrl, decoration: const InputDecoration(labelText: 'Dominant value'), keyboardType: TextInputType.number)),
-                  const SizedBox(width: 8),
-                  Expanded(child: TextField(controller: recValCtrl, decoration: const InputDecoration(labelText: 'Recessive value'), keyboardType: TextInputType.number)),
-                ]),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: domValCtrl,
+                        decoration: const InputDecoration(
+                          labelText: 'Dominant value',
+                        ),
+                        keyboardType: TextInputType.number,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: TextField(
+                        controller: recValCtrl,
+                        decoration: const InputDecoration(
+                          labelText: 'Recessive value',
+                        ),
+                        keyboardType: TextInputType.number,
+                      ),
+                    ),
+                  ],
+                ),
                 const SizedBox(height: 8),
-                Row(children: [
-                  Expanded(child: TextField(controller: mutRateDomCtrl, decoration: const InputDecoration(labelText: 'Mut. rate dom'), keyboardType: TextInputType.number)),
-                  const SizedBox(width: 8),
-                  Expanded(child: TextField(controller: mutRateRecCtrl, decoration: const InputDecoration(labelText: 'Mut. rate rec'), keyboardType: TextInputType.number)),
-                ]),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: mutRateDomCtrl,
+                        decoration: const InputDecoration(
+                          labelText: 'Mut. rate dom',
+                        ),
+                        keyboardType: TextInputType.number,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: TextField(
+                        controller: mutRateRecCtrl,
+                        decoration: const InputDecoration(
+                          labelText: 'Mut. rate rec',
+                        ),
+                        keyboardType: TextInputType.number,
+                      ),
+                    ),
+                  ],
+                ),
                 const SizedBox(height: 8),
-                Row(children: [
-                  Expanded(child: TextField(controller: mutRangeDomCtrl, decoration: const InputDecoration(labelText: 'Mut. range dom'), keyboardType: TextInputType.number)),
-                  const SizedBox(width: 8),
-                  Expanded(child: TextField(controller: mutRangeRecCtrl, decoration: const InputDecoration(labelText: 'Mut. range rec'), keyboardType: TextInputType.number)),
-                ]),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: mutRangeDomCtrl,
+                        decoration: const InputDecoration(
+                          labelText: 'Mut. range dom',
+                        ),
+                        keyboardType: TextInputType.number,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: TextField(
+                        controller: mutRangeRecCtrl,
+                        decoration: const InputDecoration(
+                          labelText: 'Mut. range rec',
+                        ),
+                        keyboardType: TextInputType.number,
+                      ),
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
-            FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Add')),
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              child: const Text('Add'),
+            ),
           ],
         ),
       ),
@@ -105,17 +203,19 @@ class LociListScreen extends ConsumerWidget {
     if (dao == null) return;
 
     final existing = await dao.getAll();
-    await dao.add(LociCompanion.insert(
-      name: name,
-      isContinuous: Value(isContinuous),
-      dominantValue: Value(double.tryParse(domValCtrl.text) ?? 1.0),
-      recessiveValue: Value(double.tryParse(recValCtrl.text) ?? 0.5),
-      mutationRateDom: Value(double.tryParse(mutRateDomCtrl.text) ?? 0.01),
-      mutationRateRec: Value(double.tryParse(mutRateRecCtrl.text) ?? 0.01),
-      mutationRangeDom: Value(double.tryParse(mutRangeDomCtrl.text) ?? 0.1),
-      mutationRangeRec: Value(double.tryParse(mutRangeRecCtrl.text) ?? 0.1),
-      sortOrder: Value(existing.length + 1),
-    ));
+    await dao.add(
+      LociCompanion.insert(
+        name: name,
+        isContinuous: Value(isContinuous),
+        dominantValue: Value(double.tryParse(domValCtrl.text) ?? 1.0),
+        recessiveValue: Value(double.tryParse(recValCtrl.text) ?? 0.5),
+        mutationRateDom: Value(double.tryParse(mutRateDomCtrl.text) ?? 0.01),
+        mutationRateRec: Value(double.tryParse(mutRateRecCtrl.text) ?? 0.01),
+        mutationRangeDom: Value(double.tryParse(mutRangeDomCtrl.text) ?? 0.1),
+        mutationRangeRec: Value(double.tryParse(mutRangeRecCtrl.text) ?? 0.1),
+        sortOrder: Value(existing.length + 1),
+      ),
+    );
   }
 }
 

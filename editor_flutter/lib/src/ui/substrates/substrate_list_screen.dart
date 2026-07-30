@@ -6,11 +6,92 @@ import '../../providers/database_provider.dart';
 
 /// Screen for managing simple and mixed substrates.
 class SubstrateListScreen extends ConsumerWidget {
-  const SubstrateListScreen({super.key});
+  const SubstrateListScreen({super.key, this.embedded = false});
+
+  final bool embedded;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final substrates = ref.watch(substratesProvider);
+
+    final body = substrates.when(
+      data: (list) {
+        if (list.isEmpty) {
+          return const Center(
+            child: Text('No substrates defined. Tap + to add one.'),
+          );
+        }
+        final simple = list.where((s) => !s.isMixed).toList();
+        final mixed = list.where((s) => s.isMixed).toList();
+
+        return ListView(
+          padding: const EdgeInsets.all(16),
+          children: [
+            if (simple.isNotEmpty) ...[
+              Text(
+                'Simple Substrates',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              const SizedBox(height: 8),
+              ...simple.map((s) => _SubstrateTile(substrate: s)),
+            ],
+            if (mixed.isNotEmpty) ...[
+              const SizedBox(height: 24),
+              Text(
+                'Mixed Substrates',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              const SizedBox(height: 8),
+              ...mixed.map((s) => _MixedSubstrateTile(substrate: s)),
+            ],
+          ],
+        );
+      },
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (e, _) => Center(child: Text('Error: $e')),
+    );
+
+    if (embedded) {
+      return Column(
+        children: [
+          Row(
+            children: [
+              const Expanded(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: Text(
+                    'Substrates',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+              PopupMenuButton<String>(
+                icon: const Icon(Icons.add),
+                tooltip: 'Add substrate',
+                onSelected: (value) {
+                  if (value == 'simple') {
+                    _showAddSimpleDialog(context, ref);
+                  } else {
+                    _showAddMixedDialog(context, ref);
+                  }
+                },
+                itemBuilder: (_) => const [
+                  PopupMenuItem(
+                    value: 'simple',
+                    child: Text('Add Simple Substrate'),
+                  ),
+                  PopupMenuItem(
+                    value: 'mixed',
+                    child: Text('Add Mixed Substrate'),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          Expanded(child: body),
+        ],
+      );
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -36,42 +117,7 @@ class SubstrateListScreen extends ConsumerWidget {
           ),
         ],
       ),
-      body: substrates.when(
-        data: (list) {
-          if (list.isEmpty) {
-            return const Center(
-              child: Text('No substrates defined. Tap + to add one.'),
-            );
-          }
-          final simple = list.where((s) => !s.isMixed).toList();
-          final mixed = list.where((s) => s.isMixed).toList();
-
-          return ListView(
-            padding: const EdgeInsets.all(16),
-            children: [
-              if (simple.isNotEmpty) ...[
-                Text(
-                  'Simple Substrates',
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                const SizedBox(height: 8),
-                ...simple.map((s) => _SubstrateTile(substrate: s)),
-              ],
-              if (mixed.isNotEmpty) ...[
-                const SizedBox(height: 24),
-                Text(
-                  'Mixed Substrates',
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                const SizedBox(height: 8),
-                ...mixed.map((s) => _MixedSubstrateTile(substrate: s)),
-              ],
-            ],
-          );
-        },
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Error: $e')),
-      ),
+      body: body,
     );
   }
 
