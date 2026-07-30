@@ -443,6 +443,254 @@ class _EnvironmentEditorScreenState
     });
   }
 
+  // --- Environment management ---
+
+  List<PopupMenuEntry<int>> _buildEnvironmentMenuItems() {
+    final envs = ref.read(environmentsProvider).valueOrNull ?? [];
+    return [
+      ...envs.map(
+        (env) => PopupMenuItem<int>(
+          value: env.id,
+          child: Row(
+            children: [
+              if (env.id == widget.environmentId)
+                const Icon(Icons.check, size: 16)
+              else
+                const SizedBox(width: 16),
+              const SizedBox(width: 8),
+              Text('${env.name} (${env.width}×${env.height})'),
+            ],
+          ),
+          onTap: () {
+            if (env.id != widget.environmentId) {
+              _switchToEnvironment(env.id);
+            }
+          },
+        ),
+      ),
+      const PopupMenuDivider(),
+      PopupMenuItem<int>(
+        value: -1,
+        child: const Row(
+          children: [
+            Icon(Icons.add, size: 16),
+            SizedBox(width: 8),
+            Text('New environment...'),
+          ],
+        ),
+        onTap: () => Future.microtask(_createNewEnvironment),
+      ),
+    ];
+  }
+
+  void _switchToEnvironment(int envId) {
+    // Save current, then navigate to the new environment.
+    _saveAll().then((_) {
+      if (!mounted) return;
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => EnvironmentEditorScreen(environmentId: envId),
+        ),
+      );
+    });
+  }
+
+  Future<void> _createNewEnvironment() async {
+    final nameCtrl = TextEditingController(text: 'Environment');
+    final widthCtrl = TextEditingController(text: '50');
+    final heightCtrl = TextEditingController(text: '50');
+
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('New Environment'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: nameCtrl,
+              decoration: const InputDecoration(labelText: 'Name'),
+              autofocus: true,
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: widthCtrl,
+                    decoration: const InputDecoration(labelText: 'Width'),
+                    keyboardType: TextInputType.number,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: TextField(
+                    controller: heightCtrl,
+                    decoration: const InputDecoration(labelText: 'Height'),
+                    keyboardType: TextInputType.number,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Create'),
+          ),
+        ],
+      ),
+    );
+
+    if (result != true || !mounted) return;
+
+    final envDao = ref.read(environmentDaoProvider);
+    if (envDao == null) return;
+
+    final name = nameCtrl.text.trim().isEmpty
+        ? 'Environment'
+        : nameCtrl.text.trim();
+    final w = (int.tryParse(widthCtrl.text.trim()) ?? 50).clamp(5, 500);
+    final h = (int.tryParse(heightCtrl.text.trim()) ?? 50).clamp(5, 500);
+
+    final newId = await envDao.add(name, w, h, '');
+    if (!mounted) return;
+    _switchToEnvironment(newId);
+  }
+
+  Future<void> _showEnvironmentPropertiesDialog() async {
+    final nameCtrl = TextEditingController(text: _envName);
+    final widthCtrl = TextEditingController(text: '$_envWidth');
+    final heightCtrl = TextEditingController(text: '$_envHeight');
+
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Environment Properties'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: nameCtrl,
+              decoration: const InputDecoration(labelText: 'Name'),
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: widthCtrl,
+                    decoration: const InputDecoration(labelText: 'Width'),
+                    keyboardType: TextInputType.number,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: TextField(
+                    controller: heightCtrl,
+                    decoration: const InputDecoration(labelText: 'Height'),
+                    keyboardType: TextInputType.number,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'Warning: reducing dimensions may discard elements and terrain data outside the new bounds.',
+              style: TextStyle(fontSize: 12, color: Colors.orange.shade300),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Apply'),
+          ),
+        ],
+      ),
+    );
+
+    if (result != true || !mounted) return;
+
+    final newName = nameCtrl.text.trim().isEmpty
+        ? _envName
+        : nameCtrl.text.trim();
+    final newW = (int.tryParse(widthCtrl.text.trim()) ?? _envWidth).clamp(
+      5,
+      500,
+    );
+    final newH = (int.tryParse(heightCtrl.text.trim()) ?? _envHeight).clamp(
+      5,
+      500,
+    );
+
+    // Confirm if shrinking.
+    if (newW < _envWidth || newH < _envHeight) {
+      final confirm = await showDialog<bool>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Text('Confirm Resize'),
+          content: Text(
+            'The environment will shrink from $_envWidth×$_envHeight to $newW×$newH.\n\n'
+            'Elements and terrain outside the new bounds will be permanently lost. Continue?',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              style: FilledButton.styleFrom(backgroundColor: Colors.orange),
+              onPressed: () => Navigator.pop(ctx, true),
+              child: const Text('Resize'),
+            ),
+          ],
+        ),
+      );
+      if (confirm != true || !mounted) return;
+    }
+
+    // Apply resize.
+    final envDao = ref.read(environmentDaoProvider);
+    if (envDao == null) return;
+
+    await envDao.updateEnvironment(widget.environmentId, newName, newW, newH);
+
+    // Resize the grid in memory.
+    final newGrid = List.generate(newH, (y) {
+      return List.generate(newW, (x) {
+        if (y < _envHeight && x < _envWidth) return _grid[y][x];
+        return 0;
+      });
+    });
+
+    // Remove out-of-bounds elements.
+    _sources.removeWhere((s) => s.posX >= newW || s.posY >= newH);
+    _oviSites.removeWhere((o) => o.posX >= newW || o.posY >= newH);
+    _agents.removeWhere((a) => a.posX >= newW || a.posY >= newH);
+
+    setState(() {
+      _envName = newName;
+      _envWidth = newW;
+      _envHeight = newH;
+      _grid = newGrid;
+      _selectedElement = null;
+    });
+
+    // Save the resized grid immediately.
+    await _saveAll();
+  }
+
   // --- Build ---
 
   @override
@@ -546,16 +794,16 @@ class _EnvironmentEditorScreenState
           const SizedBox(width: 12),
           // Config section buttons (labeled, clearly distinct from drawing tools).
           _BarButton(
-            icon: Icons.water_drop_outlined,
-            label: 'Nutrients',
-            active: _openSection == ConfigSection.nutrients,
-            onTap: () => _toggleConfig(ConfigSection.nutrients),
-          ),
-          _BarButton(
             icon: Icons.terrain,
             label: 'Substrates',
             active: _openSection == ConfigSection.substrates,
             onTap: () => _toggleConfig(ConfigSection.substrates),
+          ),
+          _BarButton(
+            icon: Icons.water_drop_outlined,
+            label: 'Nutrients',
+            active: _openSection == ConfigSection.nutrients,
+            onTap: () => _toggleConfig(ConfigSection.nutrients),
           ),
           _BarButton(
             icon: Icons.biotech,
@@ -576,10 +824,42 @@ class _EnvironmentEditorScreenState
             onTap: () => _toggleConfig(ConfigSection.prototypes),
           ),
           const Spacer(),
-          // Environment name.
-          Text(
-            _envName,
-            style: TextStyle(fontSize: 12, color: scheme.onSurfaceVariant),
+          // Environment selector.
+          PopupMenuButton<int>(
+            tooltip: 'Switch environment',
+            offset: const Offset(0, 36),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(4),
+                border: Border.all(color: scheme.outlineVariant),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.map, size: 14, color: scheme.onSurfaceVariant),
+                  const SizedBox(width: 6),
+                  Text(
+                    _envName,
+                    style: TextStyle(fontSize: 12, color: scheme.onSurface),
+                  ),
+                  const SizedBox(width: 4),
+                  Icon(
+                    Icons.arrow_drop_down,
+                    size: 16,
+                    color: scheme.onSurfaceVariant,
+                  ),
+                ],
+              ),
+            ),
+            itemBuilder: (_) => _buildEnvironmentMenuItems(),
+          ),
+          const SizedBox(width: 4),
+          // Edit environment properties.
+          _BarButton(
+            icon: Icons.settings,
+            label: 'Properties',
+            onTap: _showEnvironmentPropertiesDialog,
           ),
           const SizedBox(width: 12),
           // Close project.

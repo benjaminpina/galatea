@@ -219,6 +219,22 @@ class EnvironmentDao extends DatabaseAccessor<AppDatabase>
   Future<void> remove(int id) =>
       (delete(environments)..where((t) => t.id.equals(id))).go();
 
+  Future<void> updateEnvironment(
+    int id,
+    String name,
+    int width,
+    int height,
+  ) async {
+    await (update(environments)..where((t) => t.id.equals(id))).write(
+      EnvironmentsCompanion(
+        name: Value(name),
+        width: Value(width),
+        height: Value(height),
+        updatedAt: Value(DateTime.now().toIso8601String()),
+      ),
+    );
+  }
+
   Future<int> placeSource(EnvironmentSourcesCompanion entry) =>
       into(environmentSources).insert(entry);
 
