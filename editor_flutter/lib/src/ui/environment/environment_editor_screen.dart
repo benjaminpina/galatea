@@ -74,10 +74,54 @@ class _EnvironmentEditorScreenState
   // --- Right config panel ---
   ConfigSection? _openSection;
 
+  // --- Scrollbar controllers ---
+  final ScrollController _hScrollCtrl = ScrollController();
+  final ScrollController _vScrollCtrl = ScrollController();
+
   @override
   void initState() {
     super.initState();
+    _hScrollCtrl.addListener(_onHScroll);
+    _vScrollCtrl.addListener(_onVScroll);
     _loadAll();
+  }
+
+  @override
+  void dispose() {
+    _hScrollCtrl.removeListener(_onHScroll);
+    _vScrollCtrl.removeListener(_onVScroll);
+    _hScrollCtrl.dispose();
+    _vScrollCtrl.dispose();
+    super.dispose();
+  }
+
+  void _onHScroll() {
+    if (_hScrollCtrl.hasClients) {
+      setState(() => _offset = Offset(-_hScrollCtrl.offset, _offset.dy));
+    }
+  }
+
+  void _onVScroll() {
+    if (_vScrollCtrl.hasClients) {
+      setState(() => _offset = Offset(_offset.dx, -_vScrollCtrl.offset));
+    }
+  }
+
+  void _syncScrollbars() {
+    final hTarget = (-_offset.dx).clamp(
+      0.0,
+      _hScrollCtrl.position.maxScrollExtent,
+    );
+    if ((_hScrollCtrl.offset - hTarget).abs() > 0.5) {
+      _hScrollCtrl.jumpTo(hTarget);
+    }
+    final vTarget = (-_offset.dy).clamp(
+      0.0,
+      _vScrollCtrl.position.maxScrollExtent,
+    );
+    if ((_vScrollCtrl.offset - vTarget).abs() > 0.5) {
+      _vScrollCtrl.jumpTo(vTarget);
+    }
   }
 
   Future<void> _loadAll() async {
@@ -392,6 +436,7 @@ class _EnvironmentEditorScreenState
   void _handlePanUpdate(DragUpdateDetails d) {
     if (_panning) {
       setState(() => _offset = _offsetStart + (d.localPosition - _panStart));
+      WidgetsBinding.instance.addPostFrameCallback((_) => _syncScrollbars());
     } else if (_painting) {
       final (x, y) = _localToGrid(d.localPosition);
       _onCellDrag(x, y);
@@ -428,6 +473,7 @@ class _EnvironmentEditorScreenState
           40.0,
         );
       });
+      WidgetsBinding.instance.addPostFrameCallback((_) => _syncScrollbars());
     }
   }
 
@@ -891,36 +937,104 @@ class _EnvironmentEditorScreenState
     if (_envWidth == 0 || _envHeight == 0) {
       return const Center(child: CircularProgressIndicator());
     }
-    return Listener(
-      onPointerSignal: _handleScroll,
-      onPointerHover: _handleHover,
-      child: GestureDetector(
-        onPanStart: _handlePanStart,
-        onPanUpdate: _handlePanUpdate,
-        onPanEnd: _handlePanEnd,
-        onSecondaryTapDown: _handleSecondaryTap,
-        child: ClipRect(
-          child: CustomPaint(
-            size: Size.infinite,
-            painter: EnvironmentCanvasPainter(
-              grid: _grid,
-              width: _envWidth,
-              height: _envHeight,
-              cellSize: _cellSize,
-              offset: _offset,
-              substrateColorMap: substrateColorMap,
-              nutrientColorMap: nutrientColorMap,
-              sources: _sources,
-              oviSites: _oviSites,
-              agents: _agents,
-              selectedElement: _selectedElement,
-              hoverX: _hoverX,
-              hoverY: _hoverY,
-              currentTool: _currentTool,
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final totalW = _envWidth * _cellSize;
+        final totalH = _envHeight * _cellSize;
+        final viewW = constraints.maxWidth;
+        final viewH = constraints.maxHeight;
+
+        return Column(
+          children: [
+            Expanded(
+              child: Row(
+                children: [
+                  // Canvas area.
+                  Expanded(
+                    child: Listener(
+                      onPointerSignal: _handleScroll,
+                      onPointerHover: _handleHover,
+                      child: GestureDetector(
+                        onPanStart: _handlePanStart,
+                        onPanUpdate: _handlePanUpdate,
+                        onPanEnd: _handlePanEnd,
+                        onSecondaryTapDown: _handleSecondaryTap,
+                        child: ClipRect(
+                          child: CustomPaint(
+                            size: Size.infinite,
+                            painter: EnvironmentCanvasPainter(
+                              grid: _grid,
+                              width: _envWidth,
+                              height: _envHeight,
+                              cellSize: _cellSize,
+                              offset: _offset,
+                              substrateColorMap: substrateColorMap,
+                              nutrientColorMap: nutrientColorMap,
+                              sources: _sources,
+                              oviSites: _oviSites,
+                              agents: _agents,
+                              selectedElement: _selectedElement,
+                              hoverX: _hoverX,
+                              hoverY: _hoverY,
+                              currentTool: _currentTool,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  // Vertical scrollbar.
+                  if (totalH > viewH)
+                    SizedBox(
+                      width: 14,
+                      child: ScrollbarTheme(
+                        data: ScrollbarThemeData(
+                          thumbColor: WidgetStatePropertyAll(
+                            Theme.of(
+                              context,
+                            ).colorScheme.outline.withValues(alpha: 0.5),
+                          ),
+                        ),
+                        child: Scrollbar(
+                          thumbVisibility: true,
+                          controller: _vScrollCtrl,
+                          child: SingleChildScrollView(
+                            controller: _vScrollCtrl,
+                            child: SizedBox(height: totalH, width: 14),
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
             ),
-          ),
-        ),
-      ),
+            // Horizontal scrollbar.
+            if (totalW > viewW)
+              SizedBox(
+                height: 14,
+                child: ScrollbarTheme(
+                  data: ScrollbarThemeData(
+                    thumbColor: WidgetStatePropertyAll(
+                      Theme.of(
+                        context,
+                      ).colorScheme.outline.withValues(alpha: 0.5),
+                    ),
+                  ),
+                  child: Scrollbar(
+                    thumbVisibility: true,
+                    controller: _hScrollCtrl,
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      controller: _hScrollCtrl,
+                      child: SizedBox(width: totalW, height: 14),
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        );
+      },
     );
   }
 
