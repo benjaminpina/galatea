@@ -84,6 +84,9 @@ CREATE TABLE IF NOT EXISTS substrate_map_rows (
 
 -- =============================================================================
 -- GENETIC LOCI (dynamic: 0..N)
+-- Pure hereditary units. Each agent carries a genotype (paternal + maternal)
+-- for each locus. Expression is calculated via dominance rules.
+-- Available as variables CL_<name> / DL_<name> in formulas.
 -- =============================================================================
 
 CREATE TABLE IF NOT EXISTS loci (
@@ -96,6 +99,20 @@ CREATE TABLE IF NOT EXISTS loci (
     mutation_rate_rec     REAL    NOT NULL DEFAULT 0,
     mutation_range_dom    REAL    NOT NULL DEFAULT 0,
     mutation_range_rec    REAL    NOT NULL DEFAULT 0,
+    sort_order            INTEGER NOT NULL DEFAULT 0
+);
+
+-- =============================================================================
+-- MORPHOLOGICAL CHARACTERS (dynamic: 0..N)
+-- Phenotypic traits of the organism. Each has a name and a default expression.
+-- The expression can be a constant or a formula referencing loci, age, etc.
+-- Completely independent from loci — the connection is only through formulas.
+-- =============================================================================
+
+CREATE TABLE IF NOT EXISTS morphological_characters (
+    id                    INTEGER PRIMARY KEY AUTOINCREMENT,
+    name                  TEXT    NOT NULL UNIQUE,
+    is_continuous         INTEGER NOT NULL DEFAULT 1,
     default_expression    TEXT    NOT NULL DEFAULT '0',
     sort_order            INTEGER NOT NULL DEFAULT 0
 );
@@ -159,10 +176,10 @@ CREATE TABLE IF NOT EXISTS prototypes (
 CREATE TABLE IF NOT EXISTS prototype_morphology (
     id                  INTEGER PRIMARY KEY AUTOINCREMENT,
     prototype_id        INTEGER NOT NULL REFERENCES prototypes(id) ON DELETE CASCADE,
-    locus_id            INTEGER NOT NULL REFERENCES loci(id) ON DELETE CASCADE,
+    character_id        INTEGER NOT NULL REFERENCES morphological_characters(id) ON DELETE CASCADE,
     genetic_formula     TEXT    NOT NULL DEFAULT '0',
     environmental_formula TEXT  NOT NULL DEFAULT '0',
-    UNIQUE(prototype_id, locus_id)
+    UNIQUE(prototype_id, character_id)
 );
 
 CREATE TABLE IF NOT EXISTS prototype_tendencies (

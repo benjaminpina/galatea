@@ -5,7 +5,14 @@ import '../database/daos.dart';
 
 // Re-export data classes for convenient use in UI layer.
 export '../database/database.dart'
-    show Nutrient, Substrate, LociData, Stage, Prototype, Environment;
+    show
+        Nutrient,
+        Substrate,
+        LociData,
+        MorphologicalCharacter,
+        Stage,
+        Prototype,
+        Environment;
 
 /// The workspace database path. Must be set before accessing the database.
 final workspacePathProvider = StateProvider<String?>((ref) => null);
@@ -44,6 +51,12 @@ final locusDaoProvider = Provider<LocusDao?>((ref) {
   return LocusDao(db);
 });
 
+final characterDaoProvider = Provider<CharacterDao?>((ref) {
+  final db = ref.watch(databaseProvider);
+  if (db == null) return null;
+  return CharacterDao(db);
+});
+
 final stageDaoProvider = Provider<StageDao?>((ref) {
   final db = ref.watch(databaseProvider);
   if (db == null) return null;
@@ -77,6 +90,12 @@ final substratesProvider = StreamProvider<List<Substrate>>((ref) {
 
 final lociProvider = StreamProvider<List<LociData>>((ref) {
   final dao = ref.watch(locusDaoProvider);
+  if (dao == null) return const Stream.empty();
+  return dao.watchAll();
+});
+
+final charactersProvider = StreamProvider<List<MorphologicalCharacter>>((ref) {
+  final dao = ref.watch(characterDaoProvider);
   if (dao == null) return const Stream.empty();
   return dao.watchAll();
 });

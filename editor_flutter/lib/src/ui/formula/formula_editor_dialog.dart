@@ -79,6 +79,7 @@ class _FormulaEditorDialogState extends ConsumerState<_FormulaEditorDialog>
     _categories = buildFormulaVariables(
       nutrients: nutrients,
       loci: loci,
+      characters: ref.read(charactersProvider).valueOrNull ?? [],
       substrates: substrates,
       stages: stages,
       prototypes: prototypes,

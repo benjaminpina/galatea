@@ -1416,19 +1416,6 @@ class $LociTable extends Loci with TableInfo<$LociTable, LociData> {
     requiredDuringInsert: false,
     defaultValue: const Constant(0.0),
   );
-  static const VerificationMeta _defaultExpressionMeta = const VerificationMeta(
-    'defaultExpression',
-  );
-  @override
-  late final GeneratedColumn<String> defaultExpression =
-      GeneratedColumn<String>(
-        'default_expression',
-        aliasedName,
-        false,
-        type: DriftSqlType.string,
-        requiredDuringInsert: false,
-        defaultValue: const Constant('0'),
-      );
   static const VerificationMeta _sortOrderMeta = const VerificationMeta(
     'sortOrder',
   );
@@ -1452,7 +1439,6 @@ class $LociTable extends Loci with TableInfo<$LociTable, LociData> {
     mutationRateRec,
     mutationRangeDom,
     mutationRangeRec,
-    defaultExpression,
     sortOrder,
   ];
   @override
@@ -1541,15 +1527,6 @@ class $LociTable extends Loci with TableInfo<$LociTable, LociData> {
         ),
       );
     }
-    if (data.containsKey('default_expression')) {
-      context.handle(
-        _defaultExpressionMeta,
-        defaultExpression.isAcceptableOrUnknown(
-          data['default_expression']!,
-          _defaultExpressionMeta,
-        ),
-      );
-    }
     if (data.containsKey('sort_order')) {
       context.handle(
         _sortOrderMeta,
@@ -1601,10 +1578,6 @@ class $LociTable extends Loci with TableInfo<$LociTable, LociData> {
         DriftSqlType.double,
         data['${effectivePrefix}mutation_range_rec'],
       )!,
-      defaultExpression: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}default_expression'],
-      )!,
       sortOrder: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}sort_order'],
@@ -1628,7 +1601,6 @@ class LociData extends DataClass implements Insertable<LociData> {
   final double mutationRateRec;
   final double mutationRangeDom;
   final double mutationRangeRec;
-  final String defaultExpression;
   final int sortOrder;
   const LociData({
     required this.id,
@@ -1640,7 +1612,6 @@ class LociData extends DataClass implements Insertable<LociData> {
     required this.mutationRateRec,
     required this.mutationRangeDom,
     required this.mutationRangeRec,
-    required this.defaultExpression,
     required this.sortOrder,
   });
   @override
@@ -1655,7 +1626,6 @@ class LociData extends DataClass implements Insertable<LociData> {
     map['mutation_rate_rec'] = Variable<double>(mutationRateRec);
     map['mutation_range_dom'] = Variable<double>(mutationRangeDom);
     map['mutation_range_rec'] = Variable<double>(mutationRangeRec);
-    map['default_expression'] = Variable<String>(defaultExpression);
     map['sort_order'] = Variable<int>(sortOrder);
     return map;
   }
@@ -1671,7 +1641,6 @@ class LociData extends DataClass implements Insertable<LociData> {
       mutationRateRec: Value(mutationRateRec),
       mutationRangeDom: Value(mutationRangeDom),
       mutationRangeRec: Value(mutationRangeRec),
-      defaultExpression: Value(defaultExpression),
       sortOrder: Value(sortOrder),
     );
   }
@@ -1691,7 +1660,6 @@ class LociData extends DataClass implements Insertable<LociData> {
       mutationRateRec: serializer.fromJson<double>(json['mutationRateRec']),
       mutationRangeDom: serializer.fromJson<double>(json['mutationRangeDom']),
       mutationRangeRec: serializer.fromJson<double>(json['mutationRangeRec']),
-      defaultExpression: serializer.fromJson<String>(json['defaultExpression']),
       sortOrder: serializer.fromJson<int>(json['sortOrder']),
     );
   }
@@ -1708,7 +1676,6 @@ class LociData extends DataClass implements Insertable<LociData> {
       'mutationRateRec': serializer.toJson<double>(mutationRateRec),
       'mutationRangeDom': serializer.toJson<double>(mutationRangeDom),
       'mutationRangeRec': serializer.toJson<double>(mutationRangeRec),
-      'defaultExpression': serializer.toJson<String>(defaultExpression),
       'sortOrder': serializer.toJson<int>(sortOrder),
     };
   }
@@ -1723,7 +1690,6 @@ class LociData extends DataClass implements Insertable<LociData> {
     double? mutationRateRec,
     double? mutationRangeDom,
     double? mutationRangeRec,
-    String? defaultExpression,
     int? sortOrder,
   }) => LociData(
     id: id ?? this.id,
@@ -1735,7 +1701,6 @@ class LociData extends DataClass implements Insertable<LociData> {
     mutationRateRec: mutationRateRec ?? this.mutationRateRec,
     mutationRangeDom: mutationRangeDom ?? this.mutationRangeDom,
     mutationRangeRec: mutationRangeRec ?? this.mutationRangeRec,
-    defaultExpression: defaultExpression ?? this.defaultExpression,
     sortOrder: sortOrder ?? this.sortOrder,
   );
   LociData copyWithCompanion(LociCompanion data) {
@@ -1763,9 +1728,6 @@ class LociData extends DataClass implements Insertable<LociData> {
       mutationRangeRec: data.mutationRangeRec.present
           ? data.mutationRangeRec.value
           : this.mutationRangeRec,
-      defaultExpression: data.defaultExpression.present
-          ? data.defaultExpression.value
-          : this.defaultExpression,
       sortOrder: data.sortOrder.present ? data.sortOrder.value : this.sortOrder,
     );
   }
@@ -1782,7 +1744,6 @@ class LociData extends DataClass implements Insertable<LociData> {
           ..write('mutationRateRec: $mutationRateRec, ')
           ..write('mutationRangeDom: $mutationRangeDom, ')
           ..write('mutationRangeRec: $mutationRangeRec, ')
-          ..write('defaultExpression: $defaultExpression, ')
           ..write('sortOrder: $sortOrder')
           ..write(')'))
         .toString();
@@ -1799,7 +1760,6 @@ class LociData extends DataClass implements Insertable<LociData> {
     mutationRateRec,
     mutationRangeDom,
     mutationRangeRec,
-    defaultExpression,
     sortOrder,
   );
   @override
@@ -1815,7 +1775,6 @@ class LociData extends DataClass implements Insertable<LociData> {
           other.mutationRateRec == this.mutationRateRec &&
           other.mutationRangeDom == this.mutationRangeDom &&
           other.mutationRangeRec == this.mutationRangeRec &&
-          other.defaultExpression == this.defaultExpression &&
           other.sortOrder == this.sortOrder);
 }
 
@@ -1829,7 +1788,6 @@ class LociCompanion extends UpdateCompanion<LociData> {
   final Value<double> mutationRateRec;
   final Value<double> mutationRangeDom;
   final Value<double> mutationRangeRec;
-  final Value<String> defaultExpression;
   final Value<int> sortOrder;
   const LociCompanion({
     this.id = const Value.absent(),
@@ -1841,7 +1799,6 @@ class LociCompanion extends UpdateCompanion<LociData> {
     this.mutationRateRec = const Value.absent(),
     this.mutationRangeDom = const Value.absent(),
     this.mutationRangeRec = const Value.absent(),
-    this.defaultExpression = const Value.absent(),
     this.sortOrder = const Value.absent(),
   });
   LociCompanion.insert({
@@ -1854,7 +1811,6 @@ class LociCompanion extends UpdateCompanion<LociData> {
     this.mutationRateRec = const Value.absent(),
     this.mutationRangeDom = const Value.absent(),
     this.mutationRangeRec = const Value.absent(),
-    this.defaultExpression = const Value.absent(),
     this.sortOrder = const Value.absent(),
   }) : name = Value(name);
   static Insertable<LociData> custom({
@@ -1867,7 +1823,6 @@ class LociCompanion extends UpdateCompanion<LociData> {
     Expression<double>? mutationRateRec,
     Expression<double>? mutationRangeDom,
     Expression<double>? mutationRangeRec,
-    Expression<String>? defaultExpression,
     Expression<int>? sortOrder,
   }) {
     return RawValuesInsertable({
@@ -1880,7 +1835,6 @@ class LociCompanion extends UpdateCompanion<LociData> {
       if (mutationRateRec != null) 'mutation_rate_rec': mutationRateRec,
       if (mutationRangeDom != null) 'mutation_range_dom': mutationRangeDom,
       if (mutationRangeRec != null) 'mutation_range_rec': mutationRangeRec,
-      if (defaultExpression != null) 'default_expression': defaultExpression,
       if (sortOrder != null) 'sort_order': sortOrder,
     });
   }
@@ -1895,7 +1849,6 @@ class LociCompanion extends UpdateCompanion<LociData> {
     Value<double>? mutationRateRec,
     Value<double>? mutationRangeDom,
     Value<double>? mutationRangeRec,
-    Value<String>? defaultExpression,
     Value<int>? sortOrder,
   }) {
     return LociCompanion(
@@ -1908,7 +1861,6 @@ class LociCompanion extends UpdateCompanion<LociData> {
       mutationRateRec: mutationRateRec ?? this.mutationRateRec,
       mutationRangeDom: mutationRangeDom ?? this.mutationRangeDom,
       mutationRangeRec: mutationRangeRec ?? this.mutationRangeRec,
-      defaultExpression: defaultExpression ?? this.defaultExpression,
       sortOrder: sortOrder ?? this.sortOrder,
     );
   }
@@ -1943,9 +1895,6 @@ class LociCompanion extends UpdateCompanion<LociData> {
     if (mutationRangeRec.present) {
       map['mutation_range_rec'] = Variable<double>(mutationRangeRec.value);
     }
-    if (defaultExpression.present) {
-      map['default_expression'] = Variable<String>(defaultExpression.value);
-    }
     if (sortOrder.present) {
       map['sort_order'] = Variable<int>(sortOrder.value);
     }
@@ -1964,6 +1913,369 @@ class LociCompanion extends UpdateCompanion<LociData> {
           ..write('mutationRateRec: $mutationRateRec, ')
           ..write('mutationRangeDom: $mutationRangeDom, ')
           ..write('mutationRangeRec: $mutationRangeRec, ')
+          ..write('sortOrder: $sortOrder')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $MorphologicalCharactersTable extends MorphologicalCharacters
+    with TableInfo<$MorphologicalCharactersTable, MorphologicalCharacter> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $MorphologicalCharactersTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'),
+  );
+  static const VerificationMeta _isContinuousMeta = const VerificationMeta(
+    'isContinuous',
+  );
+  @override
+  late final GeneratedColumn<bool> isContinuous = GeneratedColumn<bool>(
+    'is_continuous',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_continuous" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  static const VerificationMeta _defaultExpressionMeta = const VerificationMeta(
+    'defaultExpression',
+  );
+  @override
+  late final GeneratedColumn<String> defaultExpression =
+      GeneratedColumn<String>(
+        'default_expression',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultValue: const Constant('0'),
+      );
+  static const VerificationMeta _sortOrderMeta = const VerificationMeta(
+    'sortOrder',
+  );
+  @override
+  late final GeneratedColumn<int> sortOrder = GeneratedColumn<int>(
+    'sort_order',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    name,
+    isContinuous,
+    defaultExpression,
+    sortOrder,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'morphological_characters';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<MorphologicalCharacter> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('is_continuous')) {
+      context.handle(
+        _isContinuousMeta,
+        isContinuous.isAcceptableOrUnknown(
+          data['is_continuous']!,
+          _isContinuousMeta,
+        ),
+      );
+    }
+    if (data.containsKey('default_expression')) {
+      context.handle(
+        _defaultExpressionMeta,
+        defaultExpression.isAcceptableOrUnknown(
+          data['default_expression']!,
+          _defaultExpressionMeta,
+        ),
+      );
+    }
+    if (data.containsKey('sort_order')) {
+      context.handle(
+        _sortOrderMeta,
+        sortOrder.isAcceptableOrUnknown(data['sort_order']!, _sortOrderMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  MorphologicalCharacter map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return MorphologicalCharacter(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      isContinuous: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_continuous'],
+      )!,
+      defaultExpression: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}default_expression'],
+      )!,
+      sortOrder: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}sort_order'],
+      )!,
+    );
+  }
+
+  @override
+  $MorphologicalCharactersTable createAlias(String alias) {
+    return $MorphologicalCharactersTable(attachedDatabase, alias);
+  }
+}
+
+class MorphologicalCharacter extends DataClass
+    implements Insertable<MorphologicalCharacter> {
+  final int id;
+  final String name;
+  final bool isContinuous;
+  final String defaultExpression;
+  final int sortOrder;
+  const MorphologicalCharacter({
+    required this.id,
+    required this.name,
+    required this.isContinuous,
+    required this.defaultExpression,
+    required this.sortOrder,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['name'] = Variable<String>(name);
+    map['is_continuous'] = Variable<bool>(isContinuous);
+    map['default_expression'] = Variable<String>(defaultExpression);
+    map['sort_order'] = Variable<int>(sortOrder);
+    return map;
+  }
+
+  MorphologicalCharactersCompanion toCompanion(bool nullToAbsent) {
+    return MorphologicalCharactersCompanion(
+      id: Value(id),
+      name: Value(name),
+      isContinuous: Value(isContinuous),
+      defaultExpression: Value(defaultExpression),
+      sortOrder: Value(sortOrder),
+    );
+  }
+
+  factory MorphologicalCharacter.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return MorphologicalCharacter(
+      id: serializer.fromJson<int>(json['id']),
+      name: serializer.fromJson<String>(json['name']),
+      isContinuous: serializer.fromJson<bool>(json['isContinuous']),
+      defaultExpression: serializer.fromJson<String>(json['defaultExpression']),
+      sortOrder: serializer.fromJson<int>(json['sortOrder']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'name': serializer.toJson<String>(name),
+      'isContinuous': serializer.toJson<bool>(isContinuous),
+      'defaultExpression': serializer.toJson<String>(defaultExpression),
+      'sortOrder': serializer.toJson<int>(sortOrder),
+    };
+  }
+
+  MorphologicalCharacter copyWith({
+    int? id,
+    String? name,
+    bool? isContinuous,
+    String? defaultExpression,
+    int? sortOrder,
+  }) => MorphologicalCharacter(
+    id: id ?? this.id,
+    name: name ?? this.name,
+    isContinuous: isContinuous ?? this.isContinuous,
+    defaultExpression: defaultExpression ?? this.defaultExpression,
+    sortOrder: sortOrder ?? this.sortOrder,
+  );
+  MorphologicalCharacter copyWithCompanion(
+    MorphologicalCharactersCompanion data,
+  ) {
+    return MorphologicalCharacter(
+      id: data.id.present ? data.id.value : this.id,
+      name: data.name.present ? data.name.value : this.name,
+      isContinuous: data.isContinuous.present
+          ? data.isContinuous.value
+          : this.isContinuous,
+      defaultExpression: data.defaultExpression.present
+          ? data.defaultExpression.value
+          : this.defaultExpression,
+      sortOrder: data.sortOrder.present ? data.sortOrder.value : this.sortOrder,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MorphologicalCharacter(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('isContinuous: $isContinuous, ')
+          ..write('defaultExpression: $defaultExpression, ')
+          ..write('sortOrder: $sortOrder')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, name, isContinuous, defaultExpression, sortOrder);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is MorphologicalCharacter &&
+          other.id == this.id &&
+          other.name == this.name &&
+          other.isContinuous == this.isContinuous &&
+          other.defaultExpression == this.defaultExpression &&
+          other.sortOrder == this.sortOrder);
+}
+
+class MorphologicalCharactersCompanion
+    extends UpdateCompanion<MorphologicalCharacter> {
+  final Value<int> id;
+  final Value<String> name;
+  final Value<bool> isContinuous;
+  final Value<String> defaultExpression;
+  final Value<int> sortOrder;
+  const MorphologicalCharactersCompanion({
+    this.id = const Value.absent(),
+    this.name = const Value.absent(),
+    this.isContinuous = const Value.absent(),
+    this.defaultExpression = const Value.absent(),
+    this.sortOrder = const Value.absent(),
+  });
+  MorphologicalCharactersCompanion.insert({
+    this.id = const Value.absent(),
+    required String name,
+    this.isContinuous = const Value.absent(),
+    this.defaultExpression = const Value.absent(),
+    this.sortOrder = const Value.absent(),
+  }) : name = Value(name);
+  static Insertable<MorphologicalCharacter> custom({
+    Expression<int>? id,
+    Expression<String>? name,
+    Expression<bool>? isContinuous,
+    Expression<String>? defaultExpression,
+    Expression<int>? sortOrder,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (name != null) 'name': name,
+      if (isContinuous != null) 'is_continuous': isContinuous,
+      if (defaultExpression != null) 'default_expression': defaultExpression,
+      if (sortOrder != null) 'sort_order': sortOrder,
+    });
+  }
+
+  MorphologicalCharactersCompanion copyWith({
+    Value<int>? id,
+    Value<String>? name,
+    Value<bool>? isContinuous,
+    Value<String>? defaultExpression,
+    Value<int>? sortOrder,
+  }) {
+    return MorphologicalCharactersCompanion(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      isContinuous: isContinuous ?? this.isContinuous,
+      defaultExpression: defaultExpression ?? this.defaultExpression,
+      sortOrder: sortOrder ?? this.sortOrder,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (isContinuous.present) {
+      map['is_continuous'] = Variable<bool>(isContinuous.value);
+    }
+    if (defaultExpression.present) {
+      map['default_expression'] = Variable<String>(defaultExpression.value);
+    }
+    if (sortOrder.present) {
+      map['sort_order'] = Variable<int>(sortOrder.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MorphologicalCharactersCompanion(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('isContinuous: $isContinuous, ')
           ..write('defaultExpression: $defaultExpression, ')
           ..write('sortOrder: $sortOrder')
           ..write(')'))
@@ -4199,18 +4511,18 @@ class $PrototypeMorphologyTable extends PrototypeMorphology
       'REFERENCES prototypes (id)',
     ),
   );
-  static const VerificationMeta _locusIdMeta = const VerificationMeta(
-    'locusId',
+  static const VerificationMeta _characterIdMeta = const VerificationMeta(
+    'characterId',
   );
   @override
-  late final GeneratedColumn<int> locusId = GeneratedColumn<int>(
-    'locus_id',
+  late final GeneratedColumn<int> characterId = GeneratedColumn<int>(
+    'character_id',
     aliasedName,
     false,
     type: DriftSqlType.int,
     requiredDuringInsert: true,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES loci (id)',
+      'REFERENCES morphological_characters (id)',
     ),
   );
   static const VerificationMeta _geneticFormulaMeta = const VerificationMeta(
@@ -4241,7 +4553,7 @@ class $PrototypeMorphologyTable extends PrototypeMorphology
   List<GeneratedColumn> get $columns => [
     id,
     prototypeId,
-    locusId,
+    characterId,
     geneticFormula,
     environmentalFormula,
   ];
@@ -4271,13 +4583,16 @@ class $PrototypeMorphologyTable extends PrototypeMorphology
     } else if (isInserting) {
       context.missing(_prototypeIdMeta);
     }
-    if (data.containsKey('locus_id')) {
+    if (data.containsKey('character_id')) {
       context.handle(
-        _locusIdMeta,
-        locusId.isAcceptableOrUnknown(data['locus_id']!, _locusIdMeta),
+        _characterIdMeta,
+        characterId.isAcceptableOrUnknown(
+          data['character_id']!,
+          _characterIdMeta,
+        ),
       );
     } else if (isInserting) {
-      context.missing(_locusIdMeta);
+      context.missing(_characterIdMeta);
     }
     if (data.containsKey('genetic_formula')) {
       context.handle(
@@ -4304,7 +4619,7 @@ class $PrototypeMorphologyTable extends PrototypeMorphology
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
   List<Set<GeneratedColumn>> get uniqueKeys => [
-    {prototypeId, locusId},
+    {prototypeId, characterId},
   ];
   @override
   PrototypeMorphologyData map(
@@ -4321,9 +4636,9 @@ class $PrototypeMorphologyTable extends PrototypeMorphology
         DriftSqlType.int,
         data['${effectivePrefix}prototype_id'],
       )!,
-      locusId: attachedDatabase.typeMapping.read(
+      characterId: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
-        data['${effectivePrefix}locus_id'],
+        data['${effectivePrefix}character_id'],
       )!,
       geneticFormula: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
@@ -4346,13 +4661,13 @@ class PrototypeMorphologyData extends DataClass
     implements Insertable<PrototypeMorphologyData> {
   final int id;
   final int prototypeId;
-  final int locusId;
+  final int characterId;
   final String geneticFormula;
   final String environmentalFormula;
   const PrototypeMorphologyData({
     required this.id,
     required this.prototypeId,
-    required this.locusId,
+    required this.characterId,
     required this.geneticFormula,
     required this.environmentalFormula,
   });
@@ -4361,7 +4676,7 @@ class PrototypeMorphologyData extends DataClass
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
     map['prototype_id'] = Variable<int>(prototypeId);
-    map['locus_id'] = Variable<int>(locusId);
+    map['character_id'] = Variable<int>(characterId);
     map['genetic_formula'] = Variable<String>(geneticFormula);
     map['environmental_formula'] = Variable<String>(environmentalFormula);
     return map;
@@ -4371,7 +4686,7 @@ class PrototypeMorphologyData extends DataClass
     return PrototypeMorphologyCompanion(
       id: Value(id),
       prototypeId: Value(prototypeId),
-      locusId: Value(locusId),
+      characterId: Value(characterId),
       geneticFormula: Value(geneticFormula),
       environmentalFormula: Value(environmentalFormula),
     );
@@ -4385,7 +4700,7 @@ class PrototypeMorphologyData extends DataClass
     return PrototypeMorphologyData(
       id: serializer.fromJson<int>(json['id']),
       prototypeId: serializer.fromJson<int>(json['prototypeId']),
-      locusId: serializer.fromJson<int>(json['locusId']),
+      characterId: serializer.fromJson<int>(json['characterId']),
       geneticFormula: serializer.fromJson<String>(json['geneticFormula']),
       environmentalFormula: serializer.fromJson<String>(
         json['environmentalFormula'],
@@ -4398,7 +4713,7 @@ class PrototypeMorphologyData extends DataClass
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
       'prototypeId': serializer.toJson<int>(prototypeId),
-      'locusId': serializer.toJson<int>(locusId),
+      'characterId': serializer.toJson<int>(characterId),
       'geneticFormula': serializer.toJson<String>(geneticFormula),
       'environmentalFormula': serializer.toJson<String>(environmentalFormula),
     };
@@ -4407,13 +4722,13 @@ class PrototypeMorphologyData extends DataClass
   PrototypeMorphologyData copyWith({
     int? id,
     int? prototypeId,
-    int? locusId,
+    int? characterId,
     String? geneticFormula,
     String? environmentalFormula,
   }) => PrototypeMorphologyData(
     id: id ?? this.id,
     prototypeId: prototypeId ?? this.prototypeId,
-    locusId: locusId ?? this.locusId,
+    characterId: characterId ?? this.characterId,
     geneticFormula: geneticFormula ?? this.geneticFormula,
     environmentalFormula: environmentalFormula ?? this.environmentalFormula,
   );
@@ -4423,7 +4738,9 @@ class PrototypeMorphologyData extends DataClass
       prototypeId: data.prototypeId.present
           ? data.prototypeId.value
           : this.prototypeId,
-      locusId: data.locusId.present ? data.locusId.value : this.locusId,
+      characterId: data.characterId.present
+          ? data.characterId.value
+          : this.characterId,
       geneticFormula: data.geneticFormula.present
           ? data.geneticFormula.value
           : this.geneticFormula,
@@ -4438,7 +4755,7 @@ class PrototypeMorphologyData extends DataClass
     return (StringBuffer('PrototypeMorphologyData(')
           ..write('id: $id, ')
           ..write('prototypeId: $prototypeId, ')
-          ..write('locusId: $locusId, ')
+          ..write('characterId: $characterId, ')
           ..write('geneticFormula: $geneticFormula, ')
           ..write('environmentalFormula: $environmentalFormula')
           ..write(')'))
@@ -4449,7 +4766,7 @@ class PrototypeMorphologyData extends DataClass
   int get hashCode => Object.hash(
     id,
     prototypeId,
-    locusId,
+    characterId,
     geneticFormula,
     environmentalFormula,
   );
@@ -4459,7 +4776,7 @@ class PrototypeMorphologyData extends DataClass
       (other is PrototypeMorphologyData &&
           other.id == this.id &&
           other.prototypeId == this.prototypeId &&
-          other.locusId == this.locusId &&
+          other.characterId == this.characterId &&
           other.geneticFormula == this.geneticFormula &&
           other.environmentalFormula == this.environmentalFormula);
 }
@@ -4468,35 +4785,35 @@ class PrototypeMorphologyCompanion
     extends UpdateCompanion<PrototypeMorphologyData> {
   final Value<int> id;
   final Value<int> prototypeId;
-  final Value<int> locusId;
+  final Value<int> characterId;
   final Value<String> geneticFormula;
   final Value<String> environmentalFormula;
   const PrototypeMorphologyCompanion({
     this.id = const Value.absent(),
     this.prototypeId = const Value.absent(),
-    this.locusId = const Value.absent(),
+    this.characterId = const Value.absent(),
     this.geneticFormula = const Value.absent(),
     this.environmentalFormula = const Value.absent(),
   });
   PrototypeMorphologyCompanion.insert({
     this.id = const Value.absent(),
     required int prototypeId,
-    required int locusId,
+    required int characterId,
     this.geneticFormula = const Value.absent(),
     this.environmentalFormula = const Value.absent(),
   }) : prototypeId = Value(prototypeId),
-       locusId = Value(locusId);
+       characterId = Value(characterId);
   static Insertable<PrototypeMorphologyData> custom({
     Expression<int>? id,
     Expression<int>? prototypeId,
-    Expression<int>? locusId,
+    Expression<int>? characterId,
     Expression<String>? geneticFormula,
     Expression<String>? environmentalFormula,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (prototypeId != null) 'prototype_id': prototypeId,
-      if (locusId != null) 'locus_id': locusId,
+      if (characterId != null) 'character_id': characterId,
       if (geneticFormula != null) 'genetic_formula': geneticFormula,
       if (environmentalFormula != null)
         'environmental_formula': environmentalFormula,
@@ -4506,14 +4823,14 @@ class PrototypeMorphologyCompanion
   PrototypeMorphologyCompanion copyWith({
     Value<int>? id,
     Value<int>? prototypeId,
-    Value<int>? locusId,
+    Value<int>? characterId,
     Value<String>? geneticFormula,
     Value<String>? environmentalFormula,
   }) {
     return PrototypeMorphologyCompanion(
       id: id ?? this.id,
       prototypeId: prototypeId ?? this.prototypeId,
-      locusId: locusId ?? this.locusId,
+      characterId: characterId ?? this.characterId,
       geneticFormula: geneticFormula ?? this.geneticFormula,
       environmentalFormula: environmentalFormula ?? this.environmentalFormula,
     );
@@ -4528,8 +4845,8 @@ class PrototypeMorphologyCompanion
     if (prototypeId.present) {
       map['prototype_id'] = Variable<int>(prototypeId.value);
     }
-    if (locusId.present) {
-      map['locus_id'] = Variable<int>(locusId.value);
+    if (characterId.present) {
+      map['character_id'] = Variable<int>(characterId.value);
     }
     if (geneticFormula.present) {
       map['genetic_formula'] = Variable<String>(geneticFormula.value);
@@ -4547,7 +4864,7 @@ class PrototypeMorphologyCompanion
     return (StringBuffer('PrototypeMorphologyCompanion(')
           ..write('id: $id, ')
           ..write('prototypeId: $prototypeId, ')
-          ..write('locusId: $locusId, ')
+          ..write('characterId: $characterId, ')
           ..write('geneticFormula: $geneticFormula, ')
           ..write('environmentalFormula: $environmentalFormula')
           ..write(')'))
@@ -14687,6 +15004,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $SubstrateCompositionsTable substrateCompositions =
       $SubstrateCompositionsTable(this);
   late final $LociTable loci = $LociTable(this);
+  late final $MorphologicalCharactersTable morphologicalCharacters =
+      $MorphologicalCharactersTable(this);
   late final $StagesTable stages = $StagesTable(this);
   late final $StageNutrientRequirementsTable stageNutrientRequirements =
       $StageNutrientRequirementsTable(this);
@@ -14748,6 +15067,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final NutrientDao nutrientDao = NutrientDao(this as AppDatabase);
   late final SubstrateDao substrateDao = SubstrateDao(this as AppDatabase);
   late final LocusDao locusDao = LocusDao(this as AppDatabase);
+  late final CharacterDao characterDao = CharacterDao(this as AppDatabase);
   late final StageDao stageDao = StageDao(this as AppDatabase);
   late final PrototypeDao prototypeDao = PrototypeDao(this as AppDatabase);
   late final EnvironmentDao environmentDao = EnvironmentDao(
@@ -14763,6 +15083,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     substrates,
     substrateCompositions,
     loci,
+    morphologicalCharacters,
     stages,
     stageNutrientRequirements,
     stageTendencies,
@@ -17103,7 +17424,6 @@ typedef $$LociTableCreateCompanionBuilder =
       Value<double> mutationRateRec,
       Value<double> mutationRangeDom,
       Value<double> mutationRangeRec,
-      Value<String> defaultExpression,
       Value<int> sortOrder,
     });
 typedef $$LociTableUpdateCompanionBuilder =
@@ -17117,38 +17437,8 @@ typedef $$LociTableUpdateCompanionBuilder =
       Value<double> mutationRateRec,
       Value<double> mutationRangeDom,
       Value<double> mutationRangeRec,
-      Value<String> defaultExpression,
       Value<int> sortOrder,
     });
-
-final class $$LociTableReferences
-    extends BaseReferences<_$AppDatabase, $LociTable, LociData> {
-  $$LociTableReferences(super.$_db, super.$_table, super.$_typedResult);
-
-  static MultiTypedResultKey<
-    $PrototypeMorphologyTable,
-    List<PrototypeMorphologyData>
-  >
-  _prototypeMorphologyRefsTable(_$AppDatabase db) =>
-      MultiTypedResultKey.fromTable(
-        db.prototypeMorphology,
-        aliasName: 'loci__id__prototype_morphology__locus_id',
-      );
-
-  $$PrototypeMorphologyTableProcessedTableManager get prototypeMorphologyRefs {
-    final manager = $$PrototypeMorphologyTableTableManager(
-      $_db,
-      $_db.prototypeMorphology,
-    ).filter((f) => f.locusId.id.sqlEquals($_itemColumn<int>('id')!));
-
-    final cache = $_typedResult.readTableOrNull(
-      _prototypeMorphologyRefsTable($_db),
-    );
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: cache),
-    );
-  }
-}
 
 class $$LociTableFilterComposer extends Composer<_$AppDatabase, $LociTable> {
   $$LociTableFilterComposer({
@@ -17203,40 +17493,10 @@ class $$LociTableFilterComposer extends Composer<_$AppDatabase, $LociTable> {
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<String> get defaultExpression => $composableBuilder(
-    column: $table.defaultExpression,
-    builder: (column) => ColumnFilters(column),
-  );
-
   ColumnFilters<int> get sortOrder => $composableBuilder(
     column: $table.sortOrder,
     builder: (column) => ColumnFilters(column),
   );
-
-  Expression<bool> prototypeMorphologyRefs(
-    Expression<bool> Function($$PrototypeMorphologyTableFilterComposer f) f,
-  ) {
-    final $$PrototypeMorphologyTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.prototypeMorphology,
-      getReferencedColumn: (t) => t.locusId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$PrototypeMorphologyTableFilterComposer(
-            $db: $db,
-            $table: $db.prototypeMorphology,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
 }
 
 class $$LociTableOrderingComposer extends Composer<_$AppDatabase, $LociTable> {
@@ -17289,11 +17549,6 @@ class $$LociTableOrderingComposer extends Composer<_$AppDatabase, $LociTable> {
 
   ColumnOrderings<double> get mutationRangeRec => $composableBuilder(
     column: $table.mutationRangeRec,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get defaultExpression => $composableBuilder(
-    column: $table.defaultExpression,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -17353,39 +17608,8 @@ class $$LociTableAnnotationComposer
     builder: (column) => column,
   );
 
-  GeneratedColumn<String> get defaultExpression => $composableBuilder(
-    column: $table.defaultExpression,
-    builder: (column) => column,
-  );
-
   GeneratedColumn<int> get sortOrder =>
       $composableBuilder(column: $table.sortOrder, builder: (column) => column);
-
-  Expression<T> prototypeMorphologyRefs<T extends Object>(
-    Expression<T> Function($$PrototypeMorphologyTableAnnotationComposer a) f,
-  ) {
-    final $$PrototypeMorphologyTableAnnotationComposer composer =
-        $composerBuilder(
-          composer: this,
-          getCurrentColumn: (t) => t.id,
-          referencedTable: $db.prototypeMorphology,
-          getReferencedColumn: (t) => t.locusId,
-          builder:
-              (
-                joinBuilder, {
-                $addJoinBuilderToRootComposer,
-                $removeJoinBuilderFromRootComposer,
-              }) => $$PrototypeMorphologyTableAnnotationComposer(
-                $db: $db,
-                $table: $db.prototypeMorphology,
-                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-                joinBuilder: joinBuilder,
-                $removeJoinBuilderFromRootComposer:
-                    $removeJoinBuilderFromRootComposer,
-              ),
-        );
-    return f(composer);
-  }
 }
 
 class $$LociTableTableManager
@@ -17399,9 +17623,9 @@ class $$LociTableTableManager
           $$LociTableAnnotationComposer,
           $$LociTableCreateCompanionBuilder,
           $$LociTableUpdateCompanionBuilder,
-          (LociData, $$LociTableReferences),
+          (LociData, BaseReferences<_$AppDatabase, $LociTable, LociData>),
           LociData,
-          PrefetchHooks Function({bool prototypeMorphologyRefs})
+          PrefetchHooks Function()
         > {
   $$LociTableTableManager(_$AppDatabase db, $LociTable table)
     : super(
@@ -17425,7 +17649,6 @@ class $$LociTableTableManager
                 Value<double> mutationRateRec = const Value.absent(),
                 Value<double> mutationRangeDom = const Value.absent(),
                 Value<double> mutationRangeRec = const Value.absent(),
-                Value<String> defaultExpression = const Value.absent(),
                 Value<int> sortOrder = const Value.absent(),
               }) => LociCompanion(
                 id: id,
@@ -17437,7 +17660,6 @@ class $$LociTableTableManager
                 mutationRateRec: mutationRateRec,
                 mutationRangeDom: mutationRangeDom,
                 mutationRangeRec: mutationRangeRec,
-                defaultExpression: defaultExpression,
                 sortOrder: sortOrder,
               ),
           createCompanionCallback:
@@ -17451,7 +17673,6 @@ class $$LociTableTableManager
                 Value<double> mutationRateRec = const Value.absent(),
                 Value<double> mutationRangeDom = const Value.absent(),
                 Value<double> mutationRangeRec = const Value.absent(),
-                Value<String> defaultExpression = const Value.absent(),
                 Value<int> sortOrder = const Value.absent(),
               }) => LociCompanion.insert(
                 id: id,
@@ -17463,46 +17684,12 @@ class $$LociTableTableManager
                 mutationRateRec: mutationRateRec,
                 mutationRangeDom: mutationRangeDom,
                 mutationRangeRec: mutationRangeRec,
-                defaultExpression: defaultExpression,
                 sortOrder: sortOrder,
               ),
           withReferenceMapper: (p0) => p0
-              .map(
-                (e) =>
-                    (e.readTable(table), $$LociTableReferences(db, table, e)),
-              )
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
               .toList(),
-          prefetchHooksCallback: ({prototypeMorphologyRefs = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [
-                if (prototypeMorphologyRefs) db.prototypeMorphology,
-              ],
-              addJoins: null,
-              getPrefetchedDataCallback: (items) async {
-                return [
-                  if (prototypeMorphologyRefs)
-                    await $_getPrefetchedData<
-                      LociData,
-                      $LociTable,
-                      PrototypeMorphologyData
-                    >(
-                      currentTable: table,
-                      referencedTable: $$LociTableReferences
-                          ._prototypeMorphologyRefsTable(db),
-                      managerFromTypedResult: (p0) => $$LociTableReferences(
-                        db,
-                        table,
-                        p0,
-                      ).prototypeMorphologyRefs,
-                      referencedItemsForCurrentItem: (item, referencedItems) =>
-                          referencedItems.where((e) => e.locusId == item.id),
-                      typedResults: items,
-                    ),
-                ];
-              },
-            );
-          },
+          prefetchHooksCallback: null,
         ),
       );
 }
@@ -17517,8 +17704,339 @@ typedef $$LociTableProcessedTableManager =
       $$LociTableAnnotationComposer,
       $$LociTableCreateCompanionBuilder,
       $$LociTableUpdateCompanionBuilder,
-      (LociData, $$LociTableReferences),
+      (LociData, BaseReferences<_$AppDatabase, $LociTable, LociData>),
       LociData,
+      PrefetchHooks Function()
+    >;
+typedef $$MorphologicalCharactersTableCreateCompanionBuilder =
+    MorphologicalCharactersCompanion Function({
+      Value<int> id,
+      required String name,
+      Value<bool> isContinuous,
+      Value<String> defaultExpression,
+      Value<int> sortOrder,
+    });
+typedef $$MorphologicalCharactersTableUpdateCompanionBuilder =
+    MorphologicalCharactersCompanion Function({
+      Value<int> id,
+      Value<String> name,
+      Value<bool> isContinuous,
+      Value<String> defaultExpression,
+      Value<int> sortOrder,
+    });
+
+final class $$MorphologicalCharactersTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $MorphologicalCharactersTable,
+          MorphologicalCharacter
+        > {
+  $$MorphologicalCharactersTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static MultiTypedResultKey<
+    $PrototypeMorphologyTable,
+    List<PrototypeMorphologyData>
+  >
+  _prototypeMorphologyRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.prototypeMorphology,
+        aliasName:
+            'morphological_characters__id__prototype_morphology__character_id',
+      );
+
+  $$PrototypeMorphologyTableProcessedTableManager get prototypeMorphologyRefs {
+    final manager = $$PrototypeMorphologyTableTableManager(
+      $_db,
+      $_db.prototypeMorphology,
+    ).filter((f) => f.characterId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _prototypeMorphologyRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$MorphologicalCharactersTableFilterComposer
+    extends Composer<_$AppDatabase, $MorphologicalCharactersTable> {
+  $$MorphologicalCharactersTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isContinuous => $composableBuilder(
+    column: $table.isContinuous,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get defaultExpression => $composableBuilder(
+    column: $table.defaultExpression,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get sortOrder => $composableBuilder(
+    column: $table.sortOrder,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  Expression<bool> prototypeMorphologyRefs(
+    Expression<bool> Function($$PrototypeMorphologyTableFilterComposer f) f,
+  ) {
+    final $$PrototypeMorphologyTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.prototypeMorphology,
+      getReferencedColumn: (t) => t.characterId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PrototypeMorphologyTableFilterComposer(
+            $db: $db,
+            $table: $db.prototypeMorphology,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$MorphologicalCharactersTableOrderingComposer
+    extends Composer<_$AppDatabase, $MorphologicalCharactersTable> {
+  $$MorphologicalCharactersTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isContinuous => $composableBuilder(
+    column: $table.isContinuous,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get defaultExpression => $composableBuilder(
+    column: $table.defaultExpression,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get sortOrder => $composableBuilder(
+    column: $table.sortOrder,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$MorphologicalCharactersTableAnnotationComposer
+    extends Composer<_$AppDatabase, $MorphologicalCharactersTable> {
+  $$MorphologicalCharactersTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<bool> get isContinuous => $composableBuilder(
+    column: $table.isContinuous,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get defaultExpression => $composableBuilder(
+    column: $table.defaultExpression,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get sortOrder =>
+      $composableBuilder(column: $table.sortOrder, builder: (column) => column);
+
+  Expression<T> prototypeMorphologyRefs<T extends Object>(
+    Expression<T> Function($$PrototypeMorphologyTableAnnotationComposer a) f,
+  ) {
+    final $$PrototypeMorphologyTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.prototypeMorphology,
+          getReferencedColumn: (t) => t.characterId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$PrototypeMorphologyTableAnnotationComposer(
+                $db: $db,
+                $table: $db.prototypeMorphology,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+}
+
+class $$MorphologicalCharactersTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $MorphologicalCharactersTable,
+          MorphologicalCharacter,
+          $$MorphologicalCharactersTableFilterComposer,
+          $$MorphologicalCharactersTableOrderingComposer,
+          $$MorphologicalCharactersTableAnnotationComposer,
+          $$MorphologicalCharactersTableCreateCompanionBuilder,
+          $$MorphologicalCharactersTableUpdateCompanionBuilder,
+          (MorphologicalCharacter, $$MorphologicalCharactersTableReferences),
+          MorphologicalCharacter,
+          PrefetchHooks Function({bool prototypeMorphologyRefs})
+        > {
+  $$MorphologicalCharactersTableTableManager(
+    _$AppDatabase db,
+    $MorphologicalCharactersTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$MorphologicalCharactersTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$MorphologicalCharactersTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$MorphologicalCharactersTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<bool> isContinuous = const Value.absent(),
+                Value<String> defaultExpression = const Value.absent(),
+                Value<int> sortOrder = const Value.absent(),
+              }) => MorphologicalCharactersCompanion(
+                id: id,
+                name: name,
+                isContinuous: isContinuous,
+                defaultExpression: defaultExpression,
+                sortOrder: sortOrder,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String name,
+                Value<bool> isContinuous = const Value.absent(),
+                Value<String> defaultExpression = const Value.absent(),
+                Value<int> sortOrder = const Value.absent(),
+              }) => MorphologicalCharactersCompanion.insert(
+                id: id,
+                name: name,
+                isContinuous: isContinuous,
+                defaultExpression: defaultExpression,
+                sortOrder: sortOrder,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$MorphologicalCharactersTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({prototypeMorphologyRefs = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [
+                if (prototypeMorphologyRefs) db.prototypeMorphology,
+              ],
+              addJoins: null,
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (prototypeMorphologyRefs)
+                    await $_getPrefetchedData<
+                      MorphologicalCharacter,
+                      $MorphologicalCharactersTable,
+                      PrototypeMorphologyData
+                    >(
+                      currentTable: table,
+                      referencedTable: $$MorphologicalCharactersTableReferences
+                          ._prototypeMorphologyRefsTable(db),
+                      managerFromTypedResult: (p0) =>
+                          $$MorphologicalCharactersTableReferences(
+                            db,
+                            table,
+                            p0,
+                          ).prototypeMorphologyRefs,
+                      referencedItemsForCurrentItem: (item, referencedItems) =>
+                          referencedItems.where(
+                            (e) => e.characterId == item.id,
+                          ),
+                      typedResults: items,
+                    ),
+                ];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$MorphologicalCharactersTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $MorphologicalCharactersTable,
+      MorphologicalCharacter,
+      $$MorphologicalCharactersTableFilterComposer,
+      $$MorphologicalCharactersTableOrderingComposer,
+      $$MorphologicalCharactersTableAnnotationComposer,
+      $$MorphologicalCharactersTableCreateCompanionBuilder,
+      $$MorphologicalCharactersTableUpdateCompanionBuilder,
+      (MorphologicalCharacter, $$MorphologicalCharactersTableReferences),
+      MorphologicalCharacter,
       PrefetchHooks Function({bool prototypeMorphologyRefs})
     >;
 typedef $$StagesTableCreateCompanionBuilder =
@@ -21721,7 +22239,7 @@ typedef $$PrototypeMorphologyTableCreateCompanionBuilder =
     PrototypeMorphologyCompanion Function({
       Value<int> id,
       required int prototypeId,
-      required int locusId,
+      required int characterId,
       Value<String> geneticFormula,
       Value<String> environmentalFormula,
     });
@@ -21729,7 +22247,7 @@ typedef $$PrototypeMorphologyTableUpdateCompanionBuilder =
     PrototypeMorphologyCompanion Function({
       Value<int> id,
       Value<int> prototypeId,
-      Value<int> locusId,
+      Value<int> characterId,
       Value<String> geneticFormula,
       Value<String> environmentalFormula,
     });
@@ -21764,17 +22282,19 @@ final class $$PrototypeMorphologyTableReferences
     );
   }
 
-  static $LociTable _locusIdTable(_$AppDatabase db) =>
-      db.loci.createAlias('prototype_morphology__locus_id__loci__id');
+  static $MorphologicalCharactersTable _characterIdTable(_$AppDatabase db) =>
+      db.morphologicalCharacters.createAlias(
+        'prototype_morphology__character_id__morphological_characters__id',
+      );
 
-  $$LociTableProcessedTableManager get locusId {
-    final $_column = $_itemColumn<int>('locus_id')!;
+  $$MorphologicalCharactersTableProcessedTableManager get characterId {
+    final $_column = $_itemColumn<int>('character_id')!;
 
-    final manager = $$LociTableTableManager(
+    final manager = $$MorphologicalCharactersTableTableManager(
       $_db,
-      $_db.loci,
+      $_db.morphologicalCharacters,
     ).filter((f) => f.id.sqlEquals($_column));
-    final item = $_typedResult.readTableOrNull(_locusIdTable($_db));
+    final item = $_typedResult.readTableOrNull(_characterIdTable($_db));
     if (item == null) return manager;
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: [item]),
@@ -21829,26 +22349,27 @@ class $$PrototypeMorphologyTableFilterComposer
     return composer;
   }
 
-  $$LociTableFilterComposer get locusId {
-    final $$LociTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.locusId,
-      referencedTable: $db.loci,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$LociTableFilterComposer(
-            $db: $db,
-            $table: $db.loci,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
+  $$MorphologicalCharactersTableFilterComposer get characterId {
+    final $$MorphologicalCharactersTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.characterId,
+          referencedTable: $db.morphologicalCharacters,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
                 $removeJoinBuilderFromRootComposer,
-          ),
-    );
+              }) => $$MorphologicalCharactersTableFilterComposer(
+                $db: $db,
+                $table: $db.morphologicalCharacters,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
     return composer;
   }
 }
@@ -21900,26 +22421,27 @@ class $$PrototypeMorphologyTableOrderingComposer
     return composer;
   }
 
-  $$LociTableOrderingComposer get locusId {
-    final $$LociTableOrderingComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.locusId,
-      referencedTable: $db.loci,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$LociTableOrderingComposer(
-            $db: $db,
-            $table: $db.loci,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
+  $$MorphologicalCharactersTableOrderingComposer get characterId {
+    final $$MorphologicalCharactersTableOrderingComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.characterId,
+          referencedTable: $db.morphologicalCharacters,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
                 $removeJoinBuilderFromRootComposer,
-          ),
-    );
+              }) => $$MorphologicalCharactersTableOrderingComposer(
+                $db: $db,
+                $table: $db.morphologicalCharacters,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
     return composer;
   }
 }
@@ -21969,26 +22491,27 @@ class $$PrototypeMorphologyTableAnnotationComposer
     return composer;
   }
 
-  $$LociTableAnnotationComposer get locusId {
-    final $$LociTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.locusId,
-      referencedTable: $db.loci,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$LociTableAnnotationComposer(
-            $db: $db,
-            $table: $db.loci,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
+  $$MorphologicalCharactersTableAnnotationComposer get characterId {
+    final $$MorphologicalCharactersTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.characterId,
+          referencedTable: $db.morphologicalCharacters,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
                 $removeJoinBuilderFromRootComposer,
-          ),
-    );
+              }) => $$MorphologicalCharactersTableAnnotationComposer(
+                $db: $db,
+                $table: $db.morphologicalCharacters,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
     return composer;
   }
 }
@@ -22006,7 +22529,7 @@ class $$PrototypeMorphologyTableTableManager
           $$PrototypeMorphologyTableUpdateCompanionBuilder,
           (PrototypeMorphologyData, $$PrototypeMorphologyTableReferences),
           PrototypeMorphologyData,
-          PrefetchHooks Function({bool prototypeId, bool locusId})
+          PrefetchHooks Function({bool prototypeId, bool characterId})
         > {
   $$PrototypeMorphologyTableTableManager(
     _$AppDatabase db,
@@ -22031,13 +22554,13 @@ class $$PrototypeMorphologyTableTableManager
               ({
                 Value<int> id = const Value.absent(),
                 Value<int> prototypeId = const Value.absent(),
-                Value<int> locusId = const Value.absent(),
+                Value<int> characterId = const Value.absent(),
                 Value<String> geneticFormula = const Value.absent(),
                 Value<String> environmentalFormula = const Value.absent(),
               }) => PrototypeMorphologyCompanion(
                 id: id,
                 prototypeId: prototypeId,
-                locusId: locusId,
+                characterId: characterId,
                 geneticFormula: geneticFormula,
                 environmentalFormula: environmentalFormula,
               ),
@@ -22045,13 +22568,13 @@ class $$PrototypeMorphologyTableTableManager
               ({
                 Value<int> id = const Value.absent(),
                 required int prototypeId,
-                required int locusId,
+                required int characterId,
                 Value<String> geneticFormula = const Value.absent(),
                 Value<String> environmentalFormula = const Value.absent(),
               }) => PrototypeMorphologyCompanion.insert(
                 id: id,
                 prototypeId: prototypeId,
-                locusId: locusId,
+                characterId: characterId,
                 geneticFormula: geneticFormula,
                 environmentalFormula: environmentalFormula,
               ),
@@ -22063,7 +22586,7 @@ class $$PrototypeMorphologyTableTableManager
                 ),
               )
               .toList(),
-          prefetchHooksCallback: ({prototypeId = false, locusId = false}) {
+          prefetchHooksCallback: ({prototypeId = false, characterId = false}) {
             return PrefetchHooks(
               db: db,
               explicitlyWatchedTables: [],
@@ -22098,17 +22621,17 @@ class $$PrototypeMorphologyTableTableManager
                               )
                               as T;
                     }
-                    if (locusId) {
+                    if (characterId) {
                       state =
                           state.withJoin(
                                 currentTable: table,
-                                currentColumn: table.locusId,
+                                currentColumn: table.characterId,
                                 referencedTable:
                                     $$PrototypeMorphologyTableReferences
-                                        ._locusIdTable(db),
+                                        ._characterIdTable(db),
                                 referencedColumn:
                                     $$PrototypeMorphologyTableReferences
-                                        ._locusIdTable(db)
+                                        ._characterIdTable(db)
                                         .id,
                               )
                               as T;
@@ -22137,7 +22660,7 @@ typedef $$PrototypeMorphologyTableProcessedTableManager =
       $$PrototypeMorphologyTableUpdateCompanionBuilder,
       (PrototypeMorphologyData, $$PrototypeMorphologyTableReferences),
       PrototypeMorphologyData,
-      PrefetchHooks Function({bool prototypeId, bool locusId})
+      PrefetchHooks Function({bool prototypeId, bool characterId})
     >;
 typedef $$PrototypeTendenciesTableCreateCompanionBuilder =
     PrototypeTendenciesCompanion Function({
@@ -32114,6 +32637,11 @@ class $AppDatabaseManager {
   $$SubstrateCompositionsTableTableManager get substrateCompositions =>
       $$SubstrateCompositionsTableTableManager(_db, _db.substrateCompositions);
   $$LociTableTableManager get loci => $$LociTableTableManager(_db, _db.loci);
+  $$MorphologicalCharactersTableTableManager get morphologicalCharacters =>
+      $$MorphologicalCharactersTableTableManager(
+        _db,
+        _db.morphologicalCharacters,
+      );
   $$StagesTableTableManager get stages =>
       $$StagesTableTableManager(_db, _db.stages);
   $$StageNutrientRequirementsTableTableManager get stageNutrientRequirements =>

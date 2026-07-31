@@ -228,7 +228,7 @@ class _PrototypeEditScreenState extends ConsumerState<PrototypeEditScreen>
           builder: (context, morphSnap) {
             final morphMap = <int, PrototypeMorphologyData>{};
             for (final m in morphSnap.data ?? []) {
-              morphMap[m.locusId] = m;
+              morphMap[m.characterId] = m;
             }
             return ListView(
               padding: const EdgeInsets.all(16),
@@ -243,7 +243,7 @@ class _PrototypeEditScreenState extends ConsumerState<PrototypeEditScreen>
                   return _MorphologyLocusRow(
                     locusName: l.name,
                     isContinuous: l.isContinuous,
-                    geneticFormula: m?.geneticFormula ?? l.defaultExpression,
+                    geneticFormula: m?.geneticFormula ?? '0',
                     environmentalFormula: m?.environmentalFormula ?? '0',
                     onGeneticChanged: (v) =>
                         _saveMorphology(db, l.id, genetic: v),
@@ -323,9 +323,6 @@ class _PrototypeEditScreenState extends ConsumerState<PrototypeEditScreen>
           LociCompanion.insert(
             name: name,
             isContinuous: Value(isContinuous),
-            defaultExpression: Value(
-              defaultCtrl.text.trim().isEmpty ? '0' : defaultCtrl.text.trim(),
-            ),
             sortOrder: Value(existing.length + 1),
           ),
         );
@@ -343,7 +340,7 @@ class _PrototypeEditScreenState extends ConsumerState<PrototypeEditScreen>
         await (db.select(db.prototypeMorphology)..where(
               (t) =>
                   t.prototypeId.equals(widget.prototypeId) &
-                  t.locusId.equals(locusId),
+                  t.characterId.equals(locusId),
             ))
             .getSingleOrNull();
     if (existing == null) {
@@ -352,7 +349,7 @@ class _PrototypeEditScreenState extends ConsumerState<PrototypeEditScreen>
           .insert(
             PrototypeMorphologyCompanion.insert(
               prototypeId: widget.prototypeId,
-              locusId: locusId,
+              characterId: locusId,
               geneticFormula: Value(genetic ?? '0'),
               environmentalFormula: Value(environmental ?? '0'),
             ),

@@ -20,29 +20,38 @@ class JsonExporter {
     final compositions = <MixedCompositionExport>[];
 
     for (final sub in substrates) {
-      exports.add(SubstrateExport(
-        name: sub.name,
-        color: sub.color,
-        isMixed: sub.isMixed,
-        sortOrder: sub.sortOrder,
-      ));
+      exports.add(
+        SubstrateExport(
+          name: sub.name,
+          color: sub.color,
+          isMixed: sub.isMixed,
+          sortOrder: sub.sortOrder,
+        ),
+      );
 
       if (sub.isMixed) {
         final comps = await dao.getCompositions(sub.id);
         for (final comp in comps) {
-          final simple = substrates.where((s) => s.id == comp.simpleSubstrateId).firstOrNull;
+          final simple = substrates
+              .where((s) => s.id == comp.simpleSubstrateId)
+              .firstOrNull;
           if (simple != null) {
-            compositions.add(MixedCompositionExport(
-              mixedName: sub.name,
-              simpleName: simple.name,
-              percentage: comp.percentage,
-            ));
+            compositions.add(
+              MixedCompositionExport(
+                mixedName: sub.name,
+                simpleName: simple.name,
+                percentage: comp.percentage,
+              ),
+            );
           }
         }
       }
     }
 
-    final export = SubstrateSetExport(substrates: exports, compositions: compositions);
+    final export = SubstrateSetExport(
+      substrates: exports,
+      compositions: compositions,
+    );
     await _writeJson(filePath, export.toJson());
   }
 
@@ -52,18 +61,20 @@ class JsonExporter {
     final loci = await dao.getAll();
 
     final exports = loci
-        .map((l) => LocusExport(
-              name: l.name,
-              isContinuous: l.isContinuous,
-              dominantValue: l.dominantValue,
-              recessiveValue: l.recessiveValue,
-              mutationRateDom: l.mutationRateDom,
-              mutationRateRec: l.mutationRateRec,
-              mutationRangeDom: l.mutationRangeDom,
-              mutationRangeRec: l.mutationRangeRec,
-              defaultExpression: l.defaultExpression,
-              sortOrder: l.sortOrder,
-            ))
+        .map(
+          (l) => LocusExport(
+            name: l.name,
+            isContinuous: l.isContinuous,
+            dominantValue: l.dominantValue,
+            recessiveValue: l.recessiveValue,
+            mutationRateDom: l.mutationRateDom,
+            mutationRateRec: l.mutationRateRec,
+            mutationRangeDom: l.mutationRangeDom,
+            mutationRangeRec: l.mutationRangeRec,
+
+            sortOrder: l.sortOrder,
+          ),
+        )
         .toList();
 
     final export = LociSetExport(loci: exports);
@@ -76,17 +87,19 @@ class JsonExporter {
     final prototypes = await dao.getAll();
 
     final exports = prototypes
-        .map((p) => PrototypeExport(
-              name: p.name,
-              sex: p.sex,
-              color: p.color,
-              longevityFormula: p.longevityFormula,
-              refractoryCombatFormula: p.refractoryCombatFormula,
-              refractoryCourtshipFormula: p.refractoryCourtshipFormula,
-              sexRatioMalesFormula: p.sexRatioMalesFormula,
-              sexRatioFemalesFormula: p.sexRatioFemalesFormula,
-              sortOrder: p.sortOrder,
-            ))
+        .map(
+          (p) => PrototypeExport(
+            name: p.name,
+            sex: p.sex,
+            color: p.color,
+            longevityFormula: p.longevityFormula,
+            refractoryCombatFormula: p.refractoryCombatFormula,
+            refractoryCourtshipFormula: p.refractoryCourtshipFormula,
+            sexRatioMalesFormula: p.sexRatioMalesFormula,
+            sexRatioFemalesFormula: p.sexRatioFemalesFormula,
+            sortOrder: p.sortOrder,
+          ),
+        )
         .toList();
 
     final export = PrototypeSetExport(prototypes: exports);

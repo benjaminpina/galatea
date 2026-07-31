@@ -42,7 +42,7 @@ class SubstrateCompositions extends Table {
   IntColumn get percentage => integer().withDefault(const Constant(0))();
 }
 
-/// Genetic loci definitions (0..N).
+/// Genetic loci definitions (0..N). Pure hereditary units.
 class Loci extends Table {
   IntColumn get id => integer().autoIncrement()();
   TextColumn get name => text().unique()();
@@ -53,6 +53,14 @@ class Loci extends Table {
   RealColumn get mutationRateRec => real().withDefault(const Constant(0.0))();
   RealColumn get mutationRangeDom => real().withDefault(const Constant(0.0))();
   RealColumn get mutationRangeRec => real().withDefault(const Constant(0.0))();
+  IntColumn get sortOrder => integer().withDefault(const Constant(0))();
+}
+
+/// Morphological characters (0..N). Phenotypic traits independent from loci.
+class MorphologicalCharacters extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get name => text().unique()();
+  BoolColumn get isContinuous => boolean().withDefault(const Constant(true))();
   TextColumn get defaultExpression => text().withDefault(const Constant('0'))();
   IntColumn get sortOrder => integer().withDefault(const Constant(0))();
 }
@@ -237,18 +245,19 @@ class StageTendencies extends Table {
 // PROTOTYPE DETAIL TABLES
 // =============================================================================
 
-/// Morphological character values (genetic + environmental formula) per locus per prototype.
+/// Morphological character values (genetic + environmental formula) per character per prototype.
 class PrototypeMorphology extends Table {
   IntColumn get id => integer().autoIncrement()();
   IntColumn get prototypeId => integer().references(Prototypes, #id)();
-  IntColumn get locusId => integer().references(Loci, #id)();
+  IntColumn get characterId =>
+      integer().references(MorphologicalCharacters, #id)();
   TextColumn get geneticFormula => text().withDefault(const Constant('0'))();
   TextColumn get environmentalFormula =>
       text().withDefault(const Constant('0'))();
 
   @override
   List<Set<Column>> get uniqueKeys => [
-    {prototypeId, locusId},
+    {prototypeId, characterId},
   ];
 }
 

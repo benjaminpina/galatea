@@ -16,6 +16,10 @@ type Config struct {
 	// NumLoci is the number of genetic loci defined (0..N).
 	NumLoci int
 
+	// NumCharacters is the number of morphological characters defined (0..N).
+	// Independent from NumLoci — characters are phenotypic traits, loci are hereditary.
+	NumCharacters int
+
 	// NumStages is the number of immature life stages (0..N).
 	NumStages int
 

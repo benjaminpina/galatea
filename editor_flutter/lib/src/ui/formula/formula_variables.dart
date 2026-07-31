@@ -15,20 +15,12 @@ class VariableCategory {
   final List<FormulaVariable> variables;
 }
 
-/// Checks if a locus/character has genetic parameters configured
-/// (i.e., it's not purely a morphological constant).
-bool _hasGenetics(LociData l) {
-  return l.dominantValue != 0 ||
-      l.recessiveValue != 0 ||
-      l.mutationRateDom != 0 ||
-      l.mutationRateRec != 0;
-}
-
 /// Builds the complete list of available formula variables from the current
 /// project data. Organized by category matching the legacy editor's tabs.
 List<VariableCategory> buildFormulaVariables({
   required List<Nutrient> nutrients,
   required List<LociData> loci,
+  required List<MorphologicalCharacter> characters,
   required List<Substrate> substrates,
   required List<Stage> stages,
   required List<Prototype> prototypes,
@@ -70,36 +62,30 @@ List<VariableCategory> buildFormulaVariables({
       ),
     ]),
 
-    // --- Genetics (only for characters with genetic parameters configured) ---
+    // --- Genetics (ALL loci, always shown) ---
     VariableCategory('Genetics', 'biotech', [
       ...loci
-          .where((l) => l.isContinuous && _hasGenetics(l))
+          .where((l) => l.isContinuous)
           .map(
-            (l) => FormulaVariable(
-              'CL_${l.name}',
-              'Expressed continuous locus: ${l.name}',
-            ),
+            (l) =>
+                FormulaVariable('CL_${l.name}', 'Continuous locus: ${l.name}'),
           ),
       ...loci
-          .where((l) => !l.isContinuous && _hasGenetics(l))
+          .where((l) => !l.isContinuous)
           .map(
-            (l) => FormulaVariable(
-              'DL_${l.name}',
-              'Expressed discrete locus: ${l.name}',
-            ),
+            (l) => FormulaVariable('DL_${l.name}', 'Discrete locus: ${l.name}'),
           ),
-      if (loci.every((l) => !_hasGenetics(l)))
-        const FormulaVariable(
-          '—',
-          'No characters have genetic parameters configured',
-        ),
+      if (loci.isEmpty)
+        const FormulaVariable('—', 'No genetic loci defined yet'),
     ]),
 
-    // --- Morphology (all characters, as fixed adult traits) ---
+    // --- Morphology (characters, independent from loci) ---
     VariableCategory('Morphology', 'straighten', [
-      ...loci.map(
-        (l) => FormulaVariable(l.name, 'Morphological value: ${l.name}'),
+      ...characters.map(
+        (c) => FormulaVariable(c.name, 'Morphological value: ${c.name}'),
       ),
+      if (characters.isEmpty)
+        const FormulaVariable('—', 'No morphological characters defined yet'),
     ]),
 
     // --- Reproduction ---
@@ -170,14 +156,14 @@ List<VariableCategory> buildFormulaVariables({
       const FormulaVariable('ContenderAge', 'Opponent age'),
       const FormulaVariable('ContenderIsMale', 'Opponent is male'),
       const FormulaVariable('ContenderIsFemale', 'Opponent is female'),
-      ...loci.map(
-        (l) => FormulaVariable(
-          'Contender_${l.name}',
-          'Opponent morphology: ${l.name}',
+      ...characters.map(
+        (c) => FormulaVariable(
+          'Contender_${c.name}',
+          'Opponent morphology: ${c.name}',
         ),
       ),
       ...loci
-          .where((l) => l.isContinuous && _hasGenetics(l))
+          .where((l) => l.isContinuous)
           .map(
             (l) => FormulaVariable(
               'ContenderCL_${l.name}',

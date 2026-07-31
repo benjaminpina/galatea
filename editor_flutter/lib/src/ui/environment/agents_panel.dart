@@ -17,6 +17,7 @@ class AgentsPanel extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final loci = ref.watch(lociProvider).valueOrNull ?? [];
+    final characters = ref.watch(charactersProvider).valueOrNull ?? [];
     final stages = ref.watch(stagesProvider).valueOrNull ?? [];
     final prototypes = ref.watch(prototypesProvider).valueOrNull ?? [];
     final males = prototypes.where((p) => p.sex == 'M').toList();
@@ -25,34 +26,34 @@ class AgentsPanel extends ConsumerWidget {
     return ListView(
       padding: const EdgeInsets.all(12),
       children: [
-        // --- Morphological Characters ---
+        // --- Morphological Characters (phenotypic traits) ---
         _SectionHeader(
           title: 'Morphology',
           icon: Icons.straighten,
-          count: loci.length,
+          count: characters.length,
           onAdd: () => _addCharacter(context, ref),
+        ),
+        if (characters.isEmpty)
+          _emptyHint(
+            'No characters defined. Define phenotypic traits (e.g., BodySize, Speed).',
+          )
+        else
+          ...characters.map((c) => _CharacterTile(character: c)),
+        const SizedBox(height: 16),
+
+        // --- Genetic Loci (hereditary units) ---
+        _SectionHeader(
+          title: 'Genetics (Loci)',
+          icon: Icons.biotech,
+          count: loci.length,
+          onAdd: () => _addLocus(context, ref),
         ),
         if (loci.isEmpty)
           _emptyHint(
-            'No characters defined. Define the phenotypic traits of your organisms (e.g., BodySize, Speed).',
+            'No loci defined. Loci are hereditary units available as CL_/DL_ variables in formulas.',
           )
         else
-          ...loci.map((l) => _CharacterTile(character: l)),
-        const SizedBox(height: 16),
-
-        // --- Genetics ---
-        _SectionHeader(
-          title: 'Genetics',
-          icon: Icons.biotech,
-          count: loci
-              .where((l) => l.dominantValue != 0 || l.mutationRateDom != 0)
-              .length,
-          onAdd: null,
-        ),
-        _emptyHint(
-          'Genetic parameters (dominance, mutation) are configured per character above. '
-          'Characters without genetic parameters behave as constants or formula-derived values.',
-        ),
+          ...loci.map((l) => _LocusTile(locus: l)),
         const SizedBox(height: 16),
 
         // --- Life Stages ---
@@ -194,6 +195,67 @@ class AgentsPanel extends ConsumerWidget {
     final name = nameCtrl.text.trim();
     if (name.isEmpty) return;
 
+    final dao = ref.read(characterDaoProvider);
+    if (dao == null) return;
+    final existing = await dao.getAll();
+    await dao.add(
+      MorphologicalCharactersCompanion.insert(
+        name: name,
+        isContinuous: Value(isContinuous),
+        defaultExpression: Value(
+          defaultCtrl.text.trim().isEmpty ? '0' : defaultCtrl.text.trim(),
+        ),
+        sortOrder: Value(existing.length + 1),
+      ),
+    );
+  }
+
+  Future<void> _addLocus(BuildContext context, WidgetRef ref) async {
+    final nameCtrl = TextEditingController();
+    var isContinuous = true;
+
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setState) => AlertDialog(
+          title: const Text('New Genetic Locus'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: nameCtrl,
+                decoration: const InputDecoration(
+                  labelText: 'Name',
+                  hintText: 'e.g., SizeLocus, ColorGene',
+                ),
+                autofocus: true,
+              ),
+              const SizedBox(height: 12),
+              SwitchListTile(
+                title: const Text('Continuous'),
+                subtitle: Text(isContinuous ? 'Real-valued' : 'Integer-valued'),
+                value: isContinuous,
+                onChanged: (v) => setState(() => isContinuous = v),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              child: const Text('Add'),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (result != true) return;
+    final name = nameCtrl.text.trim();
+    if (name.isEmpty) return;
+
     final dao = ref.read(locusDaoProvider);
     if (dao == null) return;
     final existing = await dao.getAll();
@@ -201,9 +263,6 @@ class AgentsPanel extends ConsumerWidget {
       LociCompanion.insert(
         name: name,
         isContinuous: Value(isContinuous),
-        defaultExpression: Value(
-          defaultCtrl.text.trim().isEmpty ? '0' : defaultCtrl.text.trim(),
-        ),
         sortOrder: Value(existing.length + 1),
       ),
     );
@@ -333,11 +392,11 @@ class _SectionHeader extends StatelessWidget {
   }
 }
 
-// --- Locus tile ---
+// --- Character tile (morphology) ---
 
 class _CharacterTile extends ConsumerWidget {
   const _CharacterTile({required this.character});
-  final LociData character;
+  final MorphologicalCharacter character;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -352,10 +411,192 @@ class _CharacterTile extends ConsumerWidget {
       trailing: IconButton(
         icon: const Icon(Icons.delete_outline, size: 16),
         onPressed: () async {
-          final dao = ref.read(locusDaoProvider);
+          final dao = ref.read(characterDaoProvider);
           await dao?.remove(character.id);
         },
         visualDensity: VisualDensity.compact,
+      ),
+    );
+  }
+}
+
+// --- Locus tile (genetics) ---
+
+class _LocusTile extends ConsumerWidget {
+  const _LocusTile({required this.locus});
+  final LociData locus;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return ListTile(
+      dense: true,
+      visualDensity: VisualDensity.compact,
+      title: Text(locus.name, style: const TextStyle(fontSize: 12)),
+      subtitle: Text(
+        '${locus.isContinuous ? 'Cont.' : 'Disc.'} · Dom: ${locus.dominantValue} · Rec: ${locus.recessiveValue} · Mut: ${locus.mutationRateDom}',
+        style: const TextStyle(fontSize: 10),
+      ),
+      onTap: () => _showEditDialog(context, ref),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconButton(
+            icon: const Icon(Icons.edit_outlined, size: 16),
+            onPressed: () => _showEditDialog(context, ref),
+            visualDensity: VisualDensity.compact,
+          ),
+          IconButton(
+            icon: const Icon(Icons.delete_outline, size: 16),
+            onPressed: () async {
+              final dao = ref.read(locusDaoProvider);
+              await dao?.remove(locus.id);
+            },
+            visualDensity: VisualDensity.compact,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _showEditDialog(BuildContext context, WidgetRef ref) async {
+    final nameCtrl = TextEditingController(text: locus.name);
+    final domCtrl = TextEditingController(text: '${locus.dominantValue}');
+    final recCtrl = TextEditingController(text: '${locus.recessiveValue}');
+    final mutRateDomCtrl = TextEditingController(
+      text: '${locus.mutationRateDom}',
+    );
+    final mutRateRecCtrl = TextEditingController(
+      text: '${locus.mutationRateRec}',
+    );
+    final mutRangeDomCtrl = TextEditingController(
+      text: '${locus.mutationRangeDom}',
+    );
+    final mutRangeRecCtrl = TextEditingController(
+      text: '${locus.mutationRangeRec}',
+    );
+
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('Edit Locus: ${locus.name}'),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: nameCtrl,
+                decoration: const InputDecoration(labelText: 'Name'),
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: domCtrl,
+                      decoration: const InputDecoration(
+                        labelText: 'Dominant value',
+                      ),
+                      keyboardType: TextInputType.number,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: TextField(
+                      controller: recCtrl,
+                      decoration: const InputDecoration(
+                        labelText: 'Recessive value',
+                      ),
+                      keyboardType: TextInputType.number,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: mutRateDomCtrl,
+                      decoration: const InputDecoration(
+                        labelText: 'Mutation rate (dom)',
+                      ),
+                      keyboardType: TextInputType.number,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: TextField(
+                      controller: mutRateRecCtrl,
+                      decoration: const InputDecoration(
+                        labelText: 'Mutation rate (rec)',
+                      ),
+                      keyboardType: TextInputType.number,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: mutRangeDomCtrl,
+                      decoration: const InputDecoration(
+                        labelText: 'Mutation range (dom)',
+                      ),
+                      keyboardType: TextInputType.number,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: TextField(
+                      controller: mutRangeRecCtrl,
+                      decoration: const InputDecoration(
+                        labelText: 'Mutation range (rec)',
+                      ),
+                      keyboardType: TextInputType.number,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+
+    if (result != true) return;
+
+    final db = ref.read(databaseProvider);
+    if (db == null) return;
+
+    await (db.update(db.loci)..where((t) => t.id.equals(locus.id))).write(
+      LociCompanion(
+        name: Value(nameCtrl.text.trim()),
+        dominantValue: Value(double.tryParse(domCtrl.text.trim()) ?? 0),
+        recessiveValue: Value(double.tryParse(recCtrl.text.trim()) ?? 0),
+        mutationRateDom: Value(
+          double.tryParse(mutRateDomCtrl.text.trim()) ?? 0,
+        ),
+        mutationRateRec: Value(
+          double.tryParse(mutRateRecCtrl.text.trim()) ?? 0,
+        ),
+        mutationRangeDom: Value(
+          double.tryParse(mutRangeDomCtrl.text.trim()) ?? 0,
+        ),
+        mutationRangeRec: Value(
+          double.tryParse(mutRangeRecCtrl.text.trim()) ?? 0,
+        ),
       ),
     );
   }

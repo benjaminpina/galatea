@@ -16,6 +16,7 @@ part 'database.g.dart';
     Substrates,
     SubstrateCompositions,
     Loci,
+    MorphologicalCharacters,
     Stages,
     StageNutrientRequirements,
     StageTendencies,
@@ -51,6 +52,7 @@ part 'database.g.dart';
     NutrientDao,
     SubstrateDao,
     LocusDao,
+    CharacterDao,
     StageDao,
     PrototypeDao,
     EnvironmentDao,
@@ -63,7 +65,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.memory() : super(NativeDatabase.memory());
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(

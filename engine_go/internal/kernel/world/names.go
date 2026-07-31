@@ -13,9 +13,13 @@ type Names struct {
 	// Used for variables like "ReserveWater", "MemoryLastPerWater", etc.
 	NutrientNames []string
 
-	// LocusNames: user-defined names for morphological characters / genetic loci.
-	// Used for variables like "BodySize" (morphology), "CLBodySize" (genetic expression).
+	// LocusNames: user-defined names for genetic loci.
+	// Used for variables like "CL_LocusName" (genetic expression).
 	LocusNames []string
+
+	// CharacterNames: user-defined names for morphological characters.
+	// Used for variables like "BodySize" (morphological value).
+	CharacterNames []string
 
 	// SubstrateNames: user-defined names for substrate types.
 	// Used for memory variables like "MemoryLastPerGrass".

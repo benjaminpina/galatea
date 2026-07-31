@@ -16,7 +16,8 @@ class ImportResult {
   ImportResult({this.imported = 0, this.skipped = 0, this.errors = const []});
 
   @override
-  String toString() => 'Imported: $imported, Skipped: $skipped'
+  String toString() =>
+      'Imported: $imported, Skipped: $skipped'
       '${errors.isNotEmpty ? ", Errors: ${errors.join(", ")}" : ""}';
 }
 
@@ -31,7 +32,9 @@ class JsonImporter {
   Future<ImportResult> importSubstrates(String filePath) async {
     final json = await _readJson(filePath);
     if (json['type'] != 'substrate_set') {
-      return ImportResult(errors: ['Invalid file type: expected substrate_set']);
+      return ImportResult(
+        errors: ['Invalid file type: expected substrate_set'],
+      );
     }
 
     final data = SubstrateSetExport.fromJson(json);
@@ -88,18 +91,20 @@ class JsonImporter {
         skipped++;
         continue;
       }
-      await dao.add(LociCompanion.insert(
-        name: locus.name,
-        isContinuous: Value(locus.isContinuous),
-        dominantValue: Value(locus.dominantValue),
-        recessiveValue: Value(locus.recessiveValue),
-        mutationRateDom: Value(locus.mutationRateDom),
-        mutationRateRec: Value(locus.mutationRateRec),
-        mutationRangeDom: Value(locus.mutationRangeDom),
-        mutationRangeRec: Value(locus.mutationRangeRec),
-        defaultExpression: Value(locus.defaultExpression),
-        sortOrder: Value(locus.sortOrder),
-      ));
+      await dao.add(
+        LociCompanion.insert(
+          name: locus.name,
+          isContinuous: Value(locus.isContinuous),
+          dominantValue: Value(locus.dominantValue),
+          recessiveValue: Value(locus.recessiveValue),
+          mutationRateDom: Value(locus.mutationRateDom),
+          mutationRateRec: Value(locus.mutationRateRec),
+          mutationRangeDom: Value(locus.mutationRangeDom),
+          mutationRangeRec: Value(locus.mutationRangeRec),
+
+          sortOrder: Value(locus.sortOrder),
+        ),
+      );
       imported++;
     }
 
@@ -110,7 +115,9 @@ class JsonImporter {
   Future<ImportResult> importPrototypes(String filePath) async {
     final json = await _readJson(filePath);
     if (json['type'] != 'prototype_set') {
-      return ImportResult(errors: ['Invalid file type: expected prototype_set']);
+      return ImportResult(
+        errors: ['Invalid file type: expected prototype_set'],
+      );
     }
 
     final data = PrototypeSetExport.fromJson(json);
@@ -126,17 +133,19 @@ class JsonImporter {
         skipped++;
         continue;
       }
-      await dao.add(PrototypesCompanion.insert(
-        name: proto.name,
-        sex: proto.sex,
-        color: Value(proto.color),
-        longevityFormula: Value(proto.longevityFormula),
-        refractoryCombatFormula: Value(proto.refractoryCombatFormula),
-        refractoryCourtshipFormula: Value(proto.refractoryCourtshipFormula),
-        sexRatioMalesFormula: Value(proto.sexRatioMalesFormula),
-        sexRatioFemalesFormula: Value(proto.sexRatioFemalesFormula),
-        sortOrder: Value(proto.sortOrder),
-      ));
+      await dao.add(
+        PrototypesCompanion.insert(
+          name: proto.name,
+          sex: proto.sex,
+          color: Value(proto.color),
+          longevityFormula: Value(proto.longevityFormula),
+          refractoryCombatFormula: Value(proto.refractoryCombatFormula),
+          refractoryCourtshipFormula: Value(proto.refractoryCourtshipFormula),
+          sexRatioMalesFormula: Value(proto.sexRatioMalesFormula),
+          sexRatioFemalesFormula: Value(proto.sexRatioFemalesFormula),
+          sortOrder: Value(proto.sortOrder),
+        ),
+      );
       imported++;
     }
 

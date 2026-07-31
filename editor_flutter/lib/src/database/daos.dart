@@ -146,6 +146,26 @@ class LocusDao extends DatabaseAccessor<AppDatabase> with _$LocusDaoMixin {
       (delete(loci)..where((t) => t.id.equals(id))).go();
 }
 
+@DriftAccessor(tables: [MorphologicalCharacters])
+class CharacterDao extends DatabaseAccessor<AppDatabase>
+    with _$CharacterDaoMixin {
+  CharacterDao(super.db);
+
+  Future<int> add(MorphologicalCharactersCompanion entry) =>
+      into(morphologicalCharacters).insert(entry);
+
+  Future<List<MorphologicalCharacter>> getAll() => (select(
+    morphologicalCharacters,
+  )..orderBy([(t) => OrderingTerm.asc(t.sortOrder)])).get();
+
+  Stream<List<MorphologicalCharacter>> watchAll() => (select(
+    morphologicalCharacters,
+  )..orderBy([(t) => OrderingTerm.asc(t.sortOrder)])).watch();
+
+  Future<void> remove(int id) =>
+      (delete(morphologicalCharacters)..where((t) => t.id.equals(id))).go();
+}
+
 @DriftAccessor(tables: [Stages])
 class StageDao extends DatabaseAccessor<AppDatabase> with _$StageDaoMixin {
   StageDao(super.db);

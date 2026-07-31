@@ -58,6 +58,22 @@ class LocusDaoManager {
       $$LociTableTableManager(_db.attachedDatabase, _db.loci);
 }
 
+mixin _$CharacterDaoMixin on DatabaseAccessor<AppDatabase> {
+  $MorphologicalCharactersTable get morphologicalCharacters =>
+      attachedDatabase.morphologicalCharacters;
+  CharacterDaoManager get managers => CharacterDaoManager(this);
+}
+
+class CharacterDaoManager {
+  final _$CharacterDaoMixin _db;
+  CharacterDaoManager(this._db);
+  $$MorphologicalCharactersTableTableManager get morphologicalCharacters =>
+      $$MorphologicalCharactersTableTableManager(
+        _db.attachedDatabase,
+        _db.morphologicalCharacters,
+      );
+}
+
 mixin _$StageDaoMixin on DatabaseAccessor<AppDatabase> {
   $StagesTable get stages => attachedDatabase.stages;
   StageDaoManager get managers => StageDaoManager(this);

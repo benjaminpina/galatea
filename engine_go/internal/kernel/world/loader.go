@@ -62,6 +62,13 @@ func loadConfig(db *storage.DB, environmentID int64) (Config, error) {
 	}
 	cfg.NumLoci = len(loci)
 
+	// Morphological characters.
+	characters, err := loadCharacterNames(db)
+	if err != nil {
+		return cfg, err
+	}
+	cfg.NumCharacters = len(characters)
+
 	// Stages.
 	stageRepo := storage.NewStageRepo(db)
 	stages, err := stageRepo.List()
@@ -123,6 +130,7 @@ func loadConfig(db *storage.DB, environmentID int64) (Config, error) {
 	for i, l := range loci {
 		cfg.Names.LocusNames[i] = l.Name
 	}
+	cfg.Names.CharacterNames = characters
 	cfg.Names.SubstrateNames = make([]string, len(substrates))
 	for i, s := range substrates {
 		cfg.Names.SubstrateNames[i] = s.Name
@@ -259,4 +267,24 @@ func loadAgents(db *storage.DB, w *World, environmentID int64) error {
 	}
 
 	return nil
+}
+
+// loadCharacterNames reads morphological character names from the DB.
+func loadCharacterNames(db *storage.DB) ([]string, error) {
+	rows, err := db.Conn.Query(
+		"SELECT name FROM morphological_characters ORDER BY sort_order, id")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var names []string
+	for rows.Next() {
+		var name string
+		if err := rows.Scan(&name); err != nil {
+			return nil, err
+		}
+		names = append(names, name)
+	}
+	return names, rows.Err()
 }

@@ -48,7 +48,7 @@ func (b *EnvBuilder) SetAgentVars(w *world.World, idx int) {
 		b.eval.SetInt(name, int(a.Reserves[reserveIdx]))
 	}
 
-	// --- Genetics: loci (named by character) ---
+	// --- Genetics: loci (named by locus) ---
 	for l := 0; l < cfg.NumLoci; l++ {
 		locusBase := idx*cfg.NumLoci*2 + l*2
 
@@ -65,6 +65,16 @@ func (b *EnvBuilder) SetAgentVars(w *world.World, idx int) {
 		)
 		dlName := locusVarName("DL", l, names.LocusNames)
 		b.eval.SetInt(dlName, expressedDisc)
+	}
+
+	// --- Morphology (fixed adult traits, named by character) ---
+	if a.MorphologyFixed[idx] {
+		for c := 0; c < cfg.NumCharacters; c++ {
+			morphBase := idx*cfg.NumCharacters + c
+			name := characterVarName(c, names.CharacterNames)
+			b.eval.SetFloat(name, a.MorphologyCont[morphBase])
+			b.eval.SetInt(name+"Disc", int(a.MorphologyDisc[morphBase]))
+		}
 	}
 
 	// --- Reproduction ---
@@ -119,16 +129,6 @@ func (b *EnvBuilder) SetAgentVars(w *world.World, idx int) {
 		b.eval.SetInt("MemoryLast"+name, int(a.MemoryLastBehavior[memBehaviorBase+bh]))
 		b.eval.SetInt("MemoryNum"+name, int(a.MemoryNumBehavior[memBehaviorBase+bh]))
 	}
-
-	// --- Morphology (fixed adult traits, named by character) ---
-	if a.MorphologyFixed[idx] {
-		for l := 0; l < cfg.NumLoci; l++ {
-			morphBase := idx*cfg.NumLoci + l
-			name := locusVarName("", l, names.LocusNames)
-			b.eval.SetFloat(name, a.MorphologyCont[morphBase])
-			b.eval.SetInt(name+"Disc", int(a.MorphologyDisc[morphBase]))
-		}
-	}
 }
 
 // SetContenderVars sets variables for the interacting opponent agent.
@@ -141,17 +141,17 @@ func (b *EnvBuilder) SetContenderVars(w *world.World, contenderIdx int) {
 	b.eval.Set("ContenderIsMale", a.Sex[contenderIdx] == world.SexMale)
 	b.eval.Set("ContenderIsFemale", a.Sex[contenderIdx] == world.SexFemale)
 
-	// Contender morphology
+	// Contender morphology (uses characters, not loci)
 	if a.MorphologyFixed[contenderIdx] {
-		for l := 0; l < cfg.NumLoci; l++ {
-			morphBase := contenderIdx*cfg.NumLoci + l
-			name := locusVarName("Contender", l, names.LocusNames)
-			b.eval.SetFloat(name, a.MorphologyCont[morphBase])
-			b.eval.SetInt(name+"Disc", int(a.MorphologyDisc[morphBase]))
+		for c := 0; c < cfg.NumCharacters; c++ {
+			morphBase := contenderIdx*cfg.NumCharacters + c
+			name := characterVarName(c, names.CharacterNames)
+			b.eval.SetFloat("Contender_"+name, a.MorphologyCont[morphBase])
+			b.eval.SetInt("Contender_"+name+"Disc", int(a.MorphologyDisc[morphBase]))
 		}
 	}
 
-	// Contender loci
+	// Contender loci (genetics)
 	for l := 0; l < cfg.NumLoci; l++ {
 		locusBase := contenderIdx*cfg.NumLoci*2 + l*2
 		expressed := expressLocusCont(
@@ -171,6 +171,14 @@ func (b *EnvBuilder) SetResourceVars(w *world.World, resourceIdx int) {
 }
 
 // --- Variable name helpers ---
+
+// characterVarName returns the character name or fallback "Char" + index.
+func characterVarName(idx int, charNames []string) string {
+	if idx < len(charNames) && charNames[idx] != "" {
+		return charNames[idx]
+	}
+	return "Char" + itoa(idx+1)
+}
 
 // nutrientVarName returns "prefix + NutrientName" or "prefix + (index+1)" as fallback.
 func nutrientVarName(prefix string, idx int, nutrientNames []string) string {
