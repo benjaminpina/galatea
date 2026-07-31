@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../database/database.dart';
 import '../../providers/database_provider.dart';
+import '../formula/formula_field.dart';
 
 /// Dedicated edit screen for a single prototype.
 /// Tabs: General, Morphology, Fighting, Courtship, Movement.
@@ -141,23 +142,25 @@ class _PrototypeEditScreenState extends ConsumerState<PrototypeEditScreen>
           decoration: const InputDecoration(labelText: 'Name'),
         ),
         const SizedBox(height: 12),
-        TextField(
-          controller: _longevityCtrl,
-          decoration: const InputDecoration(labelText: 'Longevity (formula)'),
+        FormulaField(
+          label: 'Longevity',
+          title: '${_nameCtrl.text} — Longevity',
+          value: _longevityCtrl.text,
+          onChanged: (v) => setState(() => _longevityCtrl.text = v),
         ),
         const SizedBox(height: 12),
-        TextField(
-          controller: _refCombatCtrl,
-          decoration: const InputDecoration(
-            labelText: 'Refractory combat (formula)',
-          ),
+        FormulaField(
+          label: 'Refractory combat',
+          title: '${_nameCtrl.text} — Refractory Combat',
+          value: _refCombatCtrl.text,
+          onChanged: (v) => setState(() => _refCombatCtrl.text = v),
         ),
         const SizedBox(height: 12),
-        TextField(
-          controller: _refCourtshipCtrl,
-          decoration: const InputDecoration(
-            labelText: 'Refractory courtship (formula)',
-          ),
+        FormulaField(
+          label: 'Refractory courtship',
+          title: '${_nameCtrl.text} — Refractory Courtship',
+          value: _refCourtshipCtrl.text,
+          onChanged: (v) => setState(() => _refCourtshipCtrl.text = v),
         ),
         if (isFemale) ...[
           const SizedBox(height: 24),
@@ -166,18 +169,18 @@ class _PrototypeEditScreenState extends ConsumerState<PrototypeEditScreen>
             style: Theme.of(context).textTheme.titleSmall,
           ),
           const SizedBox(height: 8),
-          TextField(
-            controller: _ratioMalesCtrl,
-            decoration: const InputDecoration(
-              labelText: 'Males proportion (formula)',
-            ),
+          FormulaField(
+            label: 'Males proportion',
+            title: '${_nameCtrl.text} — Males Proportion',
+            value: _ratioMalesCtrl.text,
+            onChanged: (v) => setState(() => _ratioMalesCtrl.text = v),
           ),
           const SizedBox(height: 12),
-          TextField(
-            controller: _ratioFemalesCtrl,
-            decoration: const InputDecoration(
-              labelText: 'Females proportion (formula)',
-            ),
+          FormulaField(
+            label: 'Females proportion',
+            title: '${_nameCtrl.text} — Females Proportion',
+            value: _ratioFemalesCtrl.text,
+            onChanged: (v) => setState(() => _ratioFemalesCtrl.text = v),
           ),
         ],
       ],
@@ -472,9 +475,11 @@ class _PrototypeEditScreenState extends ConsumerState<PrototypeEditScreen>
                       ),
                     ),
                     Expanded(
-                      child: _InlineFormula(
-                        initial: tendencies[dir] ?? '1',
-                        onSubmitted: (v) => _saveTendency(db, dir, v),
+                      child: FormulaField(
+                        label: directions[i],
+                        title: '${_nameCtrl.text} — Tendency ${directions[i]}',
+                        value: tendencies[dir] ?? '1',
+                        onChanged: (v) => _saveTendency(db, dir, v),
                       ),
                     ),
                   ],
@@ -547,34 +552,18 @@ class _MorphologyLocusRow extends StatelessWidget {
             style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 4),
-          Row(
-            children: [
-              const SizedBox(
-                width: 60,
-                child: Text('Genetic:', style: TextStyle(fontSize: 11)),
-              ),
-              Expanded(
-                child: _InlineFormula(
-                  initial: geneticFormula,
-                  onSubmitted: onGeneticChanged,
-                ),
-              ),
-            ],
+          FormulaField(
+            label: 'Genetic',
+            title: '$locusName — Genetic Expression',
+            value: geneticFormula,
+            onChanged: onGeneticChanged,
           ),
-          const SizedBox(height: 2),
-          Row(
-            children: [
-              const SizedBox(
-                width: 60,
-                child: Text('Environ:', style: TextStyle(fontSize: 11)),
-              ),
-              Expanded(
-                child: _InlineFormula(
-                  initial: environmentalFormula,
-                  onSubmitted: onEnvironmentalChanged,
-                ),
-              ),
-            ],
+          const SizedBox(height: 4),
+          FormulaField(
+            label: 'Environmental',
+            title: '$locusName — Environmental Expression',
+            value: environmentalFormula,
+            onChanged: onEnvironmentalChanged,
           ),
           const Divider(height: 12),
         ],

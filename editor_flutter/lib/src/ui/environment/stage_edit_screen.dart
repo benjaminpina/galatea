@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../database/database.dart';
 import '../../providers/database_provider.dart';
+import '../formula/formula_field.dart';
 
 /// Dedicated edit screen for a single life stage.
 /// Sections: General (cycles, conditions, logic, color, linked prototype),
@@ -136,11 +137,11 @@ class _StageEditScreenState extends ConsumerState<StageEditScreen> {
             decoration: const InputDecoration(labelText: 'Name'),
           ),
           const SizedBox(height: 12),
-          TextField(
-            controller: _cyclesCtrl,
-            decoration: const InputDecoration(
-              labelText: 'Duration cycles (formula)',
-            ),
+          FormulaField(
+            label: 'Duration cycles',
+            title: '${_nameCtrl.text} — Duration Cycles',
+            value: _cyclesCtrl.text,
+            onChanged: (v) => setState(() => _cyclesCtrl.text = v),
           ),
           const SizedBox(height: 24),
 
@@ -314,18 +315,20 @@ class _NutrientRequirementsSection extends ConsumerWidget {
                     child: Text(n.name, style: const TextStyle(fontSize: 12)),
                   ),
                   Expanded(
-                    child: _SmallField(
+                    child: FormulaField(
                       label: 'Requirement',
-                      initial: req?.requirementFormula ?? '0',
-                      onSubmitted: (v) => _save(db, n.id, requirement: v),
+                      title: '${n.name} — Requirement',
+                      value: req?.requirementFormula ?? '0',
+                      onChanged: (v) => _save(db, n.id, requirement: v),
                     ),
                   ),
                   const SizedBox(width: 8),
                   Expanded(
-                    child: _SmallField(
+                    child: FormulaField(
                       label: 'Cost',
-                      initial: req?.costFormula ?? '0',
-                      onSubmitted: (v) => _save(db, n.id, cost: v),
+                      title: '${n.name} — Cost',
+                      value: req?.costFormula ?? '0',
+                      onChanged: (v) => _save(db, n.id, cost: v),
                     ),
                   ),
                 ],
@@ -417,10 +420,11 @@ class _TendenciesSection extends ConsumerWidget {
                     ),
                   ),
                   Expanded(
-                    child: _SmallField(
-                      label: '',
-                      initial: tendMap[dir] ?? '1',
-                      onSubmitted: (v) => _save(db, dir, v),
+                    child: FormulaField(
+                      label: _dirs[i],
+                      title: 'Tendency ${_dirs[i]}',
+                      value: tendMap[dir] ?? '1',
+                      onChanged: (v) => _save(db, dir, v),
                     ),
                   ),
                 ],
