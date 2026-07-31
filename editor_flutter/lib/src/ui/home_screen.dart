@@ -162,6 +162,10 @@ class HomeScreen extends ConsumerWidget {
     final service = ref.read(recentProjectsServiceProvider);
     final lastDir = service.getLastDirectory();
 
+    // Let the previous modal dialog fully close before opening the native picker.
+    await Future<void>.delayed(const Duration(milliseconds: 150));
+    if (!context.mounted) return;
+
     final dirPath = await FilePicker.platform.getDirectoryPath(
       dialogTitle: 'Select directory to save project',
       initialDirectory: lastDir,
@@ -198,6 +202,9 @@ class HomeScreen extends ConsumerWidget {
   Future<void> _openExistingProject(BuildContext context, WidgetRef ref) async {
     final service = ref.read(recentProjectsServiceProvider);
     final lastDir = service.getLastDirectory();
+
+    await Future<void>.delayed(const Duration(milliseconds: 150));
+    if (!context.mounted) return;
 
     final result = await FilePicker.platform.pickFiles(
       dialogTitle: 'Open project database',
