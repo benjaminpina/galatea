@@ -11,12 +11,11 @@ import 'environment_canvas.dart';
 import 'left_sidebar.dart';
 import '../nutrients/nutrient_list_screen.dart';
 import '../substrates/substrate_list_screen.dart';
-import '../genetics/loci_list_screen.dart';
-import '../ontogeny/stage_list_screen.dart';
-import '../prototypes/prototype_list_screen.dart';
+import 'agents_panel.dart';
+import 'physiology_panel.dart';
 
 /// Which configuration section is open in the right panel.
-enum ConfigSection { nutrients, substrates, genetics, stages, prototypes }
+enum ConfigSection { substrates, nutrients, agents, physiology }
 
 /// Unified environment editor — the main working screen.
 ///
@@ -960,22 +959,16 @@ class _EnvironmentEditorScreenState
             onTap: () => _toggleConfig(ConfigSection.nutrients),
           ),
           _BarButton(
-            icon: Icons.biotech,
-            label: 'Genetics',
-            active: _openSection == ConfigSection.genetics,
-            onTap: () => _toggleConfig(ConfigSection.genetics),
+            icon: Icons.pest_control,
+            label: 'Agents',
+            active: _openSection == ConfigSection.agents,
+            onTap: () => _toggleConfig(ConfigSection.agents),
           ),
           _BarButton(
-            icon: Icons.timeline,
-            label: 'Stages',
-            active: _openSection == ConfigSection.stages,
-            onTap: () => _toggleConfig(ConfigSection.stages),
-          ),
-          _BarButton(
-            icon: Icons.person,
-            label: 'Prototypes',
-            active: _openSection == ConfigSection.prototypes,
-            onTap: () => _toggleConfig(ConfigSection.prototypes),
+            icon: Icons.monitor_heart_outlined,
+            label: 'Physiology',
+            active: _openSection == ConfigSection.physiology,
+            onTap: () => _toggleConfig(ConfigSection.physiology),
           ),
           const Spacer(),
           // Environment selector.
@@ -1030,11 +1023,10 @@ class _EnvironmentEditorScreenState
   /// Right panel content based on the selected config section.
   Widget _buildConfigPanel() {
     return switch (_openSection!) {
-      ConfigSection.nutrients => const NutrientListScreen(embedded: true),
       ConfigSection.substrates => const SubstrateListScreen(embedded: true),
-      ConfigSection.genetics => const LociListScreen(embedded: true),
-      ConfigSection.stages => const StageListScreen(embedded: true),
-      ConfigSection.prototypes => const PrototypeListScreen(embedded: true),
+      ConfigSection.nutrients => const NutrientListScreen(embedded: true),
+      ConfigSection.agents => const AgentsPanel(),
+      ConfigSection.physiology => const PhysiologyPanel(),
     };
   }
 

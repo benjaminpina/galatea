@@ -1,0 +1,386 @@
+import 'package:drift/drift.dart' hide Column;
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../database/database.dart';
+import '../../providers/database_provider.dart';
+
+/// Right panel for Physiology configuration:
+/// - Metabolism (levels per nutrient)
+/// - Behavior costs
+/// - Feeding gains
+/// - Substrate velocities
+class PhysiologyPanel extends ConsumerWidget {
+  const PhysiologyPanel({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final nutrients = ref.watch(nutrientsProvider).valueOrNull ?? [];
+    final substrates = ref.watch(substratesProvider).valueOrNull ?? [];
+
+    return ListView(
+      padding: const EdgeInsets.all(12),
+      children: [
+        // --- Metabolism ---
+        _SectionTitle(title: 'Metabolism', icon: Icons.monitor_heart_outlined),
+        const SizedBox(height: 4),
+        if (nutrients.isEmpty)
+          _hint('Define nutrients first to configure metabolism.')
+        else
+          ...nutrients.map((n) => _MetabolismTile(nutrient: n)),
+        const SizedBox(height: 16),
+
+        // --- Feeding Gains ---
+        _SectionTitle(title: 'Feeding Gains', icon: Icons.restaurant),
+        const SizedBox(height: 4),
+        if (nutrients.isEmpty)
+          _hint('Define nutrients first.')
+        else
+          ...nutrients.map((n) => _FeedingGainTile(nutrient: n)),
+        const SizedBox(height: 16),
+
+        // --- Substrate Velocities ---
+        _SectionTitle(title: 'Substrate Velocities', icon: Icons.speed),
+        const SizedBox(height: 4),
+        if (substrates.isEmpty)
+          _hint('Define substrates first.')
+        else
+          ...substrates.map((s) => _VelocityTile(substrate: s)),
+        const SizedBox(height: 16),
+
+        // --- Behavior Costs ---
+        _SectionTitle(title: 'Behavior Costs', icon: Icons.fitness_center),
+        const SizedBox(height: 4),
+        _hint(
+          'Behavior costs per nutrient are configured per behavior type '
+          '(movement, feeding, combat, courtship, oviposition). '
+          'Full editor coming in a future update.',
+        ),
+        const SizedBox(height: 16),
+
+        // --- Reproduction ---
+        _SectionTitle(title: 'Reproduction', icon: Icons.child_care),
+        const SizedBox(height: 4),
+        _hint(
+          'Reproduction parameters (max eggs, sperm packs, transfer rates, etc.) '
+          'are configured here. Full editor coming in a future update.',
+        ),
+      ],
+    );
+  }
+
+  Widget _hint(String text) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
+      child: Text(text, style: const TextStyle(fontSize: 11, color: Colors.grey)),
+    );
+  }
+}
+
+class _SectionTitle extends StatelessWidget {
+  const _SectionTitle({required this.title, required this.icon});
+  final String title;
+  final IconData icon;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Icon(icon, size: 16, color: Theme.of(context).colorScheme.primary),
+        const SizedBox(width: 6),
+        Text(title, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+      ],
+    );
+  }
+}
+
+/// Editable metabolism levels for a nutrient.
+class _MetabolismTile extends ConsumerStatefulWidget {
+  const _MetabolismTile({required this.nutrient});
+  final Nutrient nutrient;
+
+  @override
+  ConsumerState<_MetabolismTile> createState() => _MetabolismTileState();
+}
+
+class _MetabolismTileState extends ConsumerState<_MetabolismTile> {
+  bool _expanded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 2),
+      child: Column(
+        children: [
+          ListTile(
+            dense: true,
+            visualDensity: VisualDensity.compact,
+            leading: Container(
+              width: 12, height: 12,
+              decoration: BoxDecoration(
+                color: Color(widget.nutrient.color),
+                shape: BoxShape.circle,
+              ),
+            ),
+            title: Text(widget.nutrient.name, style: const TextStyle(fontSize: 12)),
+            trailing: Icon(
+              _expanded ? Icons.expand_less : Icons.expand_more, size: 18,
+            ),
+            onTap: () => setState(() => _expanded = !_expanded),
+          ),
+          if (_expanded) _buildFields(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFields() {
+    // Read current metabolism from DB (or show defaults).
+    final db = ref.read(databaseProvider);
+    if (db == null) return const SizedBox.shrink();
+
+    return FutureBuilder<MetabolismData?>(
+      future: (db.select(db.metabolism)
+            ..where((t) => t.nutrientId.equals(widget.nutrient.id)))
+          .getSingleOrNull(),
+      builder: (context, snapshot) {
+        final data = snapshot.data;
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+          child: Column(
+            children: [
+              _FormulaField(label: 'Min', initial: data?.minFormula ?? '0',
+                onSaved: (v) => _save(db, min: v)),
+              _FormulaField(label: 'Critical', initial: data?.criticalFormula ?? '10',
+                onSaved: (v) => _save(db, critical: v)),
+              _FormulaField(label: 'Optimal', initial: data?.optimalFormula ?? '50',
+                onSaved: (v) => _save(db, optimal: v)),
+              _FormulaField(label: 'Initial', initial: data?.initialFormula ?? '50',
+                onSaved: (v) => _save(db, initial: v)),
+              _FormulaField(label: 'Max', initial: data?.maxFormula ?? '100',
+                onSaved: (v) => _save(db, max: v)),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _save(AppDatabase db, {
+    String? min, String? critical, String? optimal, String? initial, String? max,
+  }) async {
+    final existing = await (db.select(db.metabolism)
+          ..where((t) => t.nutrientId.equals(widget.nutrient.id)))
+        .getSingleOrNull();
+
+    if (existing == null) {
+      await db.into(db.metabolism).insert(MetabolismCompanion.insert(
+        nutrientId: widget.nutrient.id,
+        minFormula: Value(min ?? '0'),
+        criticalFormula: Value(critical ?? '10'),
+        optimalFormula: Value(optimal ?? '50'),
+        initialFormula: Value(initial ?? '50'),
+        maxFormula: Value(max ?? '100'),
+      ));
+    } else {
+      await (db.update(db.metabolism)..where((t) => t.nutrientId.equals(widget.nutrient.id)))
+          .write(MetabolismCompanion(
+        minFormula: min != null ? Value(min) : const Value.absent(),
+        criticalFormula: critical != null ? Value(critical) : const Value.absent(),
+        optimalFormula: optimal != null ? Value(optimal) : const Value.absent(),
+        initialFormula: initial != null ? Value(initial) : const Value.absent(),
+        maxFormula: max != null ? Value(max) : const Value.absent(),
+      ));
+    }
+  }
+}
+
+/// Editable feeding gain for a nutrient.
+class _FeedingGainTile extends ConsumerWidget {
+  const _FeedingGainTile({required this.nutrient});
+  final Nutrient nutrient;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final db = ref.read(databaseProvider);
+    if (db == null) return const SizedBox.shrink();
+
+    return FutureBuilder<FeedingGain?>(
+      future: (db.select(db.feedingGains)
+            ..where((t) => t.nutrientId.equals(nutrient.id)))
+          .getSingleOrNull(),
+      builder: (context, snapshot) {
+        final gain = snapshot.data?.gainFormula ?? '10';
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 2),
+          child: Row(
+            children: [
+              Container(width: 10, height: 10,
+                decoration: BoxDecoration(color: Color(nutrient.color), shape: BoxShape.circle)),
+              const SizedBox(width: 8),
+              SizedBox(width: 60, child: Text(nutrient.name, style: const TextStyle(fontSize: 11))),
+              Expanded(
+                child: _InlineFormulaField(
+                  initial: gain,
+                  onSubmitted: (v) async {
+                    final existing = await (db.select(db.feedingGains)
+                          ..where((t) => t.nutrientId.equals(nutrient.id)))
+                        .getSingleOrNull();
+                    if (existing == null) {
+                      await db.into(db.feedingGains).insert(
+                        FeedingGainsCompanion.insert(nutrientId: nutrient.id, gainFormula: Value(v)));
+                    } else {
+                      await (db.update(db.feedingGains)..where((t) => t.nutrientId.equals(nutrient.id)))
+                          .write(FeedingGainsCompanion(gainFormula: Value(v)));
+                    }
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+/// Editable velocity for a substrate.
+class _VelocityTile extends ConsumerWidget {
+  const _VelocityTile({required this.substrate});
+  final Substrate substrate;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final db = ref.read(databaseProvider);
+    if (db == null) return const SizedBox.shrink();
+
+    return FutureBuilder<SubstrateVelocity?>(
+      future: (db.select(db.substrateVelocities)
+            ..where((t) => t.substrateId.equals(substrate.id)))
+          .getSingleOrNull(),
+      builder: (context, snapshot) {
+        final vel = snapshot.data?.velocityFormula ?? '1';
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 2),
+          child: Row(
+            children: [
+              Container(width: 10, height: 10,
+                decoration: BoxDecoration(color: Color(substrate.color), borderRadius: BorderRadius.circular(2))),
+              const SizedBox(width: 8),
+              SizedBox(width: 60, child: Text(substrate.name, style: const TextStyle(fontSize: 11), overflow: TextOverflow.ellipsis)),
+              Expanded(
+                child: _InlineFormulaField(
+                  initial: vel,
+                  onSubmitted: (v) async {
+                    final existing = await (db.select(db.substrateVelocities)
+                          ..where((t) => t.substrateId.equals(substrate.id)))
+                        .getSingleOrNull();
+                    if (existing == null) {
+                      await db.into(db.substrateVelocities).insert(
+                        SubstrateVelocitiesCompanion.insert(substrateId: substrate.id, velocityFormula: Value(v)));
+                    } else {
+                      await (db.update(db.substrateVelocities)..where((t) => t.substrateId.equals(substrate.id)))
+                          .write(SubstrateVelocitiesCompanion(velocityFormula: Value(v)));
+                    }
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+// --- Helper widgets ---
+
+class _FormulaField extends StatefulWidget {
+  const _FormulaField({required this.label, required this.initial, required this.onSaved});
+  final String label;
+  final String initial;
+  final ValueChanged<String> onSaved;
+
+  @override
+  State<_FormulaField> createState() => _FormulaFieldState();
+}
+
+class _FormulaFieldState extends State<_FormulaField> {
+  late final TextEditingController _ctrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = TextEditingController(text: widget.initial);
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2),
+      child: Row(
+        children: [
+          SizedBox(width: 55, child: Text(widget.label, style: const TextStyle(fontSize: 11))),
+          Expanded(
+            child: TextField(
+              controller: _ctrl,
+              style: const TextStyle(fontSize: 11),
+              decoration: const InputDecoration(
+                isDense: true,
+                contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                border: OutlineInputBorder(),
+              ),
+              onSubmitted: widget.onSaved,
+              onEditingComplete: () => widget.onSaved(_ctrl.text),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _InlineFormulaField extends StatefulWidget {
+  const _InlineFormulaField({required this.initial, required this.onSubmitted});
+  final String initial;
+  final ValueChanged<String> onSubmitted;
+
+  @override
+  State<_InlineFormulaField> createState() => _InlineFormulaFieldState();
+}
+
+class _InlineFormulaFieldState extends State<_InlineFormulaField> {
+  late final TextEditingController _ctrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = TextEditingController(text: widget.initial);
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return TextField(
+      controller: _ctrl,
+      style: const TextStyle(fontSize: 11),
+      decoration: const InputDecoration(
+        isDense: true,
+        contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+        border: OutlineInputBorder(),
+      ),
+      onSubmitted: widget.onSubmitted,
+    );
+  }
+}
