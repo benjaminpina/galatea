@@ -191,13 +191,13 @@ class _PrototypeEditScreenState extends ConsumerState<PrototypeEditScreen>
     final db = ref.read(databaseProvider);
     if (db == null) return const SizedBox.shrink();
 
-    return FutureBuilder<List<LociData>>(
+    return FutureBuilder<List<MorphologicalCharacter>>(
       future: (db.select(
-        db.loci,
+        db.morphologicalCharacters,
       )..orderBy([(t) => OrderingTerm.asc(t.sortOrder)])).get(),
       builder: (context, snapshot) {
-        final loci = snapshot.data ?? [];
-        if (loci.isEmpty) {
+        final chars = snapshot.data ?? [];
+        if (chars.isEmpty) {
           return Center(
             child: Padding(
               padding: const EdgeInsets.all(24),
@@ -238,17 +238,17 @@ class _PrototypeEditScreenState extends ConsumerState<PrototypeEditScreen>
                   style: Theme.of(context).textTheme.bodySmall,
                 ),
                 const SizedBox(height: 12),
-                ...loci.map((l) {
-                  final m = morphMap[l.id];
+                ...chars.map((c) {
+                  final m = morphMap[c.id];
                   return _MorphologyLocusRow(
-                    locusName: l.name,
-                    isContinuous: l.isContinuous,
-                    geneticFormula: m?.geneticFormula ?? '0',
+                    locusName: c.name,
+                    isContinuous: c.isContinuous,
+                    geneticFormula: m?.geneticFormula ?? c.defaultExpression,
                     environmentalFormula: m?.environmentalFormula ?? '0',
                     onGeneticChanged: (v) =>
-                        _saveMorphology(db, l.id, genetic: v),
+                        _saveMorphology(db, c.id, genetic: v),
                     onEnvironmentalChanged: (v) =>
-                        _saveMorphology(db, l.id, environmental: v),
+                        _saveMorphology(db, c.id, environmental: v),
                   );
                 }),
               ],
@@ -316,13 +316,16 @@ class _PrototypeEditScreenState extends ConsumerState<PrototypeEditScreen>
 
     final db = ref.read(databaseProvider);
     if (db == null) return;
-    final existing = await (db.select(db.loci)).get();
+    final existing = await (db.select(db.morphologicalCharacters)).get();
     await db
-        .into(db.loci)
+        .into(db.morphologicalCharacters)
         .insert(
-          LociCompanion.insert(
+          MorphologicalCharactersCompanion.insert(
             name: name,
             isContinuous: Value(isContinuous),
+            defaultExpression: Value(
+              defaultCtrl.text.trim().isEmpty ? '0' : defaultCtrl.text.trim(),
+            ),
             sortOrder: Value(existing.length + 1),
           ),
         );
