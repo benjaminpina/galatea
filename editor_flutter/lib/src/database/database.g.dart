@@ -2841,6 +2841,691 @@ class StagesCompanion extends UpdateCompanion<Stage> {
   }
 }
 
+class $StageNutrientRequirementsTable extends StageNutrientRequirements
+    with TableInfo<$StageNutrientRequirementsTable, StageNutrientRequirement> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $StageNutrientRequirementsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _stageIdMeta = const VerificationMeta(
+    'stageId',
+  );
+  @override
+  late final GeneratedColumn<int> stageId = GeneratedColumn<int>(
+    'stage_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES stages (id)',
+    ),
+  );
+  static const VerificationMeta _nutrientIdMeta = const VerificationMeta(
+    'nutrientId',
+  );
+  @override
+  late final GeneratedColumn<int> nutrientId = GeneratedColumn<int>(
+    'nutrient_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES nutrients (id)',
+    ),
+  );
+  static const VerificationMeta _requirementFormulaMeta =
+      const VerificationMeta('requirementFormula');
+  @override
+  late final GeneratedColumn<String> requirementFormula =
+      GeneratedColumn<String>(
+        'requirement_formula',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultValue: const Constant('0'),
+      );
+  static const VerificationMeta _costFormulaMeta = const VerificationMeta(
+    'costFormula',
+  );
+  @override
+  late final GeneratedColumn<String> costFormula = GeneratedColumn<String>(
+    'cost_formula',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('0'),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    stageId,
+    nutrientId,
+    requirementFormula,
+    costFormula,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'stage_nutrient_requirements';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<StageNutrientRequirement> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('stage_id')) {
+      context.handle(
+        _stageIdMeta,
+        stageId.isAcceptableOrUnknown(data['stage_id']!, _stageIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_stageIdMeta);
+    }
+    if (data.containsKey('nutrient_id')) {
+      context.handle(
+        _nutrientIdMeta,
+        nutrientId.isAcceptableOrUnknown(data['nutrient_id']!, _nutrientIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nutrientIdMeta);
+    }
+    if (data.containsKey('requirement_formula')) {
+      context.handle(
+        _requirementFormulaMeta,
+        requirementFormula.isAcceptableOrUnknown(
+          data['requirement_formula']!,
+          _requirementFormulaMeta,
+        ),
+      );
+    }
+    if (data.containsKey('cost_formula')) {
+      context.handle(
+        _costFormulaMeta,
+        costFormula.isAcceptableOrUnknown(
+          data['cost_formula']!,
+          _costFormulaMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  List<Set<GeneratedColumn>> get uniqueKeys => [
+    {stageId, nutrientId},
+  ];
+  @override
+  StageNutrientRequirement map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return StageNutrientRequirement(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      stageId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}stage_id'],
+      )!,
+      nutrientId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}nutrient_id'],
+      )!,
+      requirementFormula: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}requirement_formula'],
+      )!,
+      costFormula: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}cost_formula'],
+      )!,
+    );
+  }
+
+  @override
+  $StageNutrientRequirementsTable createAlias(String alias) {
+    return $StageNutrientRequirementsTable(attachedDatabase, alias);
+  }
+}
+
+class StageNutrientRequirement extends DataClass
+    implements Insertable<StageNutrientRequirement> {
+  final int id;
+  final int stageId;
+  final int nutrientId;
+  final String requirementFormula;
+  final String costFormula;
+  const StageNutrientRequirement({
+    required this.id,
+    required this.stageId,
+    required this.nutrientId,
+    required this.requirementFormula,
+    required this.costFormula,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['stage_id'] = Variable<int>(stageId);
+    map['nutrient_id'] = Variable<int>(nutrientId);
+    map['requirement_formula'] = Variable<String>(requirementFormula);
+    map['cost_formula'] = Variable<String>(costFormula);
+    return map;
+  }
+
+  StageNutrientRequirementsCompanion toCompanion(bool nullToAbsent) {
+    return StageNutrientRequirementsCompanion(
+      id: Value(id),
+      stageId: Value(stageId),
+      nutrientId: Value(nutrientId),
+      requirementFormula: Value(requirementFormula),
+      costFormula: Value(costFormula),
+    );
+  }
+
+  factory StageNutrientRequirement.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return StageNutrientRequirement(
+      id: serializer.fromJson<int>(json['id']),
+      stageId: serializer.fromJson<int>(json['stageId']),
+      nutrientId: serializer.fromJson<int>(json['nutrientId']),
+      requirementFormula: serializer.fromJson<String>(
+        json['requirementFormula'],
+      ),
+      costFormula: serializer.fromJson<String>(json['costFormula']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'stageId': serializer.toJson<int>(stageId),
+      'nutrientId': serializer.toJson<int>(nutrientId),
+      'requirementFormula': serializer.toJson<String>(requirementFormula),
+      'costFormula': serializer.toJson<String>(costFormula),
+    };
+  }
+
+  StageNutrientRequirement copyWith({
+    int? id,
+    int? stageId,
+    int? nutrientId,
+    String? requirementFormula,
+    String? costFormula,
+  }) => StageNutrientRequirement(
+    id: id ?? this.id,
+    stageId: stageId ?? this.stageId,
+    nutrientId: nutrientId ?? this.nutrientId,
+    requirementFormula: requirementFormula ?? this.requirementFormula,
+    costFormula: costFormula ?? this.costFormula,
+  );
+  StageNutrientRequirement copyWithCompanion(
+    StageNutrientRequirementsCompanion data,
+  ) {
+    return StageNutrientRequirement(
+      id: data.id.present ? data.id.value : this.id,
+      stageId: data.stageId.present ? data.stageId.value : this.stageId,
+      nutrientId: data.nutrientId.present
+          ? data.nutrientId.value
+          : this.nutrientId,
+      requirementFormula: data.requirementFormula.present
+          ? data.requirementFormula.value
+          : this.requirementFormula,
+      costFormula: data.costFormula.present
+          ? data.costFormula.value
+          : this.costFormula,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('StageNutrientRequirement(')
+          ..write('id: $id, ')
+          ..write('stageId: $stageId, ')
+          ..write('nutrientId: $nutrientId, ')
+          ..write('requirementFormula: $requirementFormula, ')
+          ..write('costFormula: $costFormula')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, stageId, nutrientId, requirementFormula, costFormula);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is StageNutrientRequirement &&
+          other.id == this.id &&
+          other.stageId == this.stageId &&
+          other.nutrientId == this.nutrientId &&
+          other.requirementFormula == this.requirementFormula &&
+          other.costFormula == this.costFormula);
+}
+
+class StageNutrientRequirementsCompanion
+    extends UpdateCompanion<StageNutrientRequirement> {
+  final Value<int> id;
+  final Value<int> stageId;
+  final Value<int> nutrientId;
+  final Value<String> requirementFormula;
+  final Value<String> costFormula;
+  const StageNutrientRequirementsCompanion({
+    this.id = const Value.absent(),
+    this.stageId = const Value.absent(),
+    this.nutrientId = const Value.absent(),
+    this.requirementFormula = const Value.absent(),
+    this.costFormula = const Value.absent(),
+  });
+  StageNutrientRequirementsCompanion.insert({
+    this.id = const Value.absent(),
+    required int stageId,
+    required int nutrientId,
+    this.requirementFormula = const Value.absent(),
+    this.costFormula = const Value.absent(),
+  }) : stageId = Value(stageId),
+       nutrientId = Value(nutrientId);
+  static Insertable<StageNutrientRequirement> custom({
+    Expression<int>? id,
+    Expression<int>? stageId,
+    Expression<int>? nutrientId,
+    Expression<String>? requirementFormula,
+    Expression<String>? costFormula,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (stageId != null) 'stage_id': stageId,
+      if (nutrientId != null) 'nutrient_id': nutrientId,
+      if (requirementFormula != null) 'requirement_formula': requirementFormula,
+      if (costFormula != null) 'cost_formula': costFormula,
+    });
+  }
+
+  StageNutrientRequirementsCompanion copyWith({
+    Value<int>? id,
+    Value<int>? stageId,
+    Value<int>? nutrientId,
+    Value<String>? requirementFormula,
+    Value<String>? costFormula,
+  }) {
+    return StageNutrientRequirementsCompanion(
+      id: id ?? this.id,
+      stageId: stageId ?? this.stageId,
+      nutrientId: nutrientId ?? this.nutrientId,
+      requirementFormula: requirementFormula ?? this.requirementFormula,
+      costFormula: costFormula ?? this.costFormula,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (stageId.present) {
+      map['stage_id'] = Variable<int>(stageId.value);
+    }
+    if (nutrientId.present) {
+      map['nutrient_id'] = Variable<int>(nutrientId.value);
+    }
+    if (requirementFormula.present) {
+      map['requirement_formula'] = Variable<String>(requirementFormula.value);
+    }
+    if (costFormula.present) {
+      map['cost_formula'] = Variable<String>(costFormula.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('StageNutrientRequirementsCompanion(')
+          ..write('id: $id, ')
+          ..write('stageId: $stageId, ')
+          ..write('nutrientId: $nutrientId, ')
+          ..write('requirementFormula: $requirementFormula, ')
+          ..write('costFormula: $costFormula')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $StageTendenciesTable extends StageTendencies
+    with TableInfo<$StageTendenciesTable, StageTendency> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $StageTendenciesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _stageIdMeta = const VerificationMeta(
+    'stageId',
+  );
+  @override
+  late final GeneratedColumn<int> stageId = GeneratedColumn<int>(
+    'stage_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES stages (id)',
+    ),
+  );
+  static const VerificationMeta _directionMeta = const VerificationMeta(
+    'direction',
+  );
+  @override
+  late final GeneratedColumn<int> direction = GeneratedColumn<int>(
+    'direction',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _formulaMeta = const VerificationMeta(
+    'formula',
+  );
+  @override
+  late final GeneratedColumn<String> formula = GeneratedColumn<String>(
+    'formula',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('1'),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, stageId, direction, formula];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'stage_tendencies';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<StageTendency> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('stage_id')) {
+      context.handle(
+        _stageIdMeta,
+        stageId.isAcceptableOrUnknown(data['stage_id']!, _stageIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_stageIdMeta);
+    }
+    if (data.containsKey('direction')) {
+      context.handle(
+        _directionMeta,
+        direction.isAcceptableOrUnknown(data['direction']!, _directionMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_directionMeta);
+    }
+    if (data.containsKey('formula')) {
+      context.handle(
+        _formulaMeta,
+        formula.isAcceptableOrUnknown(data['formula']!, _formulaMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  List<Set<GeneratedColumn>> get uniqueKeys => [
+    {stageId, direction},
+  ];
+  @override
+  StageTendency map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return StageTendency(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      stageId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}stage_id'],
+      )!,
+      direction: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}direction'],
+      )!,
+      formula: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}formula'],
+      )!,
+    );
+  }
+
+  @override
+  $StageTendenciesTable createAlias(String alias) {
+    return $StageTendenciesTable(attachedDatabase, alias);
+  }
+}
+
+class StageTendency extends DataClass implements Insertable<StageTendency> {
+  final int id;
+  final int stageId;
+  final int direction;
+  final String formula;
+  const StageTendency({
+    required this.id,
+    required this.stageId,
+    required this.direction,
+    required this.formula,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['stage_id'] = Variable<int>(stageId);
+    map['direction'] = Variable<int>(direction);
+    map['formula'] = Variable<String>(formula);
+    return map;
+  }
+
+  StageTendenciesCompanion toCompanion(bool nullToAbsent) {
+    return StageTendenciesCompanion(
+      id: Value(id),
+      stageId: Value(stageId),
+      direction: Value(direction),
+      formula: Value(formula),
+    );
+  }
+
+  factory StageTendency.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return StageTendency(
+      id: serializer.fromJson<int>(json['id']),
+      stageId: serializer.fromJson<int>(json['stageId']),
+      direction: serializer.fromJson<int>(json['direction']),
+      formula: serializer.fromJson<String>(json['formula']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'stageId': serializer.toJson<int>(stageId),
+      'direction': serializer.toJson<int>(direction),
+      'formula': serializer.toJson<String>(formula),
+    };
+  }
+
+  StageTendency copyWith({
+    int? id,
+    int? stageId,
+    int? direction,
+    String? formula,
+  }) => StageTendency(
+    id: id ?? this.id,
+    stageId: stageId ?? this.stageId,
+    direction: direction ?? this.direction,
+    formula: formula ?? this.formula,
+  );
+  StageTendency copyWithCompanion(StageTendenciesCompanion data) {
+    return StageTendency(
+      id: data.id.present ? data.id.value : this.id,
+      stageId: data.stageId.present ? data.stageId.value : this.stageId,
+      direction: data.direction.present ? data.direction.value : this.direction,
+      formula: data.formula.present ? data.formula.value : this.formula,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('StageTendency(')
+          ..write('id: $id, ')
+          ..write('stageId: $stageId, ')
+          ..write('direction: $direction, ')
+          ..write('formula: $formula')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, stageId, direction, formula);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is StageTendency &&
+          other.id == this.id &&
+          other.stageId == this.stageId &&
+          other.direction == this.direction &&
+          other.formula == this.formula);
+}
+
+class StageTendenciesCompanion extends UpdateCompanion<StageTendency> {
+  final Value<int> id;
+  final Value<int> stageId;
+  final Value<int> direction;
+  final Value<String> formula;
+  const StageTendenciesCompanion({
+    this.id = const Value.absent(),
+    this.stageId = const Value.absent(),
+    this.direction = const Value.absent(),
+    this.formula = const Value.absent(),
+  });
+  StageTendenciesCompanion.insert({
+    this.id = const Value.absent(),
+    required int stageId,
+    required int direction,
+    this.formula = const Value.absent(),
+  }) : stageId = Value(stageId),
+       direction = Value(direction);
+  static Insertable<StageTendency> custom({
+    Expression<int>? id,
+    Expression<int>? stageId,
+    Expression<int>? direction,
+    Expression<String>? formula,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (stageId != null) 'stage_id': stageId,
+      if (direction != null) 'direction': direction,
+      if (formula != null) 'formula': formula,
+    });
+  }
+
+  StageTendenciesCompanion copyWith({
+    Value<int>? id,
+    Value<int>? stageId,
+    Value<int>? direction,
+    Value<String>? formula,
+  }) {
+    return StageTendenciesCompanion(
+      id: id ?? this.id,
+      stageId: stageId ?? this.stageId,
+      direction: direction ?? this.direction,
+      formula: formula ?? this.formula,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (stageId.present) {
+      map['stage_id'] = Variable<int>(stageId.value);
+    }
+    if (direction.present) {
+      map['direction'] = Variable<int>(direction.value);
+    }
+    if (formula.present) {
+      map['formula'] = Variable<String>(formula.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('StageTendenciesCompanion(')
+          ..write('id: $id, ')
+          ..write('stageId: $stageId, ')
+          ..write('direction: $direction, ')
+          ..write('formula: $formula')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $PrototypesTable extends Prototypes
     with TableInfo<$PrototypesTable, Prototype> {
   @override
@@ -3476,6 +4161,1856 @@ class PrototypesCompanion extends UpdateCompanion<Prototype> {
           ..write('sexRatioMalesFormula: $sexRatioMalesFormula, ')
           ..write('sexRatioFemalesFormula: $sexRatioFemalesFormula, ')
           ..write('sortOrder: $sortOrder')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $PrototypeMorphologyTable extends PrototypeMorphology
+    with TableInfo<$PrototypeMorphologyTable, PrototypeMorphologyData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $PrototypeMorphologyTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _prototypeIdMeta = const VerificationMeta(
+    'prototypeId',
+  );
+  @override
+  late final GeneratedColumn<int> prototypeId = GeneratedColumn<int>(
+    'prototype_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES prototypes (id)',
+    ),
+  );
+  static const VerificationMeta _locusIdMeta = const VerificationMeta(
+    'locusId',
+  );
+  @override
+  late final GeneratedColumn<int> locusId = GeneratedColumn<int>(
+    'locus_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES loci (id)',
+    ),
+  );
+  static const VerificationMeta _geneticFormulaMeta = const VerificationMeta(
+    'geneticFormula',
+  );
+  @override
+  late final GeneratedColumn<String> geneticFormula = GeneratedColumn<String>(
+    'genetic_formula',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('0'),
+  );
+  static const VerificationMeta _environmentalFormulaMeta =
+      const VerificationMeta('environmentalFormula');
+  @override
+  late final GeneratedColumn<String> environmentalFormula =
+      GeneratedColumn<String>(
+        'environmental_formula',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultValue: const Constant('0'),
+      );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    prototypeId,
+    locusId,
+    geneticFormula,
+    environmentalFormula,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'prototype_morphology';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<PrototypeMorphologyData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('prototype_id')) {
+      context.handle(
+        _prototypeIdMeta,
+        prototypeId.isAcceptableOrUnknown(
+          data['prototype_id']!,
+          _prototypeIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_prototypeIdMeta);
+    }
+    if (data.containsKey('locus_id')) {
+      context.handle(
+        _locusIdMeta,
+        locusId.isAcceptableOrUnknown(data['locus_id']!, _locusIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_locusIdMeta);
+    }
+    if (data.containsKey('genetic_formula')) {
+      context.handle(
+        _geneticFormulaMeta,
+        geneticFormula.isAcceptableOrUnknown(
+          data['genetic_formula']!,
+          _geneticFormulaMeta,
+        ),
+      );
+    }
+    if (data.containsKey('environmental_formula')) {
+      context.handle(
+        _environmentalFormulaMeta,
+        environmentalFormula.isAcceptableOrUnknown(
+          data['environmental_formula']!,
+          _environmentalFormulaMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  List<Set<GeneratedColumn>> get uniqueKeys => [
+    {prototypeId, locusId},
+  ];
+  @override
+  PrototypeMorphologyData map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return PrototypeMorphologyData(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      prototypeId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}prototype_id'],
+      )!,
+      locusId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}locus_id'],
+      )!,
+      geneticFormula: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}genetic_formula'],
+      )!,
+      environmentalFormula: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}environmental_formula'],
+      )!,
+    );
+  }
+
+  @override
+  $PrototypeMorphologyTable createAlias(String alias) {
+    return $PrototypeMorphologyTable(attachedDatabase, alias);
+  }
+}
+
+class PrototypeMorphologyData extends DataClass
+    implements Insertable<PrototypeMorphologyData> {
+  final int id;
+  final int prototypeId;
+  final int locusId;
+  final String geneticFormula;
+  final String environmentalFormula;
+  const PrototypeMorphologyData({
+    required this.id,
+    required this.prototypeId,
+    required this.locusId,
+    required this.geneticFormula,
+    required this.environmentalFormula,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['prototype_id'] = Variable<int>(prototypeId);
+    map['locus_id'] = Variable<int>(locusId);
+    map['genetic_formula'] = Variable<String>(geneticFormula);
+    map['environmental_formula'] = Variable<String>(environmentalFormula);
+    return map;
+  }
+
+  PrototypeMorphologyCompanion toCompanion(bool nullToAbsent) {
+    return PrototypeMorphologyCompanion(
+      id: Value(id),
+      prototypeId: Value(prototypeId),
+      locusId: Value(locusId),
+      geneticFormula: Value(geneticFormula),
+      environmentalFormula: Value(environmentalFormula),
+    );
+  }
+
+  factory PrototypeMorphologyData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return PrototypeMorphologyData(
+      id: serializer.fromJson<int>(json['id']),
+      prototypeId: serializer.fromJson<int>(json['prototypeId']),
+      locusId: serializer.fromJson<int>(json['locusId']),
+      geneticFormula: serializer.fromJson<String>(json['geneticFormula']),
+      environmentalFormula: serializer.fromJson<String>(
+        json['environmentalFormula'],
+      ),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'prototypeId': serializer.toJson<int>(prototypeId),
+      'locusId': serializer.toJson<int>(locusId),
+      'geneticFormula': serializer.toJson<String>(geneticFormula),
+      'environmentalFormula': serializer.toJson<String>(environmentalFormula),
+    };
+  }
+
+  PrototypeMorphologyData copyWith({
+    int? id,
+    int? prototypeId,
+    int? locusId,
+    String? geneticFormula,
+    String? environmentalFormula,
+  }) => PrototypeMorphologyData(
+    id: id ?? this.id,
+    prototypeId: prototypeId ?? this.prototypeId,
+    locusId: locusId ?? this.locusId,
+    geneticFormula: geneticFormula ?? this.geneticFormula,
+    environmentalFormula: environmentalFormula ?? this.environmentalFormula,
+  );
+  PrototypeMorphologyData copyWithCompanion(PrototypeMorphologyCompanion data) {
+    return PrototypeMorphologyData(
+      id: data.id.present ? data.id.value : this.id,
+      prototypeId: data.prototypeId.present
+          ? data.prototypeId.value
+          : this.prototypeId,
+      locusId: data.locusId.present ? data.locusId.value : this.locusId,
+      geneticFormula: data.geneticFormula.present
+          ? data.geneticFormula.value
+          : this.geneticFormula,
+      environmentalFormula: data.environmentalFormula.present
+          ? data.environmentalFormula.value
+          : this.environmentalFormula,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PrototypeMorphologyData(')
+          ..write('id: $id, ')
+          ..write('prototypeId: $prototypeId, ')
+          ..write('locusId: $locusId, ')
+          ..write('geneticFormula: $geneticFormula, ')
+          ..write('environmentalFormula: $environmentalFormula')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    prototypeId,
+    locusId,
+    geneticFormula,
+    environmentalFormula,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is PrototypeMorphologyData &&
+          other.id == this.id &&
+          other.prototypeId == this.prototypeId &&
+          other.locusId == this.locusId &&
+          other.geneticFormula == this.geneticFormula &&
+          other.environmentalFormula == this.environmentalFormula);
+}
+
+class PrototypeMorphologyCompanion
+    extends UpdateCompanion<PrototypeMorphologyData> {
+  final Value<int> id;
+  final Value<int> prototypeId;
+  final Value<int> locusId;
+  final Value<String> geneticFormula;
+  final Value<String> environmentalFormula;
+  const PrototypeMorphologyCompanion({
+    this.id = const Value.absent(),
+    this.prototypeId = const Value.absent(),
+    this.locusId = const Value.absent(),
+    this.geneticFormula = const Value.absent(),
+    this.environmentalFormula = const Value.absent(),
+  });
+  PrototypeMorphologyCompanion.insert({
+    this.id = const Value.absent(),
+    required int prototypeId,
+    required int locusId,
+    this.geneticFormula = const Value.absent(),
+    this.environmentalFormula = const Value.absent(),
+  }) : prototypeId = Value(prototypeId),
+       locusId = Value(locusId);
+  static Insertable<PrototypeMorphologyData> custom({
+    Expression<int>? id,
+    Expression<int>? prototypeId,
+    Expression<int>? locusId,
+    Expression<String>? geneticFormula,
+    Expression<String>? environmentalFormula,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (prototypeId != null) 'prototype_id': prototypeId,
+      if (locusId != null) 'locus_id': locusId,
+      if (geneticFormula != null) 'genetic_formula': geneticFormula,
+      if (environmentalFormula != null)
+        'environmental_formula': environmentalFormula,
+    });
+  }
+
+  PrototypeMorphologyCompanion copyWith({
+    Value<int>? id,
+    Value<int>? prototypeId,
+    Value<int>? locusId,
+    Value<String>? geneticFormula,
+    Value<String>? environmentalFormula,
+  }) {
+    return PrototypeMorphologyCompanion(
+      id: id ?? this.id,
+      prototypeId: prototypeId ?? this.prototypeId,
+      locusId: locusId ?? this.locusId,
+      geneticFormula: geneticFormula ?? this.geneticFormula,
+      environmentalFormula: environmentalFormula ?? this.environmentalFormula,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (prototypeId.present) {
+      map['prototype_id'] = Variable<int>(prototypeId.value);
+    }
+    if (locusId.present) {
+      map['locus_id'] = Variable<int>(locusId.value);
+    }
+    if (geneticFormula.present) {
+      map['genetic_formula'] = Variable<String>(geneticFormula.value);
+    }
+    if (environmentalFormula.present) {
+      map['environmental_formula'] = Variable<String>(
+        environmentalFormula.value,
+      );
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PrototypeMorphologyCompanion(')
+          ..write('id: $id, ')
+          ..write('prototypeId: $prototypeId, ')
+          ..write('locusId: $locusId, ')
+          ..write('geneticFormula: $geneticFormula, ')
+          ..write('environmentalFormula: $environmentalFormula')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $PrototypeTendenciesTable extends PrototypeTendencies
+    with TableInfo<$PrototypeTendenciesTable, PrototypeTendency> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $PrototypeTendenciesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _prototypeIdMeta = const VerificationMeta(
+    'prototypeId',
+  );
+  @override
+  late final GeneratedColumn<int> prototypeId = GeneratedColumn<int>(
+    'prototype_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES prototypes (id)',
+    ),
+  );
+  static const VerificationMeta _directionMeta = const VerificationMeta(
+    'direction',
+  );
+  @override
+  late final GeneratedColumn<int> direction = GeneratedColumn<int>(
+    'direction',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _formulaMeta = const VerificationMeta(
+    'formula',
+  );
+  @override
+  late final GeneratedColumn<String> formula = GeneratedColumn<String>(
+    'formula',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('1'),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, prototypeId, direction, formula];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'prototype_tendencies';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<PrototypeTendency> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('prototype_id')) {
+      context.handle(
+        _prototypeIdMeta,
+        prototypeId.isAcceptableOrUnknown(
+          data['prototype_id']!,
+          _prototypeIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_prototypeIdMeta);
+    }
+    if (data.containsKey('direction')) {
+      context.handle(
+        _directionMeta,
+        direction.isAcceptableOrUnknown(data['direction']!, _directionMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_directionMeta);
+    }
+    if (data.containsKey('formula')) {
+      context.handle(
+        _formulaMeta,
+        formula.isAcceptableOrUnknown(data['formula']!, _formulaMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  List<Set<GeneratedColumn>> get uniqueKeys => [
+    {prototypeId, direction},
+  ];
+  @override
+  PrototypeTendency map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return PrototypeTendency(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      prototypeId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}prototype_id'],
+      )!,
+      direction: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}direction'],
+      )!,
+      formula: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}formula'],
+      )!,
+    );
+  }
+
+  @override
+  $PrototypeTendenciesTable createAlias(String alias) {
+    return $PrototypeTendenciesTable(attachedDatabase, alias);
+  }
+}
+
+class PrototypeTendency extends DataClass
+    implements Insertable<PrototypeTendency> {
+  final int id;
+  final int prototypeId;
+  final int direction;
+  final String formula;
+  const PrototypeTendency({
+    required this.id,
+    required this.prototypeId,
+    required this.direction,
+    required this.formula,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['prototype_id'] = Variable<int>(prototypeId);
+    map['direction'] = Variable<int>(direction);
+    map['formula'] = Variable<String>(formula);
+    return map;
+  }
+
+  PrototypeTendenciesCompanion toCompanion(bool nullToAbsent) {
+    return PrototypeTendenciesCompanion(
+      id: Value(id),
+      prototypeId: Value(prototypeId),
+      direction: Value(direction),
+      formula: Value(formula),
+    );
+  }
+
+  factory PrototypeTendency.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return PrototypeTendency(
+      id: serializer.fromJson<int>(json['id']),
+      prototypeId: serializer.fromJson<int>(json['prototypeId']),
+      direction: serializer.fromJson<int>(json['direction']),
+      formula: serializer.fromJson<String>(json['formula']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'prototypeId': serializer.toJson<int>(prototypeId),
+      'direction': serializer.toJson<int>(direction),
+      'formula': serializer.toJson<String>(formula),
+    };
+  }
+
+  PrototypeTendency copyWith({
+    int? id,
+    int? prototypeId,
+    int? direction,
+    String? formula,
+  }) => PrototypeTendency(
+    id: id ?? this.id,
+    prototypeId: prototypeId ?? this.prototypeId,
+    direction: direction ?? this.direction,
+    formula: formula ?? this.formula,
+  );
+  PrototypeTendency copyWithCompanion(PrototypeTendenciesCompanion data) {
+    return PrototypeTendency(
+      id: data.id.present ? data.id.value : this.id,
+      prototypeId: data.prototypeId.present
+          ? data.prototypeId.value
+          : this.prototypeId,
+      direction: data.direction.present ? data.direction.value : this.direction,
+      formula: data.formula.present ? data.formula.value : this.formula,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PrototypeTendency(')
+          ..write('id: $id, ')
+          ..write('prototypeId: $prototypeId, ')
+          ..write('direction: $direction, ')
+          ..write('formula: $formula')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, prototypeId, direction, formula);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is PrototypeTendency &&
+          other.id == this.id &&
+          other.prototypeId == this.prototypeId &&
+          other.direction == this.direction &&
+          other.formula == this.formula);
+}
+
+class PrototypeTendenciesCompanion extends UpdateCompanion<PrototypeTendency> {
+  final Value<int> id;
+  final Value<int> prototypeId;
+  final Value<int> direction;
+  final Value<String> formula;
+  const PrototypeTendenciesCompanion({
+    this.id = const Value.absent(),
+    this.prototypeId = const Value.absent(),
+    this.direction = const Value.absent(),
+    this.formula = const Value.absent(),
+  });
+  PrototypeTendenciesCompanion.insert({
+    this.id = const Value.absent(),
+    required int prototypeId,
+    required int direction,
+    this.formula = const Value.absent(),
+  }) : prototypeId = Value(prototypeId),
+       direction = Value(direction);
+  static Insertable<PrototypeTendency> custom({
+    Expression<int>? id,
+    Expression<int>? prototypeId,
+    Expression<int>? direction,
+    Expression<String>? formula,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (prototypeId != null) 'prototype_id': prototypeId,
+      if (direction != null) 'direction': direction,
+      if (formula != null) 'formula': formula,
+    });
+  }
+
+  PrototypeTendenciesCompanion copyWith({
+    Value<int>? id,
+    Value<int>? prototypeId,
+    Value<int>? direction,
+    Value<String>? formula,
+  }) {
+    return PrototypeTendenciesCompanion(
+      id: id ?? this.id,
+      prototypeId: prototypeId ?? this.prototypeId,
+      direction: direction ?? this.direction,
+      formula: formula ?? this.formula,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (prototypeId.present) {
+      map['prototype_id'] = Variable<int>(prototypeId.value);
+    }
+    if (direction.present) {
+      map['direction'] = Variable<int>(direction.value);
+    }
+    if (formula.present) {
+      map['formula'] = Variable<String>(formula.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PrototypeTendenciesCompanion(')
+          ..write('id: $id, ')
+          ..write('prototypeId: $prototypeId, ')
+          ..write('direction: $direction, ')
+          ..write('formula: $formula')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $PrototypeCombatTable extends PrototypeCombat
+    with TableInfo<$PrototypeCombatTable, PrototypeCombatData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $PrototypeCombatTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _prototypeIdMeta = const VerificationMeta(
+    'prototypeId',
+  );
+  @override
+  late final GeneratedColumn<int> prototypeId = GeneratedColumn<int>(
+    'prototype_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES prototypes (id)',
+    ),
+  );
+  static const VerificationMeta _actionMeta = const VerificationMeta('action');
+  @override
+  late final GeneratedColumn<int> action = GeneratedColumn<int>(
+    'action',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _opponentActionMeta = const VerificationMeta(
+    'opponentAction',
+  );
+  @override
+  late final GeneratedColumn<int> opponentAction = GeneratedColumn<int>(
+    'opponent_action',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _formulaMeta = const VerificationMeta(
+    'formula',
+  );
+  @override
+  late final GeneratedColumn<String> formula = GeneratedColumn<String>(
+    'formula',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('1'),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    prototypeId,
+    action,
+    opponentAction,
+    formula,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'prototype_combat';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<PrototypeCombatData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('prototype_id')) {
+      context.handle(
+        _prototypeIdMeta,
+        prototypeId.isAcceptableOrUnknown(
+          data['prototype_id']!,
+          _prototypeIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_prototypeIdMeta);
+    }
+    if (data.containsKey('action')) {
+      context.handle(
+        _actionMeta,
+        action.isAcceptableOrUnknown(data['action']!, _actionMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_actionMeta);
+    }
+    if (data.containsKey('opponent_action')) {
+      context.handle(
+        _opponentActionMeta,
+        opponentAction.isAcceptableOrUnknown(
+          data['opponent_action']!,
+          _opponentActionMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_opponentActionMeta);
+    }
+    if (data.containsKey('formula')) {
+      context.handle(
+        _formulaMeta,
+        formula.isAcceptableOrUnknown(data['formula']!, _formulaMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  List<Set<GeneratedColumn>> get uniqueKeys => [
+    {prototypeId, action, opponentAction},
+  ];
+  @override
+  PrototypeCombatData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return PrototypeCombatData(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      prototypeId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}prototype_id'],
+      )!,
+      action: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}action'],
+      )!,
+      opponentAction: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}opponent_action'],
+      )!,
+      formula: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}formula'],
+      )!,
+    );
+  }
+
+  @override
+  $PrototypeCombatTable createAlias(String alias) {
+    return $PrototypeCombatTable(attachedDatabase, alias);
+  }
+}
+
+class PrototypeCombatData extends DataClass
+    implements Insertable<PrototypeCombatData> {
+  final int id;
+  final int prototypeId;
+  final int action;
+  final int opponentAction;
+  final String formula;
+  const PrototypeCombatData({
+    required this.id,
+    required this.prototypeId,
+    required this.action,
+    required this.opponentAction,
+    required this.formula,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['prototype_id'] = Variable<int>(prototypeId);
+    map['action'] = Variable<int>(action);
+    map['opponent_action'] = Variable<int>(opponentAction);
+    map['formula'] = Variable<String>(formula);
+    return map;
+  }
+
+  PrototypeCombatCompanion toCompanion(bool nullToAbsent) {
+    return PrototypeCombatCompanion(
+      id: Value(id),
+      prototypeId: Value(prototypeId),
+      action: Value(action),
+      opponentAction: Value(opponentAction),
+      formula: Value(formula),
+    );
+  }
+
+  factory PrototypeCombatData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return PrototypeCombatData(
+      id: serializer.fromJson<int>(json['id']),
+      prototypeId: serializer.fromJson<int>(json['prototypeId']),
+      action: serializer.fromJson<int>(json['action']),
+      opponentAction: serializer.fromJson<int>(json['opponentAction']),
+      formula: serializer.fromJson<String>(json['formula']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'prototypeId': serializer.toJson<int>(prototypeId),
+      'action': serializer.toJson<int>(action),
+      'opponentAction': serializer.toJson<int>(opponentAction),
+      'formula': serializer.toJson<String>(formula),
+    };
+  }
+
+  PrototypeCombatData copyWith({
+    int? id,
+    int? prototypeId,
+    int? action,
+    int? opponentAction,
+    String? formula,
+  }) => PrototypeCombatData(
+    id: id ?? this.id,
+    prototypeId: prototypeId ?? this.prototypeId,
+    action: action ?? this.action,
+    opponentAction: opponentAction ?? this.opponentAction,
+    formula: formula ?? this.formula,
+  );
+  PrototypeCombatData copyWithCompanion(PrototypeCombatCompanion data) {
+    return PrototypeCombatData(
+      id: data.id.present ? data.id.value : this.id,
+      prototypeId: data.prototypeId.present
+          ? data.prototypeId.value
+          : this.prototypeId,
+      action: data.action.present ? data.action.value : this.action,
+      opponentAction: data.opponentAction.present
+          ? data.opponentAction.value
+          : this.opponentAction,
+      formula: data.formula.present ? data.formula.value : this.formula,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PrototypeCombatData(')
+          ..write('id: $id, ')
+          ..write('prototypeId: $prototypeId, ')
+          ..write('action: $action, ')
+          ..write('opponentAction: $opponentAction, ')
+          ..write('formula: $formula')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, prototypeId, action, opponentAction, formula);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is PrototypeCombatData &&
+          other.id == this.id &&
+          other.prototypeId == this.prototypeId &&
+          other.action == this.action &&
+          other.opponentAction == this.opponentAction &&
+          other.formula == this.formula);
+}
+
+class PrototypeCombatCompanion extends UpdateCompanion<PrototypeCombatData> {
+  final Value<int> id;
+  final Value<int> prototypeId;
+  final Value<int> action;
+  final Value<int> opponentAction;
+  final Value<String> formula;
+  const PrototypeCombatCompanion({
+    this.id = const Value.absent(),
+    this.prototypeId = const Value.absent(),
+    this.action = const Value.absent(),
+    this.opponentAction = const Value.absent(),
+    this.formula = const Value.absent(),
+  });
+  PrototypeCombatCompanion.insert({
+    this.id = const Value.absent(),
+    required int prototypeId,
+    required int action,
+    required int opponentAction,
+    this.formula = const Value.absent(),
+  }) : prototypeId = Value(prototypeId),
+       action = Value(action),
+       opponentAction = Value(opponentAction);
+  static Insertable<PrototypeCombatData> custom({
+    Expression<int>? id,
+    Expression<int>? prototypeId,
+    Expression<int>? action,
+    Expression<int>? opponentAction,
+    Expression<String>? formula,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (prototypeId != null) 'prototype_id': prototypeId,
+      if (action != null) 'action': action,
+      if (opponentAction != null) 'opponent_action': opponentAction,
+      if (formula != null) 'formula': formula,
+    });
+  }
+
+  PrototypeCombatCompanion copyWith({
+    Value<int>? id,
+    Value<int>? prototypeId,
+    Value<int>? action,
+    Value<int>? opponentAction,
+    Value<String>? formula,
+  }) {
+    return PrototypeCombatCompanion(
+      id: id ?? this.id,
+      prototypeId: prototypeId ?? this.prototypeId,
+      action: action ?? this.action,
+      opponentAction: opponentAction ?? this.opponentAction,
+      formula: formula ?? this.formula,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (prototypeId.present) {
+      map['prototype_id'] = Variable<int>(prototypeId.value);
+    }
+    if (action.present) {
+      map['action'] = Variable<int>(action.value);
+    }
+    if (opponentAction.present) {
+      map['opponent_action'] = Variable<int>(opponentAction.value);
+    }
+    if (formula.present) {
+      map['formula'] = Variable<String>(formula.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PrototypeCombatCompanion(')
+          ..write('id: $id, ')
+          ..write('prototypeId: $prototypeId, ')
+          ..write('action: $action, ')
+          ..write('opponentAction: $opponentAction, ')
+          ..write('formula: $formula')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $PrototypeCourtshipTable extends PrototypeCourtship
+    with TableInfo<$PrototypeCourtshipTable, PrototypeCourtshipData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $PrototypeCourtshipTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _prototypeIdMeta = const VerificationMeta(
+    'prototypeId',
+  );
+  @override
+  late final GeneratedColumn<int> prototypeId = GeneratedColumn<int>(
+    'prototype_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES prototypes (id)',
+    ),
+  );
+  static const VerificationMeta _actionMeta = const VerificationMeta('action');
+  @override
+  late final GeneratedColumn<int> action = GeneratedColumn<int>(
+    'action',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _opponentActionMeta = const VerificationMeta(
+    'opponentAction',
+  );
+  @override
+  late final GeneratedColumn<int> opponentAction = GeneratedColumn<int>(
+    'opponent_action',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _formulaMeta = const VerificationMeta(
+    'formula',
+  );
+  @override
+  late final GeneratedColumn<String> formula = GeneratedColumn<String>(
+    'formula',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('1'),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    prototypeId,
+    action,
+    opponentAction,
+    formula,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'prototype_courtship';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<PrototypeCourtshipData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('prototype_id')) {
+      context.handle(
+        _prototypeIdMeta,
+        prototypeId.isAcceptableOrUnknown(
+          data['prototype_id']!,
+          _prototypeIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_prototypeIdMeta);
+    }
+    if (data.containsKey('action')) {
+      context.handle(
+        _actionMeta,
+        action.isAcceptableOrUnknown(data['action']!, _actionMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_actionMeta);
+    }
+    if (data.containsKey('opponent_action')) {
+      context.handle(
+        _opponentActionMeta,
+        opponentAction.isAcceptableOrUnknown(
+          data['opponent_action']!,
+          _opponentActionMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_opponentActionMeta);
+    }
+    if (data.containsKey('formula')) {
+      context.handle(
+        _formulaMeta,
+        formula.isAcceptableOrUnknown(data['formula']!, _formulaMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  List<Set<GeneratedColumn>> get uniqueKeys => [
+    {prototypeId, action, opponentAction},
+  ];
+  @override
+  PrototypeCourtshipData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return PrototypeCourtshipData(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      prototypeId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}prototype_id'],
+      )!,
+      action: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}action'],
+      )!,
+      opponentAction: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}opponent_action'],
+      )!,
+      formula: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}formula'],
+      )!,
+    );
+  }
+
+  @override
+  $PrototypeCourtshipTable createAlias(String alias) {
+    return $PrototypeCourtshipTable(attachedDatabase, alias);
+  }
+}
+
+class PrototypeCourtshipData extends DataClass
+    implements Insertable<PrototypeCourtshipData> {
+  final int id;
+  final int prototypeId;
+  final int action;
+  final int opponentAction;
+  final String formula;
+  const PrototypeCourtshipData({
+    required this.id,
+    required this.prototypeId,
+    required this.action,
+    required this.opponentAction,
+    required this.formula,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['prototype_id'] = Variable<int>(prototypeId);
+    map['action'] = Variable<int>(action);
+    map['opponent_action'] = Variable<int>(opponentAction);
+    map['formula'] = Variable<String>(formula);
+    return map;
+  }
+
+  PrototypeCourtshipCompanion toCompanion(bool nullToAbsent) {
+    return PrototypeCourtshipCompanion(
+      id: Value(id),
+      prototypeId: Value(prototypeId),
+      action: Value(action),
+      opponentAction: Value(opponentAction),
+      formula: Value(formula),
+    );
+  }
+
+  factory PrototypeCourtshipData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return PrototypeCourtshipData(
+      id: serializer.fromJson<int>(json['id']),
+      prototypeId: serializer.fromJson<int>(json['prototypeId']),
+      action: serializer.fromJson<int>(json['action']),
+      opponentAction: serializer.fromJson<int>(json['opponentAction']),
+      formula: serializer.fromJson<String>(json['formula']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'prototypeId': serializer.toJson<int>(prototypeId),
+      'action': serializer.toJson<int>(action),
+      'opponentAction': serializer.toJson<int>(opponentAction),
+      'formula': serializer.toJson<String>(formula),
+    };
+  }
+
+  PrototypeCourtshipData copyWith({
+    int? id,
+    int? prototypeId,
+    int? action,
+    int? opponentAction,
+    String? formula,
+  }) => PrototypeCourtshipData(
+    id: id ?? this.id,
+    prototypeId: prototypeId ?? this.prototypeId,
+    action: action ?? this.action,
+    opponentAction: opponentAction ?? this.opponentAction,
+    formula: formula ?? this.formula,
+  );
+  PrototypeCourtshipData copyWithCompanion(PrototypeCourtshipCompanion data) {
+    return PrototypeCourtshipData(
+      id: data.id.present ? data.id.value : this.id,
+      prototypeId: data.prototypeId.present
+          ? data.prototypeId.value
+          : this.prototypeId,
+      action: data.action.present ? data.action.value : this.action,
+      opponentAction: data.opponentAction.present
+          ? data.opponentAction.value
+          : this.opponentAction,
+      formula: data.formula.present ? data.formula.value : this.formula,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PrototypeCourtshipData(')
+          ..write('id: $id, ')
+          ..write('prototypeId: $prototypeId, ')
+          ..write('action: $action, ')
+          ..write('opponentAction: $opponentAction, ')
+          ..write('formula: $formula')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, prototypeId, action, opponentAction, formula);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is PrototypeCourtshipData &&
+          other.id == this.id &&
+          other.prototypeId == this.prototypeId &&
+          other.action == this.action &&
+          other.opponentAction == this.opponentAction &&
+          other.formula == this.formula);
+}
+
+class PrototypeCourtshipCompanion
+    extends UpdateCompanion<PrototypeCourtshipData> {
+  final Value<int> id;
+  final Value<int> prototypeId;
+  final Value<int> action;
+  final Value<int> opponentAction;
+  final Value<String> formula;
+  const PrototypeCourtshipCompanion({
+    this.id = const Value.absent(),
+    this.prototypeId = const Value.absent(),
+    this.action = const Value.absent(),
+    this.opponentAction = const Value.absent(),
+    this.formula = const Value.absent(),
+  });
+  PrototypeCourtshipCompanion.insert({
+    this.id = const Value.absent(),
+    required int prototypeId,
+    required int action,
+    required int opponentAction,
+    this.formula = const Value.absent(),
+  }) : prototypeId = Value(prototypeId),
+       action = Value(action),
+       opponentAction = Value(opponentAction);
+  static Insertable<PrototypeCourtshipData> custom({
+    Expression<int>? id,
+    Expression<int>? prototypeId,
+    Expression<int>? action,
+    Expression<int>? opponentAction,
+    Expression<String>? formula,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (prototypeId != null) 'prototype_id': prototypeId,
+      if (action != null) 'action': action,
+      if (opponentAction != null) 'opponent_action': opponentAction,
+      if (formula != null) 'formula': formula,
+    });
+  }
+
+  PrototypeCourtshipCompanion copyWith({
+    Value<int>? id,
+    Value<int>? prototypeId,
+    Value<int>? action,
+    Value<int>? opponentAction,
+    Value<String>? formula,
+  }) {
+    return PrototypeCourtshipCompanion(
+      id: id ?? this.id,
+      prototypeId: prototypeId ?? this.prototypeId,
+      action: action ?? this.action,
+      opponentAction: opponentAction ?? this.opponentAction,
+      formula: formula ?? this.formula,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (prototypeId.present) {
+      map['prototype_id'] = Variable<int>(prototypeId.value);
+    }
+    if (action.present) {
+      map['action'] = Variable<int>(action.value);
+    }
+    if (opponentAction.present) {
+      map['opponent_action'] = Variable<int>(opponentAction.value);
+    }
+    if (formula.present) {
+      map['formula'] = Variable<String>(formula.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PrototypeCourtshipCompanion(')
+          ..write('id: $id, ')
+          ..write('prototypeId: $prototypeId, ')
+          ..write('action: $action, ')
+          ..write('opponentAction: $opponentAction, ')
+          ..write('formula: $formula')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $PrototypeAssignmentCriteriaTable extends PrototypeAssignmentCriteria
+    with
+        TableInfo<
+          $PrototypeAssignmentCriteriaTable,
+          PrototypeAssignmentCriteriaData
+        > {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $PrototypeAssignmentCriteriaTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _prototypeIdMeta = const VerificationMeta(
+    'prototypeId',
+  );
+  @override
+  late final GeneratedColumn<int> prototypeId = GeneratedColumn<int>(
+    'prototype_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES prototypes (id)',
+    ),
+  );
+  static const VerificationMeta _priorityMeta = const VerificationMeta(
+    'priority',
+  );
+  @override
+  late final GeneratedColumn<int> priority = GeneratedColumn<int>(
+    'priority',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _formulaMeta = const VerificationMeta(
+    'formula',
+  );
+  @override
+  late final GeneratedColumn<String> formula = GeneratedColumn<String>(
+    'formula',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('0'),
+  );
+  static const VerificationMeta _operatorMeta = const VerificationMeta(
+    'operator',
+  );
+  @override
+  late final GeneratedColumn<String> operator = GeneratedColumn<String>(
+    'operator',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('>'),
+  );
+  static const VerificationMeta _thresholdMeta = const VerificationMeta(
+    'threshold',
+  );
+  @override
+  late final GeneratedColumn<double> threshold = GeneratedColumn<double>(
+    'threshold',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0.0),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    prototypeId,
+    priority,
+    formula,
+    operator,
+    threshold,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'prototype_assignment_criteria';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<PrototypeAssignmentCriteriaData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('prototype_id')) {
+      context.handle(
+        _prototypeIdMeta,
+        prototypeId.isAcceptableOrUnknown(
+          data['prototype_id']!,
+          _prototypeIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_prototypeIdMeta);
+    }
+    if (data.containsKey('priority')) {
+      context.handle(
+        _priorityMeta,
+        priority.isAcceptableOrUnknown(data['priority']!, _priorityMeta),
+      );
+    }
+    if (data.containsKey('formula')) {
+      context.handle(
+        _formulaMeta,
+        formula.isAcceptableOrUnknown(data['formula']!, _formulaMeta),
+      );
+    }
+    if (data.containsKey('operator')) {
+      context.handle(
+        _operatorMeta,
+        operator.isAcceptableOrUnknown(data['operator']!, _operatorMeta),
+      );
+    }
+    if (data.containsKey('threshold')) {
+      context.handle(
+        _thresholdMeta,
+        threshold.isAcceptableOrUnknown(data['threshold']!, _thresholdMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  List<Set<GeneratedColumn>> get uniqueKeys => [
+    {prototypeId, priority},
+  ];
+  @override
+  PrototypeAssignmentCriteriaData map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return PrototypeAssignmentCriteriaData(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      prototypeId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}prototype_id'],
+      )!,
+      priority: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}priority'],
+      )!,
+      formula: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}formula'],
+      )!,
+      operator: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}operator'],
+      )!,
+      threshold: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}threshold'],
+      )!,
+    );
+  }
+
+  @override
+  $PrototypeAssignmentCriteriaTable createAlias(String alias) {
+    return $PrototypeAssignmentCriteriaTable(attachedDatabase, alias);
+  }
+}
+
+class PrototypeAssignmentCriteriaData extends DataClass
+    implements Insertable<PrototypeAssignmentCriteriaData> {
+  final int id;
+  final int prototypeId;
+  final int priority;
+  final String formula;
+  final String operator;
+  final double threshold;
+  const PrototypeAssignmentCriteriaData({
+    required this.id,
+    required this.prototypeId,
+    required this.priority,
+    required this.formula,
+    required this.operator,
+    required this.threshold,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['prototype_id'] = Variable<int>(prototypeId);
+    map['priority'] = Variable<int>(priority);
+    map['formula'] = Variable<String>(formula);
+    map['operator'] = Variable<String>(operator);
+    map['threshold'] = Variable<double>(threshold);
+    return map;
+  }
+
+  PrototypeAssignmentCriteriaCompanion toCompanion(bool nullToAbsent) {
+    return PrototypeAssignmentCriteriaCompanion(
+      id: Value(id),
+      prototypeId: Value(prototypeId),
+      priority: Value(priority),
+      formula: Value(formula),
+      operator: Value(operator),
+      threshold: Value(threshold),
+    );
+  }
+
+  factory PrototypeAssignmentCriteriaData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return PrototypeAssignmentCriteriaData(
+      id: serializer.fromJson<int>(json['id']),
+      prototypeId: serializer.fromJson<int>(json['prototypeId']),
+      priority: serializer.fromJson<int>(json['priority']),
+      formula: serializer.fromJson<String>(json['formula']),
+      operator: serializer.fromJson<String>(json['operator']),
+      threshold: serializer.fromJson<double>(json['threshold']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'prototypeId': serializer.toJson<int>(prototypeId),
+      'priority': serializer.toJson<int>(priority),
+      'formula': serializer.toJson<String>(formula),
+      'operator': serializer.toJson<String>(operator),
+      'threshold': serializer.toJson<double>(threshold),
+    };
+  }
+
+  PrototypeAssignmentCriteriaData copyWith({
+    int? id,
+    int? prototypeId,
+    int? priority,
+    String? formula,
+    String? operator,
+    double? threshold,
+  }) => PrototypeAssignmentCriteriaData(
+    id: id ?? this.id,
+    prototypeId: prototypeId ?? this.prototypeId,
+    priority: priority ?? this.priority,
+    formula: formula ?? this.formula,
+    operator: operator ?? this.operator,
+    threshold: threshold ?? this.threshold,
+  );
+  PrototypeAssignmentCriteriaData copyWithCompanion(
+    PrototypeAssignmentCriteriaCompanion data,
+  ) {
+    return PrototypeAssignmentCriteriaData(
+      id: data.id.present ? data.id.value : this.id,
+      prototypeId: data.prototypeId.present
+          ? data.prototypeId.value
+          : this.prototypeId,
+      priority: data.priority.present ? data.priority.value : this.priority,
+      formula: data.formula.present ? data.formula.value : this.formula,
+      operator: data.operator.present ? data.operator.value : this.operator,
+      threshold: data.threshold.present ? data.threshold.value : this.threshold,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PrototypeAssignmentCriteriaData(')
+          ..write('id: $id, ')
+          ..write('prototypeId: $prototypeId, ')
+          ..write('priority: $priority, ')
+          ..write('formula: $formula, ')
+          ..write('operator: $operator, ')
+          ..write('threshold: $threshold')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, prototypeId, priority, formula, operator, threshold);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is PrototypeAssignmentCriteriaData &&
+          other.id == this.id &&
+          other.prototypeId == this.prototypeId &&
+          other.priority == this.priority &&
+          other.formula == this.formula &&
+          other.operator == this.operator &&
+          other.threshold == this.threshold);
+}
+
+class PrototypeAssignmentCriteriaCompanion
+    extends UpdateCompanion<PrototypeAssignmentCriteriaData> {
+  final Value<int> id;
+  final Value<int> prototypeId;
+  final Value<int> priority;
+  final Value<String> formula;
+  final Value<String> operator;
+  final Value<double> threshold;
+  const PrototypeAssignmentCriteriaCompanion({
+    this.id = const Value.absent(),
+    this.prototypeId = const Value.absent(),
+    this.priority = const Value.absent(),
+    this.formula = const Value.absent(),
+    this.operator = const Value.absent(),
+    this.threshold = const Value.absent(),
+  });
+  PrototypeAssignmentCriteriaCompanion.insert({
+    this.id = const Value.absent(),
+    required int prototypeId,
+    this.priority = const Value.absent(),
+    this.formula = const Value.absent(),
+    this.operator = const Value.absent(),
+    this.threshold = const Value.absent(),
+  }) : prototypeId = Value(prototypeId);
+  static Insertable<PrototypeAssignmentCriteriaData> custom({
+    Expression<int>? id,
+    Expression<int>? prototypeId,
+    Expression<int>? priority,
+    Expression<String>? formula,
+    Expression<String>? operator,
+    Expression<double>? threshold,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (prototypeId != null) 'prototype_id': prototypeId,
+      if (priority != null) 'priority': priority,
+      if (formula != null) 'formula': formula,
+      if (operator != null) 'operator': operator,
+      if (threshold != null) 'threshold': threshold,
+    });
+  }
+
+  PrototypeAssignmentCriteriaCompanion copyWith({
+    Value<int>? id,
+    Value<int>? prototypeId,
+    Value<int>? priority,
+    Value<String>? formula,
+    Value<String>? operator,
+    Value<double>? threshold,
+  }) {
+    return PrototypeAssignmentCriteriaCompanion(
+      id: id ?? this.id,
+      prototypeId: prototypeId ?? this.prototypeId,
+      priority: priority ?? this.priority,
+      formula: formula ?? this.formula,
+      operator: operator ?? this.operator,
+      threshold: threshold ?? this.threshold,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (prototypeId.present) {
+      map['prototype_id'] = Variable<int>(prototypeId.value);
+    }
+    if (priority.present) {
+      map['priority'] = Variable<int>(priority.value);
+    }
+    if (formula.present) {
+      map['formula'] = Variable<String>(formula.value);
+    }
+    if (operator.present) {
+      map['operator'] = Variable<String>(operator.value);
+    }
+    if (threshold.present) {
+      map['threshold'] = Variable<double>(threshold.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PrototypeAssignmentCriteriaCompanion(')
+          ..write('id: $id, ')
+          ..write('prototypeId: $prototypeId, ')
+          ..write('priority: $priority, ')
+          ..write('formula: $formula, ')
+          ..write('operator: $operator, ')
+          ..write('threshold: $threshold')
           ..write(')'))
         .toString();
   }
@@ -6312,6 +8847,843 @@ class MetabolismCompanion extends UpdateCompanion<MetabolismData> {
   }
 }
 
+class $BehaviorCostsTable extends BehaviorCosts
+    with TableInfo<$BehaviorCostsTable, BehaviorCost> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $BehaviorCostsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _behaviorMeta = const VerificationMeta(
+    'behavior',
+  );
+  @override
+  late final GeneratedColumn<String> behavior = GeneratedColumn<String>(
+    'behavior',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nutrientIdMeta = const VerificationMeta(
+    'nutrientId',
+  );
+  @override
+  late final GeneratedColumn<int> nutrientId = GeneratedColumn<int>(
+    'nutrient_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES nutrients (id)',
+    ),
+  );
+  static const VerificationMeta _costFormulaMeta = const VerificationMeta(
+    'costFormula',
+  );
+  @override
+  late final GeneratedColumn<String> costFormula = GeneratedColumn<String>(
+    'cost_formula',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('0'),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, behavior, nutrientId, costFormula];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'behavior_costs';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<BehaviorCost> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('behavior')) {
+      context.handle(
+        _behaviorMeta,
+        behavior.isAcceptableOrUnknown(data['behavior']!, _behaviorMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_behaviorMeta);
+    }
+    if (data.containsKey('nutrient_id')) {
+      context.handle(
+        _nutrientIdMeta,
+        nutrientId.isAcceptableOrUnknown(data['nutrient_id']!, _nutrientIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nutrientIdMeta);
+    }
+    if (data.containsKey('cost_formula')) {
+      context.handle(
+        _costFormulaMeta,
+        costFormula.isAcceptableOrUnknown(
+          data['cost_formula']!,
+          _costFormulaMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  List<Set<GeneratedColumn>> get uniqueKeys => [
+    {behavior, nutrientId},
+  ];
+  @override
+  BehaviorCost map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return BehaviorCost(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      behavior: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}behavior'],
+      )!,
+      nutrientId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}nutrient_id'],
+      )!,
+      costFormula: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}cost_formula'],
+      )!,
+    );
+  }
+
+  @override
+  $BehaviorCostsTable createAlias(String alias) {
+    return $BehaviorCostsTable(attachedDatabase, alias);
+  }
+}
+
+class BehaviorCost extends DataClass implements Insertable<BehaviorCost> {
+  final int id;
+  final String behavior;
+  final int nutrientId;
+  final String costFormula;
+  const BehaviorCost({
+    required this.id,
+    required this.behavior,
+    required this.nutrientId,
+    required this.costFormula,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['behavior'] = Variable<String>(behavior);
+    map['nutrient_id'] = Variable<int>(nutrientId);
+    map['cost_formula'] = Variable<String>(costFormula);
+    return map;
+  }
+
+  BehaviorCostsCompanion toCompanion(bool nullToAbsent) {
+    return BehaviorCostsCompanion(
+      id: Value(id),
+      behavior: Value(behavior),
+      nutrientId: Value(nutrientId),
+      costFormula: Value(costFormula),
+    );
+  }
+
+  factory BehaviorCost.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return BehaviorCost(
+      id: serializer.fromJson<int>(json['id']),
+      behavior: serializer.fromJson<String>(json['behavior']),
+      nutrientId: serializer.fromJson<int>(json['nutrientId']),
+      costFormula: serializer.fromJson<String>(json['costFormula']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'behavior': serializer.toJson<String>(behavior),
+      'nutrientId': serializer.toJson<int>(nutrientId),
+      'costFormula': serializer.toJson<String>(costFormula),
+    };
+  }
+
+  BehaviorCost copyWith({
+    int? id,
+    String? behavior,
+    int? nutrientId,
+    String? costFormula,
+  }) => BehaviorCost(
+    id: id ?? this.id,
+    behavior: behavior ?? this.behavior,
+    nutrientId: nutrientId ?? this.nutrientId,
+    costFormula: costFormula ?? this.costFormula,
+  );
+  BehaviorCost copyWithCompanion(BehaviorCostsCompanion data) {
+    return BehaviorCost(
+      id: data.id.present ? data.id.value : this.id,
+      behavior: data.behavior.present ? data.behavior.value : this.behavior,
+      nutrientId: data.nutrientId.present
+          ? data.nutrientId.value
+          : this.nutrientId,
+      costFormula: data.costFormula.present
+          ? data.costFormula.value
+          : this.costFormula,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('BehaviorCost(')
+          ..write('id: $id, ')
+          ..write('behavior: $behavior, ')
+          ..write('nutrientId: $nutrientId, ')
+          ..write('costFormula: $costFormula')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, behavior, nutrientId, costFormula);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is BehaviorCost &&
+          other.id == this.id &&
+          other.behavior == this.behavior &&
+          other.nutrientId == this.nutrientId &&
+          other.costFormula == this.costFormula);
+}
+
+class BehaviorCostsCompanion extends UpdateCompanion<BehaviorCost> {
+  final Value<int> id;
+  final Value<String> behavior;
+  final Value<int> nutrientId;
+  final Value<String> costFormula;
+  const BehaviorCostsCompanion({
+    this.id = const Value.absent(),
+    this.behavior = const Value.absent(),
+    this.nutrientId = const Value.absent(),
+    this.costFormula = const Value.absent(),
+  });
+  BehaviorCostsCompanion.insert({
+    this.id = const Value.absent(),
+    required String behavior,
+    required int nutrientId,
+    this.costFormula = const Value.absent(),
+  }) : behavior = Value(behavior),
+       nutrientId = Value(nutrientId);
+  static Insertable<BehaviorCost> custom({
+    Expression<int>? id,
+    Expression<String>? behavior,
+    Expression<int>? nutrientId,
+    Expression<String>? costFormula,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (behavior != null) 'behavior': behavior,
+      if (nutrientId != null) 'nutrient_id': nutrientId,
+      if (costFormula != null) 'cost_formula': costFormula,
+    });
+  }
+
+  BehaviorCostsCompanion copyWith({
+    Value<int>? id,
+    Value<String>? behavior,
+    Value<int>? nutrientId,
+    Value<String>? costFormula,
+  }) {
+    return BehaviorCostsCompanion(
+      id: id ?? this.id,
+      behavior: behavior ?? this.behavior,
+      nutrientId: nutrientId ?? this.nutrientId,
+      costFormula: costFormula ?? this.costFormula,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (behavior.present) {
+      map['behavior'] = Variable<String>(behavior.value);
+    }
+    if (nutrientId.present) {
+      map['nutrient_id'] = Variable<int>(nutrientId.value);
+    }
+    if (costFormula.present) {
+      map['cost_formula'] = Variable<String>(costFormula.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('BehaviorCostsCompanion(')
+          ..write('id: $id, ')
+          ..write('behavior: $behavior, ')
+          ..write('nutrientId: $nutrientId, ')
+          ..write('costFormula: $costFormula')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $FeedingGainsTable extends FeedingGains
+    with TableInfo<$FeedingGainsTable, FeedingGain> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $FeedingGainsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _nutrientIdMeta = const VerificationMeta(
+    'nutrientId',
+  );
+  @override
+  late final GeneratedColumn<int> nutrientId = GeneratedColumn<int>(
+    'nutrient_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'UNIQUE REFERENCES nutrients (id)',
+    ),
+  );
+  static const VerificationMeta _gainFormulaMeta = const VerificationMeta(
+    'gainFormula',
+  );
+  @override
+  late final GeneratedColumn<String> gainFormula = GeneratedColumn<String>(
+    'gain_formula',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('10'),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, nutrientId, gainFormula];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'feeding_gains';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<FeedingGain> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('nutrient_id')) {
+      context.handle(
+        _nutrientIdMeta,
+        nutrientId.isAcceptableOrUnknown(data['nutrient_id']!, _nutrientIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nutrientIdMeta);
+    }
+    if (data.containsKey('gain_formula')) {
+      context.handle(
+        _gainFormulaMeta,
+        gainFormula.isAcceptableOrUnknown(
+          data['gain_formula']!,
+          _gainFormulaMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  FeedingGain map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return FeedingGain(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      nutrientId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}nutrient_id'],
+      )!,
+      gainFormula: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}gain_formula'],
+      )!,
+    );
+  }
+
+  @override
+  $FeedingGainsTable createAlias(String alias) {
+    return $FeedingGainsTable(attachedDatabase, alias);
+  }
+}
+
+class FeedingGain extends DataClass implements Insertable<FeedingGain> {
+  final int id;
+  final int nutrientId;
+  final String gainFormula;
+  const FeedingGain({
+    required this.id,
+    required this.nutrientId,
+    required this.gainFormula,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['nutrient_id'] = Variable<int>(nutrientId);
+    map['gain_formula'] = Variable<String>(gainFormula);
+    return map;
+  }
+
+  FeedingGainsCompanion toCompanion(bool nullToAbsent) {
+    return FeedingGainsCompanion(
+      id: Value(id),
+      nutrientId: Value(nutrientId),
+      gainFormula: Value(gainFormula),
+    );
+  }
+
+  factory FeedingGain.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return FeedingGain(
+      id: serializer.fromJson<int>(json['id']),
+      nutrientId: serializer.fromJson<int>(json['nutrientId']),
+      gainFormula: serializer.fromJson<String>(json['gainFormula']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'nutrientId': serializer.toJson<int>(nutrientId),
+      'gainFormula': serializer.toJson<String>(gainFormula),
+    };
+  }
+
+  FeedingGain copyWith({int? id, int? nutrientId, String? gainFormula}) =>
+      FeedingGain(
+        id: id ?? this.id,
+        nutrientId: nutrientId ?? this.nutrientId,
+        gainFormula: gainFormula ?? this.gainFormula,
+      );
+  FeedingGain copyWithCompanion(FeedingGainsCompanion data) {
+    return FeedingGain(
+      id: data.id.present ? data.id.value : this.id,
+      nutrientId: data.nutrientId.present
+          ? data.nutrientId.value
+          : this.nutrientId,
+      gainFormula: data.gainFormula.present
+          ? data.gainFormula.value
+          : this.gainFormula,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('FeedingGain(')
+          ..write('id: $id, ')
+          ..write('nutrientId: $nutrientId, ')
+          ..write('gainFormula: $gainFormula')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, nutrientId, gainFormula);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is FeedingGain &&
+          other.id == this.id &&
+          other.nutrientId == this.nutrientId &&
+          other.gainFormula == this.gainFormula);
+}
+
+class FeedingGainsCompanion extends UpdateCompanion<FeedingGain> {
+  final Value<int> id;
+  final Value<int> nutrientId;
+  final Value<String> gainFormula;
+  const FeedingGainsCompanion({
+    this.id = const Value.absent(),
+    this.nutrientId = const Value.absent(),
+    this.gainFormula = const Value.absent(),
+  });
+  FeedingGainsCompanion.insert({
+    this.id = const Value.absent(),
+    required int nutrientId,
+    this.gainFormula = const Value.absent(),
+  }) : nutrientId = Value(nutrientId);
+  static Insertable<FeedingGain> custom({
+    Expression<int>? id,
+    Expression<int>? nutrientId,
+    Expression<String>? gainFormula,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (nutrientId != null) 'nutrient_id': nutrientId,
+      if (gainFormula != null) 'gain_formula': gainFormula,
+    });
+  }
+
+  FeedingGainsCompanion copyWith({
+    Value<int>? id,
+    Value<int>? nutrientId,
+    Value<String>? gainFormula,
+  }) {
+    return FeedingGainsCompanion(
+      id: id ?? this.id,
+      nutrientId: nutrientId ?? this.nutrientId,
+      gainFormula: gainFormula ?? this.gainFormula,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (nutrientId.present) {
+      map['nutrient_id'] = Variable<int>(nutrientId.value);
+    }
+    if (gainFormula.present) {
+      map['gain_formula'] = Variable<String>(gainFormula.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('FeedingGainsCompanion(')
+          ..write('id: $id, ')
+          ..write('nutrientId: $nutrientId, ')
+          ..write('gainFormula: $gainFormula')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $SubstrateVelocitiesTable extends SubstrateVelocities
+    with TableInfo<$SubstrateVelocitiesTable, SubstrateVelocity> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $SubstrateVelocitiesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _substrateIdMeta = const VerificationMeta(
+    'substrateId',
+  );
+  @override
+  late final GeneratedColumn<int> substrateId = GeneratedColumn<int>(
+    'substrate_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'UNIQUE REFERENCES substrates (id)',
+    ),
+  );
+  static const VerificationMeta _velocityFormulaMeta = const VerificationMeta(
+    'velocityFormula',
+  );
+  @override
+  late final GeneratedColumn<String> velocityFormula = GeneratedColumn<String>(
+    'velocity_formula',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('1'),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, substrateId, velocityFormula];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'substrate_velocities';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<SubstrateVelocity> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('substrate_id')) {
+      context.handle(
+        _substrateIdMeta,
+        substrateId.isAcceptableOrUnknown(
+          data['substrate_id']!,
+          _substrateIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_substrateIdMeta);
+    }
+    if (data.containsKey('velocity_formula')) {
+      context.handle(
+        _velocityFormulaMeta,
+        velocityFormula.isAcceptableOrUnknown(
+          data['velocity_formula']!,
+          _velocityFormulaMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  SubstrateVelocity map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return SubstrateVelocity(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      substrateId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}substrate_id'],
+      )!,
+      velocityFormula: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}velocity_formula'],
+      )!,
+    );
+  }
+
+  @override
+  $SubstrateVelocitiesTable createAlias(String alias) {
+    return $SubstrateVelocitiesTable(attachedDatabase, alias);
+  }
+}
+
+class SubstrateVelocity extends DataClass
+    implements Insertable<SubstrateVelocity> {
+  final int id;
+  final int substrateId;
+  final String velocityFormula;
+  const SubstrateVelocity({
+    required this.id,
+    required this.substrateId,
+    required this.velocityFormula,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['substrate_id'] = Variable<int>(substrateId);
+    map['velocity_formula'] = Variable<String>(velocityFormula);
+    return map;
+  }
+
+  SubstrateVelocitiesCompanion toCompanion(bool nullToAbsent) {
+    return SubstrateVelocitiesCompanion(
+      id: Value(id),
+      substrateId: Value(substrateId),
+      velocityFormula: Value(velocityFormula),
+    );
+  }
+
+  factory SubstrateVelocity.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return SubstrateVelocity(
+      id: serializer.fromJson<int>(json['id']),
+      substrateId: serializer.fromJson<int>(json['substrateId']),
+      velocityFormula: serializer.fromJson<String>(json['velocityFormula']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'substrateId': serializer.toJson<int>(substrateId),
+      'velocityFormula': serializer.toJson<String>(velocityFormula),
+    };
+  }
+
+  SubstrateVelocity copyWith({
+    int? id,
+    int? substrateId,
+    String? velocityFormula,
+  }) => SubstrateVelocity(
+    id: id ?? this.id,
+    substrateId: substrateId ?? this.substrateId,
+    velocityFormula: velocityFormula ?? this.velocityFormula,
+  );
+  SubstrateVelocity copyWithCompanion(SubstrateVelocitiesCompanion data) {
+    return SubstrateVelocity(
+      id: data.id.present ? data.id.value : this.id,
+      substrateId: data.substrateId.present
+          ? data.substrateId.value
+          : this.substrateId,
+      velocityFormula: data.velocityFormula.present
+          ? data.velocityFormula.value
+          : this.velocityFormula,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SubstrateVelocity(')
+          ..write('id: $id, ')
+          ..write('substrateId: $substrateId, ')
+          ..write('velocityFormula: $velocityFormula')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, substrateId, velocityFormula);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is SubstrateVelocity &&
+          other.id == this.id &&
+          other.substrateId == this.substrateId &&
+          other.velocityFormula == this.velocityFormula);
+}
+
+class SubstrateVelocitiesCompanion extends UpdateCompanion<SubstrateVelocity> {
+  final Value<int> id;
+  final Value<int> substrateId;
+  final Value<String> velocityFormula;
+  const SubstrateVelocitiesCompanion({
+    this.id = const Value.absent(),
+    this.substrateId = const Value.absent(),
+    this.velocityFormula = const Value.absent(),
+  });
+  SubstrateVelocitiesCompanion.insert({
+    this.id = const Value.absent(),
+    required int substrateId,
+    this.velocityFormula = const Value.absent(),
+  }) : substrateId = Value(substrateId);
+  static Insertable<SubstrateVelocity> custom({
+    Expression<int>? id,
+    Expression<int>? substrateId,
+    Expression<String>? velocityFormula,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (substrateId != null) 'substrate_id': substrateId,
+      if (velocityFormula != null) 'velocity_formula': velocityFormula,
+    });
+  }
+
+  SubstrateVelocitiesCompanion copyWith({
+    Value<int>? id,
+    Value<int>? substrateId,
+    Value<String>? velocityFormula,
+  }) {
+    return SubstrateVelocitiesCompanion(
+      id: id ?? this.id,
+      substrateId: substrateId ?? this.substrateId,
+      velocityFormula: velocityFormula ?? this.velocityFormula,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (substrateId.present) {
+      map['substrate_id'] = Variable<int>(substrateId.value);
+    }
+    if (velocityFormula.present) {
+      map['velocity_formula'] = Variable<String>(velocityFormula.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SubstrateVelocitiesCompanion(')
+          ..write('id: $id, ')
+          ..write('substrateId: $substrateId, ')
+          ..write('velocityFormula: $velocityFormula')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $ReproductionTable extends Reproduction
     with TableInfo<$ReproductionTable, ReproductionData> {
   @override
@@ -7103,6 +10475,3815 @@ class ReproductionCompanion extends UpdateCompanion<ReproductionData> {
   }
 }
 
+class $GameteCostsTable extends GameteCosts
+    with TableInfo<$GameteCostsTable, GameteCost> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $GameteCostsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _sexMeta = const VerificationMeta('sex');
+  @override
+  late final GeneratedColumn<String> sex = GeneratedColumn<String>(
+    'sex',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nutrientIdMeta = const VerificationMeta(
+    'nutrientId',
+  );
+  @override
+  late final GeneratedColumn<int> nutrientId = GeneratedColumn<int>(
+    'nutrient_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES nutrients (id)',
+    ),
+  );
+  static const VerificationMeta _costFormulaMeta = const VerificationMeta(
+    'costFormula',
+  );
+  @override
+  late final GeneratedColumn<String> costFormula = GeneratedColumn<String>(
+    'cost_formula',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('5'),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, sex, nutrientId, costFormula];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'gamete_costs';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<GameteCost> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('sex')) {
+      context.handle(
+        _sexMeta,
+        sex.isAcceptableOrUnknown(data['sex']!, _sexMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_sexMeta);
+    }
+    if (data.containsKey('nutrient_id')) {
+      context.handle(
+        _nutrientIdMeta,
+        nutrientId.isAcceptableOrUnknown(data['nutrient_id']!, _nutrientIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nutrientIdMeta);
+    }
+    if (data.containsKey('cost_formula')) {
+      context.handle(
+        _costFormulaMeta,
+        costFormula.isAcceptableOrUnknown(
+          data['cost_formula']!,
+          _costFormulaMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  List<Set<GeneratedColumn>> get uniqueKeys => [
+    {sex, nutrientId},
+  ];
+  @override
+  GameteCost map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return GameteCost(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      sex: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}sex'],
+      )!,
+      nutrientId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}nutrient_id'],
+      )!,
+      costFormula: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}cost_formula'],
+      )!,
+    );
+  }
+
+  @override
+  $GameteCostsTable createAlias(String alias) {
+    return $GameteCostsTable(attachedDatabase, alias);
+  }
+}
+
+class GameteCost extends DataClass implements Insertable<GameteCost> {
+  final int id;
+  final String sex;
+  final int nutrientId;
+  final String costFormula;
+  const GameteCost({
+    required this.id,
+    required this.sex,
+    required this.nutrientId,
+    required this.costFormula,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['sex'] = Variable<String>(sex);
+    map['nutrient_id'] = Variable<int>(nutrientId);
+    map['cost_formula'] = Variable<String>(costFormula);
+    return map;
+  }
+
+  GameteCostsCompanion toCompanion(bool nullToAbsent) {
+    return GameteCostsCompanion(
+      id: Value(id),
+      sex: Value(sex),
+      nutrientId: Value(nutrientId),
+      costFormula: Value(costFormula),
+    );
+  }
+
+  factory GameteCost.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return GameteCost(
+      id: serializer.fromJson<int>(json['id']),
+      sex: serializer.fromJson<String>(json['sex']),
+      nutrientId: serializer.fromJson<int>(json['nutrientId']),
+      costFormula: serializer.fromJson<String>(json['costFormula']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'sex': serializer.toJson<String>(sex),
+      'nutrientId': serializer.toJson<int>(nutrientId),
+      'costFormula': serializer.toJson<String>(costFormula),
+    };
+  }
+
+  GameteCost copyWith({
+    int? id,
+    String? sex,
+    int? nutrientId,
+    String? costFormula,
+  }) => GameteCost(
+    id: id ?? this.id,
+    sex: sex ?? this.sex,
+    nutrientId: nutrientId ?? this.nutrientId,
+    costFormula: costFormula ?? this.costFormula,
+  );
+  GameteCost copyWithCompanion(GameteCostsCompanion data) {
+    return GameteCost(
+      id: data.id.present ? data.id.value : this.id,
+      sex: data.sex.present ? data.sex.value : this.sex,
+      nutrientId: data.nutrientId.present
+          ? data.nutrientId.value
+          : this.nutrientId,
+      costFormula: data.costFormula.present
+          ? data.costFormula.value
+          : this.costFormula,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('GameteCost(')
+          ..write('id: $id, ')
+          ..write('sex: $sex, ')
+          ..write('nutrientId: $nutrientId, ')
+          ..write('costFormula: $costFormula')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, sex, nutrientId, costFormula);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is GameteCost &&
+          other.id == this.id &&
+          other.sex == this.sex &&
+          other.nutrientId == this.nutrientId &&
+          other.costFormula == this.costFormula);
+}
+
+class GameteCostsCompanion extends UpdateCompanion<GameteCost> {
+  final Value<int> id;
+  final Value<String> sex;
+  final Value<int> nutrientId;
+  final Value<String> costFormula;
+  const GameteCostsCompanion({
+    this.id = const Value.absent(),
+    this.sex = const Value.absent(),
+    this.nutrientId = const Value.absent(),
+    this.costFormula = const Value.absent(),
+  });
+  GameteCostsCompanion.insert({
+    this.id = const Value.absent(),
+    required String sex,
+    required int nutrientId,
+    this.costFormula = const Value.absent(),
+  }) : sex = Value(sex),
+       nutrientId = Value(nutrientId);
+  static Insertable<GameteCost> custom({
+    Expression<int>? id,
+    Expression<String>? sex,
+    Expression<int>? nutrientId,
+    Expression<String>? costFormula,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (sex != null) 'sex': sex,
+      if (nutrientId != null) 'nutrient_id': nutrientId,
+      if (costFormula != null) 'cost_formula': costFormula,
+    });
+  }
+
+  GameteCostsCompanion copyWith({
+    Value<int>? id,
+    Value<String>? sex,
+    Value<int>? nutrientId,
+    Value<String>? costFormula,
+  }) {
+    return GameteCostsCompanion(
+      id: id ?? this.id,
+      sex: sex ?? this.sex,
+      nutrientId: nutrientId ?? this.nutrientId,
+      costFormula: costFormula ?? this.costFormula,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (sex.present) {
+      map['sex'] = Variable<String>(sex.value);
+    }
+    if (nutrientId.present) {
+      map['nutrient_id'] = Variable<int>(nutrientId.value);
+    }
+    if (costFormula.present) {
+      map['cost_formula'] = Variable<String>(costFormula.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('GameteCostsCompanion(')
+          ..write('id: $id, ')
+          ..write('sex: $sex, ')
+          ..write('nutrientId: $nutrientId, ')
+          ..write('costFormula: $costFormula')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $InteractionSubstratesTable extends InteractionSubstrates
+    with TableInfo<$InteractionSubstratesTable, InteractionSubstrate> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $InteractionSubstratesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _substrateIdMeta = const VerificationMeta(
+    'substrateId',
+  );
+  @override
+  late final GeneratedColumn<int> substrateId = GeneratedColumn<int>(
+    'substrate_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES substrates (id)',
+    ),
+  );
+  static const VerificationMeta _perceiverStageIdMeta = const VerificationMeta(
+    'perceiverStageId',
+  );
+  @override
+  late final GeneratedColumn<int> perceiverStageId = GeneratedColumn<int>(
+    'perceiver_stage_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES stages (id)',
+    ),
+  );
+  static const VerificationMeta _perceiverPrototypeIdMeta =
+      const VerificationMeta('perceiverPrototypeId');
+  @override
+  late final GeneratedColumn<int> perceiverPrototypeId = GeneratedColumn<int>(
+    'perceiver_prototype_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES prototypes (id)',
+    ),
+  );
+  static const VerificationMeta _behaviorIndexMeta = const VerificationMeta(
+    'behaviorIndex',
+  );
+  @override
+  late final GeneratedColumn<int> behaviorIndex = GeneratedColumn<int>(
+    'behavior_index',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _formulaMeta = const VerificationMeta(
+    'formula',
+  );
+  @override
+  late final GeneratedColumn<String> formula = GeneratedColumn<String>(
+    'formula',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('0'),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    substrateId,
+    perceiverStageId,
+    perceiverPrototypeId,
+    behaviorIndex,
+    formula,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'interaction_substrates';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<InteractionSubstrate> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('substrate_id')) {
+      context.handle(
+        _substrateIdMeta,
+        substrateId.isAcceptableOrUnknown(
+          data['substrate_id']!,
+          _substrateIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_substrateIdMeta);
+    }
+    if (data.containsKey('perceiver_stage_id')) {
+      context.handle(
+        _perceiverStageIdMeta,
+        perceiverStageId.isAcceptableOrUnknown(
+          data['perceiver_stage_id']!,
+          _perceiverStageIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('perceiver_prototype_id')) {
+      context.handle(
+        _perceiverPrototypeIdMeta,
+        perceiverPrototypeId.isAcceptableOrUnknown(
+          data['perceiver_prototype_id']!,
+          _perceiverPrototypeIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('behavior_index')) {
+      context.handle(
+        _behaviorIndexMeta,
+        behaviorIndex.isAcceptableOrUnknown(
+          data['behavior_index']!,
+          _behaviorIndexMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_behaviorIndexMeta);
+    }
+    if (data.containsKey('formula')) {
+      context.handle(
+        _formulaMeta,
+        formula.isAcceptableOrUnknown(data['formula']!, _formulaMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  InteractionSubstrate map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return InteractionSubstrate(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      substrateId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}substrate_id'],
+      )!,
+      perceiverStageId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}perceiver_stage_id'],
+      ),
+      perceiverPrototypeId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}perceiver_prototype_id'],
+      ),
+      behaviorIndex: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}behavior_index'],
+      )!,
+      formula: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}formula'],
+      )!,
+    );
+  }
+
+  @override
+  $InteractionSubstratesTable createAlias(String alias) {
+    return $InteractionSubstratesTable(attachedDatabase, alias);
+  }
+}
+
+class InteractionSubstrate extends DataClass
+    implements Insertable<InteractionSubstrate> {
+  final int id;
+  final int substrateId;
+  final int? perceiverStageId;
+  final int? perceiverPrototypeId;
+  final int behaviorIndex;
+  final String formula;
+  const InteractionSubstrate({
+    required this.id,
+    required this.substrateId,
+    this.perceiverStageId,
+    this.perceiverPrototypeId,
+    required this.behaviorIndex,
+    required this.formula,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['substrate_id'] = Variable<int>(substrateId);
+    if (!nullToAbsent || perceiverStageId != null) {
+      map['perceiver_stage_id'] = Variable<int>(perceiverStageId);
+    }
+    if (!nullToAbsent || perceiverPrototypeId != null) {
+      map['perceiver_prototype_id'] = Variable<int>(perceiverPrototypeId);
+    }
+    map['behavior_index'] = Variable<int>(behaviorIndex);
+    map['formula'] = Variable<String>(formula);
+    return map;
+  }
+
+  InteractionSubstratesCompanion toCompanion(bool nullToAbsent) {
+    return InteractionSubstratesCompanion(
+      id: Value(id),
+      substrateId: Value(substrateId),
+      perceiverStageId: perceiverStageId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(perceiverStageId),
+      perceiverPrototypeId: perceiverPrototypeId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(perceiverPrototypeId),
+      behaviorIndex: Value(behaviorIndex),
+      formula: Value(formula),
+    );
+  }
+
+  factory InteractionSubstrate.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return InteractionSubstrate(
+      id: serializer.fromJson<int>(json['id']),
+      substrateId: serializer.fromJson<int>(json['substrateId']),
+      perceiverStageId: serializer.fromJson<int?>(json['perceiverStageId']),
+      perceiverPrototypeId: serializer.fromJson<int?>(
+        json['perceiverPrototypeId'],
+      ),
+      behaviorIndex: serializer.fromJson<int>(json['behaviorIndex']),
+      formula: serializer.fromJson<String>(json['formula']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'substrateId': serializer.toJson<int>(substrateId),
+      'perceiverStageId': serializer.toJson<int?>(perceiverStageId),
+      'perceiverPrototypeId': serializer.toJson<int?>(perceiverPrototypeId),
+      'behaviorIndex': serializer.toJson<int>(behaviorIndex),
+      'formula': serializer.toJson<String>(formula),
+    };
+  }
+
+  InteractionSubstrate copyWith({
+    int? id,
+    int? substrateId,
+    Value<int?> perceiverStageId = const Value.absent(),
+    Value<int?> perceiverPrototypeId = const Value.absent(),
+    int? behaviorIndex,
+    String? formula,
+  }) => InteractionSubstrate(
+    id: id ?? this.id,
+    substrateId: substrateId ?? this.substrateId,
+    perceiverStageId: perceiverStageId.present
+        ? perceiverStageId.value
+        : this.perceiverStageId,
+    perceiverPrototypeId: perceiverPrototypeId.present
+        ? perceiverPrototypeId.value
+        : this.perceiverPrototypeId,
+    behaviorIndex: behaviorIndex ?? this.behaviorIndex,
+    formula: formula ?? this.formula,
+  );
+  InteractionSubstrate copyWithCompanion(InteractionSubstratesCompanion data) {
+    return InteractionSubstrate(
+      id: data.id.present ? data.id.value : this.id,
+      substrateId: data.substrateId.present
+          ? data.substrateId.value
+          : this.substrateId,
+      perceiverStageId: data.perceiverStageId.present
+          ? data.perceiverStageId.value
+          : this.perceiverStageId,
+      perceiverPrototypeId: data.perceiverPrototypeId.present
+          ? data.perceiverPrototypeId.value
+          : this.perceiverPrototypeId,
+      behaviorIndex: data.behaviorIndex.present
+          ? data.behaviorIndex.value
+          : this.behaviorIndex,
+      formula: data.formula.present ? data.formula.value : this.formula,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('InteractionSubstrate(')
+          ..write('id: $id, ')
+          ..write('substrateId: $substrateId, ')
+          ..write('perceiverStageId: $perceiverStageId, ')
+          ..write('perceiverPrototypeId: $perceiverPrototypeId, ')
+          ..write('behaviorIndex: $behaviorIndex, ')
+          ..write('formula: $formula')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    substrateId,
+    perceiverStageId,
+    perceiverPrototypeId,
+    behaviorIndex,
+    formula,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is InteractionSubstrate &&
+          other.id == this.id &&
+          other.substrateId == this.substrateId &&
+          other.perceiverStageId == this.perceiverStageId &&
+          other.perceiverPrototypeId == this.perceiverPrototypeId &&
+          other.behaviorIndex == this.behaviorIndex &&
+          other.formula == this.formula);
+}
+
+class InteractionSubstratesCompanion
+    extends UpdateCompanion<InteractionSubstrate> {
+  final Value<int> id;
+  final Value<int> substrateId;
+  final Value<int?> perceiverStageId;
+  final Value<int?> perceiverPrototypeId;
+  final Value<int> behaviorIndex;
+  final Value<String> formula;
+  const InteractionSubstratesCompanion({
+    this.id = const Value.absent(),
+    this.substrateId = const Value.absent(),
+    this.perceiverStageId = const Value.absent(),
+    this.perceiverPrototypeId = const Value.absent(),
+    this.behaviorIndex = const Value.absent(),
+    this.formula = const Value.absent(),
+  });
+  InteractionSubstratesCompanion.insert({
+    this.id = const Value.absent(),
+    required int substrateId,
+    this.perceiverStageId = const Value.absent(),
+    this.perceiverPrototypeId = const Value.absent(),
+    required int behaviorIndex,
+    this.formula = const Value.absent(),
+  }) : substrateId = Value(substrateId),
+       behaviorIndex = Value(behaviorIndex);
+  static Insertable<InteractionSubstrate> custom({
+    Expression<int>? id,
+    Expression<int>? substrateId,
+    Expression<int>? perceiverStageId,
+    Expression<int>? perceiverPrototypeId,
+    Expression<int>? behaviorIndex,
+    Expression<String>? formula,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (substrateId != null) 'substrate_id': substrateId,
+      if (perceiverStageId != null) 'perceiver_stage_id': perceiverStageId,
+      if (perceiverPrototypeId != null)
+        'perceiver_prototype_id': perceiverPrototypeId,
+      if (behaviorIndex != null) 'behavior_index': behaviorIndex,
+      if (formula != null) 'formula': formula,
+    });
+  }
+
+  InteractionSubstratesCompanion copyWith({
+    Value<int>? id,
+    Value<int>? substrateId,
+    Value<int?>? perceiverStageId,
+    Value<int?>? perceiverPrototypeId,
+    Value<int>? behaviorIndex,
+    Value<String>? formula,
+  }) {
+    return InteractionSubstratesCompanion(
+      id: id ?? this.id,
+      substrateId: substrateId ?? this.substrateId,
+      perceiverStageId: perceiverStageId ?? this.perceiverStageId,
+      perceiverPrototypeId: perceiverPrototypeId ?? this.perceiverPrototypeId,
+      behaviorIndex: behaviorIndex ?? this.behaviorIndex,
+      formula: formula ?? this.formula,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (substrateId.present) {
+      map['substrate_id'] = Variable<int>(substrateId.value);
+    }
+    if (perceiverStageId.present) {
+      map['perceiver_stage_id'] = Variable<int>(perceiverStageId.value);
+    }
+    if (perceiverPrototypeId.present) {
+      map['perceiver_prototype_id'] = Variable<int>(perceiverPrototypeId.value);
+    }
+    if (behaviorIndex.present) {
+      map['behavior_index'] = Variable<int>(behaviorIndex.value);
+    }
+    if (formula.present) {
+      map['formula'] = Variable<String>(formula.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('InteractionSubstratesCompanion(')
+          ..write('id: $id, ')
+          ..write('substrateId: $substrateId, ')
+          ..write('perceiverStageId: $perceiverStageId, ')
+          ..write('perceiverPrototypeId: $perceiverPrototypeId, ')
+          ..write('behaviorIndex: $behaviorIndex, ')
+          ..write('formula: $formula')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $AttractivenessSubstratesTable extends AttractivenessSubstrates
+    with TableInfo<$AttractivenessSubstratesTable, AttractivenessSubstrate> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $AttractivenessSubstratesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _substrateIdMeta = const VerificationMeta(
+    'substrateId',
+  );
+  @override
+  late final GeneratedColumn<int> substrateId = GeneratedColumn<int>(
+    'substrate_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES substrates (id)',
+    ),
+  );
+  static const VerificationMeta _perceiverStageIdMeta = const VerificationMeta(
+    'perceiverStageId',
+  );
+  @override
+  late final GeneratedColumn<int> perceiverStageId = GeneratedColumn<int>(
+    'perceiver_stage_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES stages (id)',
+    ),
+  );
+  static const VerificationMeta _perceiverPrototypeIdMeta =
+      const VerificationMeta('perceiverPrototypeId');
+  @override
+  late final GeneratedColumn<int> perceiverPrototypeId = GeneratedColumn<int>(
+    'perceiver_prototype_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES prototypes (id)',
+    ),
+  );
+  static const VerificationMeta _attractivenessFormulaMeta =
+      const VerificationMeta('attractivenessFormula');
+  @override
+  late final GeneratedColumn<String> attractivenessFormula =
+      GeneratedColumn<String>(
+        'attractiveness_formula',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultValue: const Constant('0'),
+      );
+  static const VerificationMeta _radiusFormulaMeta = const VerificationMeta(
+    'radiusFormula',
+  );
+  @override
+  late final GeneratedColumn<String> radiusFormula = GeneratedColumn<String>(
+    'radius_formula',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('5'),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    substrateId,
+    perceiverStageId,
+    perceiverPrototypeId,
+    attractivenessFormula,
+    radiusFormula,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'attractiveness_substrates';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<AttractivenessSubstrate> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('substrate_id')) {
+      context.handle(
+        _substrateIdMeta,
+        substrateId.isAcceptableOrUnknown(
+          data['substrate_id']!,
+          _substrateIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_substrateIdMeta);
+    }
+    if (data.containsKey('perceiver_stage_id')) {
+      context.handle(
+        _perceiverStageIdMeta,
+        perceiverStageId.isAcceptableOrUnknown(
+          data['perceiver_stage_id']!,
+          _perceiverStageIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('perceiver_prototype_id')) {
+      context.handle(
+        _perceiverPrototypeIdMeta,
+        perceiverPrototypeId.isAcceptableOrUnknown(
+          data['perceiver_prototype_id']!,
+          _perceiverPrototypeIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('attractiveness_formula')) {
+      context.handle(
+        _attractivenessFormulaMeta,
+        attractivenessFormula.isAcceptableOrUnknown(
+          data['attractiveness_formula']!,
+          _attractivenessFormulaMeta,
+        ),
+      );
+    }
+    if (data.containsKey('radius_formula')) {
+      context.handle(
+        _radiusFormulaMeta,
+        radiusFormula.isAcceptableOrUnknown(
+          data['radius_formula']!,
+          _radiusFormulaMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  AttractivenessSubstrate map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return AttractivenessSubstrate(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      substrateId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}substrate_id'],
+      )!,
+      perceiverStageId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}perceiver_stage_id'],
+      ),
+      perceiverPrototypeId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}perceiver_prototype_id'],
+      ),
+      attractivenessFormula: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}attractiveness_formula'],
+      )!,
+      radiusFormula: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}radius_formula'],
+      )!,
+    );
+  }
+
+  @override
+  $AttractivenessSubstratesTable createAlias(String alias) {
+    return $AttractivenessSubstratesTable(attachedDatabase, alias);
+  }
+}
+
+class AttractivenessSubstrate extends DataClass
+    implements Insertable<AttractivenessSubstrate> {
+  final int id;
+  final int substrateId;
+  final int? perceiverStageId;
+  final int? perceiverPrototypeId;
+  final String attractivenessFormula;
+  final String radiusFormula;
+  const AttractivenessSubstrate({
+    required this.id,
+    required this.substrateId,
+    this.perceiverStageId,
+    this.perceiverPrototypeId,
+    required this.attractivenessFormula,
+    required this.radiusFormula,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['substrate_id'] = Variable<int>(substrateId);
+    if (!nullToAbsent || perceiverStageId != null) {
+      map['perceiver_stage_id'] = Variable<int>(perceiverStageId);
+    }
+    if (!nullToAbsent || perceiverPrototypeId != null) {
+      map['perceiver_prototype_id'] = Variable<int>(perceiverPrototypeId);
+    }
+    map['attractiveness_formula'] = Variable<String>(attractivenessFormula);
+    map['radius_formula'] = Variable<String>(radiusFormula);
+    return map;
+  }
+
+  AttractivenessSubstratesCompanion toCompanion(bool nullToAbsent) {
+    return AttractivenessSubstratesCompanion(
+      id: Value(id),
+      substrateId: Value(substrateId),
+      perceiverStageId: perceiverStageId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(perceiverStageId),
+      perceiverPrototypeId: perceiverPrototypeId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(perceiverPrototypeId),
+      attractivenessFormula: Value(attractivenessFormula),
+      radiusFormula: Value(radiusFormula),
+    );
+  }
+
+  factory AttractivenessSubstrate.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return AttractivenessSubstrate(
+      id: serializer.fromJson<int>(json['id']),
+      substrateId: serializer.fromJson<int>(json['substrateId']),
+      perceiverStageId: serializer.fromJson<int?>(json['perceiverStageId']),
+      perceiverPrototypeId: serializer.fromJson<int?>(
+        json['perceiverPrototypeId'],
+      ),
+      attractivenessFormula: serializer.fromJson<String>(
+        json['attractivenessFormula'],
+      ),
+      radiusFormula: serializer.fromJson<String>(json['radiusFormula']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'substrateId': serializer.toJson<int>(substrateId),
+      'perceiverStageId': serializer.toJson<int?>(perceiverStageId),
+      'perceiverPrototypeId': serializer.toJson<int?>(perceiverPrototypeId),
+      'attractivenessFormula': serializer.toJson<String>(attractivenessFormula),
+      'radiusFormula': serializer.toJson<String>(radiusFormula),
+    };
+  }
+
+  AttractivenessSubstrate copyWith({
+    int? id,
+    int? substrateId,
+    Value<int?> perceiverStageId = const Value.absent(),
+    Value<int?> perceiverPrototypeId = const Value.absent(),
+    String? attractivenessFormula,
+    String? radiusFormula,
+  }) => AttractivenessSubstrate(
+    id: id ?? this.id,
+    substrateId: substrateId ?? this.substrateId,
+    perceiverStageId: perceiverStageId.present
+        ? perceiverStageId.value
+        : this.perceiverStageId,
+    perceiverPrototypeId: perceiverPrototypeId.present
+        ? perceiverPrototypeId.value
+        : this.perceiverPrototypeId,
+    attractivenessFormula: attractivenessFormula ?? this.attractivenessFormula,
+    radiusFormula: radiusFormula ?? this.radiusFormula,
+  );
+  AttractivenessSubstrate copyWithCompanion(
+    AttractivenessSubstratesCompanion data,
+  ) {
+    return AttractivenessSubstrate(
+      id: data.id.present ? data.id.value : this.id,
+      substrateId: data.substrateId.present
+          ? data.substrateId.value
+          : this.substrateId,
+      perceiverStageId: data.perceiverStageId.present
+          ? data.perceiverStageId.value
+          : this.perceiverStageId,
+      perceiverPrototypeId: data.perceiverPrototypeId.present
+          ? data.perceiverPrototypeId.value
+          : this.perceiverPrototypeId,
+      attractivenessFormula: data.attractivenessFormula.present
+          ? data.attractivenessFormula.value
+          : this.attractivenessFormula,
+      radiusFormula: data.radiusFormula.present
+          ? data.radiusFormula.value
+          : this.radiusFormula,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AttractivenessSubstrate(')
+          ..write('id: $id, ')
+          ..write('substrateId: $substrateId, ')
+          ..write('perceiverStageId: $perceiverStageId, ')
+          ..write('perceiverPrototypeId: $perceiverPrototypeId, ')
+          ..write('attractivenessFormula: $attractivenessFormula, ')
+          ..write('radiusFormula: $radiusFormula')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    substrateId,
+    perceiverStageId,
+    perceiverPrototypeId,
+    attractivenessFormula,
+    radiusFormula,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is AttractivenessSubstrate &&
+          other.id == this.id &&
+          other.substrateId == this.substrateId &&
+          other.perceiverStageId == this.perceiverStageId &&
+          other.perceiverPrototypeId == this.perceiverPrototypeId &&
+          other.attractivenessFormula == this.attractivenessFormula &&
+          other.radiusFormula == this.radiusFormula);
+}
+
+class AttractivenessSubstratesCompanion
+    extends UpdateCompanion<AttractivenessSubstrate> {
+  final Value<int> id;
+  final Value<int> substrateId;
+  final Value<int?> perceiverStageId;
+  final Value<int?> perceiverPrototypeId;
+  final Value<String> attractivenessFormula;
+  final Value<String> radiusFormula;
+  const AttractivenessSubstratesCompanion({
+    this.id = const Value.absent(),
+    this.substrateId = const Value.absent(),
+    this.perceiverStageId = const Value.absent(),
+    this.perceiverPrototypeId = const Value.absent(),
+    this.attractivenessFormula = const Value.absent(),
+    this.radiusFormula = const Value.absent(),
+  });
+  AttractivenessSubstratesCompanion.insert({
+    this.id = const Value.absent(),
+    required int substrateId,
+    this.perceiverStageId = const Value.absent(),
+    this.perceiverPrototypeId = const Value.absent(),
+    this.attractivenessFormula = const Value.absent(),
+    this.radiusFormula = const Value.absent(),
+  }) : substrateId = Value(substrateId);
+  static Insertable<AttractivenessSubstrate> custom({
+    Expression<int>? id,
+    Expression<int>? substrateId,
+    Expression<int>? perceiverStageId,
+    Expression<int>? perceiverPrototypeId,
+    Expression<String>? attractivenessFormula,
+    Expression<String>? radiusFormula,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (substrateId != null) 'substrate_id': substrateId,
+      if (perceiverStageId != null) 'perceiver_stage_id': perceiverStageId,
+      if (perceiverPrototypeId != null)
+        'perceiver_prototype_id': perceiverPrototypeId,
+      if (attractivenessFormula != null)
+        'attractiveness_formula': attractivenessFormula,
+      if (radiusFormula != null) 'radius_formula': radiusFormula,
+    });
+  }
+
+  AttractivenessSubstratesCompanion copyWith({
+    Value<int>? id,
+    Value<int>? substrateId,
+    Value<int?>? perceiverStageId,
+    Value<int?>? perceiverPrototypeId,
+    Value<String>? attractivenessFormula,
+    Value<String>? radiusFormula,
+  }) {
+    return AttractivenessSubstratesCompanion(
+      id: id ?? this.id,
+      substrateId: substrateId ?? this.substrateId,
+      perceiverStageId: perceiverStageId ?? this.perceiverStageId,
+      perceiverPrototypeId: perceiverPrototypeId ?? this.perceiverPrototypeId,
+      attractivenessFormula:
+          attractivenessFormula ?? this.attractivenessFormula,
+      radiusFormula: radiusFormula ?? this.radiusFormula,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (substrateId.present) {
+      map['substrate_id'] = Variable<int>(substrateId.value);
+    }
+    if (perceiverStageId.present) {
+      map['perceiver_stage_id'] = Variable<int>(perceiverStageId.value);
+    }
+    if (perceiverPrototypeId.present) {
+      map['perceiver_prototype_id'] = Variable<int>(perceiverPrototypeId.value);
+    }
+    if (attractivenessFormula.present) {
+      map['attractiveness_formula'] = Variable<String>(
+        attractivenessFormula.value,
+      );
+    }
+    if (radiusFormula.present) {
+      map['radius_formula'] = Variable<String>(radiusFormula.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AttractivenessSubstratesCompanion(')
+          ..write('id: $id, ')
+          ..write('substrateId: $substrateId, ')
+          ..write('perceiverStageId: $perceiverStageId, ')
+          ..write('perceiverPrototypeId: $perceiverPrototypeId, ')
+          ..write('attractivenessFormula: $attractivenessFormula, ')
+          ..write('radiusFormula: $radiusFormula')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $InteractionSourcesTable extends InteractionSources
+    with TableInfo<$InteractionSourcesTable, InteractionSource> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $InteractionSourcesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _nutrientIdMeta = const VerificationMeta(
+    'nutrientId',
+  );
+  @override
+  late final GeneratedColumn<int> nutrientId = GeneratedColumn<int>(
+    'nutrient_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES nutrients (id)',
+    ),
+  );
+  static const VerificationMeta _perceiverStageIdMeta = const VerificationMeta(
+    'perceiverStageId',
+  );
+  @override
+  late final GeneratedColumn<int> perceiverStageId = GeneratedColumn<int>(
+    'perceiver_stage_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES stages (id)',
+    ),
+  );
+  static const VerificationMeta _perceiverPrototypeIdMeta =
+      const VerificationMeta('perceiverPrototypeId');
+  @override
+  late final GeneratedColumn<int> perceiverPrototypeId = GeneratedColumn<int>(
+    'perceiver_prototype_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES prototypes (id)',
+    ),
+  );
+  static const VerificationMeta _behaviorIndexMeta = const VerificationMeta(
+    'behaviorIndex',
+  );
+  @override
+  late final GeneratedColumn<int> behaviorIndex = GeneratedColumn<int>(
+    'behavior_index',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _formulaMeta = const VerificationMeta(
+    'formula',
+  );
+  @override
+  late final GeneratedColumn<String> formula = GeneratedColumn<String>(
+    'formula',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('0'),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    nutrientId,
+    perceiverStageId,
+    perceiverPrototypeId,
+    behaviorIndex,
+    formula,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'interaction_sources';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<InteractionSource> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('nutrient_id')) {
+      context.handle(
+        _nutrientIdMeta,
+        nutrientId.isAcceptableOrUnknown(data['nutrient_id']!, _nutrientIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nutrientIdMeta);
+    }
+    if (data.containsKey('perceiver_stage_id')) {
+      context.handle(
+        _perceiverStageIdMeta,
+        perceiverStageId.isAcceptableOrUnknown(
+          data['perceiver_stage_id']!,
+          _perceiverStageIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('perceiver_prototype_id')) {
+      context.handle(
+        _perceiverPrototypeIdMeta,
+        perceiverPrototypeId.isAcceptableOrUnknown(
+          data['perceiver_prototype_id']!,
+          _perceiverPrototypeIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('behavior_index')) {
+      context.handle(
+        _behaviorIndexMeta,
+        behaviorIndex.isAcceptableOrUnknown(
+          data['behavior_index']!,
+          _behaviorIndexMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_behaviorIndexMeta);
+    }
+    if (data.containsKey('formula')) {
+      context.handle(
+        _formulaMeta,
+        formula.isAcceptableOrUnknown(data['formula']!, _formulaMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  InteractionSource map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return InteractionSource(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      nutrientId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}nutrient_id'],
+      )!,
+      perceiverStageId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}perceiver_stage_id'],
+      ),
+      perceiverPrototypeId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}perceiver_prototype_id'],
+      ),
+      behaviorIndex: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}behavior_index'],
+      )!,
+      formula: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}formula'],
+      )!,
+    );
+  }
+
+  @override
+  $InteractionSourcesTable createAlias(String alias) {
+    return $InteractionSourcesTable(attachedDatabase, alias);
+  }
+}
+
+class InteractionSource extends DataClass
+    implements Insertable<InteractionSource> {
+  final int id;
+  final int nutrientId;
+  final int? perceiverStageId;
+  final int? perceiverPrototypeId;
+  final int behaviorIndex;
+  final String formula;
+  const InteractionSource({
+    required this.id,
+    required this.nutrientId,
+    this.perceiverStageId,
+    this.perceiverPrototypeId,
+    required this.behaviorIndex,
+    required this.formula,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['nutrient_id'] = Variable<int>(nutrientId);
+    if (!nullToAbsent || perceiverStageId != null) {
+      map['perceiver_stage_id'] = Variable<int>(perceiverStageId);
+    }
+    if (!nullToAbsent || perceiverPrototypeId != null) {
+      map['perceiver_prototype_id'] = Variable<int>(perceiverPrototypeId);
+    }
+    map['behavior_index'] = Variable<int>(behaviorIndex);
+    map['formula'] = Variable<String>(formula);
+    return map;
+  }
+
+  InteractionSourcesCompanion toCompanion(bool nullToAbsent) {
+    return InteractionSourcesCompanion(
+      id: Value(id),
+      nutrientId: Value(nutrientId),
+      perceiverStageId: perceiverStageId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(perceiverStageId),
+      perceiverPrototypeId: perceiverPrototypeId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(perceiverPrototypeId),
+      behaviorIndex: Value(behaviorIndex),
+      formula: Value(formula),
+    );
+  }
+
+  factory InteractionSource.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return InteractionSource(
+      id: serializer.fromJson<int>(json['id']),
+      nutrientId: serializer.fromJson<int>(json['nutrientId']),
+      perceiverStageId: serializer.fromJson<int?>(json['perceiverStageId']),
+      perceiverPrototypeId: serializer.fromJson<int?>(
+        json['perceiverPrototypeId'],
+      ),
+      behaviorIndex: serializer.fromJson<int>(json['behaviorIndex']),
+      formula: serializer.fromJson<String>(json['formula']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'nutrientId': serializer.toJson<int>(nutrientId),
+      'perceiverStageId': serializer.toJson<int?>(perceiverStageId),
+      'perceiverPrototypeId': serializer.toJson<int?>(perceiverPrototypeId),
+      'behaviorIndex': serializer.toJson<int>(behaviorIndex),
+      'formula': serializer.toJson<String>(formula),
+    };
+  }
+
+  InteractionSource copyWith({
+    int? id,
+    int? nutrientId,
+    Value<int?> perceiverStageId = const Value.absent(),
+    Value<int?> perceiverPrototypeId = const Value.absent(),
+    int? behaviorIndex,
+    String? formula,
+  }) => InteractionSource(
+    id: id ?? this.id,
+    nutrientId: nutrientId ?? this.nutrientId,
+    perceiverStageId: perceiverStageId.present
+        ? perceiverStageId.value
+        : this.perceiverStageId,
+    perceiverPrototypeId: perceiverPrototypeId.present
+        ? perceiverPrototypeId.value
+        : this.perceiverPrototypeId,
+    behaviorIndex: behaviorIndex ?? this.behaviorIndex,
+    formula: formula ?? this.formula,
+  );
+  InteractionSource copyWithCompanion(InteractionSourcesCompanion data) {
+    return InteractionSource(
+      id: data.id.present ? data.id.value : this.id,
+      nutrientId: data.nutrientId.present
+          ? data.nutrientId.value
+          : this.nutrientId,
+      perceiverStageId: data.perceiverStageId.present
+          ? data.perceiverStageId.value
+          : this.perceiverStageId,
+      perceiverPrototypeId: data.perceiverPrototypeId.present
+          ? data.perceiverPrototypeId.value
+          : this.perceiverPrototypeId,
+      behaviorIndex: data.behaviorIndex.present
+          ? data.behaviorIndex.value
+          : this.behaviorIndex,
+      formula: data.formula.present ? data.formula.value : this.formula,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('InteractionSource(')
+          ..write('id: $id, ')
+          ..write('nutrientId: $nutrientId, ')
+          ..write('perceiverStageId: $perceiverStageId, ')
+          ..write('perceiverPrototypeId: $perceiverPrototypeId, ')
+          ..write('behaviorIndex: $behaviorIndex, ')
+          ..write('formula: $formula')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    nutrientId,
+    perceiverStageId,
+    perceiverPrototypeId,
+    behaviorIndex,
+    formula,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is InteractionSource &&
+          other.id == this.id &&
+          other.nutrientId == this.nutrientId &&
+          other.perceiverStageId == this.perceiverStageId &&
+          other.perceiverPrototypeId == this.perceiverPrototypeId &&
+          other.behaviorIndex == this.behaviorIndex &&
+          other.formula == this.formula);
+}
+
+class InteractionSourcesCompanion extends UpdateCompanion<InteractionSource> {
+  final Value<int> id;
+  final Value<int> nutrientId;
+  final Value<int?> perceiverStageId;
+  final Value<int?> perceiverPrototypeId;
+  final Value<int> behaviorIndex;
+  final Value<String> formula;
+  const InteractionSourcesCompanion({
+    this.id = const Value.absent(),
+    this.nutrientId = const Value.absent(),
+    this.perceiverStageId = const Value.absent(),
+    this.perceiverPrototypeId = const Value.absent(),
+    this.behaviorIndex = const Value.absent(),
+    this.formula = const Value.absent(),
+  });
+  InteractionSourcesCompanion.insert({
+    this.id = const Value.absent(),
+    required int nutrientId,
+    this.perceiverStageId = const Value.absent(),
+    this.perceiverPrototypeId = const Value.absent(),
+    required int behaviorIndex,
+    this.formula = const Value.absent(),
+  }) : nutrientId = Value(nutrientId),
+       behaviorIndex = Value(behaviorIndex);
+  static Insertable<InteractionSource> custom({
+    Expression<int>? id,
+    Expression<int>? nutrientId,
+    Expression<int>? perceiverStageId,
+    Expression<int>? perceiverPrototypeId,
+    Expression<int>? behaviorIndex,
+    Expression<String>? formula,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (nutrientId != null) 'nutrient_id': nutrientId,
+      if (perceiverStageId != null) 'perceiver_stage_id': perceiverStageId,
+      if (perceiverPrototypeId != null)
+        'perceiver_prototype_id': perceiverPrototypeId,
+      if (behaviorIndex != null) 'behavior_index': behaviorIndex,
+      if (formula != null) 'formula': formula,
+    });
+  }
+
+  InteractionSourcesCompanion copyWith({
+    Value<int>? id,
+    Value<int>? nutrientId,
+    Value<int?>? perceiverStageId,
+    Value<int?>? perceiverPrototypeId,
+    Value<int>? behaviorIndex,
+    Value<String>? formula,
+  }) {
+    return InteractionSourcesCompanion(
+      id: id ?? this.id,
+      nutrientId: nutrientId ?? this.nutrientId,
+      perceiverStageId: perceiverStageId ?? this.perceiverStageId,
+      perceiverPrototypeId: perceiverPrototypeId ?? this.perceiverPrototypeId,
+      behaviorIndex: behaviorIndex ?? this.behaviorIndex,
+      formula: formula ?? this.formula,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (nutrientId.present) {
+      map['nutrient_id'] = Variable<int>(nutrientId.value);
+    }
+    if (perceiverStageId.present) {
+      map['perceiver_stage_id'] = Variable<int>(perceiverStageId.value);
+    }
+    if (perceiverPrototypeId.present) {
+      map['perceiver_prototype_id'] = Variable<int>(perceiverPrototypeId.value);
+    }
+    if (behaviorIndex.present) {
+      map['behavior_index'] = Variable<int>(behaviorIndex.value);
+    }
+    if (formula.present) {
+      map['formula'] = Variable<String>(formula.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('InteractionSourcesCompanion(')
+          ..write('id: $id, ')
+          ..write('nutrientId: $nutrientId, ')
+          ..write('perceiverStageId: $perceiverStageId, ')
+          ..write('perceiverPrototypeId: $perceiverPrototypeId, ')
+          ..write('behaviorIndex: $behaviorIndex, ')
+          ..write('formula: $formula')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $AttractivenessSourcesTable extends AttractivenessSources
+    with TableInfo<$AttractivenessSourcesTable, AttractivenessSource> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $AttractivenessSourcesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _nutrientIdMeta = const VerificationMeta(
+    'nutrientId',
+  );
+  @override
+  late final GeneratedColumn<int> nutrientId = GeneratedColumn<int>(
+    'nutrient_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES nutrients (id)',
+    ),
+  );
+  static const VerificationMeta _perceiverStageIdMeta = const VerificationMeta(
+    'perceiverStageId',
+  );
+  @override
+  late final GeneratedColumn<int> perceiverStageId = GeneratedColumn<int>(
+    'perceiver_stage_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES stages (id)',
+    ),
+  );
+  static const VerificationMeta _perceiverPrototypeIdMeta =
+      const VerificationMeta('perceiverPrototypeId');
+  @override
+  late final GeneratedColumn<int> perceiverPrototypeId = GeneratedColumn<int>(
+    'perceiver_prototype_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES prototypes (id)',
+    ),
+  );
+  static const VerificationMeta _attractivenessFormulaMeta =
+      const VerificationMeta('attractivenessFormula');
+  @override
+  late final GeneratedColumn<String> attractivenessFormula =
+      GeneratedColumn<String>(
+        'attractiveness_formula',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultValue: const Constant('0'),
+      );
+  static const VerificationMeta _radiusFormulaMeta = const VerificationMeta(
+    'radiusFormula',
+  );
+  @override
+  late final GeneratedColumn<String> radiusFormula = GeneratedColumn<String>(
+    'radius_formula',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('5'),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    nutrientId,
+    perceiverStageId,
+    perceiverPrototypeId,
+    attractivenessFormula,
+    radiusFormula,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'attractiveness_sources';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<AttractivenessSource> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('nutrient_id')) {
+      context.handle(
+        _nutrientIdMeta,
+        nutrientId.isAcceptableOrUnknown(data['nutrient_id']!, _nutrientIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nutrientIdMeta);
+    }
+    if (data.containsKey('perceiver_stage_id')) {
+      context.handle(
+        _perceiverStageIdMeta,
+        perceiverStageId.isAcceptableOrUnknown(
+          data['perceiver_stage_id']!,
+          _perceiverStageIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('perceiver_prototype_id')) {
+      context.handle(
+        _perceiverPrototypeIdMeta,
+        perceiverPrototypeId.isAcceptableOrUnknown(
+          data['perceiver_prototype_id']!,
+          _perceiverPrototypeIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('attractiveness_formula')) {
+      context.handle(
+        _attractivenessFormulaMeta,
+        attractivenessFormula.isAcceptableOrUnknown(
+          data['attractiveness_formula']!,
+          _attractivenessFormulaMeta,
+        ),
+      );
+    }
+    if (data.containsKey('radius_formula')) {
+      context.handle(
+        _radiusFormulaMeta,
+        radiusFormula.isAcceptableOrUnknown(
+          data['radius_formula']!,
+          _radiusFormulaMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  AttractivenessSource map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return AttractivenessSource(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      nutrientId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}nutrient_id'],
+      )!,
+      perceiverStageId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}perceiver_stage_id'],
+      ),
+      perceiverPrototypeId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}perceiver_prototype_id'],
+      ),
+      attractivenessFormula: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}attractiveness_formula'],
+      )!,
+      radiusFormula: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}radius_formula'],
+      )!,
+    );
+  }
+
+  @override
+  $AttractivenessSourcesTable createAlias(String alias) {
+    return $AttractivenessSourcesTable(attachedDatabase, alias);
+  }
+}
+
+class AttractivenessSource extends DataClass
+    implements Insertable<AttractivenessSource> {
+  final int id;
+  final int nutrientId;
+  final int? perceiverStageId;
+  final int? perceiverPrototypeId;
+  final String attractivenessFormula;
+  final String radiusFormula;
+  const AttractivenessSource({
+    required this.id,
+    required this.nutrientId,
+    this.perceiverStageId,
+    this.perceiverPrototypeId,
+    required this.attractivenessFormula,
+    required this.radiusFormula,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['nutrient_id'] = Variable<int>(nutrientId);
+    if (!nullToAbsent || perceiverStageId != null) {
+      map['perceiver_stage_id'] = Variable<int>(perceiverStageId);
+    }
+    if (!nullToAbsent || perceiverPrototypeId != null) {
+      map['perceiver_prototype_id'] = Variable<int>(perceiverPrototypeId);
+    }
+    map['attractiveness_formula'] = Variable<String>(attractivenessFormula);
+    map['radius_formula'] = Variable<String>(radiusFormula);
+    return map;
+  }
+
+  AttractivenessSourcesCompanion toCompanion(bool nullToAbsent) {
+    return AttractivenessSourcesCompanion(
+      id: Value(id),
+      nutrientId: Value(nutrientId),
+      perceiverStageId: perceiverStageId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(perceiverStageId),
+      perceiverPrototypeId: perceiverPrototypeId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(perceiverPrototypeId),
+      attractivenessFormula: Value(attractivenessFormula),
+      radiusFormula: Value(radiusFormula),
+    );
+  }
+
+  factory AttractivenessSource.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return AttractivenessSource(
+      id: serializer.fromJson<int>(json['id']),
+      nutrientId: serializer.fromJson<int>(json['nutrientId']),
+      perceiverStageId: serializer.fromJson<int?>(json['perceiverStageId']),
+      perceiverPrototypeId: serializer.fromJson<int?>(
+        json['perceiverPrototypeId'],
+      ),
+      attractivenessFormula: serializer.fromJson<String>(
+        json['attractivenessFormula'],
+      ),
+      radiusFormula: serializer.fromJson<String>(json['radiusFormula']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'nutrientId': serializer.toJson<int>(nutrientId),
+      'perceiverStageId': serializer.toJson<int?>(perceiverStageId),
+      'perceiverPrototypeId': serializer.toJson<int?>(perceiverPrototypeId),
+      'attractivenessFormula': serializer.toJson<String>(attractivenessFormula),
+      'radiusFormula': serializer.toJson<String>(radiusFormula),
+    };
+  }
+
+  AttractivenessSource copyWith({
+    int? id,
+    int? nutrientId,
+    Value<int?> perceiverStageId = const Value.absent(),
+    Value<int?> perceiverPrototypeId = const Value.absent(),
+    String? attractivenessFormula,
+    String? radiusFormula,
+  }) => AttractivenessSource(
+    id: id ?? this.id,
+    nutrientId: nutrientId ?? this.nutrientId,
+    perceiverStageId: perceiverStageId.present
+        ? perceiverStageId.value
+        : this.perceiverStageId,
+    perceiverPrototypeId: perceiverPrototypeId.present
+        ? perceiverPrototypeId.value
+        : this.perceiverPrototypeId,
+    attractivenessFormula: attractivenessFormula ?? this.attractivenessFormula,
+    radiusFormula: radiusFormula ?? this.radiusFormula,
+  );
+  AttractivenessSource copyWithCompanion(AttractivenessSourcesCompanion data) {
+    return AttractivenessSource(
+      id: data.id.present ? data.id.value : this.id,
+      nutrientId: data.nutrientId.present
+          ? data.nutrientId.value
+          : this.nutrientId,
+      perceiverStageId: data.perceiverStageId.present
+          ? data.perceiverStageId.value
+          : this.perceiverStageId,
+      perceiverPrototypeId: data.perceiverPrototypeId.present
+          ? data.perceiverPrototypeId.value
+          : this.perceiverPrototypeId,
+      attractivenessFormula: data.attractivenessFormula.present
+          ? data.attractivenessFormula.value
+          : this.attractivenessFormula,
+      radiusFormula: data.radiusFormula.present
+          ? data.radiusFormula.value
+          : this.radiusFormula,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AttractivenessSource(')
+          ..write('id: $id, ')
+          ..write('nutrientId: $nutrientId, ')
+          ..write('perceiverStageId: $perceiverStageId, ')
+          ..write('perceiverPrototypeId: $perceiverPrototypeId, ')
+          ..write('attractivenessFormula: $attractivenessFormula, ')
+          ..write('radiusFormula: $radiusFormula')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    nutrientId,
+    perceiverStageId,
+    perceiverPrototypeId,
+    attractivenessFormula,
+    radiusFormula,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is AttractivenessSource &&
+          other.id == this.id &&
+          other.nutrientId == this.nutrientId &&
+          other.perceiverStageId == this.perceiverStageId &&
+          other.perceiverPrototypeId == this.perceiverPrototypeId &&
+          other.attractivenessFormula == this.attractivenessFormula &&
+          other.radiusFormula == this.radiusFormula);
+}
+
+class AttractivenessSourcesCompanion
+    extends UpdateCompanion<AttractivenessSource> {
+  final Value<int> id;
+  final Value<int> nutrientId;
+  final Value<int?> perceiverStageId;
+  final Value<int?> perceiverPrototypeId;
+  final Value<String> attractivenessFormula;
+  final Value<String> radiusFormula;
+  const AttractivenessSourcesCompanion({
+    this.id = const Value.absent(),
+    this.nutrientId = const Value.absent(),
+    this.perceiverStageId = const Value.absent(),
+    this.perceiverPrototypeId = const Value.absent(),
+    this.attractivenessFormula = const Value.absent(),
+    this.radiusFormula = const Value.absent(),
+  });
+  AttractivenessSourcesCompanion.insert({
+    this.id = const Value.absent(),
+    required int nutrientId,
+    this.perceiverStageId = const Value.absent(),
+    this.perceiverPrototypeId = const Value.absent(),
+    this.attractivenessFormula = const Value.absent(),
+    this.radiusFormula = const Value.absent(),
+  }) : nutrientId = Value(nutrientId);
+  static Insertable<AttractivenessSource> custom({
+    Expression<int>? id,
+    Expression<int>? nutrientId,
+    Expression<int>? perceiverStageId,
+    Expression<int>? perceiverPrototypeId,
+    Expression<String>? attractivenessFormula,
+    Expression<String>? radiusFormula,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (nutrientId != null) 'nutrient_id': nutrientId,
+      if (perceiverStageId != null) 'perceiver_stage_id': perceiverStageId,
+      if (perceiverPrototypeId != null)
+        'perceiver_prototype_id': perceiverPrototypeId,
+      if (attractivenessFormula != null)
+        'attractiveness_formula': attractivenessFormula,
+      if (radiusFormula != null) 'radius_formula': radiusFormula,
+    });
+  }
+
+  AttractivenessSourcesCompanion copyWith({
+    Value<int>? id,
+    Value<int>? nutrientId,
+    Value<int?>? perceiverStageId,
+    Value<int?>? perceiverPrototypeId,
+    Value<String>? attractivenessFormula,
+    Value<String>? radiusFormula,
+  }) {
+    return AttractivenessSourcesCompanion(
+      id: id ?? this.id,
+      nutrientId: nutrientId ?? this.nutrientId,
+      perceiverStageId: perceiverStageId ?? this.perceiverStageId,
+      perceiverPrototypeId: perceiverPrototypeId ?? this.perceiverPrototypeId,
+      attractivenessFormula:
+          attractivenessFormula ?? this.attractivenessFormula,
+      radiusFormula: radiusFormula ?? this.radiusFormula,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (nutrientId.present) {
+      map['nutrient_id'] = Variable<int>(nutrientId.value);
+    }
+    if (perceiverStageId.present) {
+      map['perceiver_stage_id'] = Variable<int>(perceiverStageId.value);
+    }
+    if (perceiverPrototypeId.present) {
+      map['perceiver_prototype_id'] = Variable<int>(perceiverPrototypeId.value);
+    }
+    if (attractivenessFormula.present) {
+      map['attractiveness_formula'] = Variable<String>(
+        attractivenessFormula.value,
+      );
+    }
+    if (radiusFormula.present) {
+      map['radius_formula'] = Variable<String>(radiusFormula.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AttractivenessSourcesCompanion(')
+          ..write('id: $id, ')
+          ..write('nutrientId: $nutrientId, ')
+          ..write('perceiverStageId: $perceiverStageId, ')
+          ..write('perceiverPrototypeId: $perceiverPrototypeId, ')
+          ..write('attractivenessFormula: $attractivenessFormula, ')
+          ..write('radiusFormula: $radiusFormula')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $InteractionAgentsTable extends InteractionAgents
+    with TableInfo<$InteractionAgentsTable, InteractionAgent> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $InteractionAgentsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _observedStageIdMeta = const VerificationMeta(
+    'observedStageId',
+  );
+  @override
+  late final GeneratedColumn<int> observedStageId = GeneratedColumn<int>(
+    'observed_stage_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES stages (id)',
+    ),
+  );
+  static const VerificationMeta _observedPrototypeIdMeta =
+      const VerificationMeta('observedPrototypeId');
+  @override
+  late final GeneratedColumn<int> observedPrototypeId = GeneratedColumn<int>(
+    'observed_prototype_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES prototypes (id)',
+    ),
+  );
+  static const VerificationMeta _perceiverStageIdMeta = const VerificationMeta(
+    'perceiverStageId',
+  );
+  @override
+  late final GeneratedColumn<int> perceiverStageId = GeneratedColumn<int>(
+    'perceiver_stage_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES stages (id)',
+    ),
+  );
+  static const VerificationMeta _perceiverPrototypeIdMeta =
+      const VerificationMeta('perceiverPrototypeId');
+  @override
+  late final GeneratedColumn<int> perceiverPrototypeId = GeneratedColumn<int>(
+    'perceiver_prototype_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES prototypes (id)',
+    ),
+  );
+  static const VerificationMeta _behaviorIndexMeta = const VerificationMeta(
+    'behaviorIndex',
+  );
+  @override
+  late final GeneratedColumn<int> behaviorIndex = GeneratedColumn<int>(
+    'behavior_index',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _formulaMeta = const VerificationMeta(
+    'formula',
+  );
+  @override
+  late final GeneratedColumn<String> formula = GeneratedColumn<String>(
+    'formula',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('0'),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    observedStageId,
+    observedPrototypeId,
+    perceiverStageId,
+    perceiverPrototypeId,
+    behaviorIndex,
+    formula,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'interaction_agents';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<InteractionAgent> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('observed_stage_id')) {
+      context.handle(
+        _observedStageIdMeta,
+        observedStageId.isAcceptableOrUnknown(
+          data['observed_stage_id']!,
+          _observedStageIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('observed_prototype_id')) {
+      context.handle(
+        _observedPrototypeIdMeta,
+        observedPrototypeId.isAcceptableOrUnknown(
+          data['observed_prototype_id']!,
+          _observedPrototypeIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('perceiver_stage_id')) {
+      context.handle(
+        _perceiverStageIdMeta,
+        perceiverStageId.isAcceptableOrUnknown(
+          data['perceiver_stage_id']!,
+          _perceiverStageIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('perceiver_prototype_id')) {
+      context.handle(
+        _perceiverPrototypeIdMeta,
+        perceiverPrototypeId.isAcceptableOrUnknown(
+          data['perceiver_prototype_id']!,
+          _perceiverPrototypeIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('behavior_index')) {
+      context.handle(
+        _behaviorIndexMeta,
+        behaviorIndex.isAcceptableOrUnknown(
+          data['behavior_index']!,
+          _behaviorIndexMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_behaviorIndexMeta);
+    }
+    if (data.containsKey('formula')) {
+      context.handle(
+        _formulaMeta,
+        formula.isAcceptableOrUnknown(data['formula']!, _formulaMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  InteractionAgent map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return InteractionAgent(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      observedStageId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}observed_stage_id'],
+      ),
+      observedPrototypeId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}observed_prototype_id'],
+      ),
+      perceiverStageId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}perceiver_stage_id'],
+      ),
+      perceiverPrototypeId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}perceiver_prototype_id'],
+      ),
+      behaviorIndex: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}behavior_index'],
+      )!,
+      formula: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}formula'],
+      )!,
+    );
+  }
+
+  @override
+  $InteractionAgentsTable createAlias(String alias) {
+    return $InteractionAgentsTable(attachedDatabase, alias);
+  }
+}
+
+class InteractionAgent extends DataClass
+    implements Insertable<InteractionAgent> {
+  final int id;
+  final int? observedStageId;
+  final int? observedPrototypeId;
+  final int? perceiverStageId;
+  final int? perceiverPrototypeId;
+  final int behaviorIndex;
+  final String formula;
+  const InteractionAgent({
+    required this.id,
+    this.observedStageId,
+    this.observedPrototypeId,
+    this.perceiverStageId,
+    this.perceiverPrototypeId,
+    required this.behaviorIndex,
+    required this.formula,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    if (!nullToAbsent || observedStageId != null) {
+      map['observed_stage_id'] = Variable<int>(observedStageId);
+    }
+    if (!nullToAbsent || observedPrototypeId != null) {
+      map['observed_prototype_id'] = Variable<int>(observedPrototypeId);
+    }
+    if (!nullToAbsent || perceiverStageId != null) {
+      map['perceiver_stage_id'] = Variable<int>(perceiverStageId);
+    }
+    if (!nullToAbsent || perceiverPrototypeId != null) {
+      map['perceiver_prototype_id'] = Variable<int>(perceiverPrototypeId);
+    }
+    map['behavior_index'] = Variable<int>(behaviorIndex);
+    map['formula'] = Variable<String>(formula);
+    return map;
+  }
+
+  InteractionAgentsCompanion toCompanion(bool nullToAbsent) {
+    return InteractionAgentsCompanion(
+      id: Value(id),
+      observedStageId: observedStageId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(observedStageId),
+      observedPrototypeId: observedPrototypeId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(observedPrototypeId),
+      perceiverStageId: perceiverStageId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(perceiverStageId),
+      perceiverPrototypeId: perceiverPrototypeId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(perceiverPrototypeId),
+      behaviorIndex: Value(behaviorIndex),
+      formula: Value(formula),
+    );
+  }
+
+  factory InteractionAgent.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return InteractionAgent(
+      id: serializer.fromJson<int>(json['id']),
+      observedStageId: serializer.fromJson<int?>(json['observedStageId']),
+      observedPrototypeId: serializer.fromJson<int?>(
+        json['observedPrototypeId'],
+      ),
+      perceiverStageId: serializer.fromJson<int?>(json['perceiverStageId']),
+      perceiverPrototypeId: serializer.fromJson<int?>(
+        json['perceiverPrototypeId'],
+      ),
+      behaviorIndex: serializer.fromJson<int>(json['behaviorIndex']),
+      formula: serializer.fromJson<String>(json['formula']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'observedStageId': serializer.toJson<int?>(observedStageId),
+      'observedPrototypeId': serializer.toJson<int?>(observedPrototypeId),
+      'perceiverStageId': serializer.toJson<int?>(perceiverStageId),
+      'perceiverPrototypeId': serializer.toJson<int?>(perceiverPrototypeId),
+      'behaviorIndex': serializer.toJson<int>(behaviorIndex),
+      'formula': serializer.toJson<String>(formula),
+    };
+  }
+
+  InteractionAgent copyWith({
+    int? id,
+    Value<int?> observedStageId = const Value.absent(),
+    Value<int?> observedPrototypeId = const Value.absent(),
+    Value<int?> perceiverStageId = const Value.absent(),
+    Value<int?> perceiverPrototypeId = const Value.absent(),
+    int? behaviorIndex,
+    String? formula,
+  }) => InteractionAgent(
+    id: id ?? this.id,
+    observedStageId: observedStageId.present
+        ? observedStageId.value
+        : this.observedStageId,
+    observedPrototypeId: observedPrototypeId.present
+        ? observedPrototypeId.value
+        : this.observedPrototypeId,
+    perceiverStageId: perceiverStageId.present
+        ? perceiverStageId.value
+        : this.perceiverStageId,
+    perceiverPrototypeId: perceiverPrototypeId.present
+        ? perceiverPrototypeId.value
+        : this.perceiverPrototypeId,
+    behaviorIndex: behaviorIndex ?? this.behaviorIndex,
+    formula: formula ?? this.formula,
+  );
+  InteractionAgent copyWithCompanion(InteractionAgentsCompanion data) {
+    return InteractionAgent(
+      id: data.id.present ? data.id.value : this.id,
+      observedStageId: data.observedStageId.present
+          ? data.observedStageId.value
+          : this.observedStageId,
+      observedPrototypeId: data.observedPrototypeId.present
+          ? data.observedPrototypeId.value
+          : this.observedPrototypeId,
+      perceiverStageId: data.perceiverStageId.present
+          ? data.perceiverStageId.value
+          : this.perceiverStageId,
+      perceiverPrototypeId: data.perceiverPrototypeId.present
+          ? data.perceiverPrototypeId.value
+          : this.perceiverPrototypeId,
+      behaviorIndex: data.behaviorIndex.present
+          ? data.behaviorIndex.value
+          : this.behaviorIndex,
+      formula: data.formula.present ? data.formula.value : this.formula,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('InteractionAgent(')
+          ..write('id: $id, ')
+          ..write('observedStageId: $observedStageId, ')
+          ..write('observedPrototypeId: $observedPrototypeId, ')
+          ..write('perceiverStageId: $perceiverStageId, ')
+          ..write('perceiverPrototypeId: $perceiverPrototypeId, ')
+          ..write('behaviorIndex: $behaviorIndex, ')
+          ..write('formula: $formula')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    observedStageId,
+    observedPrototypeId,
+    perceiverStageId,
+    perceiverPrototypeId,
+    behaviorIndex,
+    formula,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is InteractionAgent &&
+          other.id == this.id &&
+          other.observedStageId == this.observedStageId &&
+          other.observedPrototypeId == this.observedPrototypeId &&
+          other.perceiverStageId == this.perceiverStageId &&
+          other.perceiverPrototypeId == this.perceiverPrototypeId &&
+          other.behaviorIndex == this.behaviorIndex &&
+          other.formula == this.formula);
+}
+
+class InteractionAgentsCompanion extends UpdateCompanion<InteractionAgent> {
+  final Value<int> id;
+  final Value<int?> observedStageId;
+  final Value<int?> observedPrototypeId;
+  final Value<int?> perceiverStageId;
+  final Value<int?> perceiverPrototypeId;
+  final Value<int> behaviorIndex;
+  final Value<String> formula;
+  const InteractionAgentsCompanion({
+    this.id = const Value.absent(),
+    this.observedStageId = const Value.absent(),
+    this.observedPrototypeId = const Value.absent(),
+    this.perceiverStageId = const Value.absent(),
+    this.perceiverPrototypeId = const Value.absent(),
+    this.behaviorIndex = const Value.absent(),
+    this.formula = const Value.absent(),
+  });
+  InteractionAgentsCompanion.insert({
+    this.id = const Value.absent(),
+    this.observedStageId = const Value.absent(),
+    this.observedPrototypeId = const Value.absent(),
+    this.perceiverStageId = const Value.absent(),
+    this.perceiverPrototypeId = const Value.absent(),
+    required int behaviorIndex,
+    this.formula = const Value.absent(),
+  }) : behaviorIndex = Value(behaviorIndex);
+  static Insertable<InteractionAgent> custom({
+    Expression<int>? id,
+    Expression<int>? observedStageId,
+    Expression<int>? observedPrototypeId,
+    Expression<int>? perceiverStageId,
+    Expression<int>? perceiverPrototypeId,
+    Expression<int>? behaviorIndex,
+    Expression<String>? formula,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (observedStageId != null) 'observed_stage_id': observedStageId,
+      if (observedPrototypeId != null)
+        'observed_prototype_id': observedPrototypeId,
+      if (perceiverStageId != null) 'perceiver_stage_id': perceiverStageId,
+      if (perceiverPrototypeId != null)
+        'perceiver_prototype_id': perceiverPrototypeId,
+      if (behaviorIndex != null) 'behavior_index': behaviorIndex,
+      if (formula != null) 'formula': formula,
+    });
+  }
+
+  InteractionAgentsCompanion copyWith({
+    Value<int>? id,
+    Value<int?>? observedStageId,
+    Value<int?>? observedPrototypeId,
+    Value<int?>? perceiverStageId,
+    Value<int?>? perceiverPrototypeId,
+    Value<int>? behaviorIndex,
+    Value<String>? formula,
+  }) {
+    return InteractionAgentsCompanion(
+      id: id ?? this.id,
+      observedStageId: observedStageId ?? this.observedStageId,
+      observedPrototypeId: observedPrototypeId ?? this.observedPrototypeId,
+      perceiverStageId: perceiverStageId ?? this.perceiverStageId,
+      perceiverPrototypeId: perceiverPrototypeId ?? this.perceiverPrototypeId,
+      behaviorIndex: behaviorIndex ?? this.behaviorIndex,
+      formula: formula ?? this.formula,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (observedStageId.present) {
+      map['observed_stage_id'] = Variable<int>(observedStageId.value);
+    }
+    if (observedPrototypeId.present) {
+      map['observed_prototype_id'] = Variable<int>(observedPrototypeId.value);
+    }
+    if (perceiverStageId.present) {
+      map['perceiver_stage_id'] = Variable<int>(perceiverStageId.value);
+    }
+    if (perceiverPrototypeId.present) {
+      map['perceiver_prototype_id'] = Variable<int>(perceiverPrototypeId.value);
+    }
+    if (behaviorIndex.present) {
+      map['behavior_index'] = Variable<int>(behaviorIndex.value);
+    }
+    if (formula.present) {
+      map['formula'] = Variable<String>(formula.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('InteractionAgentsCompanion(')
+          ..write('id: $id, ')
+          ..write('observedStageId: $observedStageId, ')
+          ..write('observedPrototypeId: $observedPrototypeId, ')
+          ..write('perceiverStageId: $perceiverStageId, ')
+          ..write('perceiverPrototypeId: $perceiverPrototypeId, ')
+          ..write('behaviorIndex: $behaviorIndex, ')
+          ..write('formula: $formula')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $AttractivenessAgentsTable extends AttractivenessAgents
+    with TableInfo<$AttractivenessAgentsTable, AttractivenessAgent> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $AttractivenessAgentsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _observedStageIdMeta = const VerificationMeta(
+    'observedStageId',
+  );
+  @override
+  late final GeneratedColumn<int> observedStageId = GeneratedColumn<int>(
+    'observed_stage_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES stages (id)',
+    ),
+  );
+  static const VerificationMeta _observedPrototypeIdMeta =
+      const VerificationMeta('observedPrototypeId');
+  @override
+  late final GeneratedColumn<int> observedPrototypeId = GeneratedColumn<int>(
+    'observed_prototype_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES prototypes (id)',
+    ),
+  );
+  static const VerificationMeta _perceiverStageIdMeta = const VerificationMeta(
+    'perceiverStageId',
+  );
+  @override
+  late final GeneratedColumn<int> perceiverStageId = GeneratedColumn<int>(
+    'perceiver_stage_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES stages (id)',
+    ),
+  );
+  static const VerificationMeta _perceiverPrototypeIdMeta =
+      const VerificationMeta('perceiverPrototypeId');
+  @override
+  late final GeneratedColumn<int> perceiverPrototypeId = GeneratedColumn<int>(
+    'perceiver_prototype_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES prototypes (id)',
+    ),
+  );
+  static const VerificationMeta _attractivenessFormulaMeta =
+      const VerificationMeta('attractivenessFormula');
+  @override
+  late final GeneratedColumn<String> attractivenessFormula =
+      GeneratedColumn<String>(
+        'attractiveness_formula',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultValue: const Constant('0'),
+      );
+  static const VerificationMeta _radiusFormulaMeta = const VerificationMeta(
+    'radiusFormula',
+  );
+  @override
+  late final GeneratedColumn<String> radiusFormula = GeneratedColumn<String>(
+    'radius_formula',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('5'),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    observedStageId,
+    observedPrototypeId,
+    perceiverStageId,
+    perceiverPrototypeId,
+    attractivenessFormula,
+    radiusFormula,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'attractiveness_agents';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<AttractivenessAgent> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('observed_stage_id')) {
+      context.handle(
+        _observedStageIdMeta,
+        observedStageId.isAcceptableOrUnknown(
+          data['observed_stage_id']!,
+          _observedStageIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('observed_prototype_id')) {
+      context.handle(
+        _observedPrototypeIdMeta,
+        observedPrototypeId.isAcceptableOrUnknown(
+          data['observed_prototype_id']!,
+          _observedPrototypeIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('perceiver_stage_id')) {
+      context.handle(
+        _perceiverStageIdMeta,
+        perceiverStageId.isAcceptableOrUnknown(
+          data['perceiver_stage_id']!,
+          _perceiverStageIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('perceiver_prototype_id')) {
+      context.handle(
+        _perceiverPrototypeIdMeta,
+        perceiverPrototypeId.isAcceptableOrUnknown(
+          data['perceiver_prototype_id']!,
+          _perceiverPrototypeIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('attractiveness_formula')) {
+      context.handle(
+        _attractivenessFormulaMeta,
+        attractivenessFormula.isAcceptableOrUnknown(
+          data['attractiveness_formula']!,
+          _attractivenessFormulaMeta,
+        ),
+      );
+    }
+    if (data.containsKey('radius_formula')) {
+      context.handle(
+        _radiusFormulaMeta,
+        radiusFormula.isAcceptableOrUnknown(
+          data['radius_formula']!,
+          _radiusFormulaMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  AttractivenessAgent map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return AttractivenessAgent(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      observedStageId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}observed_stage_id'],
+      ),
+      observedPrototypeId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}observed_prototype_id'],
+      ),
+      perceiverStageId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}perceiver_stage_id'],
+      ),
+      perceiverPrototypeId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}perceiver_prototype_id'],
+      ),
+      attractivenessFormula: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}attractiveness_formula'],
+      )!,
+      radiusFormula: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}radius_formula'],
+      )!,
+    );
+  }
+
+  @override
+  $AttractivenessAgentsTable createAlias(String alias) {
+    return $AttractivenessAgentsTable(attachedDatabase, alias);
+  }
+}
+
+class AttractivenessAgent extends DataClass
+    implements Insertable<AttractivenessAgent> {
+  final int id;
+  final int? observedStageId;
+  final int? observedPrototypeId;
+  final int? perceiverStageId;
+  final int? perceiverPrototypeId;
+  final String attractivenessFormula;
+  final String radiusFormula;
+  const AttractivenessAgent({
+    required this.id,
+    this.observedStageId,
+    this.observedPrototypeId,
+    this.perceiverStageId,
+    this.perceiverPrototypeId,
+    required this.attractivenessFormula,
+    required this.radiusFormula,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    if (!nullToAbsent || observedStageId != null) {
+      map['observed_stage_id'] = Variable<int>(observedStageId);
+    }
+    if (!nullToAbsent || observedPrototypeId != null) {
+      map['observed_prototype_id'] = Variable<int>(observedPrototypeId);
+    }
+    if (!nullToAbsent || perceiverStageId != null) {
+      map['perceiver_stage_id'] = Variable<int>(perceiverStageId);
+    }
+    if (!nullToAbsent || perceiverPrototypeId != null) {
+      map['perceiver_prototype_id'] = Variable<int>(perceiverPrototypeId);
+    }
+    map['attractiveness_formula'] = Variable<String>(attractivenessFormula);
+    map['radius_formula'] = Variable<String>(radiusFormula);
+    return map;
+  }
+
+  AttractivenessAgentsCompanion toCompanion(bool nullToAbsent) {
+    return AttractivenessAgentsCompanion(
+      id: Value(id),
+      observedStageId: observedStageId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(observedStageId),
+      observedPrototypeId: observedPrototypeId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(observedPrototypeId),
+      perceiverStageId: perceiverStageId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(perceiverStageId),
+      perceiverPrototypeId: perceiverPrototypeId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(perceiverPrototypeId),
+      attractivenessFormula: Value(attractivenessFormula),
+      radiusFormula: Value(radiusFormula),
+    );
+  }
+
+  factory AttractivenessAgent.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return AttractivenessAgent(
+      id: serializer.fromJson<int>(json['id']),
+      observedStageId: serializer.fromJson<int?>(json['observedStageId']),
+      observedPrototypeId: serializer.fromJson<int?>(
+        json['observedPrototypeId'],
+      ),
+      perceiverStageId: serializer.fromJson<int?>(json['perceiverStageId']),
+      perceiverPrototypeId: serializer.fromJson<int?>(
+        json['perceiverPrototypeId'],
+      ),
+      attractivenessFormula: serializer.fromJson<String>(
+        json['attractivenessFormula'],
+      ),
+      radiusFormula: serializer.fromJson<String>(json['radiusFormula']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'observedStageId': serializer.toJson<int?>(observedStageId),
+      'observedPrototypeId': serializer.toJson<int?>(observedPrototypeId),
+      'perceiverStageId': serializer.toJson<int?>(perceiverStageId),
+      'perceiverPrototypeId': serializer.toJson<int?>(perceiverPrototypeId),
+      'attractivenessFormula': serializer.toJson<String>(attractivenessFormula),
+      'radiusFormula': serializer.toJson<String>(radiusFormula),
+    };
+  }
+
+  AttractivenessAgent copyWith({
+    int? id,
+    Value<int?> observedStageId = const Value.absent(),
+    Value<int?> observedPrototypeId = const Value.absent(),
+    Value<int?> perceiverStageId = const Value.absent(),
+    Value<int?> perceiverPrototypeId = const Value.absent(),
+    String? attractivenessFormula,
+    String? radiusFormula,
+  }) => AttractivenessAgent(
+    id: id ?? this.id,
+    observedStageId: observedStageId.present
+        ? observedStageId.value
+        : this.observedStageId,
+    observedPrototypeId: observedPrototypeId.present
+        ? observedPrototypeId.value
+        : this.observedPrototypeId,
+    perceiverStageId: perceiverStageId.present
+        ? perceiverStageId.value
+        : this.perceiverStageId,
+    perceiverPrototypeId: perceiverPrototypeId.present
+        ? perceiverPrototypeId.value
+        : this.perceiverPrototypeId,
+    attractivenessFormula: attractivenessFormula ?? this.attractivenessFormula,
+    radiusFormula: radiusFormula ?? this.radiusFormula,
+  );
+  AttractivenessAgent copyWithCompanion(AttractivenessAgentsCompanion data) {
+    return AttractivenessAgent(
+      id: data.id.present ? data.id.value : this.id,
+      observedStageId: data.observedStageId.present
+          ? data.observedStageId.value
+          : this.observedStageId,
+      observedPrototypeId: data.observedPrototypeId.present
+          ? data.observedPrototypeId.value
+          : this.observedPrototypeId,
+      perceiverStageId: data.perceiverStageId.present
+          ? data.perceiverStageId.value
+          : this.perceiverStageId,
+      perceiverPrototypeId: data.perceiverPrototypeId.present
+          ? data.perceiverPrototypeId.value
+          : this.perceiverPrototypeId,
+      attractivenessFormula: data.attractivenessFormula.present
+          ? data.attractivenessFormula.value
+          : this.attractivenessFormula,
+      radiusFormula: data.radiusFormula.present
+          ? data.radiusFormula.value
+          : this.radiusFormula,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AttractivenessAgent(')
+          ..write('id: $id, ')
+          ..write('observedStageId: $observedStageId, ')
+          ..write('observedPrototypeId: $observedPrototypeId, ')
+          ..write('perceiverStageId: $perceiverStageId, ')
+          ..write('perceiverPrototypeId: $perceiverPrototypeId, ')
+          ..write('attractivenessFormula: $attractivenessFormula, ')
+          ..write('radiusFormula: $radiusFormula')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    observedStageId,
+    observedPrototypeId,
+    perceiverStageId,
+    perceiverPrototypeId,
+    attractivenessFormula,
+    radiusFormula,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is AttractivenessAgent &&
+          other.id == this.id &&
+          other.observedStageId == this.observedStageId &&
+          other.observedPrototypeId == this.observedPrototypeId &&
+          other.perceiverStageId == this.perceiverStageId &&
+          other.perceiverPrototypeId == this.perceiverPrototypeId &&
+          other.attractivenessFormula == this.attractivenessFormula &&
+          other.radiusFormula == this.radiusFormula);
+}
+
+class AttractivenessAgentsCompanion
+    extends UpdateCompanion<AttractivenessAgent> {
+  final Value<int> id;
+  final Value<int?> observedStageId;
+  final Value<int?> observedPrototypeId;
+  final Value<int?> perceiverStageId;
+  final Value<int?> perceiverPrototypeId;
+  final Value<String> attractivenessFormula;
+  final Value<String> radiusFormula;
+  const AttractivenessAgentsCompanion({
+    this.id = const Value.absent(),
+    this.observedStageId = const Value.absent(),
+    this.observedPrototypeId = const Value.absent(),
+    this.perceiverStageId = const Value.absent(),
+    this.perceiverPrototypeId = const Value.absent(),
+    this.attractivenessFormula = const Value.absent(),
+    this.radiusFormula = const Value.absent(),
+  });
+  AttractivenessAgentsCompanion.insert({
+    this.id = const Value.absent(),
+    this.observedStageId = const Value.absent(),
+    this.observedPrototypeId = const Value.absent(),
+    this.perceiverStageId = const Value.absent(),
+    this.perceiverPrototypeId = const Value.absent(),
+    this.attractivenessFormula = const Value.absent(),
+    this.radiusFormula = const Value.absent(),
+  });
+  static Insertable<AttractivenessAgent> custom({
+    Expression<int>? id,
+    Expression<int>? observedStageId,
+    Expression<int>? observedPrototypeId,
+    Expression<int>? perceiverStageId,
+    Expression<int>? perceiverPrototypeId,
+    Expression<String>? attractivenessFormula,
+    Expression<String>? radiusFormula,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (observedStageId != null) 'observed_stage_id': observedStageId,
+      if (observedPrototypeId != null)
+        'observed_prototype_id': observedPrototypeId,
+      if (perceiverStageId != null) 'perceiver_stage_id': perceiverStageId,
+      if (perceiverPrototypeId != null)
+        'perceiver_prototype_id': perceiverPrototypeId,
+      if (attractivenessFormula != null)
+        'attractiveness_formula': attractivenessFormula,
+      if (radiusFormula != null) 'radius_formula': radiusFormula,
+    });
+  }
+
+  AttractivenessAgentsCompanion copyWith({
+    Value<int>? id,
+    Value<int?>? observedStageId,
+    Value<int?>? observedPrototypeId,
+    Value<int?>? perceiverStageId,
+    Value<int?>? perceiverPrototypeId,
+    Value<String>? attractivenessFormula,
+    Value<String>? radiusFormula,
+  }) {
+    return AttractivenessAgentsCompanion(
+      id: id ?? this.id,
+      observedStageId: observedStageId ?? this.observedStageId,
+      observedPrototypeId: observedPrototypeId ?? this.observedPrototypeId,
+      perceiverStageId: perceiverStageId ?? this.perceiverStageId,
+      perceiverPrototypeId: perceiverPrototypeId ?? this.perceiverPrototypeId,
+      attractivenessFormula:
+          attractivenessFormula ?? this.attractivenessFormula,
+      radiusFormula: radiusFormula ?? this.radiusFormula,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (observedStageId.present) {
+      map['observed_stage_id'] = Variable<int>(observedStageId.value);
+    }
+    if (observedPrototypeId.present) {
+      map['observed_prototype_id'] = Variable<int>(observedPrototypeId.value);
+    }
+    if (perceiverStageId.present) {
+      map['perceiver_stage_id'] = Variable<int>(perceiverStageId.value);
+    }
+    if (perceiverPrototypeId.present) {
+      map['perceiver_prototype_id'] = Variable<int>(perceiverPrototypeId.value);
+    }
+    if (attractivenessFormula.present) {
+      map['attractiveness_formula'] = Variable<String>(
+        attractivenessFormula.value,
+      );
+    }
+    if (radiusFormula.present) {
+      map['radius_formula'] = Variable<String>(radiusFormula.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AttractivenessAgentsCompanion(')
+          ..write('id: $id, ')
+          ..write('observedStageId: $observedStageId, ')
+          ..write('observedPrototypeId: $observedPrototypeId, ')
+          ..write('perceiverStageId: $perceiverStageId, ')
+          ..write('perceiverPrototypeId: $perceiverPrototypeId, ')
+          ..write('attractivenessFormula: $attractivenessFormula, ')
+          ..write('radiusFormula: $radiusFormula')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $MemoryInfluenceTable extends MemoryInfluence
+    with TableInfo<$MemoryInfluenceTable, MemoryInfluenceData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $MemoryInfluenceTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _memoryTypeMeta = const VerificationMeta(
+    'memoryType',
+  );
+  @override
+  late final GeneratedColumn<String> memoryType = GeneratedColumn<String>(
+    'memory_type',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _elementIndexMeta = const VerificationMeta(
+    'elementIndex',
+  );
+  @override
+  late final GeneratedColumn<int> elementIndex = GeneratedColumn<int>(
+    'element_index',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _perceiverStageIdMeta = const VerificationMeta(
+    'perceiverStageId',
+  );
+  @override
+  late final GeneratedColumn<int> perceiverStageId = GeneratedColumn<int>(
+    'perceiver_stage_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES stages (id)',
+    ),
+  );
+  static const VerificationMeta _perceiverPrototypeIdMeta =
+      const VerificationMeta('perceiverPrototypeId');
+  @override
+  late final GeneratedColumn<int> perceiverPrototypeId = GeneratedColumn<int>(
+    'perceiver_prototype_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES prototypes (id)',
+    ),
+  );
+  static const VerificationMeta _formulaMeta = const VerificationMeta(
+    'formula',
+  );
+  @override
+  late final GeneratedColumn<String> formula = GeneratedColumn<String>(
+    'formula',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('0'),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    memoryType,
+    elementIndex,
+    perceiverStageId,
+    perceiverPrototypeId,
+    formula,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'memory_influence';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<MemoryInfluenceData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('memory_type')) {
+      context.handle(
+        _memoryTypeMeta,
+        memoryType.isAcceptableOrUnknown(data['memory_type']!, _memoryTypeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_memoryTypeMeta);
+    }
+    if (data.containsKey('element_index')) {
+      context.handle(
+        _elementIndexMeta,
+        elementIndex.isAcceptableOrUnknown(
+          data['element_index']!,
+          _elementIndexMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_elementIndexMeta);
+    }
+    if (data.containsKey('perceiver_stage_id')) {
+      context.handle(
+        _perceiverStageIdMeta,
+        perceiverStageId.isAcceptableOrUnknown(
+          data['perceiver_stage_id']!,
+          _perceiverStageIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('perceiver_prototype_id')) {
+      context.handle(
+        _perceiverPrototypeIdMeta,
+        perceiverPrototypeId.isAcceptableOrUnknown(
+          data['perceiver_prototype_id']!,
+          _perceiverPrototypeIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('formula')) {
+      context.handle(
+        _formulaMeta,
+        formula.isAcceptableOrUnknown(data['formula']!, _formulaMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  MemoryInfluenceData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return MemoryInfluenceData(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      memoryType: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}memory_type'],
+      )!,
+      elementIndex: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}element_index'],
+      )!,
+      perceiverStageId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}perceiver_stage_id'],
+      ),
+      perceiverPrototypeId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}perceiver_prototype_id'],
+      ),
+      formula: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}formula'],
+      )!,
+    );
+  }
+
+  @override
+  $MemoryInfluenceTable createAlias(String alias) {
+    return $MemoryInfluenceTable(attachedDatabase, alias);
+  }
+}
+
+class MemoryInfluenceData extends DataClass
+    implements Insertable<MemoryInfluenceData> {
+  final int id;
+  final String memoryType;
+  final int elementIndex;
+  final int? perceiverStageId;
+  final int? perceiverPrototypeId;
+  final String formula;
+  const MemoryInfluenceData({
+    required this.id,
+    required this.memoryType,
+    required this.elementIndex,
+    this.perceiverStageId,
+    this.perceiverPrototypeId,
+    required this.formula,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['memory_type'] = Variable<String>(memoryType);
+    map['element_index'] = Variable<int>(elementIndex);
+    if (!nullToAbsent || perceiverStageId != null) {
+      map['perceiver_stage_id'] = Variable<int>(perceiverStageId);
+    }
+    if (!nullToAbsent || perceiverPrototypeId != null) {
+      map['perceiver_prototype_id'] = Variable<int>(perceiverPrototypeId);
+    }
+    map['formula'] = Variable<String>(formula);
+    return map;
+  }
+
+  MemoryInfluenceCompanion toCompanion(bool nullToAbsent) {
+    return MemoryInfluenceCompanion(
+      id: Value(id),
+      memoryType: Value(memoryType),
+      elementIndex: Value(elementIndex),
+      perceiverStageId: perceiverStageId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(perceiverStageId),
+      perceiverPrototypeId: perceiverPrototypeId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(perceiverPrototypeId),
+      formula: Value(formula),
+    );
+  }
+
+  factory MemoryInfluenceData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return MemoryInfluenceData(
+      id: serializer.fromJson<int>(json['id']),
+      memoryType: serializer.fromJson<String>(json['memoryType']),
+      elementIndex: serializer.fromJson<int>(json['elementIndex']),
+      perceiverStageId: serializer.fromJson<int?>(json['perceiverStageId']),
+      perceiverPrototypeId: serializer.fromJson<int?>(
+        json['perceiverPrototypeId'],
+      ),
+      formula: serializer.fromJson<String>(json['formula']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'memoryType': serializer.toJson<String>(memoryType),
+      'elementIndex': serializer.toJson<int>(elementIndex),
+      'perceiverStageId': serializer.toJson<int?>(perceiverStageId),
+      'perceiverPrototypeId': serializer.toJson<int?>(perceiverPrototypeId),
+      'formula': serializer.toJson<String>(formula),
+    };
+  }
+
+  MemoryInfluenceData copyWith({
+    int? id,
+    String? memoryType,
+    int? elementIndex,
+    Value<int?> perceiverStageId = const Value.absent(),
+    Value<int?> perceiverPrototypeId = const Value.absent(),
+    String? formula,
+  }) => MemoryInfluenceData(
+    id: id ?? this.id,
+    memoryType: memoryType ?? this.memoryType,
+    elementIndex: elementIndex ?? this.elementIndex,
+    perceiverStageId: perceiverStageId.present
+        ? perceiverStageId.value
+        : this.perceiverStageId,
+    perceiverPrototypeId: perceiverPrototypeId.present
+        ? perceiverPrototypeId.value
+        : this.perceiverPrototypeId,
+    formula: formula ?? this.formula,
+  );
+  MemoryInfluenceData copyWithCompanion(MemoryInfluenceCompanion data) {
+    return MemoryInfluenceData(
+      id: data.id.present ? data.id.value : this.id,
+      memoryType: data.memoryType.present
+          ? data.memoryType.value
+          : this.memoryType,
+      elementIndex: data.elementIndex.present
+          ? data.elementIndex.value
+          : this.elementIndex,
+      perceiverStageId: data.perceiverStageId.present
+          ? data.perceiverStageId.value
+          : this.perceiverStageId,
+      perceiverPrototypeId: data.perceiverPrototypeId.present
+          ? data.perceiverPrototypeId.value
+          : this.perceiverPrototypeId,
+      formula: data.formula.present ? data.formula.value : this.formula,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MemoryInfluenceData(')
+          ..write('id: $id, ')
+          ..write('memoryType: $memoryType, ')
+          ..write('elementIndex: $elementIndex, ')
+          ..write('perceiverStageId: $perceiverStageId, ')
+          ..write('perceiverPrototypeId: $perceiverPrototypeId, ')
+          ..write('formula: $formula')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    memoryType,
+    elementIndex,
+    perceiverStageId,
+    perceiverPrototypeId,
+    formula,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is MemoryInfluenceData &&
+          other.id == this.id &&
+          other.memoryType == this.memoryType &&
+          other.elementIndex == this.elementIndex &&
+          other.perceiverStageId == this.perceiverStageId &&
+          other.perceiverPrototypeId == this.perceiverPrototypeId &&
+          other.formula == this.formula);
+}
+
+class MemoryInfluenceCompanion extends UpdateCompanion<MemoryInfluenceData> {
+  final Value<int> id;
+  final Value<String> memoryType;
+  final Value<int> elementIndex;
+  final Value<int?> perceiverStageId;
+  final Value<int?> perceiverPrototypeId;
+  final Value<String> formula;
+  const MemoryInfluenceCompanion({
+    this.id = const Value.absent(),
+    this.memoryType = const Value.absent(),
+    this.elementIndex = const Value.absent(),
+    this.perceiverStageId = const Value.absent(),
+    this.perceiverPrototypeId = const Value.absent(),
+    this.formula = const Value.absent(),
+  });
+  MemoryInfluenceCompanion.insert({
+    this.id = const Value.absent(),
+    required String memoryType,
+    required int elementIndex,
+    this.perceiverStageId = const Value.absent(),
+    this.perceiverPrototypeId = const Value.absent(),
+    this.formula = const Value.absent(),
+  }) : memoryType = Value(memoryType),
+       elementIndex = Value(elementIndex);
+  static Insertable<MemoryInfluenceData> custom({
+    Expression<int>? id,
+    Expression<String>? memoryType,
+    Expression<int>? elementIndex,
+    Expression<int>? perceiverStageId,
+    Expression<int>? perceiverPrototypeId,
+    Expression<String>? formula,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (memoryType != null) 'memory_type': memoryType,
+      if (elementIndex != null) 'element_index': elementIndex,
+      if (perceiverStageId != null) 'perceiver_stage_id': perceiverStageId,
+      if (perceiverPrototypeId != null)
+        'perceiver_prototype_id': perceiverPrototypeId,
+      if (formula != null) 'formula': formula,
+    });
+  }
+
+  MemoryInfluenceCompanion copyWith({
+    Value<int>? id,
+    Value<String>? memoryType,
+    Value<int>? elementIndex,
+    Value<int?>? perceiverStageId,
+    Value<int?>? perceiverPrototypeId,
+    Value<String>? formula,
+  }) {
+    return MemoryInfluenceCompanion(
+      id: id ?? this.id,
+      memoryType: memoryType ?? this.memoryType,
+      elementIndex: elementIndex ?? this.elementIndex,
+      perceiverStageId: perceiverStageId ?? this.perceiverStageId,
+      perceiverPrototypeId: perceiverPrototypeId ?? this.perceiverPrototypeId,
+      formula: formula ?? this.formula,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (memoryType.present) {
+      map['memory_type'] = Variable<String>(memoryType.value);
+    }
+    if (elementIndex.present) {
+      map['element_index'] = Variable<int>(elementIndex.value);
+    }
+    if (perceiverStageId.present) {
+      map['perceiver_stage_id'] = Variable<int>(perceiverStageId.value);
+    }
+    if (perceiverPrototypeId.present) {
+      map['perceiver_prototype_id'] = Variable<int>(perceiverPrototypeId.value);
+    }
+    if (formula.present) {
+      map['formula'] = Variable<String>(formula.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MemoryInfluenceCompanion(')
+          ..write('id: $id, ')
+          ..write('memoryType: $memoryType, ')
+          ..write('elementIndex: $elementIndex, ')
+          ..write('perceiverStageId: $perceiverStageId, ')
+          ..write('perceiverPrototypeId: $perceiverPrototypeId, ')
+          ..write('formula: $formula')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $OvipositionSiteConfigTable extends OvipositionSiteConfig
+    with TableInfo<$OvipositionSiteConfigTable, OvipositionSiteConfigData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $OvipositionSiteConfigTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _colorMeta = const VerificationMeta('color');
+  @override
+  late final GeneratedColumn<int> color = GeneratedColumn<int>(
+    'color',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0x00FF00),
+  );
+  static const VerificationMeta _enabledMeta = const VerificationMeta(
+    'enabled',
+  );
+  @override
+  late final GeneratedColumn<bool> enabled = GeneratedColumn<bool>(
+    'enabled',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("enabled" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, color, enabled];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'oviposition_site_config';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<OvipositionSiteConfigData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('color')) {
+      context.handle(
+        _colorMeta,
+        color.isAcceptableOrUnknown(data['color']!, _colorMeta),
+      );
+    }
+    if (data.containsKey('enabled')) {
+      context.handle(
+        _enabledMeta,
+        enabled.isAcceptableOrUnknown(data['enabled']!, _enabledMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  OvipositionSiteConfigData map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return OvipositionSiteConfigData(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      color: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}color'],
+      )!,
+      enabled: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}enabled'],
+      )!,
+    );
+  }
+
+  @override
+  $OvipositionSiteConfigTable createAlias(String alias) {
+    return $OvipositionSiteConfigTable(attachedDatabase, alias);
+  }
+}
+
+class OvipositionSiteConfigData extends DataClass
+    implements Insertable<OvipositionSiteConfigData> {
+  final int id;
+  final int color;
+  final bool enabled;
+  const OvipositionSiteConfigData({
+    required this.id,
+    required this.color,
+    required this.enabled,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['color'] = Variable<int>(color);
+    map['enabled'] = Variable<bool>(enabled);
+    return map;
+  }
+
+  OvipositionSiteConfigCompanion toCompanion(bool nullToAbsent) {
+    return OvipositionSiteConfigCompanion(
+      id: Value(id),
+      color: Value(color),
+      enabled: Value(enabled),
+    );
+  }
+
+  factory OvipositionSiteConfigData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return OvipositionSiteConfigData(
+      id: serializer.fromJson<int>(json['id']),
+      color: serializer.fromJson<int>(json['color']),
+      enabled: serializer.fromJson<bool>(json['enabled']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'color': serializer.toJson<int>(color),
+      'enabled': serializer.toJson<bool>(enabled),
+    };
+  }
+
+  OvipositionSiteConfigData copyWith({int? id, int? color, bool? enabled}) =>
+      OvipositionSiteConfigData(
+        id: id ?? this.id,
+        color: color ?? this.color,
+        enabled: enabled ?? this.enabled,
+      );
+  OvipositionSiteConfigData copyWithCompanion(
+    OvipositionSiteConfigCompanion data,
+  ) {
+    return OvipositionSiteConfigData(
+      id: data.id.present ? data.id.value : this.id,
+      color: data.color.present ? data.color.value : this.color,
+      enabled: data.enabled.present ? data.enabled.value : this.enabled,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('OvipositionSiteConfigData(')
+          ..write('id: $id, ')
+          ..write('color: $color, ')
+          ..write('enabled: $enabled')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, color, enabled);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is OvipositionSiteConfigData &&
+          other.id == this.id &&
+          other.color == this.color &&
+          other.enabled == this.enabled);
+}
+
+class OvipositionSiteConfigCompanion
+    extends UpdateCompanion<OvipositionSiteConfigData> {
+  final Value<int> id;
+  final Value<int> color;
+  final Value<bool> enabled;
+  const OvipositionSiteConfigCompanion({
+    this.id = const Value.absent(),
+    this.color = const Value.absent(),
+    this.enabled = const Value.absent(),
+  });
+  OvipositionSiteConfigCompanion.insert({
+    this.id = const Value.absent(),
+    this.color = const Value.absent(),
+    this.enabled = const Value.absent(),
+  });
+  static Insertable<OvipositionSiteConfigData> custom({
+    Expression<int>? id,
+    Expression<int>? color,
+    Expression<bool>? enabled,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (color != null) 'color': color,
+      if (enabled != null) 'enabled': enabled,
+    });
+  }
+
+  OvipositionSiteConfigCompanion copyWith({
+    Value<int>? id,
+    Value<int>? color,
+    Value<bool>? enabled,
+  }) {
+    return OvipositionSiteConfigCompanion(
+      id: id ?? this.id,
+      color: color ?? this.color,
+      enabled: enabled ?? this.enabled,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (color.present) {
+      map['color'] = Variable<int>(color.value);
+    }
+    if (enabled.present) {
+      map['enabled'] = Variable<bool>(enabled.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('OvipositionSiteConfigCompanion(')
+          ..write('id: $id, ')
+          ..write('color: $color, ')
+          ..write('enabled: $enabled')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -7113,7 +14294,23 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       $SubstrateCompositionsTable(this);
   late final $LociTable loci = $LociTable(this);
   late final $StagesTable stages = $StagesTable(this);
+  late final $StageNutrientRequirementsTable stageNutrientRequirements =
+      $StageNutrientRequirementsTable(this);
+  late final $StageTendenciesTable stageTendencies = $StageTendenciesTable(
+    this,
+  );
   late final $PrototypesTable prototypes = $PrototypesTable(this);
+  late final $PrototypeMorphologyTable prototypeMorphology =
+      $PrototypeMorphologyTable(this);
+  late final $PrototypeTendenciesTable prototypeTendencies =
+      $PrototypeTendenciesTable(this);
+  late final $PrototypeCombatTable prototypeCombat = $PrototypeCombatTable(
+    this,
+  );
+  late final $PrototypeCourtshipTable prototypeCourtship =
+      $PrototypeCourtshipTable(this);
+  late final $PrototypeAssignmentCriteriaTable prototypeAssignmentCriteria =
+      $PrototypeAssignmentCriteriaTable(this);
   late final $EnvironmentsTable environments = $EnvironmentsTable(this);
   late final $SubstrateMapRowsTable substrateMapRows = $SubstrateMapRowsTable(
     this,
@@ -7125,7 +14322,29 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $EnvironmentAgentsTable environmentAgents =
       $EnvironmentAgentsTable(this);
   late final $MetabolismTable metabolism = $MetabolismTable(this);
+  late final $BehaviorCostsTable behaviorCosts = $BehaviorCostsTable(this);
+  late final $FeedingGainsTable feedingGains = $FeedingGainsTable(this);
+  late final $SubstrateVelocitiesTable substrateVelocities =
+      $SubstrateVelocitiesTable(this);
   late final $ReproductionTable reproduction = $ReproductionTable(this);
+  late final $GameteCostsTable gameteCosts = $GameteCostsTable(this);
+  late final $InteractionSubstratesTable interactionSubstrates =
+      $InteractionSubstratesTable(this);
+  late final $AttractivenessSubstratesTable attractivenessSubstrates =
+      $AttractivenessSubstratesTable(this);
+  late final $InteractionSourcesTable interactionSources =
+      $InteractionSourcesTable(this);
+  late final $AttractivenessSourcesTable attractivenessSources =
+      $AttractivenessSourcesTable(this);
+  late final $InteractionAgentsTable interactionAgents =
+      $InteractionAgentsTable(this);
+  late final $AttractivenessAgentsTable attractivenessAgents =
+      $AttractivenessAgentsTable(this);
+  late final $MemoryInfluenceTable memoryInfluence = $MemoryInfluenceTable(
+    this,
+  );
+  late final $OvipositionSiteConfigTable ovipositionSiteConfig =
+      $OvipositionSiteConfigTable(this);
   late final ProjectInfoDao projectInfoDao = ProjectInfoDao(
     this as AppDatabase,
   );
@@ -7148,14 +14367,33 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     substrateCompositions,
     loci,
     stages,
+    stageNutrientRequirements,
+    stageTendencies,
     prototypes,
+    prototypeMorphology,
+    prototypeTendencies,
+    prototypeCombat,
+    prototypeCourtship,
+    prototypeAssignmentCriteria,
     environments,
     substrateMapRows,
     environmentSources,
     environmentOvipositionSites,
     environmentAgents,
     metabolism,
+    behaviorCosts,
+    feedingGains,
+    substrateVelocities,
     reproduction,
+    gameteCosts,
+    interactionSubstrates,
+    attractivenessSubstrates,
+    interactionSources,
+    attractivenessSources,
+    interactionAgents,
+    attractivenessAgents,
+    memoryInfluence,
+    ovipositionSiteConfig,
   ];
 }
 
@@ -7374,6 +14612,31 @@ final class $$NutrientsTableReferences
     extends BaseReferences<_$AppDatabase, $NutrientsTable, Nutrient> {
   $$NutrientsTableReferences(super.$_db, super.$_table, super.$_typedResult);
 
+  static MultiTypedResultKey<
+    $StageNutrientRequirementsTable,
+    List<StageNutrientRequirement>
+  >
+  _stageNutrientRequirementsRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.stageNutrientRequirements,
+        aliasName: 'nutrients__id__stage_nutrient_requirements__nutrient_id',
+      );
+
+  $$StageNutrientRequirementsTableProcessedTableManager
+  get stageNutrientRequirementsRefs {
+    final manager = $$StageNutrientRequirementsTableTableManager(
+      $_db,
+      $_db.stageNutrientRequirements,
+    ).filter((f) => f.nutrientId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _stageNutrientRequirementsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
   static MultiTypedResultKey<$EnvironmentSourcesTable, List<EnvironmentSource>>
   _environmentSourcesRefsTable(_$AppDatabase db) =>
       MultiTypedResultKey.fromTable(
@@ -7412,6 +14675,106 @@ final class $$NutrientsTableReferences
       manager.$state.copyWith(prefetchedData: cache),
     );
   }
+
+  static MultiTypedResultKey<$BehaviorCostsTable, List<BehaviorCost>>
+  _behaviorCostsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.behaviorCosts,
+    aliasName: 'nutrients__id__behavior_costs__nutrient_id',
+  );
+
+  $$BehaviorCostsTableProcessedTableManager get behaviorCostsRefs {
+    final manager = $$BehaviorCostsTableTableManager(
+      $_db,
+      $_db.behaviorCosts,
+    ).filter((f) => f.nutrientId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_behaviorCostsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$FeedingGainsTable, List<FeedingGain>>
+  _feedingGainsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.feedingGains,
+    aliasName: 'nutrients__id__feeding_gains__nutrient_id',
+  );
+
+  $$FeedingGainsTableProcessedTableManager get feedingGainsRefs {
+    final manager = $$FeedingGainsTableTableManager(
+      $_db,
+      $_db.feedingGains,
+    ).filter((f) => f.nutrientId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_feedingGainsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$GameteCostsTable, List<GameteCost>>
+  _gameteCostsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.gameteCosts,
+    aliasName: 'nutrients__id__gamete_costs__nutrient_id',
+  );
+
+  $$GameteCostsTableProcessedTableManager get gameteCostsRefs {
+    final manager = $$GameteCostsTableTableManager(
+      $_db,
+      $_db.gameteCosts,
+    ).filter((f) => f.nutrientId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_gameteCostsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$InteractionSourcesTable, List<InteractionSource>>
+  _interactionSourcesRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.interactionSources,
+        aliasName: 'nutrients__id__interaction_sources__nutrient_id',
+      );
+
+  $$InteractionSourcesTableProcessedTableManager get interactionSourcesRefs {
+    final manager = $$InteractionSourcesTableTableManager(
+      $_db,
+      $_db.interactionSources,
+    ).filter((f) => f.nutrientId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _interactionSourcesRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $AttractivenessSourcesTable,
+    List<AttractivenessSource>
+  >
+  _attractivenessSourcesRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.attractivenessSources,
+        aliasName: 'nutrients__id__attractiveness_sources__nutrient_id',
+      );
+
+  $$AttractivenessSourcesTableProcessedTableManager
+  get attractivenessSourcesRefs {
+    final manager = $$AttractivenessSourcesTableTableManager(
+      $_db,
+      $_db.attractivenessSources,
+    ).filter((f) => f.nutrientId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _attractivenessSourcesRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$NutrientsTableFilterComposer
@@ -7442,6 +14805,33 @@ class $$NutrientsTableFilterComposer
     column: $table.sortOrder,
     builder: (column) => ColumnFilters(column),
   );
+
+  Expression<bool> stageNutrientRequirementsRefs(
+    Expression<bool> Function($$StageNutrientRequirementsTableFilterComposer f)
+    f,
+  ) {
+    final $$StageNutrientRequirementsTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.stageNutrientRequirements,
+          getReferencedColumn: (t) => t.nutrientId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$StageNutrientRequirementsTableFilterComposer(
+                $db: $db,
+                $table: $db.stageNutrientRequirements,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
 
   Expression<bool> environmentSourcesRefs(
     Expression<bool> Function($$EnvironmentSourcesTableFilterComposer f) f,
@@ -7490,6 +14880,132 @@ class $$NutrientsTableFilterComposer
                 $removeJoinBuilderFromRootComposer,
           ),
     );
+    return f(composer);
+  }
+
+  Expression<bool> behaviorCostsRefs(
+    Expression<bool> Function($$BehaviorCostsTableFilterComposer f) f,
+  ) {
+    final $$BehaviorCostsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.behaviorCosts,
+      getReferencedColumn: (t) => t.nutrientId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$BehaviorCostsTableFilterComposer(
+            $db: $db,
+            $table: $db.behaviorCosts,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> feedingGainsRefs(
+    Expression<bool> Function($$FeedingGainsTableFilterComposer f) f,
+  ) {
+    final $$FeedingGainsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.feedingGains,
+      getReferencedColumn: (t) => t.nutrientId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FeedingGainsTableFilterComposer(
+            $db: $db,
+            $table: $db.feedingGains,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> gameteCostsRefs(
+    Expression<bool> Function($$GameteCostsTableFilterComposer f) f,
+  ) {
+    final $$GameteCostsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.gameteCosts,
+      getReferencedColumn: (t) => t.nutrientId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$GameteCostsTableFilterComposer(
+            $db: $db,
+            $table: $db.gameteCosts,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> interactionSourcesRefs(
+    Expression<bool> Function($$InteractionSourcesTableFilterComposer f) f,
+  ) {
+    final $$InteractionSourcesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.interactionSources,
+      getReferencedColumn: (t) => t.nutrientId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$InteractionSourcesTableFilterComposer(
+            $db: $db,
+            $table: $db.interactionSources,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> attractivenessSourcesRefs(
+    Expression<bool> Function($$AttractivenessSourcesTableFilterComposer f) f,
+  ) {
+    final $$AttractivenessSourcesTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.attractivenessSources,
+          getReferencedColumn: (t) => t.nutrientId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$AttractivenessSourcesTableFilterComposer(
+                $db: $db,
+                $table: $db.attractivenessSources,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
     return f(composer);
   }
 }
@@ -7545,6 +15061,33 @@ class $$NutrientsTableAnnotationComposer
   GeneratedColumn<int> get sortOrder =>
       $composableBuilder(column: $table.sortOrder, builder: (column) => column);
 
+  Expression<T> stageNutrientRequirementsRefs<T extends Object>(
+    Expression<T> Function($$StageNutrientRequirementsTableAnnotationComposer a)
+    f,
+  ) {
+    final $$StageNutrientRequirementsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.stageNutrientRequirements,
+          getReferencedColumn: (t) => t.nutrientId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$StageNutrientRequirementsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.stageNutrientRequirements,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
   Expression<T> environmentSourcesRefs<T extends Object>(
     Expression<T> Function($$EnvironmentSourcesTableAnnotationComposer a) f,
   ) {
@@ -7595,6 +15138,133 @@ class $$NutrientsTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> behaviorCostsRefs<T extends Object>(
+    Expression<T> Function($$BehaviorCostsTableAnnotationComposer a) f,
+  ) {
+    final $$BehaviorCostsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.behaviorCosts,
+      getReferencedColumn: (t) => t.nutrientId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$BehaviorCostsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.behaviorCosts,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<T> feedingGainsRefs<T extends Object>(
+    Expression<T> Function($$FeedingGainsTableAnnotationComposer a) f,
+  ) {
+    final $$FeedingGainsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.feedingGains,
+      getReferencedColumn: (t) => t.nutrientId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FeedingGainsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.feedingGains,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<T> gameteCostsRefs<T extends Object>(
+    Expression<T> Function($$GameteCostsTableAnnotationComposer a) f,
+  ) {
+    final $$GameteCostsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.gameteCosts,
+      getReferencedColumn: (t) => t.nutrientId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$GameteCostsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.gameteCosts,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<T> interactionSourcesRefs<T extends Object>(
+    Expression<T> Function($$InteractionSourcesTableAnnotationComposer a) f,
+  ) {
+    final $$InteractionSourcesTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.interactionSources,
+          getReferencedColumn: (t) => t.nutrientId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$InteractionSourcesTableAnnotationComposer(
+                $db: $db,
+                $table: $db.interactionSources,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<T> attractivenessSourcesRefs<T extends Object>(
+    Expression<T> Function($$AttractivenessSourcesTableAnnotationComposer a) f,
+  ) {
+    final $$AttractivenessSourcesTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.attractivenessSources,
+          getReferencedColumn: (t) => t.nutrientId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$AttractivenessSourcesTableAnnotationComposer(
+                $db: $db,
+                $table: $db.attractivenessSources,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
 }
 
 class $$NutrientsTableTableManager
@@ -7611,8 +15281,14 @@ class $$NutrientsTableTableManager
           (Nutrient, $$NutrientsTableReferences),
           Nutrient,
           PrefetchHooks Function({
+            bool stageNutrientRequirementsRefs,
             bool environmentSourcesRefs,
             bool metabolismRefs,
+            bool behaviorCostsRefs,
+            bool feedingGainsRefs,
+            bool gameteCostsRefs,
+            bool interactionSourcesRefs,
+            bool attractivenessSourcesRefs,
           })
         > {
   $$NutrientsTableTableManager(_$AppDatabase db, $NutrientsTable table)
@@ -7659,16 +15335,53 @@ class $$NutrientsTableTableManager
               )
               .toList(),
           prefetchHooksCallback:
-              ({environmentSourcesRefs = false, metabolismRefs = false}) {
+              ({
+                stageNutrientRequirementsRefs = false,
+                environmentSourcesRefs = false,
+                metabolismRefs = false,
+                behaviorCostsRefs = false,
+                feedingGainsRefs = false,
+                gameteCostsRefs = false,
+                interactionSourcesRefs = false,
+                attractivenessSourcesRefs = false,
+              }) {
                 return PrefetchHooks(
                   db: db,
                   explicitlyWatchedTables: [
+                    if (stageNutrientRequirementsRefs)
+                      db.stageNutrientRequirements,
                     if (environmentSourcesRefs) db.environmentSources,
                     if (metabolismRefs) db.metabolism,
+                    if (behaviorCostsRefs) db.behaviorCosts,
+                    if (feedingGainsRefs) db.feedingGains,
+                    if (gameteCostsRefs) db.gameteCosts,
+                    if (interactionSourcesRefs) db.interactionSources,
+                    if (attractivenessSourcesRefs) db.attractivenessSources,
                   ],
                   addJoins: null,
                   getPrefetchedDataCallback: (items) async {
                     return [
+                      if (stageNutrientRequirementsRefs)
+                        await $_getPrefetchedData<
+                          Nutrient,
+                          $NutrientsTable,
+                          StageNutrientRequirement
+                        >(
+                          currentTable: table,
+                          referencedTable: $$NutrientsTableReferences
+                              ._stageNutrientRequirementsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$NutrientsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).stageNutrientRequirementsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.nutrientId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                       if (environmentSourcesRefs)
                         await $_getPrefetchedData<
                           Nutrient,
@@ -7711,6 +15424,111 @@ class $$NutrientsTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (behaviorCostsRefs)
+                        await $_getPrefetchedData<
+                          Nutrient,
+                          $NutrientsTable,
+                          BehaviorCost
+                        >(
+                          currentTable: table,
+                          referencedTable: $$NutrientsTableReferences
+                              ._behaviorCostsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$NutrientsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).behaviorCostsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.nutrientId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (feedingGainsRefs)
+                        await $_getPrefetchedData<
+                          Nutrient,
+                          $NutrientsTable,
+                          FeedingGain
+                        >(
+                          currentTable: table,
+                          referencedTable: $$NutrientsTableReferences
+                              ._feedingGainsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$NutrientsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).feedingGainsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.nutrientId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (gameteCostsRefs)
+                        await $_getPrefetchedData<
+                          Nutrient,
+                          $NutrientsTable,
+                          GameteCost
+                        >(
+                          currentTable: table,
+                          referencedTable: $$NutrientsTableReferences
+                              ._gameteCostsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$NutrientsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).gameteCostsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.nutrientId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (interactionSourcesRefs)
+                        await $_getPrefetchedData<
+                          Nutrient,
+                          $NutrientsTable,
+                          InteractionSource
+                        >(
+                          currentTable: table,
+                          referencedTable: $$NutrientsTableReferences
+                              ._interactionSourcesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$NutrientsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).interactionSourcesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.nutrientId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (attractivenessSourcesRefs)
+                        await $_getPrefetchedData<
+                          Nutrient,
+                          $NutrientsTable,
+                          AttractivenessSource
+                        >(
+                          currentTable: table,
+                          referencedTable: $$NutrientsTableReferences
+                              ._attractivenessSourcesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$NutrientsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).attractivenessSourcesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.nutrientId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -7731,7 +15549,16 @@ typedef $$NutrientsTableProcessedTableManager =
       $$NutrientsTableUpdateCompanionBuilder,
       (Nutrient, $$NutrientsTableReferences),
       Nutrient,
-      PrefetchHooks Function({bool environmentSourcesRefs, bool metabolismRefs})
+      PrefetchHooks Function({
+        bool stageNutrientRequirementsRefs,
+        bool environmentSourcesRefs,
+        bool metabolismRefs,
+        bool behaviorCostsRefs,
+        bool feedingGainsRefs,
+        bool gameteCostsRefs,
+        bool interactionSourcesRefs,
+        bool attractivenessSourcesRefs,
+      })
     >;
 typedef $$SubstratesTableCreateCompanionBuilder =
     SubstratesCompanion Function({
@@ -7799,6 +15626,77 @@ final class $$SubstratesTableReferences
 
     final cache = $_typedResult.readTableOrNull(
       _simpleSubstrateCompositionsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$SubstrateVelocitiesTable, List<SubstrateVelocity>>
+  _substrateVelocitiesRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.substrateVelocities,
+        aliasName: 'substrates__id__substrate_velocities__substrate_id',
+      );
+
+  $$SubstrateVelocitiesTableProcessedTableManager get substrateVelocitiesRefs {
+    final manager = $$SubstrateVelocitiesTableTableManager(
+      $_db,
+      $_db.substrateVelocities,
+    ).filter((f) => f.substrateId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _substrateVelocitiesRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $InteractionSubstratesTable,
+    List<InteractionSubstrate>
+  >
+  _interactionSubstratesRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.interactionSubstrates,
+        aliasName: 'substrates__id__interaction_substrates__substrate_id',
+      );
+
+  $$InteractionSubstratesTableProcessedTableManager
+  get interactionSubstratesRefs {
+    final manager = $$InteractionSubstratesTableTableManager(
+      $_db,
+      $_db.interactionSubstrates,
+    ).filter((f) => f.substrateId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _interactionSubstratesRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $AttractivenessSubstratesTable,
+    List<AttractivenessSubstrate>
+  >
+  _attractivenessSubstratesRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.attractivenessSubstrates,
+        aliasName: 'substrates__id__attractiveness_substrates__substrate_id',
+      );
+
+  $$AttractivenessSubstratesTableProcessedTableManager
+  get attractivenessSubstratesRefs {
+    final manager = $$AttractivenessSubstratesTableTableManager(
+      $_db,
+      $_db.attractivenessSubstrates,
+    ).filter((f) => f.substrateId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _attractivenessSubstratesRefsTable($_db),
     );
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
@@ -7883,6 +15781,84 @@ class $$SubstratesTableFilterComposer
               }) => $$SubstrateCompositionsTableFilterComposer(
                 $db: $db,
                 $table: $db.substrateCompositions,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<bool> substrateVelocitiesRefs(
+    Expression<bool> Function($$SubstrateVelocitiesTableFilterComposer f) f,
+  ) {
+    final $$SubstrateVelocitiesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.substrateVelocities,
+      getReferencedColumn: (t) => t.substrateId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$SubstrateVelocitiesTableFilterComposer(
+            $db: $db,
+            $table: $db.substrateVelocities,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> interactionSubstratesRefs(
+    Expression<bool> Function($$InteractionSubstratesTableFilterComposer f) f,
+  ) {
+    final $$InteractionSubstratesTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.interactionSubstrates,
+          getReferencedColumn: (t) => t.substrateId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$InteractionSubstratesTableFilterComposer(
+                $db: $db,
+                $table: $db.interactionSubstrates,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<bool> attractivenessSubstratesRefs(
+    Expression<bool> Function($$AttractivenessSubstratesTableFilterComposer f)
+    f,
+  ) {
+    final $$AttractivenessSubstratesTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.attractivenessSubstrates,
+          getReferencedColumn: (t) => t.substrateId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$AttractivenessSubstratesTableFilterComposer(
+                $db: $db,
+                $table: $db.attractivenessSubstrates,
                 $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
                 joinBuilder: joinBuilder,
                 $removeJoinBuilderFromRootComposer:
@@ -8003,6 +15979,85 @@ class $$SubstratesTableAnnotationComposer
         );
     return f(composer);
   }
+
+  Expression<T> substrateVelocitiesRefs<T extends Object>(
+    Expression<T> Function($$SubstrateVelocitiesTableAnnotationComposer a) f,
+  ) {
+    final $$SubstrateVelocitiesTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.substrateVelocities,
+          getReferencedColumn: (t) => t.substrateId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$SubstrateVelocitiesTableAnnotationComposer(
+                $db: $db,
+                $table: $db.substrateVelocities,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<T> interactionSubstratesRefs<T extends Object>(
+    Expression<T> Function($$InteractionSubstratesTableAnnotationComposer a) f,
+  ) {
+    final $$InteractionSubstratesTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.interactionSubstrates,
+          getReferencedColumn: (t) => t.substrateId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$InteractionSubstratesTableAnnotationComposer(
+                $db: $db,
+                $table: $db.interactionSubstrates,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<T> attractivenessSubstratesRefs<T extends Object>(
+    Expression<T> Function($$AttractivenessSubstratesTableAnnotationComposer a)
+    f,
+  ) {
+    final $$AttractivenessSubstratesTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.attractivenessSubstrates,
+          getReferencedColumn: (t) => t.substrateId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$AttractivenessSubstratesTableAnnotationComposer(
+                $db: $db,
+                $table: $db.attractivenessSubstrates,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
 }
 
 class $$SubstratesTableTableManager
@@ -8021,6 +16076,9 @@ class $$SubstratesTableTableManager
           PrefetchHooks Function({
             bool mixedSubstrateCompositions,
             bool simpleSubstrateCompositions,
+            bool substrateVelocitiesRefs,
+            bool interactionSubstratesRefs,
+            bool attractivenessSubstratesRefs,
           })
         > {
   $$SubstratesTableTableManager(_$AppDatabase db, $SubstratesTable table)
@@ -8074,12 +16132,19 @@ class $$SubstratesTableTableManager
               ({
                 mixedSubstrateCompositions = false,
                 simpleSubstrateCompositions = false,
+                substrateVelocitiesRefs = false,
+                interactionSubstratesRefs = false,
+                attractivenessSubstratesRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
                   explicitlyWatchedTables: [
                     if (mixedSubstrateCompositions) db.substrateCompositions,
                     if (simpleSubstrateCompositions) db.substrateCompositions,
+                    if (substrateVelocitiesRefs) db.substrateVelocities,
+                    if (interactionSubstratesRefs) db.interactionSubstrates,
+                    if (attractivenessSubstratesRefs)
+                      db.attractivenessSubstrates,
                   ],
                   addJoins: null,
                   getPrefetchedDataCallback: (items) async {
@@ -8126,6 +16191,69 @@ class $$SubstratesTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (substrateVelocitiesRefs)
+                        await $_getPrefetchedData<
+                          Substrate,
+                          $SubstratesTable,
+                          SubstrateVelocity
+                        >(
+                          currentTable: table,
+                          referencedTable: $$SubstratesTableReferences
+                              ._substrateVelocitiesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$SubstratesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).substrateVelocitiesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.substrateId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (interactionSubstratesRefs)
+                        await $_getPrefetchedData<
+                          Substrate,
+                          $SubstratesTable,
+                          InteractionSubstrate
+                        >(
+                          currentTable: table,
+                          referencedTable: $$SubstratesTableReferences
+                              ._interactionSubstratesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$SubstratesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).interactionSubstratesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.substrateId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (attractivenessSubstratesRefs)
+                        await $_getPrefetchedData<
+                          Substrate,
+                          $SubstratesTable,
+                          AttractivenessSubstrate
+                        >(
+                          currentTable: table,
+                          referencedTable: $$SubstratesTableReferences
+                              ._attractivenessSubstratesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$SubstratesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).attractivenessSubstratesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.substrateId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -8149,6 +16277,9 @@ typedef $$SubstratesTableProcessedTableManager =
       PrefetchHooks Function({
         bool mixedSubstrateCompositions,
         bool simpleSubstrateCompositions,
+        bool substrateVelocitiesRefs,
+        bool interactionSubstratesRefs,
+        bool attractivenessSubstratesRefs,
       })
     >;
 typedef $$SubstrateCompositionsTableCreateCompanionBuilder =
@@ -8592,6 +16723,35 @@ typedef $$LociTableUpdateCompanionBuilder =
       Value<int> sortOrder,
     });
 
+final class $$LociTableReferences
+    extends BaseReferences<_$AppDatabase, $LociTable, LociData> {
+  $$LociTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static MultiTypedResultKey<
+    $PrototypeMorphologyTable,
+    List<PrototypeMorphologyData>
+  >
+  _prototypeMorphologyRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.prototypeMorphology,
+        aliasName: 'loci__id__prototype_morphology__locus_id',
+      );
+
+  $$PrototypeMorphologyTableProcessedTableManager get prototypeMorphologyRefs {
+    final manager = $$PrototypeMorphologyTableTableManager(
+      $_db,
+      $_db.prototypeMorphology,
+    ).filter((f) => f.locusId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _prototypeMorphologyRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
 class $$LociTableFilterComposer extends Composer<_$AppDatabase, $LociTable> {
   $$LociTableFilterComposer({
     required super.$db,
@@ -8654,6 +16814,31 @@ class $$LociTableFilterComposer extends Composer<_$AppDatabase, $LociTable> {
     column: $table.sortOrder,
     builder: (column) => ColumnFilters(column),
   );
+
+  Expression<bool> prototypeMorphologyRefs(
+    Expression<bool> Function($$PrototypeMorphologyTableFilterComposer f) f,
+  ) {
+    final $$PrototypeMorphologyTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.prototypeMorphology,
+      getReferencedColumn: (t) => t.locusId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PrototypeMorphologyTableFilterComposer(
+            $db: $db,
+            $table: $db.prototypeMorphology,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$LociTableOrderingComposer extends Composer<_$AppDatabase, $LociTable> {
@@ -8777,6 +16962,32 @@ class $$LociTableAnnotationComposer
 
   GeneratedColumn<int> get sortOrder =>
       $composableBuilder(column: $table.sortOrder, builder: (column) => column);
+
+  Expression<T> prototypeMorphologyRefs<T extends Object>(
+    Expression<T> Function($$PrototypeMorphologyTableAnnotationComposer a) f,
+  ) {
+    final $$PrototypeMorphologyTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.prototypeMorphology,
+          getReferencedColumn: (t) => t.locusId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$PrototypeMorphologyTableAnnotationComposer(
+                $db: $db,
+                $table: $db.prototypeMorphology,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
 }
 
 class $$LociTableTableManager
@@ -8790,9 +17001,9 @@ class $$LociTableTableManager
           $$LociTableAnnotationComposer,
           $$LociTableCreateCompanionBuilder,
           $$LociTableUpdateCompanionBuilder,
-          (LociData, BaseReferences<_$AppDatabase, $LociTable, LociData>),
+          (LociData, $$LociTableReferences),
           LociData,
-          PrefetchHooks Function()
+          PrefetchHooks Function({bool prototypeMorphologyRefs})
         > {
   $$LociTableTableManager(_$AppDatabase db, $LociTable table)
     : super(
@@ -8858,9 +17069,42 @@ class $$LociTableTableManager
                 sortOrder: sortOrder,
               ),
           withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .map(
+                (e) =>
+                    (e.readTable(table), $$LociTableReferences(db, table, e)),
+              )
               .toList(),
-          prefetchHooksCallback: null,
+          prefetchHooksCallback: ({prototypeMorphologyRefs = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [
+                if (prototypeMorphologyRefs) db.prototypeMorphology,
+              ],
+              addJoins: null,
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (prototypeMorphologyRefs)
+                    await $_getPrefetchedData<
+                      LociData,
+                      $LociTable,
+                      PrototypeMorphologyData
+                    >(
+                      currentTable: table,
+                      referencedTable: $$LociTableReferences
+                          ._prototypeMorphologyRefsTable(db),
+                      managerFromTypedResult: (p0) => $$LociTableReferences(
+                        db,
+                        table,
+                        p0,
+                      ).prototypeMorphologyRefs,
+                      referencedItemsForCurrentItem: (item, referencedItems) =>
+                          referencedItems.where((e) => e.locusId == item.id),
+                      typedResults: items,
+                    ),
+                ];
+              },
+            );
+          },
         ),
       );
 }
@@ -8875,9 +17119,9 @@ typedef $$LociTableProcessedTableManager =
       $$LociTableAnnotationComposer,
       $$LociTableCreateCompanionBuilder,
       $$LociTableUpdateCompanionBuilder,
-      (LociData, BaseReferences<_$AppDatabase, $LociTable, LociData>),
+      (LociData, $$LociTableReferences),
       LociData,
-      PrefetchHooks Function()
+      PrefetchHooks Function({bool prototypeMorphologyRefs})
     >;
 typedef $$StagesTableCreateCompanionBuilder =
     StagesCompanion Function({
@@ -8920,6 +17164,51 @@ final class $$StagesTableReferences
     extends BaseReferences<_$AppDatabase, $StagesTable, Stage> {
   $$StagesTableReferences(super.$_db, super.$_table, super.$_typedResult);
 
+  static MultiTypedResultKey<
+    $StageNutrientRequirementsTable,
+    List<StageNutrientRequirement>
+  >
+  _stageNutrientRequirementsRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.stageNutrientRequirements,
+        aliasName: 'stages__id__stage_nutrient_requirements__stage_id',
+      );
+
+  $$StageNutrientRequirementsTableProcessedTableManager
+  get stageNutrientRequirementsRefs {
+    final manager = $$StageNutrientRequirementsTableTableManager(
+      $_db,
+      $_db.stageNutrientRequirements,
+    ).filter((f) => f.stageId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _stageNutrientRequirementsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$StageTendenciesTable, List<StageTendency>>
+  _stageTendenciesRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.stageTendencies,
+    aliasName: 'stages__id__stage_tendencies__stage_id',
+  );
+
+  $$StageTendenciesTableProcessedTableManager get stageTendenciesRefs {
+    final manager = $$StageTendenciesTableTableManager(
+      $_db,
+      $_db.stageTendencies,
+    ).filter((f) => f.stageId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _stageTendenciesRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
   static MultiTypedResultKey<$EnvironmentAgentsTable, List<EnvironmentAgent>>
   _environmentAgentsRefsTable(_$AppDatabase db) =>
       MultiTypedResultKey.fromTable(
@@ -8935,6 +17224,215 @@ final class $$StagesTableReferences
 
     final cache = $_typedResult.readTableOrNull(
       _environmentAgentsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $InteractionSubstratesTable,
+    List<InteractionSubstrate>
+  >
+  _interactionSubstratesRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.interactionSubstrates,
+        aliasName: 'stages__id__interaction_substrates__perceiver_stage_id',
+      );
+
+  $$InteractionSubstratesTableProcessedTableManager
+  get interactionSubstratesRefs {
+    final manager = $$InteractionSubstratesTableTableManager(
+      $_db,
+      $_db.interactionSubstrates,
+    ).filter((f) => f.perceiverStageId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _interactionSubstratesRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $AttractivenessSubstratesTable,
+    List<AttractivenessSubstrate>
+  >
+  _attractivenessSubstratesRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.attractivenessSubstrates,
+        aliasName: 'stages__id__attractiveness_substrates__perceiver_stage_id',
+      );
+
+  $$AttractivenessSubstratesTableProcessedTableManager
+  get attractivenessSubstratesRefs {
+    final manager = $$AttractivenessSubstratesTableTableManager(
+      $_db,
+      $_db.attractivenessSubstrates,
+    ).filter((f) => f.perceiverStageId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _attractivenessSubstratesRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$InteractionSourcesTable, List<InteractionSource>>
+  _interactionSourcesRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.interactionSources,
+        aliasName: 'stages__id__interaction_sources__perceiver_stage_id',
+      );
+
+  $$InteractionSourcesTableProcessedTableManager get interactionSourcesRefs {
+    final manager = $$InteractionSourcesTableTableManager(
+      $_db,
+      $_db.interactionSources,
+    ).filter((f) => f.perceiverStageId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _interactionSourcesRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $AttractivenessSourcesTable,
+    List<AttractivenessSource>
+  >
+  _attractivenessSourcesRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.attractivenessSources,
+        aliasName: 'stages__id__attractiveness_sources__perceiver_stage_id',
+      );
+
+  $$AttractivenessSourcesTableProcessedTableManager
+  get attractivenessSourcesRefs {
+    final manager = $$AttractivenessSourcesTableTableManager(
+      $_db,
+      $_db.attractivenessSources,
+    ).filter((f) => f.perceiverStageId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _attractivenessSourcesRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$InteractionAgentsTable, List<InteractionAgent>>
+  _interactionAgentsRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.interactionAgents,
+        aliasName: 'stages__id__interaction_agents__observed_stage_id',
+      );
+
+  $$InteractionAgentsTableProcessedTableManager get interactionAgentsRefs {
+    final manager = $$InteractionAgentsTableTableManager(
+      $_db,
+      $_db.interactionAgents,
+    ).filter((f) => f.observedStageId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _interactionAgentsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$InteractionAgentsTable, List<InteractionAgent>>
+  _perceiverStageInteractionAgentsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.interactionAgents,
+        aliasName: 'stages__id__interaction_agents__perceiver_stage_id',
+      );
+
+  $$InteractionAgentsTableProcessedTableManager
+  get perceiverStageInteractionAgents {
+    final manager = $$InteractionAgentsTableTableManager(
+      $_db,
+      $_db.interactionAgents,
+    ).filter((f) => f.perceiverStageId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _perceiverStageInteractionAgentsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $AttractivenessAgentsTable,
+    List<AttractivenessAgent>
+  >
+  _attractivenessAgentsRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.attractivenessAgents,
+        aliasName: 'stages__id__attractiveness_agents__observed_stage_id',
+      );
+
+  $$AttractivenessAgentsTableProcessedTableManager
+  get attractivenessAgentsRefs {
+    final manager = $$AttractivenessAgentsTableTableManager(
+      $_db,
+      $_db.attractivenessAgents,
+    ).filter((f) => f.observedStageId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _attractivenessAgentsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $AttractivenessAgentsTable,
+    List<AttractivenessAgent>
+  >
+  _perceiverStageAttractivenessAgentsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.attractivenessAgents,
+        aliasName: 'stages__id__attractiveness_agents__perceiver_stage_id',
+      );
+
+  $$AttractivenessAgentsTableProcessedTableManager
+  get perceiverStageAttractivenessAgents {
+    final manager = $$AttractivenessAgentsTableTableManager(
+      $_db,
+      $_db.attractivenessAgents,
+    ).filter((f) => f.perceiverStageId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _perceiverStageAttractivenessAgentsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$MemoryInfluenceTable, List<MemoryInfluenceData>>
+  _memoryInfluenceRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.memoryInfluence,
+    aliasName: 'stages__id__memory_influence__perceiver_stage_id',
+  );
+
+  $$MemoryInfluenceTableProcessedTableManager get memoryInfluenceRefs {
+    final manager = $$MemoryInfluenceTableTableManager(
+      $_db,
+      $_db.memoryInfluence,
+    ).filter((f) => f.perceiverStageId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _memoryInfluenceRefsTable($_db),
     );
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
@@ -9026,6 +17524,58 @@ class $$StagesTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  Expression<bool> stageNutrientRequirementsRefs(
+    Expression<bool> Function($$StageNutrientRequirementsTableFilterComposer f)
+    f,
+  ) {
+    final $$StageNutrientRequirementsTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.stageNutrientRequirements,
+          getReferencedColumn: (t) => t.stageId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$StageNutrientRequirementsTableFilterComposer(
+                $db: $db,
+                $table: $db.stageNutrientRequirements,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<bool> stageTendenciesRefs(
+    Expression<bool> Function($$StageTendenciesTableFilterComposer f) f,
+  ) {
+    final $$StageTendenciesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.stageTendencies,
+      getReferencedColumn: (t) => t.stageId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$StageTendenciesTableFilterComposer(
+            $db: $db,
+            $table: $db.stageTendencies,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
   Expression<bool> environmentAgentsRefs(
     Expression<bool> Function($$EnvironmentAgentsTableFilterComposer f) f,
   ) {
@@ -9042,6 +17592,235 @@ class $$StagesTableFilterComposer
           }) => $$EnvironmentAgentsTableFilterComposer(
             $db: $db,
             $table: $db.environmentAgents,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> interactionSubstratesRefs(
+    Expression<bool> Function($$InteractionSubstratesTableFilterComposer f) f,
+  ) {
+    final $$InteractionSubstratesTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.interactionSubstrates,
+          getReferencedColumn: (t) => t.perceiverStageId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$InteractionSubstratesTableFilterComposer(
+                $db: $db,
+                $table: $db.interactionSubstrates,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<bool> attractivenessSubstratesRefs(
+    Expression<bool> Function($$AttractivenessSubstratesTableFilterComposer f)
+    f,
+  ) {
+    final $$AttractivenessSubstratesTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.attractivenessSubstrates,
+          getReferencedColumn: (t) => t.perceiverStageId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$AttractivenessSubstratesTableFilterComposer(
+                $db: $db,
+                $table: $db.attractivenessSubstrates,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<bool> interactionSourcesRefs(
+    Expression<bool> Function($$InteractionSourcesTableFilterComposer f) f,
+  ) {
+    final $$InteractionSourcesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.interactionSources,
+      getReferencedColumn: (t) => t.perceiverStageId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$InteractionSourcesTableFilterComposer(
+            $db: $db,
+            $table: $db.interactionSources,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> attractivenessSourcesRefs(
+    Expression<bool> Function($$AttractivenessSourcesTableFilterComposer f) f,
+  ) {
+    final $$AttractivenessSourcesTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.attractivenessSources,
+          getReferencedColumn: (t) => t.perceiverStageId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$AttractivenessSourcesTableFilterComposer(
+                $db: $db,
+                $table: $db.attractivenessSources,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<bool> interactionAgentsRefs(
+    Expression<bool> Function($$InteractionAgentsTableFilterComposer f) f,
+  ) {
+    final $$InteractionAgentsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.interactionAgents,
+      getReferencedColumn: (t) => t.observedStageId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$InteractionAgentsTableFilterComposer(
+            $db: $db,
+            $table: $db.interactionAgents,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> perceiverStageInteractionAgents(
+    Expression<bool> Function($$InteractionAgentsTableFilterComposer f) f,
+  ) {
+    final $$InteractionAgentsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.interactionAgents,
+      getReferencedColumn: (t) => t.perceiverStageId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$InteractionAgentsTableFilterComposer(
+            $db: $db,
+            $table: $db.interactionAgents,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> attractivenessAgentsRefs(
+    Expression<bool> Function($$AttractivenessAgentsTableFilterComposer f) f,
+  ) {
+    final $$AttractivenessAgentsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.attractivenessAgents,
+      getReferencedColumn: (t) => t.observedStageId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$AttractivenessAgentsTableFilterComposer(
+            $db: $db,
+            $table: $db.attractivenessAgents,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> perceiverStageAttractivenessAgents(
+    Expression<bool> Function($$AttractivenessAgentsTableFilterComposer f) f,
+  ) {
+    final $$AttractivenessAgentsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.attractivenessAgents,
+      getReferencedColumn: (t) => t.perceiverStageId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$AttractivenessAgentsTableFilterComposer(
+            $db: $db,
+            $table: $db.attractivenessAgents,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> memoryInfluenceRefs(
+    Expression<bool> Function($$MemoryInfluenceTableFilterComposer f) f,
+  ) {
+    final $$MemoryInfluenceTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.memoryInfluence,
+      getReferencedColumn: (t) => t.perceiverStageId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$MemoryInfluenceTableFilterComposer(
+            $db: $db,
+            $table: $db.memoryInfluence,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -9213,6 +17992,58 @@ class $$StagesTableAnnotationComposer
   GeneratedColumn<int> get color =>
       $composableBuilder(column: $table.color, builder: (column) => column);
 
+  Expression<T> stageNutrientRequirementsRefs<T extends Object>(
+    Expression<T> Function($$StageNutrientRequirementsTableAnnotationComposer a)
+    f,
+  ) {
+    final $$StageNutrientRequirementsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.stageNutrientRequirements,
+          getReferencedColumn: (t) => t.stageId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$StageNutrientRequirementsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.stageNutrientRequirements,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<T> stageTendenciesRefs<T extends Object>(
+    Expression<T> Function($$StageTendenciesTableAnnotationComposer a) f,
+  ) {
+    final $$StageTendenciesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.stageTendencies,
+      getReferencedColumn: (t) => t.stageId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$StageTendenciesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.stageTendencies,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
   Expression<T> environmentAgentsRefs<T extends Object>(
     Expression<T> Function($$EnvironmentAgentsTableAnnotationComposer a) f,
   ) {
@@ -9238,6 +18069,240 @@ class $$StagesTableAnnotationComposer
         );
     return f(composer);
   }
+
+  Expression<T> interactionSubstratesRefs<T extends Object>(
+    Expression<T> Function($$InteractionSubstratesTableAnnotationComposer a) f,
+  ) {
+    final $$InteractionSubstratesTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.interactionSubstrates,
+          getReferencedColumn: (t) => t.perceiverStageId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$InteractionSubstratesTableAnnotationComposer(
+                $db: $db,
+                $table: $db.interactionSubstrates,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<T> attractivenessSubstratesRefs<T extends Object>(
+    Expression<T> Function($$AttractivenessSubstratesTableAnnotationComposer a)
+    f,
+  ) {
+    final $$AttractivenessSubstratesTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.attractivenessSubstrates,
+          getReferencedColumn: (t) => t.perceiverStageId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$AttractivenessSubstratesTableAnnotationComposer(
+                $db: $db,
+                $table: $db.attractivenessSubstrates,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<T> interactionSourcesRefs<T extends Object>(
+    Expression<T> Function($$InteractionSourcesTableAnnotationComposer a) f,
+  ) {
+    final $$InteractionSourcesTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.interactionSources,
+          getReferencedColumn: (t) => t.perceiverStageId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$InteractionSourcesTableAnnotationComposer(
+                $db: $db,
+                $table: $db.interactionSources,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<T> attractivenessSourcesRefs<T extends Object>(
+    Expression<T> Function($$AttractivenessSourcesTableAnnotationComposer a) f,
+  ) {
+    final $$AttractivenessSourcesTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.attractivenessSources,
+          getReferencedColumn: (t) => t.perceiverStageId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$AttractivenessSourcesTableAnnotationComposer(
+                $db: $db,
+                $table: $db.attractivenessSources,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<T> interactionAgentsRefs<T extends Object>(
+    Expression<T> Function($$InteractionAgentsTableAnnotationComposer a) f,
+  ) {
+    final $$InteractionAgentsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.interactionAgents,
+          getReferencedColumn: (t) => t.observedStageId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$InteractionAgentsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.interactionAgents,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<T> perceiverStageInteractionAgents<T extends Object>(
+    Expression<T> Function($$InteractionAgentsTableAnnotationComposer a) f,
+  ) {
+    final $$InteractionAgentsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.interactionAgents,
+          getReferencedColumn: (t) => t.perceiverStageId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$InteractionAgentsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.interactionAgents,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<T> attractivenessAgentsRefs<T extends Object>(
+    Expression<T> Function($$AttractivenessAgentsTableAnnotationComposer a) f,
+  ) {
+    final $$AttractivenessAgentsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.attractivenessAgents,
+          getReferencedColumn: (t) => t.observedStageId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$AttractivenessAgentsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.attractivenessAgents,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<T> perceiverStageAttractivenessAgents<T extends Object>(
+    Expression<T> Function($$AttractivenessAgentsTableAnnotationComposer a) f,
+  ) {
+    final $$AttractivenessAgentsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.attractivenessAgents,
+          getReferencedColumn: (t) => t.perceiverStageId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$AttractivenessAgentsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.attractivenessAgents,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<T> memoryInfluenceRefs<T extends Object>(
+    Expression<T> Function($$MemoryInfluenceTableAnnotationComposer a) f,
+  ) {
+    final $$MemoryInfluenceTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.memoryInfluence,
+      getReferencedColumn: (t) => t.perceiverStageId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$MemoryInfluenceTableAnnotationComposer(
+            $db: $db,
+            $table: $db.memoryInfluence,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$StagesTableTableManager
@@ -9253,7 +18318,20 @@ class $$StagesTableTableManager
           $$StagesTableUpdateCompanionBuilder,
           (Stage, $$StagesTableReferences),
           Stage,
-          PrefetchHooks Function({bool environmentAgentsRefs})
+          PrefetchHooks Function({
+            bool stageNutrientRequirementsRefs,
+            bool stageTendenciesRefs,
+            bool environmentAgentsRefs,
+            bool interactionSubstratesRefs,
+            bool attractivenessSubstratesRefs,
+            bool interactionSourcesRefs,
+            bool attractivenessSourcesRefs,
+            bool interactionAgentsRefs,
+            bool perceiverStageInteractionAgents,
+            bool attractivenessAgentsRefs,
+            bool perceiverStageAttractivenessAgents,
+            bool memoryInfluenceRefs,
+          })
         > {
   $$StagesTableTableManager(_$AppDatabase db, $StagesTable table)
     : super(
@@ -9340,37 +18418,299 @@ class $$StagesTableTableManager
                     (e.readTable(table), $$StagesTableReferences(db, table, e)),
               )
               .toList(),
-          prefetchHooksCallback: ({environmentAgentsRefs = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [
-                if (environmentAgentsRefs) db.environmentAgents,
-              ],
-              addJoins: null,
-              getPrefetchedDataCallback: (items) async {
-                return [
-                  if (environmentAgentsRefs)
-                    await $_getPrefetchedData<
-                      Stage,
-                      $StagesTable,
-                      EnvironmentAgent
-                    >(
-                      currentTable: table,
-                      referencedTable: $$StagesTableReferences
-                          ._environmentAgentsRefsTable(db),
-                      managerFromTypedResult: (p0) => $$StagesTableReferences(
-                        db,
-                        table,
-                        p0,
-                      ).environmentAgentsRefs,
-                      referencedItemsForCurrentItem: (item, referencedItems) =>
-                          referencedItems.where((e) => e.stageId == item.id),
-                      typedResults: items,
-                    ),
-                ];
+          prefetchHooksCallback:
+              ({
+                stageNutrientRequirementsRefs = false,
+                stageTendenciesRefs = false,
+                environmentAgentsRefs = false,
+                interactionSubstratesRefs = false,
+                attractivenessSubstratesRefs = false,
+                interactionSourcesRefs = false,
+                attractivenessSourcesRefs = false,
+                interactionAgentsRefs = false,
+                perceiverStageInteractionAgents = false,
+                attractivenessAgentsRefs = false,
+                perceiverStageAttractivenessAgents = false,
+                memoryInfluenceRefs = false,
+              }) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (stageNutrientRequirementsRefs)
+                      db.stageNutrientRequirements,
+                    if (stageTendenciesRefs) db.stageTendencies,
+                    if (environmentAgentsRefs) db.environmentAgents,
+                    if (interactionSubstratesRefs) db.interactionSubstrates,
+                    if (attractivenessSubstratesRefs)
+                      db.attractivenessSubstrates,
+                    if (interactionSourcesRefs) db.interactionSources,
+                    if (attractivenessSourcesRefs) db.attractivenessSources,
+                    if (interactionAgentsRefs) db.interactionAgents,
+                    if (perceiverStageInteractionAgents) db.interactionAgents,
+                    if (attractivenessAgentsRefs) db.attractivenessAgents,
+                    if (perceiverStageAttractivenessAgents)
+                      db.attractivenessAgents,
+                    if (memoryInfluenceRefs) db.memoryInfluence,
+                  ],
+                  addJoins: null,
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (stageNutrientRequirementsRefs)
+                        await $_getPrefetchedData<
+                          Stage,
+                          $StagesTable,
+                          StageNutrientRequirement
+                        >(
+                          currentTable: table,
+                          referencedTable: $$StagesTableReferences
+                              ._stageNutrientRequirementsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$StagesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).stageNutrientRequirementsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.stageId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (stageTendenciesRefs)
+                        await $_getPrefetchedData<
+                          Stage,
+                          $StagesTable,
+                          StageTendency
+                        >(
+                          currentTable: table,
+                          referencedTable: $$StagesTableReferences
+                              ._stageTendenciesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$StagesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).stageTendenciesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.stageId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (environmentAgentsRefs)
+                        await $_getPrefetchedData<
+                          Stage,
+                          $StagesTable,
+                          EnvironmentAgent
+                        >(
+                          currentTable: table,
+                          referencedTable: $$StagesTableReferences
+                              ._environmentAgentsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$StagesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).environmentAgentsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.stageId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (interactionSubstratesRefs)
+                        await $_getPrefetchedData<
+                          Stage,
+                          $StagesTable,
+                          InteractionSubstrate
+                        >(
+                          currentTable: table,
+                          referencedTable: $$StagesTableReferences
+                              ._interactionSubstratesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$StagesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).interactionSubstratesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.perceiverStageId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (attractivenessSubstratesRefs)
+                        await $_getPrefetchedData<
+                          Stage,
+                          $StagesTable,
+                          AttractivenessSubstrate
+                        >(
+                          currentTable: table,
+                          referencedTable: $$StagesTableReferences
+                              ._attractivenessSubstratesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$StagesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).attractivenessSubstratesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.perceiverStageId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (interactionSourcesRefs)
+                        await $_getPrefetchedData<
+                          Stage,
+                          $StagesTable,
+                          InteractionSource
+                        >(
+                          currentTable: table,
+                          referencedTable: $$StagesTableReferences
+                              ._interactionSourcesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$StagesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).interactionSourcesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.perceiverStageId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (attractivenessSourcesRefs)
+                        await $_getPrefetchedData<
+                          Stage,
+                          $StagesTable,
+                          AttractivenessSource
+                        >(
+                          currentTable: table,
+                          referencedTable: $$StagesTableReferences
+                              ._attractivenessSourcesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$StagesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).attractivenessSourcesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.perceiverStageId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (interactionAgentsRefs)
+                        await $_getPrefetchedData<
+                          Stage,
+                          $StagesTable,
+                          InteractionAgent
+                        >(
+                          currentTable: table,
+                          referencedTable: $$StagesTableReferences
+                              ._interactionAgentsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$StagesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).interactionAgentsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.observedStageId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (perceiverStageInteractionAgents)
+                        await $_getPrefetchedData<
+                          Stage,
+                          $StagesTable,
+                          InteractionAgent
+                        >(
+                          currentTable: table,
+                          referencedTable: $$StagesTableReferences
+                              ._perceiverStageInteractionAgentsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$StagesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).perceiverStageInteractionAgents,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.perceiverStageId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (attractivenessAgentsRefs)
+                        await $_getPrefetchedData<
+                          Stage,
+                          $StagesTable,
+                          AttractivenessAgent
+                        >(
+                          currentTable: table,
+                          referencedTable: $$StagesTableReferences
+                              ._attractivenessAgentsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$StagesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).attractivenessAgentsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.observedStageId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (perceiverStageAttractivenessAgents)
+                        await $_getPrefetchedData<
+                          Stage,
+                          $StagesTable,
+                          AttractivenessAgent
+                        >(
+                          currentTable: table,
+                          referencedTable: $$StagesTableReferences
+                              ._perceiverStageAttractivenessAgentsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$StagesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).perceiverStageAttractivenessAgents,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.perceiverStageId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (memoryInfluenceRefs)
+                        await $_getPrefetchedData<
+                          Stage,
+                          $StagesTable,
+                          MemoryInfluenceData
+                        >(
+                          currentTable: table,
+                          referencedTable: $$StagesTableReferences
+                              ._memoryInfluenceRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$StagesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).memoryInfluenceRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.perceiverStageId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
               },
-            );
-          },
         ),
       );
 }
@@ -9387,7 +18727,750 @@ typedef $$StagesTableProcessedTableManager =
       $$StagesTableUpdateCompanionBuilder,
       (Stage, $$StagesTableReferences),
       Stage,
-      PrefetchHooks Function({bool environmentAgentsRefs})
+      PrefetchHooks Function({
+        bool stageNutrientRequirementsRefs,
+        bool stageTendenciesRefs,
+        bool environmentAgentsRefs,
+        bool interactionSubstratesRefs,
+        bool attractivenessSubstratesRefs,
+        bool interactionSourcesRefs,
+        bool attractivenessSourcesRefs,
+        bool interactionAgentsRefs,
+        bool perceiverStageInteractionAgents,
+        bool attractivenessAgentsRefs,
+        bool perceiverStageAttractivenessAgents,
+        bool memoryInfluenceRefs,
+      })
+    >;
+typedef $$StageNutrientRequirementsTableCreateCompanionBuilder =
+    StageNutrientRequirementsCompanion Function({
+      Value<int> id,
+      required int stageId,
+      required int nutrientId,
+      Value<String> requirementFormula,
+      Value<String> costFormula,
+    });
+typedef $$StageNutrientRequirementsTableUpdateCompanionBuilder =
+    StageNutrientRequirementsCompanion Function({
+      Value<int> id,
+      Value<int> stageId,
+      Value<int> nutrientId,
+      Value<String> requirementFormula,
+      Value<String> costFormula,
+    });
+
+final class $$StageNutrientRequirementsTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $StageNutrientRequirementsTable,
+          StageNutrientRequirement
+        > {
+  $$StageNutrientRequirementsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $StagesTable _stageIdTable(_$AppDatabase db) => db.stages.createAlias(
+    'stage_nutrient_requirements__stage_id__stages__id',
+  );
+
+  $$StagesTableProcessedTableManager get stageId {
+    final $_column = $_itemColumn<int>('stage_id')!;
+
+    final manager = $$StagesTableTableManager(
+      $_db,
+      $_db.stages,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_stageIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $NutrientsTable _nutrientIdTable(_$AppDatabase db) => db.nutrients
+      .createAlias('stage_nutrient_requirements__nutrient_id__nutrients__id');
+
+  $$NutrientsTableProcessedTableManager get nutrientId {
+    final $_column = $_itemColumn<int>('nutrient_id')!;
+
+    final manager = $$NutrientsTableTableManager(
+      $_db,
+      $_db.nutrients,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_nutrientIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$StageNutrientRequirementsTableFilterComposer
+    extends Composer<_$AppDatabase, $StageNutrientRequirementsTable> {
+  $$StageNutrientRequirementsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get requirementFormula => $composableBuilder(
+    column: $table.requirementFormula,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get costFormula => $composableBuilder(
+    column: $table.costFormula,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$StagesTableFilterComposer get stageId {
+    final $$StagesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.stageId,
+      referencedTable: $db.stages,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$StagesTableFilterComposer(
+            $db: $db,
+            $table: $db.stages,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$NutrientsTableFilterComposer get nutrientId {
+    final $$NutrientsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.nutrientId,
+      referencedTable: $db.nutrients,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$NutrientsTableFilterComposer(
+            $db: $db,
+            $table: $db.nutrients,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$StageNutrientRequirementsTableOrderingComposer
+    extends Composer<_$AppDatabase, $StageNutrientRequirementsTable> {
+  $$StageNutrientRequirementsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get requirementFormula => $composableBuilder(
+    column: $table.requirementFormula,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get costFormula => $composableBuilder(
+    column: $table.costFormula,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$StagesTableOrderingComposer get stageId {
+    final $$StagesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.stageId,
+      referencedTable: $db.stages,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$StagesTableOrderingComposer(
+            $db: $db,
+            $table: $db.stages,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$NutrientsTableOrderingComposer get nutrientId {
+    final $$NutrientsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.nutrientId,
+      referencedTable: $db.nutrients,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$NutrientsTableOrderingComposer(
+            $db: $db,
+            $table: $db.nutrients,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$StageNutrientRequirementsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $StageNutrientRequirementsTable> {
+  $$StageNutrientRequirementsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get requirementFormula => $composableBuilder(
+    column: $table.requirementFormula,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get costFormula => $composableBuilder(
+    column: $table.costFormula,
+    builder: (column) => column,
+  );
+
+  $$StagesTableAnnotationComposer get stageId {
+    final $$StagesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.stageId,
+      referencedTable: $db.stages,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$StagesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.stages,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$NutrientsTableAnnotationComposer get nutrientId {
+    final $$NutrientsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.nutrientId,
+      referencedTable: $db.nutrients,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$NutrientsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.nutrients,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$StageNutrientRequirementsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $StageNutrientRequirementsTable,
+          StageNutrientRequirement,
+          $$StageNutrientRequirementsTableFilterComposer,
+          $$StageNutrientRequirementsTableOrderingComposer,
+          $$StageNutrientRequirementsTableAnnotationComposer,
+          $$StageNutrientRequirementsTableCreateCompanionBuilder,
+          $$StageNutrientRequirementsTableUpdateCompanionBuilder,
+          (
+            StageNutrientRequirement,
+            $$StageNutrientRequirementsTableReferences,
+          ),
+          StageNutrientRequirement,
+          PrefetchHooks Function({bool stageId, bool nutrientId})
+        > {
+  $$StageNutrientRequirementsTableTableManager(
+    _$AppDatabase db,
+    $StageNutrientRequirementsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$StageNutrientRequirementsTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$StageNutrientRequirementsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$StageNutrientRequirementsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> stageId = const Value.absent(),
+                Value<int> nutrientId = const Value.absent(),
+                Value<String> requirementFormula = const Value.absent(),
+                Value<String> costFormula = const Value.absent(),
+              }) => StageNutrientRequirementsCompanion(
+                id: id,
+                stageId: stageId,
+                nutrientId: nutrientId,
+                requirementFormula: requirementFormula,
+                costFormula: costFormula,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int stageId,
+                required int nutrientId,
+                Value<String> requirementFormula = const Value.absent(),
+                Value<String> costFormula = const Value.absent(),
+              }) => StageNutrientRequirementsCompanion.insert(
+                id: id,
+                stageId: stageId,
+                nutrientId: nutrientId,
+                requirementFormula: requirementFormula,
+                costFormula: costFormula,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$StageNutrientRequirementsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({stageId = false, nutrientId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (stageId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.stageId,
+                                referencedTable:
+                                    $$StageNutrientRequirementsTableReferences
+                                        ._stageIdTable(db),
+                                referencedColumn:
+                                    $$StageNutrientRequirementsTableReferences
+                                        ._stageIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+                    if (nutrientId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.nutrientId,
+                                referencedTable:
+                                    $$StageNutrientRequirementsTableReferences
+                                        ._nutrientIdTable(db),
+                                referencedColumn:
+                                    $$StageNutrientRequirementsTableReferences
+                                        ._nutrientIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$StageNutrientRequirementsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $StageNutrientRequirementsTable,
+      StageNutrientRequirement,
+      $$StageNutrientRequirementsTableFilterComposer,
+      $$StageNutrientRequirementsTableOrderingComposer,
+      $$StageNutrientRequirementsTableAnnotationComposer,
+      $$StageNutrientRequirementsTableCreateCompanionBuilder,
+      $$StageNutrientRequirementsTableUpdateCompanionBuilder,
+      (StageNutrientRequirement, $$StageNutrientRequirementsTableReferences),
+      StageNutrientRequirement,
+      PrefetchHooks Function({bool stageId, bool nutrientId})
+    >;
+typedef $$StageTendenciesTableCreateCompanionBuilder =
+    StageTendenciesCompanion Function({
+      Value<int> id,
+      required int stageId,
+      required int direction,
+      Value<String> formula,
+    });
+typedef $$StageTendenciesTableUpdateCompanionBuilder =
+    StageTendenciesCompanion Function({
+      Value<int> id,
+      Value<int> stageId,
+      Value<int> direction,
+      Value<String> formula,
+    });
+
+final class $$StageTendenciesTableReferences
+    extends
+        BaseReferences<_$AppDatabase, $StageTendenciesTable, StageTendency> {
+  $$StageTendenciesTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $StagesTable _stageIdTable(_$AppDatabase db) =>
+      db.stages.createAlias('stage_tendencies__stage_id__stages__id');
+
+  $$StagesTableProcessedTableManager get stageId {
+    final $_column = $_itemColumn<int>('stage_id')!;
+
+    final manager = $$StagesTableTableManager(
+      $_db,
+      $_db.stages,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_stageIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$StageTendenciesTableFilterComposer
+    extends Composer<_$AppDatabase, $StageTendenciesTable> {
+  $$StageTendenciesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get direction => $composableBuilder(
+    column: $table.direction,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get formula => $composableBuilder(
+    column: $table.formula,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$StagesTableFilterComposer get stageId {
+    final $$StagesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.stageId,
+      referencedTable: $db.stages,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$StagesTableFilterComposer(
+            $db: $db,
+            $table: $db.stages,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$StageTendenciesTableOrderingComposer
+    extends Composer<_$AppDatabase, $StageTendenciesTable> {
+  $$StageTendenciesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get direction => $composableBuilder(
+    column: $table.direction,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get formula => $composableBuilder(
+    column: $table.formula,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$StagesTableOrderingComposer get stageId {
+    final $$StagesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.stageId,
+      referencedTable: $db.stages,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$StagesTableOrderingComposer(
+            $db: $db,
+            $table: $db.stages,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$StageTendenciesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $StageTendenciesTable> {
+  $$StageTendenciesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get direction =>
+      $composableBuilder(column: $table.direction, builder: (column) => column);
+
+  GeneratedColumn<String> get formula =>
+      $composableBuilder(column: $table.formula, builder: (column) => column);
+
+  $$StagesTableAnnotationComposer get stageId {
+    final $$StagesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.stageId,
+      referencedTable: $db.stages,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$StagesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.stages,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$StageTendenciesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $StageTendenciesTable,
+          StageTendency,
+          $$StageTendenciesTableFilterComposer,
+          $$StageTendenciesTableOrderingComposer,
+          $$StageTendenciesTableAnnotationComposer,
+          $$StageTendenciesTableCreateCompanionBuilder,
+          $$StageTendenciesTableUpdateCompanionBuilder,
+          (StageTendency, $$StageTendenciesTableReferences),
+          StageTendency,
+          PrefetchHooks Function({bool stageId})
+        > {
+  $$StageTendenciesTableTableManager(
+    _$AppDatabase db,
+    $StageTendenciesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$StageTendenciesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$StageTendenciesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$StageTendenciesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> stageId = const Value.absent(),
+                Value<int> direction = const Value.absent(),
+                Value<String> formula = const Value.absent(),
+              }) => StageTendenciesCompanion(
+                id: id,
+                stageId: stageId,
+                direction: direction,
+                formula: formula,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int stageId,
+                required int direction,
+                Value<String> formula = const Value.absent(),
+              }) => StageTendenciesCompanion.insert(
+                id: id,
+                stageId: stageId,
+                direction: direction,
+                formula: formula,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$StageTendenciesTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({stageId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (stageId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.stageId,
+                                referencedTable:
+                                    $$StageTendenciesTableReferences
+                                        ._stageIdTable(db),
+                                referencedColumn:
+                                    $$StageTendenciesTableReferences
+                                        ._stageIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$StageTendenciesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $StageTendenciesTable,
+      StageTendency,
+      $$StageTendenciesTableFilterComposer,
+      $$StageTendenciesTableOrderingComposer,
+      $$StageTendenciesTableAnnotationComposer,
+      $$StageTendenciesTableCreateCompanionBuilder,
+      $$StageTendenciesTableUpdateCompanionBuilder,
+      (StageTendency, $$StageTendenciesTableReferences),
+      StageTendency,
+      PrefetchHooks Function({bool stageId})
     >;
 typedef $$PrototypesTableCreateCompanionBuilder =
     PrototypesCompanion Function({
@@ -9420,6 +19503,121 @@ final class $$PrototypesTableReferences
     extends BaseReferences<_$AppDatabase, $PrototypesTable, Prototype> {
   $$PrototypesTableReferences(super.$_db, super.$_table, super.$_typedResult);
 
+  static MultiTypedResultKey<
+    $PrototypeMorphologyTable,
+    List<PrototypeMorphologyData>
+  >
+  _prototypeMorphologyRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.prototypeMorphology,
+        aliasName: 'prototypes__id__prototype_morphology__prototype_id',
+      );
+
+  $$PrototypeMorphologyTableProcessedTableManager get prototypeMorphologyRefs {
+    final manager = $$PrototypeMorphologyTableTableManager(
+      $_db,
+      $_db.prototypeMorphology,
+    ).filter((f) => f.prototypeId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _prototypeMorphologyRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$PrototypeTendenciesTable, List<PrototypeTendency>>
+  _prototypeTendenciesRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.prototypeTendencies,
+        aliasName: 'prototypes__id__prototype_tendencies__prototype_id',
+      );
+
+  $$PrototypeTendenciesTableProcessedTableManager get prototypeTendenciesRefs {
+    final manager = $$PrototypeTendenciesTableTableManager(
+      $_db,
+      $_db.prototypeTendencies,
+    ).filter((f) => f.prototypeId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _prototypeTendenciesRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$PrototypeCombatTable, List<PrototypeCombatData>>
+  _prototypeCombatRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.prototypeCombat,
+    aliasName: 'prototypes__id__prototype_combat__prototype_id',
+  );
+
+  $$PrototypeCombatTableProcessedTableManager get prototypeCombatRefs {
+    final manager = $$PrototypeCombatTableTableManager(
+      $_db,
+      $_db.prototypeCombat,
+    ).filter((f) => f.prototypeId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _prototypeCombatRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $PrototypeCourtshipTable,
+    List<PrototypeCourtshipData>
+  >
+  _prototypeCourtshipRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.prototypeCourtship,
+        aliasName: 'prototypes__id__prototype_courtship__prototype_id',
+      );
+
+  $$PrototypeCourtshipTableProcessedTableManager get prototypeCourtshipRefs {
+    final manager = $$PrototypeCourtshipTableTableManager(
+      $_db,
+      $_db.prototypeCourtship,
+    ).filter((f) => f.prototypeId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _prototypeCourtshipRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $PrototypeAssignmentCriteriaTable,
+    List<PrototypeAssignmentCriteriaData>
+  >
+  _prototypeAssignmentCriteriaRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.prototypeAssignmentCriteria,
+        aliasName:
+            'prototypes__id__prototype_assignment_criteria__prototype_id',
+      );
+
+  $$PrototypeAssignmentCriteriaTableProcessedTableManager
+  get prototypeAssignmentCriteriaRefs {
+    final manager = $$PrototypeAssignmentCriteriaTableTableManager(
+      $_db,
+      $_db.prototypeAssignmentCriteria,
+    ).filter((f) => f.prototypeId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _prototypeAssignmentCriteriaRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
   static MultiTypedResultKey<$EnvironmentAgentsTable, List<EnvironmentAgent>>
   _environmentAgentsRefsTable(_$AppDatabase db) =>
       MultiTypedResultKey.fromTable(
@@ -9435,6 +19633,245 @@ final class $$PrototypesTableReferences
 
     final cache = $_typedResult.readTableOrNull(
       _environmentAgentsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $InteractionSubstratesTable,
+    List<InteractionSubstrate>
+  >
+  _interactionSubstratesRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.interactionSubstrates,
+        aliasName:
+            'prototypes__id__interaction_substrates__perceiver_prototype_id',
+      );
+
+  $$InteractionSubstratesTableProcessedTableManager
+  get interactionSubstratesRefs {
+    final manager =
+        $$InteractionSubstratesTableTableManager(
+          $_db,
+          $_db.interactionSubstrates,
+        ).filter(
+          (f) => f.perceiverPrototypeId.id.sqlEquals($_itemColumn<int>('id')!),
+        );
+
+    final cache = $_typedResult.readTableOrNull(
+      _interactionSubstratesRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $AttractivenessSubstratesTable,
+    List<AttractivenessSubstrate>
+  >
+  _attractivenessSubstratesRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.attractivenessSubstrates,
+        aliasName:
+            'prototypes__id__attractiveness_substrates__perceiver_prototype_id',
+      );
+
+  $$AttractivenessSubstratesTableProcessedTableManager
+  get attractivenessSubstratesRefs {
+    final manager =
+        $$AttractivenessSubstratesTableTableManager(
+          $_db,
+          $_db.attractivenessSubstrates,
+        ).filter(
+          (f) => f.perceiverPrototypeId.id.sqlEquals($_itemColumn<int>('id')!),
+        );
+
+    final cache = $_typedResult.readTableOrNull(
+      _attractivenessSubstratesRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$InteractionSourcesTable, List<InteractionSource>>
+  _interactionSourcesRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.interactionSources,
+        aliasName:
+            'prototypes__id__interaction_sources__perceiver_prototype_id',
+      );
+
+  $$InteractionSourcesTableProcessedTableManager get interactionSourcesRefs {
+    final manager =
+        $$InteractionSourcesTableTableManager(
+          $_db,
+          $_db.interactionSources,
+        ).filter(
+          (f) => f.perceiverPrototypeId.id.sqlEquals($_itemColumn<int>('id')!),
+        );
+
+    final cache = $_typedResult.readTableOrNull(
+      _interactionSourcesRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $AttractivenessSourcesTable,
+    List<AttractivenessSource>
+  >
+  _attractivenessSourcesRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.attractivenessSources,
+        aliasName:
+            'prototypes__id__attractiveness_sources__perceiver_prototype_id',
+      );
+
+  $$AttractivenessSourcesTableProcessedTableManager
+  get attractivenessSourcesRefs {
+    final manager =
+        $$AttractivenessSourcesTableTableManager(
+          $_db,
+          $_db.attractivenessSources,
+        ).filter(
+          (f) => f.perceiverPrototypeId.id.sqlEquals($_itemColumn<int>('id')!),
+        );
+
+    final cache = $_typedResult.readTableOrNull(
+      _attractivenessSourcesRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$InteractionAgentsTable, List<InteractionAgent>>
+  _interactionAgentsRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.interactionAgents,
+        aliasName: 'prototypes__id__interaction_agents__observed_prototype_id',
+      );
+
+  $$InteractionAgentsTableProcessedTableManager get interactionAgentsRefs {
+    final manager =
+        $$InteractionAgentsTableTableManager(
+          $_db,
+          $_db.interactionAgents,
+        ).filter(
+          (f) => f.observedPrototypeId.id.sqlEquals($_itemColumn<int>('id')!),
+        );
+
+    final cache = $_typedResult.readTableOrNull(
+      _interactionAgentsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$InteractionAgentsTable, List<InteractionAgent>>
+  _perceiverPrototypeInteractionAgentsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.interactionAgents,
+        aliasName: 'prototypes__id__interaction_agents__perceiver_prototype_id',
+      );
+
+  $$InteractionAgentsTableProcessedTableManager
+  get perceiverPrototypeInteractionAgents {
+    final manager =
+        $$InteractionAgentsTableTableManager(
+          $_db,
+          $_db.interactionAgents,
+        ).filter(
+          (f) => f.perceiverPrototypeId.id.sqlEquals($_itemColumn<int>('id')!),
+        );
+
+    final cache = $_typedResult.readTableOrNull(
+      _perceiverPrototypeInteractionAgentsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $AttractivenessAgentsTable,
+    List<AttractivenessAgent>
+  >
+  _attractivenessAgentsRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.attractivenessAgents,
+        aliasName:
+            'prototypes__id__attractiveness_agents__observed_prototype_id',
+      );
+
+  $$AttractivenessAgentsTableProcessedTableManager
+  get attractivenessAgentsRefs {
+    final manager =
+        $$AttractivenessAgentsTableTableManager(
+          $_db,
+          $_db.attractivenessAgents,
+        ).filter(
+          (f) => f.observedPrototypeId.id.sqlEquals($_itemColumn<int>('id')!),
+        );
+
+    final cache = $_typedResult.readTableOrNull(
+      _attractivenessAgentsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $AttractivenessAgentsTable,
+    List<AttractivenessAgent>
+  >
+  _perceiverPrototypeAttractivenessAgentsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.attractivenessAgents,
+        aliasName:
+            'prototypes__id__attractiveness_agents__perceiver_prototype_id',
+      );
+
+  $$AttractivenessAgentsTableProcessedTableManager
+  get perceiverPrototypeAttractivenessAgents {
+    final manager =
+        $$AttractivenessAgentsTableTableManager(
+          $_db,
+          $_db.attractivenessAgents,
+        ).filter(
+          (f) => f.perceiverPrototypeId.id.sqlEquals($_itemColumn<int>('id')!),
+        );
+
+    final cache = $_typedResult.readTableOrNull(
+      _perceiverPrototypeAttractivenessAgentsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$MemoryInfluenceTable, List<MemoryInfluenceData>>
+  _memoryInfluenceRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.memoryInfluence,
+    aliasName: 'prototypes__id__memory_influence__perceiver_prototype_id',
+  );
+
+  $$MemoryInfluenceTableProcessedTableManager get memoryInfluenceRefs {
+    final manager =
+        $$MemoryInfluenceTableTableManager($_db, $_db.memoryInfluence).filter(
+          (f) => f.perceiverPrototypeId.id.sqlEquals($_itemColumn<int>('id')!),
+        );
+
+    final cache = $_typedResult.readTableOrNull(
+      _memoryInfluenceRefsTable($_db),
     );
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
@@ -9501,6 +19938,135 @@ class $$PrototypesTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  Expression<bool> prototypeMorphologyRefs(
+    Expression<bool> Function($$PrototypeMorphologyTableFilterComposer f) f,
+  ) {
+    final $$PrototypeMorphologyTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.prototypeMorphology,
+      getReferencedColumn: (t) => t.prototypeId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PrototypeMorphologyTableFilterComposer(
+            $db: $db,
+            $table: $db.prototypeMorphology,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> prototypeTendenciesRefs(
+    Expression<bool> Function($$PrototypeTendenciesTableFilterComposer f) f,
+  ) {
+    final $$PrototypeTendenciesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.prototypeTendencies,
+      getReferencedColumn: (t) => t.prototypeId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PrototypeTendenciesTableFilterComposer(
+            $db: $db,
+            $table: $db.prototypeTendencies,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> prototypeCombatRefs(
+    Expression<bool> Function($$PrototypeCombatTableFilterComposer f) f,
+  ) {
+    final $$PrototypeCombatTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.prototypeCombat,
+      getReferencedColumn: (t) => t.prototypeId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PrototypeCombatTableFilterComposer(
+            $db: $db,
+            $table: $db.prototypeCombat,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> prototypeCourtshipRefs(
+    Expression<bool> Function($$PrototypeCourtshipTableFilterComposer f) f,
+  ) {
+    final $$PrototypeCourtshipTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.prototypeCourtship,
+      getReferencedColumn: (t) => t.prototypeId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PrototypeCourtshipTableFilterComposer(
+            $db: $db,
+            $table: $db.prototypeCourtship,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> prototypeAssignmentCriteriaRefs(
+    Expression<bool> Function(
+      $$PrototypeAssignmentCriteriaTableFilterComposer f,
+    )
+    f,
+  ) {
+    final $$PrototypeAssignmentCriteriaTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.prototypeAssignmentCriteria,
+          getReferencedColumn: (t) => t.prototypeId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$PrototypeAssignmentCriteriaTableFilterComposer(
+                $db: $db,
+                $table: $db.prototypeAssignmentCriteria,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
   Expression<bool> environmentAgentsRefs(
     Expression<bool> Function($$EnvironmentAgentsTableFilterComposer f) f,
   ) {
@@ -9517,6 +20083,235 @@ class $$PrototypesTableFilterComposer
           }) => $$EnvironmentAgentsTableFilterComposer(
             $db: $db,
             $table: $db.environmentAgents,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> interactionSubstratesRefs(
+    Expression<bool> Function($$InteractionSubstratesTableFilterComposer f) f,
+  ) {
+    final $$InteractionSubstratesTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.interactionSubstrates,
+          getReferencedColumn: (t) => t.perceiverPrototypeId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$InteractionSubstratesTableFilterComposer(
+                $db: $db,
+                $table: $db.interactionSubstrates,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<bool> attractivenessSubstratesRefs(
+    Expression<bool> Function($$AttractivenessSubstratesTableFilterComposer f)
+    f,
+  ) {
+    final $$AttractivenessSubstratesTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.attractivenessSubstrates,
+          getReferencedColumn: (t) => t.perceiverPrototypeId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$AttractivenessSubstratesTableFilterComposer(
+                $db: $db,
+                $table: $db.attractivenessSubstrates,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<bool> interactionSourcesRefs(
+    Expression<bool> Function($$InteractionSourcesTableFilterComposer f) f,
+  ) {
+    final $$InteractionSourcesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.interactionSources,
+      getReferencedColumn: (t) => t.perceiverPrototypeId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$InteractionSourcesTableFilterComposer(
+            $db: $db,
+            $table: $db.interactionSources,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> attractivenessSourcesRefs(
+    Expression<bool> Function($$AttractivenessSourcesTableFilterComposer f) f,
+  ) {
+    final $$AttractivenessSourcesTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.attractivenessSources,
+          getReferencedColumn: (t) => t.perceiverPrototypeId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$AttractivenessSourcesTableFilterComposer(
+                $db: $db,
+                $table: $db.attractivenessSources,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<bool> interactionAgentsRefs(
+    Expression<bool> Function($$InteractionAgentsTableFilterComposer f) f,
+  ) {
+    final $$InteractionAgentsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.interactionAgents,
+      getReferencedColumn: (t) => t.observedPrototypeId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$InteractionAgentsTableFilterComposer(
+            $db: $db,
+            $table: $db.interactionAgents,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> perceiverPrototypeInteractionAgents(
+    Expression<bool> Function($$InteractionAgentsTableFilterComposer f) f,
+  ) {
+    final $$InteractionAgentsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.interactionAgents,
+      getReferencedColumn: (t) => t.perceiverPrototypeId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$InteractionAgentsTableFilterComposer(
+            $db: $db,
+            $table: $db.interactionAgents,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> attractivenessAgentsRefs(
+    Expression<bool> Function($$AttractivenessAgentsTableFilterComposer f) f,
+  ) {
+    final $$AttractivenessAgentsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.attractivenessAgents,
+      getReferencedColumn: (t) => t.observedPrototypeId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$AttractivenessAgentsTableFilterComposer(
+            $db: $db,
+            $table: $db.attractivenessAgents,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> perceiverPrototypeAttractivenessAgents(
+    Expression<bool> Function($$AttractivenessAgentsTableFilterComposer f) f,
+  ) {
+    final $$AttractivenessAgentsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.attractivenessAgents,
+      getReferencedColumn: (t) => t.perceiverPrototypeId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$AttractivenessAgentsTableFilterComposer(
+            $db: $db,
+            $table: $db.attractivenessAgents,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> memoryInfluenceRefs(
+    Expression<bool> Function($$MemoryInfluenceTableFilterComposer f) f,
+  ) {
+    final $$MemoryInfluenceTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.memoryInfluence,
+      getReferencedColumn: (t) => t.perceiverPrototypeId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$MemoryInfluenceTableFilterComposer(
+            $db: $db,
+            $table: $db.memoryInfluence,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -9636,6 +20431,138 @@ class $$PrototypesTableAnnotationComposer
   GeneratedColumn<int> get sortOrder =>
       $composableBuilder(column: $table.sortOrder, builder: (column) => column);
 
+  Expression<T> prototypeMorphologyRefs<T extends Object>(
+    Expression<T> Function($$PrototypeMorphologyTableAnnotationComposer a) f,
+  ) {
+    final $$PrototypeMorphologyTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.prototypeMorphology,
+          getReferencedColumn: (t) => t.prototypeId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$PrototypeMorphologyTableAnnotationComposer(
+                $db: $db,
+                $table: $db.prototypeMorphology,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<T> prototypeTendenciesRefs<T extends Object>(
+    Expression<T> Function($$PrototypeTendenciesTableAnnotationComposer a) f,
+  ) {
+    final $$PrototypeTendenciesTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.prototypeTendencies,
+          getReferencedColumn: (t) => t.prototypeId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$PrototypeTendenciesTableAnnotationComposer(
+                $db: $db,
+                $table: $db.prototypeTendencies,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<T> prototypeCombatRefs<T extends Object>(
+    Expression<T> Function($$PrototypeCombatTableAnnotationComposer a) f,
+  ) {
+    final $$PrototypeCombatTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.prototypeCombat,
+      getReferencedColumn: (t) => t.prototypeId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PrototypeCombatTableAnnotationComposer(
+            $db: $db,
+            $table: $db.prototypeCombat,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<T> prototypeCourtshipRefs<T extends Object>(
+    Expression<T> Function($$PrototypeCourtshipTableAnnotationComposer a) f,
+  ) {
+    final $$PrototypeCourtshipTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.prototypeCourtship,
+          getReferencedColumn: (t) => t.prototypeId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$PrototypeCourtshipTableAnnotationComposer(
+                $db: $db,
+                $table: $db.prototypeCourtship,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<T> prototypeAssignmentCriteriaRefs<T extends Object>(
+    Expression<T> Function(
+      $$PrototypeAssignmentCriteriaTableAnnotationComposer a,
+    )
+    f,
+  ) {
+    final $$PrototypeAssignmentCriteriaTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.prototypeAssignmentCriteria,
+          getReferencedColumn: (t) => t.prototypeId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$PrototypeAssignmentCriteriaTableAnnotationComposer(
+                $db: $db,
+                $table: $db.prototypeAssignmentCriteria,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
   Expression<T> environmentAgentsRefs<T extends Object>(
     Expression<T> Function($$EnvironmentAgentsTableAnnotationComposer a) f,
   ) {
@@ -9661,6 +20588,240 @@ class $$PrototypesTableAnnotationComposer
         );
     return f(composer);
   }
+
+  Expression<T> interactionSubstratesRefs<T extends Object>(
+    Expression<T> Function($$InteractionSubstratesTableAnnotationComposer a) f,
+  ) {
+    final $$InteractionSubstratesTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.interactionSubstrates,
+          getReferencedColumn: (t) => t.perceiverPrototypeId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$InteractionSubstratesTableAnnotationComposer(
+                $db: $db,
+                $table: $db.interactionSubstrates,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<T> attractivenessSubstratesRefs<T extends Object>(
+    Expression<T> Function($$AttractivenessSubstratesTableAnnotationComposer a)
+    f,
+  ) {
+    final $$AttractivenessSubstratesTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.attractivenessSubstrates,
+          getReferencedColumn: (t) => t.perceiverPrototypeId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$AttractivenessSubstratesTableAnnotationComposer(
+                $db: $db,
+                $table: $db.attractivenessSubstrates,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<T> interactionSourcesRefs<T extends Object>(
+    Expression<T> Function($$InteractionSourcesTableAnnotationComposer a) f,
+  ) {
+    final $$InteractionSourcesTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.interactionSources,
+          getReferencedColumn: (t) => t.perceiverPrototypeId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$InteractionSourcesTableAnnotationComposer(
+                $db: $db,
+                $table: $db.interactionSources,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<T> attractivenessSourcesRefs<T extends Object>(
+    Expression<T> Function($$AttractivenessSourcesTableAnnotationComposer a) f,
+  ) {
+    final $$AttractivenessSourcesTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.attractivenessSources,
+          getReferencedColumn: (t) => t.perceiverPrototypeId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$AttractivenessSourcesTableAnnotationComposer(
+                $db: $db,
+                $table: $db.attractivenessSources,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<T> interactionAgentsRefs<T extends Object>(
+    Expression<T> Function($$InteractionAgentsTableAnnotationComposer a) f,
+  ) {
+    final $$InteractionAgentsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.interactionAgents,
+          getReferencedColumn: (t) => t.observedPrototypeId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$InteractionAgentsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.interactionAgents,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<T> perceiverPrototypeInteractionAgents<T extends Object>(
+    Expression<T> Function($$InteractionAgentsTableAnnotationComposer a) f,
+  ) {
+    final $$InteractionAgentsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.interactionAgents,
+          getReferencedColumn: (t) => t.perceiverPrototypeId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$InteractionAgentsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.interactionAgents,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<T> attractivenessAgentsRefs<T extends Object>(
+    Expression<T> Function($$AttractivenessAgentsTableAnnotationComposer a) f,
+  ) {
+    final $$AttractivenessAgentsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.attractivenessAgents,
+          getReferencedColumn: (t) => t.observedPrototypeId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$AttractivenessAgentsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.attractivenessAgents,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<T> perceiverPrototypeAttractivenessAgents<T extends Object>(
+    Expression<T> Function($$AttractivenessAgentsTableAnnotationComposer a) f,
+  ) {
+    final $$AttractivenessAgentsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.attractivenessAgents,
+          getReferencedColumn: (t) => t.perceiverPrototypeId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$AttractivenessAgentsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.attractivenessAgents,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<T> memoryInfluenceRefs<T extends Object>(
+    Expression<T> Function($$MemoryInfluenceTableAnnotationComposer a) f,
+  ) {
+    final $$MemoryInfluenceTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.memoryInfluence,
+      getReferencedColumn: (t) => t.perceiverPrototypeId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$MemoryInfluenceTableAnnotationComposer(
+            $db: $db,
+            $table: $db.memoryInfluence,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$PrototypesTableTableManager
@@ -9676,7 +20837,23 @@ class $$PrototypesTableTableManager
           $$PrototypesTableUpdateCompanionBuilder,
           (Prototype, $$PrototypesTableReferences),
           Prototype,
-          PrefetchHooks Function({bool environmentAgentsRefs})
+          PrefetchHooks Function({
+            bool prototypeMorphologyRefs,
+            bool prototypeTendenciesRefs,
+            bool prototypeCombatRefs,
+            bool prototypeCourtshipRefs,
+            bool prototypeAssignmentCriteriaRefs,
+            bool environmentAgentsRefs,
+            bool interactionSubstratesRefs,
+            bool attractivenessSubstratesRefs,
+            bool interactionSourcesRefs,
+            bool attractivenessSourcesRefs,
+            bool interactionAgentsRefs,
+            bool perceiverPrototypeInteractionAgents,
+            bool attractivenessAgentsRefs,
+            bool perceiverPrototypeAttractivenessAgents,
+            bool memoryInfluenceRefs,
+          })
         > {
   $$PrototypesTableTableManager(_$AppDatabase db, $PrototypesTable table)
     : super(
@@ -9745,40 +20922,369 @@ class $$PrototypesTableTableManager
                 ),
               )
               .toList(),
-          prefetchHooksCallback: ({environmentAgentsRefs = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [
-                if (environmentAgentsRefs) db.environmentAgents,
-              ],
-              addJoins: null,
-              getPrefetchedDataCallback: (items) async {
-                return [
-                  if (environmentAgentsRefs)
-                    await $_getPrefetchedData<
-                      Prototype,
-                      $PrototypesTable,
-                      EnvironmentAgent
-                    >(
-                      currentTable: table,
-                      referencedTable: $$PrototypesTableReferences
-                          ._environmentAgentsRefsTable(db),
-                      managerFromTypedResult: (p0) =>
-                          $$PrototypesTableReferences(
-                            db,
-                            table,
-                            p0,
-                          ).environmentAgentsRefs,
-                      referencedItemsForCurrentItem: (item, referencedItems) =>
-                          referencedItems.where(
-                            (e) => e.prototypeId == item.id,
-                          ),
-                      typedResults: items,
-                    ),
-                ];
+          prefetchHooksCallback:
+              ({
+                prototypeMorphologyRefs = false,
+                prototypeTendenciesRefs = false,
+                prototypeCombatRefs = false,
+                prototypeCourtshipRefs = false,
+                prototypeAssignmentCriteriaRefs = false,
+                environmentAgentsRefs = false,
+                interactionSubstratesRefs = false,
+                attractivenessSubstratesRefs = false,
+                interactionSourcesRefs = false,
+                attractivenessSourcesRefs = false,
+                interactionAgentsRefs = false,
+                perceiverPrototypeInteractionAgents = false,
+                attractivenessAgentsRefs = false,
+                perceiverPrototypeAttractivenessAgents = false,
+                memoryInfluenceRefs = false,
+              }) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (prototypeMorphologyRefs) db.prototypeMorphology,
+                    if (prototypeTendenciesRefs) db.prototypeTendencies,
+                    if (prototypeCombatRefs) db.prototypeCombat,
+                    if (prototypeCourtshipRefs) db.prototypeCourtship,
+                    if (prototypeAssignmentCriteriaRefs)
+                      db.prototypeAssignmentCriteria,
+                    if (environmentAgentsRefs) db.environmentAgents,
+                    if (interactionSubstratesRefs) db.interactionSubstrates,
+                    if (attractivenessSubstratesRefs)
+                      db.attractivenessSubstrates,
+                    if (interactionSourcesRefs) db.interactionSources,
+                    if (attractivenessSourcesRefs) db.attractivenessSources,
+                    if (interactionAgentsRefs) db.interactionAgents,
+                    if (perceiverPrototypeInteractionAgents)
+                      db.interactionAgents,
+                    if (attractivenessAgentsRefs) db.attractivenessAgents,
+                    if (perceiverPrototypeAttractivenessAgents)
+                      db.attractivenessAgents,
+                    if (memoryInfluenceRefs) db.memoryInfluence,
+                  ],
+                  addJoins: null,
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (prototypeMorphologyRefs)
+                        await $_getPrefetchedData<
+                          Prototype,
+                          $PrototypesTable,
+                          PrototypeMorphologyData
+                        >(
+                          currentTable: table,
+                          referencedTable: $$PrototypesTableReferences
+                              ._prototypeMorphologyRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$PrototypesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).prototypeMorphologyRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.prototypeId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (prototypeTendenciesRefs)
+                        await $_getPrefetchedData<
+                          Prototype,
+                          $PrototypesTable,
+                          PrototypeTendency
+                        >(
+                          currentTable: table,
+                          referencedTable: $$PrototypesTableReferences
+                              ._prototypeTendenciesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$PrototypesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).prototypeTendenciesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.prototypeId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (prototypeCombatRefs)
+                        await $_getPrefetchedData<
+                          Prototype,
+                          $PrototypesTable,
+                          PrototypeCombatData
+                        >(
+                          currentTable: table,
+                          referencedTable: $$PrototypesTableReferences
+                              ._prototypeCombatRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$PrototypesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).prototypeCombatRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.prototypeId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (prototypeCourtshipRefs)
+                        await $_getPrefetchedData<
+                          Prototype,
+                          $PrototypesTable,
+                          PrototypeCourtshipData
+                        >(
+                          currentTable: table,
+                          referencedTable: $$PrototypesTableReferences
+                              ._prototypeCourtshipRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$PrototypesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).prototypeCourtshipRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.prototypeId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (prototypeAssignmentCriteriaRefs)
+                        await $_getPrefetchedData<
+                          Prototype,
+                          $PrototypesTable,
+                          PrototypeAssignmentCriteriaData
+                        >(
+                          currentTable: table,
+                          referencedTable: $$PrototypesTableReferences
+                              ._prototypeAssignmentCriteriaRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$PrototypesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).prototypeAssignmentCriteriaRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.prototypeId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (environmentAgentsRefs)
+                        await $_getPrefetchedData<
+                          Prototype,
+                          $PrototypesTable,
+                          EnvironmentAgent
+                        >(
+                          currentTable: table,
+                          referencedTable: $$PrototypesTableReferences
+                              ._environmentAgentsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$PrototypesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).environmentAgentsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.prototypeId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (interactionSubstratesRefs)
+                        await $_getPrefetchedData<
+                          Prototype,
+                          $PrototypesTable,
+                          InteractionSubstrate
+                        >(
+                          currentTable: table,
+                          referencedTable: $$PrototypesTableReferences
+                              ._interactionSubstratesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$PrototypesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).interactionSubstratesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.perceiverPrototypeId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (attractivenessSubstratesRefs)
+                        await $_getPrefetchedData<
+                          Prototype,
+                          $PrototypesTable,
+                          AttractivenessSubstrate
+                        >(
+                          currentTable: table,
+                          referencedTable: $$PrototypesTableReferences
+                              ._attractivenessSubstratesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$PrototypesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).attractivenessSubstratesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.perceiverPrototypeId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (interactionSourcesRefs)
+                        await $_getPrefetchedData<
+                          Prototype,
+                          $PrototypesTable,
+                          InteractionSource
+                        >(
+                          currentTable: table,
+                          referencedTable: $$PrototypesTableReferences
+                              ._interactionSourcesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$PrototypesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).interactionSourcesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.perceiverPrototypeId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (attractivenessSourcesRefs)
+                        await $_getPrefetchedData<
+                          Prototype,
+                          $PrototypesTable,
+                          AttractivenessSource
+                        >(
+                          currentTable: table,
+                          referencedTable: $$PrototypesTableReferences
+                              ._attractivenessSourcesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$PrototypesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).attractivenessSourcesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.perceiverPrototypeId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (interactionAgentsRefs)
+                        await $_getPrefetchedData<
+                          Prototype,
+                          $PrototypesTable,
+                          InteractionAgent
+                        >(
+                          currentTable: table,
+                          referencedTable: $$PrototypesTableReferences
+                              ._interactionAgentsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$PrototypesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).interactionAgentsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.observedPrototypeId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (perceiverPrototypeInteractionAgents)
+                        await $_getPrefetchedData<
+                          Prototype,
+                          $PrototypesTable,
+                          InteractionAgent
+                        >(
+                          currentTable: table,
+                          referencedTable: $$PrototypesTableReferences
+                              ._perceiverPrototypeInteractionAgentsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$PrototypesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).perceiverPrototypeInteractionAgents,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.perceiverPrototypeId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (attractivenessAgentsRefs)
+                        await $_getPrefetchedData<
+                          Prototype,
+                          $PrototypesTable,
+                          AttractivenessAgent
+                        >(
+                          currentTable: table,
+                          referencedTable: $$PrototypesTableReferences
+                              ._attractivenessAgentsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$PrototypesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).attractivenessAgentsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.observedPrototypeId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (perceiverPrototypeAttractivenessAgents)
+                        await $_getPrefetchedData<
+                          Prototype,
+                          $PrototypesTable,
+                          AttractivenessAgent
+                        >(
+                          currentTable: table,
+                          referencedTable: $$PrototypesTableReferences
+                              ._perceiverPrototypeAttractivenessAgentsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$PrototypesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).perceiverPrototypeAttractivenessAgents,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.perceiverPrototypeId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (memoryInfluenceRefs)
+                        await $_getPrefetchedData<
+                          Prototype,
+                          $PrototypesTable,
+                          MemoryInfluenceData
+                        >(
+                          currentTable: table,
+                          referencedTable: $$PrototypesTableReferences
+                              ._memoryInfluenceRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$PrototypesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).memoryInfluenceRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.perceiverPrototypeId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
               },
-            );
-          },
         ),
       );
 }
@@ -9795,7 +21301,1771 @@ typedef $$PrototypesTableProcessedTableManager =
       $$PrototypesTableUpdateCompanionBuilder,
       (Prototype, $$PrototypesTableReferences),
       Prototype,
-      PrefetchHooks Function({bool environmentAgentsRefs})
+      PrefetchHooks Function({
+        bool prototypeMorphologyRefs,
+        bool prototypeTendenciesRefs,
+        bool prototypeCombatRefs,
+        bool prototypeCourtshipRefs,
+        bool prototypeAssignmentCriteriaRefs,
+        bool environmentAgentsRefs,
+        bool interactionSubstratesRefs,
+        bool attractivenessSubstratesRefs,
+        bool interactionSourcesRefs,
+        bool attractivenessSourcesRefs,
+        bool interactionAgentsRefs,
+        bool perceiverPrototypeInteractionAgents,
+        bool attractivenessAgentsRefs,
+        bool perceiverPrototypeAttractivenessAgents,
+        bool memoryInfluenceRefs,
+      })
+    >;
+typedef $$PrototypeMorphologyTableCreateCompanionBuilder =
+    PrototypeMorphologyCompanion Function({
+      Value<int> id,
+      required int prototypeId,
+      required int locusId,
+      Value<String> geneticFormula,
+      Value<String> environmentalFormula,
+    });
+typedef $$PrototypeMorphologyTableUpdateCompanionBuilder =
+    PrototypeMorphologyCompanion Function({
+      Value<int> id,
+      Value<int> prototypeId,
+      Value<int> locusId,
+      Value<String> geneticFormula,
+      Value<String> environmentalFormula,
+    });
+
+final class $$PrototypeMorphologyTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $PrototypeMorphologyTable,
+          PrototypeMorphologyData
+        > {
+  $$PrototypeMorphologyTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $PrototypesTable _prototypeIdTable(_$AppDatabase db) => db.prototypes
+      .createAlias('prototype_morphology__prototype_id__prototypes__id');
+
+  $$PrototypesTableProcessedTableManager get prototypeId {
+    final $_column = $_itemColumn<int>('prototype_id')!;
+
+    final manager = $$PrototypesTableTableManager(
+      $_db,
+      $_db.prototypes,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_prototypeIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $LociTable _locusIdTable(_$AppDatabase db) =>
+      db.loci.createAlias('prototype_morphology__locus_id__loci__id');
+
+  $$LociTableProcessedTableManager get locusId {
+    final $_column = $_itemColumn<int>('locus_id')!;
+
+    final manager = $$LociTableTableManager(
+      $_db,
+      $_db.loci,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_locusIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$PrototypeMorphologyTableFilterComposer
+    extends Composer<_$AppDatabase, $PrototypeMorphologyTable> {
+  $$PrototypeMorphologyTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get geneticFormula => $composableBuilder(
+    column: $table.geneticFormula,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get environmentalFormula => $composableBuilder(
+    column: $table.environmentalFormula,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$PrototypesTableFilterComposer get prototypeId {
+    final $$PrototypesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.prototypeId,
+      referencedTable: $db.prototypes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PrototypesTableFilterComposer(
+            $db: $db,
+            $table: $db.prototypes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$LociTableFilterComposer get locusId {
+    final $$LociTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.locusId,
+      referencedTable: $db.loci,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$LociTableFilterComposer(
+            $db: $db,
+            $table: $db.loci,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$PrototypeMorphologyTableOrderingComposer
+    extends Composer<_$AppDatabase, $PrototypeMorphologyTable> {
+  $$PrototypeMorphologyTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get geneticFormula => $composableBuilder(
+    column: $table.geneticFormula,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get environmentalFormula => $composableBuilder(
+    column: $table.environmentalFormula,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$PrototypesTableOrderingComposer get prototypeId {
+    final $$PrototypesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.prototypeId,
+      referencedTable: $db.prototypes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PrototypesTableOrderingComposer(
+            $db: $db,
+            $table: $db.prototypes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$LociTableOrderingComposer get locusId {
+    final $$LociTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.locusId,
+      referencedTable: $db.loci,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$LociTableOrderingComposer(
+            $db: $db,
+            $table: $db.loci,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$PrototypeMorphologyTableAnnotationComposer
+    extends Composer<_$AppDatabase, $PrototypeMorphologyTable> {
+  $$PrototypeMorphologyTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get geneticFormula => $composableBuilder(
+    column: $table.geneticFormula,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get environmentalFormula => $composableBuilder(
+    column: $table.environmentalFormula,
+    builder: (column) => column,
+  );
+
+  $$PrototypesTableAnnotationComposer get prototypeId {
+    final $$PrototypesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.prototypeId,
+      referencedTable: $db.prototypes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PrototypesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.prototypes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$LociTableAnnotationComposer get locusId {
+    final $$LociTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.locusId,
+      referencedTable: $db.loci,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$LociTableAnnotationComposer(
+            $db: $db,
+            $table: $db.loci,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$PrototypeMorphologyTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $PrototypeMorphologyTable,
+          PrototypeMorphologyData,
+          $$PrototypeMorphologyTableFilterComposer,
+          $$PrototypeMorphologyTableOrderingComposer,
+          $$PrototypeMorphologyTableAnnotationComposer,
+          $$PrototypeMorphologyTableCreateCompanionBuilder,
+          $$PrototypeMorphologyTableUpdateCompanionBuilder,
+          (PrototypeMorphologyData, $$PrototypeMorphologyTableReferences),
+          PrototypeMorphologyData,
+          PrefetchHooks Function({bool prototypeId, bool locusId})
+        > {
+  $$PrototypeMorphologyTableTableManager(
+    _$AppDatabase db,
+    $PrototypeMorphologyTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$PrototypeMorphologyTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$PrototypeMorphologyTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$PrototypeMorphologyTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> prototypeId = const Value.absent(),
+                Value<int> locusId = const Value.absent(),
+                Value<String> geneticFormula = const Value.absent(),
+                Value<String> environmentalFormula = const Value.absent(),
+              }) => PrototypeMorphologyCompanion(
+                id: id,
+                prototypeId: prototypeId,
+                locusId: locusId,
+                geneticFormula: geneticFormula,
+                environmentalFormula: environmentalFormula,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int prototypeId,
+                required int locusId,
+                Value<String> geneticFormula = const Value.absent(),
+                Value<String> environmentalFormula = const Value.absent(),
+              }) => PrototypeMorphologyCompanion.insert(
+                id: id,
+                prototypeId: prototypeId,
+                locusId: locusId,
+                geneticFormula: geneticFormula,
+                environmentalFormula: environmentalFormula,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$PrototypeMorphologyTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({prototypeId = false, locusId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (prototypeId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.prototypeId,
+                                referencedTable:
+                                    $$PrototypeMorphologyTableReferences
+                                        ._prototypeIdTable(db),
+                                referencedColumn:
+                                    $$PrototypeMorphologyTableReferences
+                                        ._prototypeIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+                    if (locusId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.locusId,
+                                referencedTable:
+                                    $$PrototypeMorphologyTableReferences
+                                        ._locusIdTable(db),
+                                referencedColumn:
+                                    $$PrototypeMorphologyTableReferences
+                                        ._locusIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$PrototypeMorphologyTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $PrototypeMorphologyTable,
+      PrototypeMorphologyData,
+      $$PrototypeMorphologyTableFilterComposer,
+      $$PrototypeMorphologyTableOrderingComposer,
+      $$PrototypeMorphologyTableAnnotationComposer,
+      $$PrototypeMorphologyTableCreateCompanionBuilder,
+      $$PrototypeMorphologyTableUpdateCompanionBuilder,
+      (PrototypeMorphologyData, $$PrototypeMorphologyTableReferences),
+      PrototypeMorphologyData,
+      PrefetchHooks Function({bool prototypeId, bool locusId})
+    >;
+typedef $$PrototypeTendenciesTableCreateCompanionBuilder =
+    PrototypeTendenciesCompanion Function({
+      Value<int> id,
+      required int prototypeId,
+      required int direction,
+      Value<String> formula,
+    });
+typedef $$PrototypeTendenciesTableUpdateCompanionBuilder =
+    PrototypeTendenciesCompanion Function({
+      Value<int> id,
+      Value<int> prototypeId,
+      Value<int> direction,
+      Value<String> formula,
+    });
+
+final class $$PrototypeTendenciesTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $PrototypeTendenciesTable,
+          PrototypeTendency
+        > {
+  $$PrototypeTendenciesTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $PrototypesTable _prototypeIdTable(_$AppDatabase db) => db.prototypes
+      .createAlias('prototype_tendencies__prototype_id__prototypes__id');
+
+  $$PrototypesTableProcessedTableManager get prototypeId {
+    final $_column = $_itemColumn<int>('prototype_id')!;
+
+    final manager = $$PrototypesTableTableManager(
+      $_db,
+      $_db.prototypes,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_prototypeIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$PrototypeTendenciesTableFilterComposer
+    extends Composer<_$AppDatabase, $PrototypeTendenciesTable> {
+  $$PrototypeTendenciesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get direction => $composableBuilder(
+    column: $table.direction,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get formula => $composableBuilder(
+    column: $table.formula,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$PrototypesTableFilterComposer get prototypeId {
+    final $$PrototypesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.prototypeId,
+      referencedTable: $db.prototypes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PrototypesTableFilterComposer(
+            $db: $db,
+            $table: $db.prototypes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$PrototypeTendenciesTableOrderingComposer
+    extends Composer<_$AppDatabase, $PrototypeTendenciesTable> {
+  $$PrototypeTendenciesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get direction => $composableBuilder(
+    column: $table.direction,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get formula => $composableBuilder(
+    column: $table.formula,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$PrototypesTableOrderingComposer get prototypeId {
+    final $$PrototypesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.prototypeId,
+      referencedTable: $db.prototypes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PrototypesTableOrderingComposer(
+            $db: $db,
+            $table: $db.prototypes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$PrototypeTendenciesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $PrototypeTendenciesTable> {
+  $$PrototypeTendenciesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get direction =>
+      $composableBuilder(column: $table.direction, builder: (column) => column);
+
+  GeneratedColumn<String> get formula =>
+      $composableBuilder(column: $table.formula, builder: (column) => column);
+
+  $$PrototypesTableAnnotationComposer get prototypeId {
+    final $$PrototypesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.prototypeId,
+      referencedTable: $db.prototypes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PrototypesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.prototypes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$PrototypeTendenciesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $PrototypeTendenciesTable,
+          PrototypeTendency,
+          $$PrototypeTendenciesTableFilterComposer,
+          $$PrototypeTendenciesTableOrderingComposer,
+          $$PrototypeTendenciesTableAnnotationComposer,
+          $$PrototypeTendenciesTableCreateCompanionBuilder,
+          $$PrototypeTendenciesTableUpdateCompanionBuilder,
+          (PrototypeTendency, $$PrototypeTendenciesTableReferences),
+          PrototypeTendency,
+          PrefetchHooks Function({bool prototypeId})
+        > {
+  $$PrototypeTendenciesTableTableManager(
+    _$AppDatabase db,
+    $PrototypeTendenciesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$PrototypeTendenciesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$PrototypeTendenciesTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$PrototypeTendenciesTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> prototypeId = const Value.absent(),
+                Value<int> direction = const Value.absent(),
+                Value<String> formula = const Value.absent(),
+              }) => PrototypeTendenciesCompanion(
+                id: id,
+                prototypeId: prototypeId,
+                direction: direction,
+                formula: formula,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int prototypeId,
+                required int direction,
+                Value<String> formula = const Value.absent(),
+              }) => PrototypeTendenciesCompanion.insert(
+                id: id,
+                prototypeId: prototypeId,
+                direction: direction,
+                formula: formula,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$PrototypeTendenciesTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({prototypeId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (prototypeId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.prototypeId,
+                                referencedTable:
+                                    $$PrototypeTendenciesTableReferences
+                                        ._prototypeIdTable(db),
+                                referencedColumn:
+                                    $$PrototypeTendenciesTableReferences
+                                        ._prototypeIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$PrototypeTendenciesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $PrototypeTendenciesTable,
+      PrototypeTendency,
+      $$PrototypeTendenciesTableFilterComposer,
+      $$PrototypeTendenciesTableOrderingComposer,
+      $$PrototypeTendenciesTableAnnotationComposer,
+      $$PrototypeTendenciesTableCreateCompanionBuilder,
+      $$PrototypeTendenciesTableUpdateCompanionBuilder,
+      (PrototypeTendency, $$PrototypeTendenciesTableReferences),
+      PrototypeTendency,
+      PrefetchHooks Function({bool prototypeId})
+    >;
+typedef $$PrototypeCombatTableCreateCompanionBuilder =
+    PrototypeCombatCompanion Function({
+      Value<int> id,
+      required int prototypeId,
+      required int action,
+      required int opponentAction,
+      Value<String> formula,
+    });
+typedef $$PrototypeCombatTableUpdateCompanionBuilder =
+    PrototypeCombatCompanion Function({
+      Value<int> id,
+      Value<int> prototypeId,
+      Value<int> action,
+      Value<int> opponentAction,
+      Value<String> formula,
+    });
+
+final class $$PrototypeCombatTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $PrototypeCombatTable,
+          PrototypeCombatData
+        > {
+  $$PrototypeCombatTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $PrototypesTable _prototypeIdTable(_$AppDatabase db) => db.prototypes
+      .createAlias('prototype_combat__prototype_id__prototypes__id');
+
+  $$PrototypesTableProcessedTableManager get prototypeId {
+    final $_column = $_itemColumn<int>('prototype_id')!;
+
+    final manager = $$PrototypesTableTableManager(
+      $_db,
+      $_db.prototypes,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_prototypeIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$PrototypeCombatTableFilterComposer
+    extends Composer<_$AppDatabase, $PrototypeCombatTable> {
+  $$PrototypeCombatTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get action => $composableBuilder(
+    column: $table.action,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get opponentAction => $composableBuilder(
+    column: $table.opponentAction,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get formula => $composableBuilder(
+    column: $table.formula,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$PrototypesTableFilterComposer get prototypeId {
+    final $$PrototypesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.prototypeId,
+      referencedTable: $db.prototypes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PrototypesTableFilterComposer(
+            $db: $db,
+            $table: $db.prototypes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$PrototypeCombatTableOrderingComposer
+    extends Composer<_$AppDatabase, $PrototypeCombatTable> {
+  $$PrototypeCombatTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get action => $composableBuilder(
+    column: $table.action,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get opponentAction => $composableBuilder(
+    column: $table.opponentAction,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get formula => $composableBuilder(
+    column: $table.formula,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$PrototypesTableOrderingComposer get prototypeId {
+    final $$PrototypesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.prototypeId,
+      referencedTable: $db.prototypes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PrototypesTableOrderingComposer(
+            $db: $db,
+            $table: $db.prototypes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$PrototypeCombatTableAnnotationComposer
+    extends Composer<_$AppDatabase, $PrototypeCombatTable> {
+  $$PrototypeCombatTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get action =>
+      $composableBuilder(column: $table.action, builder: (column) => column);
+
+  GeneratedColumn<int> get opponentAction => $composableBuilder(
+    column: $table.opponentAction,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get formula =>
+      $composableBuilder(column: $table.formula, builder: (column) => column);
+
+  $$PrototypesTableAnnotationComposer get prototypeId {
+    final $$PrototypesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.prototypeId,
+      referencedTable: $db.prototypes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PrototypesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.prototypes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$PrototypeCombatTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $PrototypeCombatTable,
+          PrototypeCombatData,
+          $$PrototypeCombatTableFilterComposer,
+          $$PrototypeCombatTableOrderingComposer,
+          $$PrototypeCombatTableAnnotationComposer,
+          $$PrototypeCombatTableCreateCompanionBuilder,
+          $$PrototypeCombatTableUpdateCompanionBuilder,
+          (PrototypeCombatData, $$PrototypeCombatTableReferences),
+          PrototypeCombatData,
+          PrefetchHooks Function({bool prototypeId})
+        > {
+  $$PrototypeCombatTableTableManager(
+    _$AppDatabase db,
+    $PrototypeCombatTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$PrototypeCombatTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$PrototypeCombatTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$PrototypeCombatTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> prototypeId = const Value.absent(),
+                Value<int> action = const Value.absent(),
+                Value<int> opponentAction = const Value.absent(),
+                Value<String> formula = const Value.absent(),
+              }) => PrototypeCombatCompanion(
+                id: id,
+                prototypeId: prototypeId,
+                action: action,
+                opponentAction: opponentAction,
+                formula: formula,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int prototypeId,
+                required int action,
+                required int opponentAction,
+                Value<String> formula = const Value.absent(),
+              }) => PrototypeCombatCompanion.insert(
+                id: id,
+                prototypeId: prototypeId,
+                action: action,
+                opponentAction: opponentAction,
+                formula: formula,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$PrototypeCombatTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({prototypeId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (prototypeId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.prototypeId,
+                                referencedTable:
+                                    $$PrototypeCombatTableReferences
+                                        ._prototypeIdTable(db),
+                                referencedColumn:
+                                    $$PrototypeCombatTableReferences
+                                        ._prototypeIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$PrototypeCombatTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $PrototypeCombatTable,
+      PrototypeCombatData,
+      $$PrototypeCombatTableFilterComposer,
+      $$PrototypeCombatTableOrderingComposer,
+      $$PrototypeCombatTableAnnotationComposer,
+      $$PrototypeCombatTableCreateCompanionBuilder,
+      $$PrototypeCombatTableUpdateCompanionBuilder,
+      (PrototypeCombatData, $$PrototypeCombatTableReferences),
+      PrototypeCombatData,
+      PrefetchHooks Function({bool prototypeId})
+    >;
+typedef $$PrototypeCourtshipTableCreateCompanionBuilder =
+    PrototypeCourtshipCompanion Function({
+      Value<int> id,
+      required int prototypeId,
+      required int action,
+      required int opponentAction,
+      Value<String> formula,
+    });
+typedef $$PrototypeCourtshipTableUpdateCompanionBuilder =
+    PrototypeCourtshipCompanion Function({
+      Value<int> id,
+      Value<int> prototypeId,
+      Value<int> action,
+      Value<int> opponentAction,
+      Value<String> formula,
+    });
+
+final class $$PrototypeCourtshipTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $PrototypeCourtshipTable,
+          PrototypeCourtshipData
+        > {
+  $$PrototypeCourtshipTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $PrototypesTable _prototypeIdTable(_$AppDatabase db) => db.prototypes
+      .createAlias('prototype_courtship__prototype_id__prototypes__id');
+
+  $$PrototypesTableProcessedTableManager get prototypeId {
+    final $_column = $_itemColumn<int>('prototype_id')!;
+
+    final manager = $$PrototypesTableTableManager(
+      $_db,
+      $_db.prototypes,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_prototypeIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$PrototypeCourtshipTableFilterComposer
+    extends Composer<_$AppDatabase, $PrototypeCourtshipTable> {
+  $$PrototypeCourtshipTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get action => $composableBuilder(
+    column: $table.action,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get opponentAction => $composableBuilder(
+    column: $table.opponentAction,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get formula => $composableBuilder(
+    column: $table.formula,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$PrototypesTableFilterComposer get prototypeId {
+    final $$PrototypesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.prototypeId,
+      referencedTable: $db.prototypes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PrototypesTableFilterComposer(
+            $db: $db,
+            $table: $db.prototypes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$PrototypeCourtshipTableOrderingComposer
+    extends Composer<_$AppDatabase, $PrototypeCourtshipTable> {
+  $$PrototypeCourtshipTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get action => $composableBuilder(
+    column: $table.action,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get opponentAction => $composableBuilder(
+    column: $table.opponentAction,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get formula => $composableBuilder(
+    column: $table.formula,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$PrototypesTableOrderingComposer get prototypeId {
+    final $$PrototypesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.prototypeId,
+      referencedTable: $db.prototypes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PrototypesTableOrderingComposer(
+            $db: $db,
+            $table: $db.prototypes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$PrototypeCourtshipTableAnnotationComposer
+    extends Composer<_$AppDatabase, $PrototypeCourtshipTable> {
+  $$PrototypeCourtshipTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get action =>
+      $composableBuilder(column: $table.action, builder: (column) => column);
+
+  GeneratedColumn<int> get opponentAction => $composableBuilder(
+    column: $table.opponentAction,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get formula =>
+      $composableBuilder(column: $table.formula, builder: (column) => column);
+
+  $$PrototypesTableAnnotationComposer get prototypeId {
+    final $$PrototypesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.prototypeId,
+      referencedTable: $db.prototypes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PrototypesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.prototypes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$PrototypeCourtshipTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $PrototypeCourtshipTable,
+          PrototypeCourtshipData,
+          $$PrototypeCourtshipTableFilterComposer,
+          $$PrototypeCourtshipTableOrderingComposer,
+          $$PrototypeCourtshipTableAnnotationComposer,
+          $$PrototypeCourtshipTableCreateCompanionBuilder,
+          $$PrototypeCourtshipTableUpdateCompanionBuilder,
+          (PrototypeCourtshipData, $$PrototypeCourtshipTableReferences),
+          PrototypeCourtshipData,
+          PrefetchHooks Function({bool prototypeId})
+        > {
+  $$PrototypeCourtshipTableTableManager(
+    _$AppDatabase db,
+    $PrototypeCourtshipTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$PrototypeCourtshipTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$PrototypeCourtshipTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$PrototypeCourtshipTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> prototypeId = const Value.absent(),
+                Value<int> action = const Value.absent(),
+                Value<int> opponentAction = const Value.absent(),
+                Value<String> formula = const Value.absent(),
+              }) => PrototypeCourtshipCompanion(
+                id: id,
+                prototypeId: prototypeId,
+                action: action,
+                opponentAction: opponentAction,
+                formula: formula,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int prototypeId,
+                required int action,
+                required int opponentAction,
+                Value<String> formula = const Value.absent(),
+              }) => PrototypeCourtshipCompanion.insert(
+                id: id,
+                prototypeId: prototypeId,
+                action: action,
+                opponentAction: opponentAction,
+                formula: formula,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$PrototypeCourtshipTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({prototypeId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (prototypeId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.prototypeId,
+                                referencedTable:
+                                    $$PrototypeCourtshipTableReferences
+                                        ._prototypeIdTable(db),
+                                referencedColumn:
+                                    $$PrototypeCourtshipTableReferences
+                                        ._prototypeIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$PrototypeCourtshipTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $PrototypeCourtshipTable,
+      PrototypeCourtshipData,
+      $$PrototypeCourtshipTableFilterComposer,
+      $$PrototypeCourtshipTableOrderingComposer,
+      $$PrototypeCourtshipTableAnnotationComposer,
+      $$PrototypeCourtshipTableCreateCompanionBuilder,
+      $$PrototypeCourtshipTableUpdateCompanionBuilder,
+      (PrototypeCourtshipData, $$PrototypeCourtshipTableReferences),
+      PrototypeCourtshipData,
+      PrefetchHooks Function({bool prototypeId})
+    >;
+typedef $$PrototypeAssignmentCriteriaTableCreateCompanionBuilder =
+    PrototypeAssignmentCriteriaCompanion Function({
+      Value<int> id,
+      required int prototypeId,
+      Value<int> priority,
+      Value<String> formula,
+      Value<String> operator,
+      Value<double> threshold,
+    });
+typedef $$PrototypeAssignmentCriteriaTableUpdateCompanionBuilder =
+    PrototypeAssignmentCriteriaCompanion Function({
+      Value<int> id,
+      Value<int> prototypeId,
+      Value<int> priority,
+      Value<String> formula,
+      Value<String> operator,
+      Value<double> threshold,
+    });
+
+final class $$PrototypeAssignmentCriteriaTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $PrototypeAssignmentCriteriaTable,
+          PrototypeAssignmentCriteriaData
+        > {
+  $$PrototypeAssignmentCriteriaTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $PrototypesTable _prototypeIdTable(_$AppDatabase db) =>
+      db.prototypes.createAlias(
+        'prototype_assignment_criteria__prototype_id__prototypes__id',
+      );
+
+  $$PrototypesTableProcessedTableManager get prototypeId {
+    final $_column = $_itemColumn<int>('prototype_id')!;
+
+    final manager = $$PrototypesTableTableManager(
+      $_db,
+      $_db.prototypes,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_prototypeIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$PrototypeAssignmentCriteriaTableFilterComposer
+    extends Composer<_$AppDatabase, $PrototypeAssignmentCriteriaTable> {
+  $$PrototypeAssignmentCriteriaTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get priority => $composableBuilder(
+    column: $table.priority,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get formula => $composableBuilder(
+    column: $table.formula,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get operator => $composableBuilder(
+    column: $table.operator,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get threshold => $composableBuilder(
+    column: $table.threshold,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$PrototypesTableFilterComposer get prototypeId {
+    final $$PrototypesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.prototypeId,
+      referencedTable: $db.prototypes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PrototypesTableFilterComposer(
+            $db: $db,
+            $table: $db.prototypes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$PrototypeAssignmentCriteriaTableOrderingComposer
+    extends Composer<_$AppDatabase, $PrototypeAssignmentCriteriaTable> {
+  $$PrototypeAssignmentCriteriaTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get priority => $composableBuilder(
+    column: $table.priority,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get formula => $composableBuilder(
+    column: $table.formula,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get operator => $composableBuilder(
+    column: $table.operator,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get threshold => $composableBuilder(
+    column: $table.threshold,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$PrototypesTableOrderingComposer get prototypeId {
+    final $$PrototypesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.prototypeId,
+      referencedTable: $db.prototypes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PrototypesTableOrderingComposer(
+            $db: $db,
+            $table: $db.prototypes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$PrototypeAssignmentCriteriaTableAnnotationComposer
+    extends Composer<_$AppDatabase, $PrototypeAssignmentCriteriaTable> {
+  $$PrototypeAssignmentCriteriaTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get priority =>
+      $composableBuilder(column: $table.priority, builder: (column) => column);
+
+  GeneratedColumn<String> get formula =>
+      $composableBuilder(column: $table.formula, builder: (column) => column);
+
+  GeneratedColumn<String> get operator =>
+      $composableBuilder(column: $table.operator, builder: (column) => column);
+
+  GeneratedColumn<double> get threshold =>
+      $composableBuilder(column: $table.threshold, builder: (column) => column);
+
+  $$PrototypesTableAnnotationComposer get prototypeId {
+    final $$PrototypesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.prototypeId,
+      referencedTable: $db.prototypes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PrototypesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.prototypes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$PrototypeAssignmentCriteriaTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $PrototypeAssignmentCriteriaTable,
+          PrototypeAssignmentCriteriaData,
+          $$PrototypeAssignmentCriteriaTableFilterComposer,
+          $$PrototypeAssignmentCriteriaTableOrderingComposer,
+          $$PrototypeAssignmentCriteriaTableAnnotationComposer,
+          $$PrototypeAssignmentCriteriaTableCreateCompanionBuilder,
+          $$PrototypeAssignmentCriteriaTableUpdateCompanionBuilder,
+          (
+            PrototypeAssignmentCriteriaData,
+            $$PrototypeAssignmentCriteriaTableReferences,
+          ),
+          PrototypeAssignmentCriteriaData,
+          PrefetchHooks Function({bool prototypeId})
+        > {
+  $$PrototypeAssignmentCriteriaTableTableManager(
+    _$AppDatabase db,
+    $PrototypeAssignmentCriteriaTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$PrototypeAssignmentCriteriaTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$PrototypeAssignmentCriteriaTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$PrototypeAssignmentCriteriaTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> prototypeId = const Value.absent(),
+                Value<int> priority = const Value.absent(),
+                Value<String> formula = const Value.absent(),
+                Value<String> operator = const Value.absent(),
+                Value<double> threshold = const Value.absent(),
+              }) => PrototypeAssignmentCriteriaCompanion(
+                id: id,
+                prototypeId: prototypeId,
+                priority: priority,
+                formula: formula,
+                operator: operator,
+                threshold: threshold,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int prototypeId,
+                Value<int> priority = const Value.absent(),
+                Value<String> formula = const Value.absent(),
+                Value<String> operator = const Value.absent(),
+                Value<double> threshold = const Value.absent(),
+              }) => PrototypeAssignmentCriteriaCompanion.insert(
+                id: id,
+                prototypeId: prototypeId,
+                priority: priority,
+                formula: formula,
+                operator: operator,
+                threshold: threshold,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$PrototypeAssignmentCriteriaTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({prototypeId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (prototypeId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.prototypeId,
+                                referencedTable:
+                                    $$PrototypeAssignmentCriteriaTableReferences
+                                        ._prototypeIdTable(db),
+                                referencedColumn:
+                                    $$PrototypeAssignmentCriteriaTableReferences
+                                        ._prototypeIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$PrototypeAssignmentCriteriaTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $PrototypeAssignmentCriteriaTable,
+      PrototypeAssignmentCriteriaData,
+      $$PrototypeAssignmentCriteriaTableFilterComposer,
+      $$PrototypeAssignmentCriteriaTableOrderingComposer,
+      $$PrototypeAssignmentCriteriaTableAnnotationComposer,
+      $$PrototypeAssignmentCriteriaTableCreateCompanionBuilder,
+      $$PrototypeAssignmentCriteriaTableUpdateCompanionBuilder,
+      (
+        PrototypeAssignmentCriteriaData,
+        $$PrototypeAssignmentCriteriaTableReferences,
+      ),
+      PrototypeAssignmentCriteriaData,
+      PrefetchHooks Function({bool prototypeId})
     >;
 typedef $$EnvironmentsTableCreateCompanionBuilder =
     EnvironmentsCompanion Function({
@@ -12589,6 +25859,873 @@ typedef $$MetabolismTableProcessedTableManager =
       MetabolismData,
       PrefetchHooks Function({bool nutrientId})
     >;
+typedef $$BehaviorCostsTableCreateCompanionBuilder =
+    BehaviorCostsCompanion Function({
+      Value<int> id,
+      required String behavior,
+      required int nutrientId,
+      Value<String> costFormula,
+    });
+typedef $$BehaviorCostsTableUpdateCompanionBuilder =
+    BehaviorCostsCompanion Function({
+      Value<int> id,
+      Value<String> behavior,
+      Value<int> nutrientId,
+      Value<String> costFormula,
+    });
+
+final class $$BehaviorCostsTableReferences
+    extends BaseReferences<_$AppDatabase, $BehaviorCostsTable, BehaviorCost> {
+  $$BehaviorCostsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $NutrientsTable _nutrientIdTable(_$AppDatabase db) =>
+      db.nutrients.createAlias('behavior_costs__nutrient_id__nutrients__id');
+
+  $$NutrientsTableProcessedTableManager get nutrientId {
+    final $_column = $_itemColumn<int>('nutrient_id')!;
+
+    final manager = $$NutrientsTableTableManager(
+      $_db,
+      $_db.nutrients,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_nutrientIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$BehaviorCostsTableFilterComposer
+    extends Composer<_$AppDatabase, $BehaviorCostsTable> {
+  $$BehaviorCostsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get behavior => $composableBuilder(
+    column: $table.behavior,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get costFormula => $composableBuilder(
+    column: $table.costFormula,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$NutrientsTableFilterComposer get nutrientId {
+    final $$NutrientsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.nutrientId,
+      referencedTable: $db.nutrients,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$NutrientsTableFilterComposer(
+            $db: $db,
+            $table: $db.nutrients,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$BehaviorCostsTableOrderingComposer
+    extends Composer<_$AppDatabase, $BehaviorCostsTable> {
+  $$BehaviorCostsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get behavior => $composableBuilder(
+    column: $table.behavior,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get costFormula => $composableBuilder(
+    column: $table.costFormula,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$NutrientsTableOrderingComposer get nutrientId {
+    final $$NutrientsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.nutrientId,
+      referencedTable: $db.nutrients,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$NutrientsTableOrderingComposer(
+            $db: $db,
+            $table: $db.nutrients,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$BehaviorCostsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $BehaviorCostsTable> {
+  $$BehaviorCostsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get behavior =>
+      $composableBuilder(column: $table.behavior, builder: (column) => column);
+
+  GeneratedColumn<String> get costFormula => $composableBuilder(
+    column: $table.costFormula,
+    builder: (column) => column,
+  );
+
+  $$NutrientsTableAnnotationComposer get nutrientId {
+    final $$NutrientsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.nutrientId,
+      referencedTable: $db.nutrients,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$NutrientsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.nutrients,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$BehaviorCostsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $BehaviorCostsTable,
+          BehaviorCost,
+          $$BehaviorCostsTableFilterComposer,
+          $$BehaviorCostsTableOrderingComposer,
+          $$BehaviorCostsTableAnnotationComposer,
+          $$BehaviorCostsTableCreateCompanionBuilder,
+          $$BehaviorCostsTableUpdateCompanionBuilder,
+          (BehaviorCost, $$BehaviorCostsTableReferences),
+          BehaviorCost,
+          PrefetchHooks Function({bool nutrientId})
+        > {
+  $$BehaviorCostsTableTableManager(_$AppDatabase db, $BehaviorCostsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$BehaviorCostsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$BehaviorCostsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$BehaviorCostsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> behavior = const Value.absent(),
+                Value<int> nutrientId = const Value.absent(),
+                Value<String> costFormula = const Value.absent(),
+              }) => BehaviorCostsCompanion(
+                id: id,
+                behavior: behavior,
+                nutrientId: nutrientId,
+                costFormula: costFormula,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String behavior,
+                required int nutrientId,
+                Value<String> costFormula = const Value.absent(),
+              }) => BehaviorCostsCompanion.insert(
+                id: id,
+                behavior: behavior,
+                nutrientId: nutrientId,
+                costFormula: costFormula,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$BehaviorCostsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({nutrientId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (nutrientId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.nutrientId,
+                                referencedTable: $$BehaviorCostsTableReferences
+                                    ._nutrientIdTable(db),
+                                referencedColumn: $$BehaviorCostsTableReferences
+                                    ._nutrientIdTable(db)
+                                    .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$BehaviorCostsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $BehaviorCostsTable,
+      BehaviorCost,
+      $$BehaviorCostsTableFilterComposer,
+      $$BehaviorCostsTableOrderingComposer,
+      $$BehaviorCostsTableAnnotationComposer,
+      $$BehaviorCostsTableCreateCompanionBuilder,
+      $$BehaviorCostsTableUpdateCompanionBuilder,
+      (BehaviorCost, $$BehaviorCostsTableReferences),
+      BehaviorCost,
+      PrefetchHooks Function({bool nutrientId})
+    >;
+typedef $$FeedingGainsTableCreateCompanionBuilder =
+    FeedingGainsCompanion Function({
+      Value<int> id,
+      required int nutrientId,
+      Value<String> gainFormula,
+    });
+typedef $$FeedingGainsTableUpdateCompanionBuilder =
+    FeedingGainsCompanion Function({
+      Value<int> id,
+      Value<int> nutrientId,
+      Value<String> gainFormula,
+    });
+
+final class $$FeedingGainsTableReferences
+    extends BaseReferences<_$AppDatabase, $FeedingGainsTable, FeedingGain> {
+  $$FeedingGainsTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $NutrientsTable _nutrientIdTable(_$AppDatabase db) =>
+      db.nutrients.createAlias('feeding_gains__nutrient_id__nutrients__id');
+
+  $$NutrientsTableProcessedTableManager get nutrientId {
+    final $_column = $_itemColumn<int>('nutrient_id')!;
+
+    final manager = $$NutrientsTableTableManager(
+      $_db,
+      $_db.nutrients,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_nutrientIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$FeedingGainsTableFilterComposer
+    extends Composer<_$AppDatabase, $FeedingGainsTable> {
+  $$FeedingGainsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get gainFormula => $composableBuilder(
+    column: $table.gainFormula,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$NutrientsTableFilterComposer get nutrientId {
+    final $$NutrientsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.nutrientId,
+      referencedTable: $db.nutrients,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$NutrientsTableFilterComposer(
+            $db: $db,
+            $table: $db.nutrients,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$FeedingGainsTableOrderingComposer
+    extends Composer<_$AppDatabase, $FeedingGainsTable> {
+  $$FeedingGainsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get gainFormula => $composableBuilder(
+    column: $table.gainFormula,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$NutrientsTableOrderingComposer get nutrientId {
+    final $$NutrientsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.nutrientId,
+      referencedTable: $db.nutrients,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$NutrientsTableOrderingComposer(
+            $db: $db,
+            $table: $db.nutrients,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$FeedingGainsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $FeedingGainsTable> {
+  $$FeedingGainsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get gainFormula => $composableBuilder(
+    column: $table.gainFormula,
+    builder: (column) => column,
+  );
+
+  $$NutrientsTableAnnotationComposer get nutrientId {
+    final $$NutrientsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.nutrientId,
+      referencedTable: $db.nutrients,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$NutrientsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.nutrients,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$FeedingGainsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $FeedingGainsTable,
+          FeedingGain,
+          $$FeedingGainsTableFilterComposer,
+          $$FeedingGainsTableOrderingComposer,
+          $$FeedingGainsTableAnnotationComposer,
+          $$FeedingGainsTableCreateCompanionBuilder,
+          $$FeedingGainsTableUpdateCompanionBuilder,
+          (FeedingGain, $$FeedingGainsTableReferences),
+          FeedingGain,
+          PrefetchHooks Function({bool nutrientId})
+        > {
+  $$FeedingGainsTableTableManager(_$AppDatabase db, $FeedingGainsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$FeedingGainsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$FeedingGainsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$FeedingGainsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> nutrientId = const Value.absent(),
+                Value<String> gainFormula = const Value.absent(),
+              }) => FeedingGainsCompanion(
+                id: id,
+                nutrientId: nutrientId,
+                gainFormula: gainFormula,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int nutrientId,
+                Value<String> gainFormula = const Value.absent(),
+              }) => FeedingGainsCompanion.insert(
+                id: id,
+                nutrientId: nutrientId,
+                gainFormula: gainFormula,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$FeedingGainsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({nutrientId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (nutrientId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.nutrientId,
+                                referencedTable: $$FeedingGainsTableReferences
+                                    ._nutrientIdTable(db),
+                                referencedColumn: $$FeedingGainsTableReferences
+                                    ._nutrientIdTable(db)
+                                    .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$FeedingGainsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $FeedingGainsTable,
+      FeedingGain,
+      $$FeedingGainsTableFilterComposer,
+      $$FeedingGainsTableOrderingComposer,
+      $$FeedingGainsTableAnnotationComposer,
+      $$FeedingGainsTableCreateCompanionBuilder,
+      $$FeedingGainsTableUpdateCompanionBuilder,
+      (FeedingGain, $$FeedingGainsTableReferences),
+      FeedingGain,
+      PrefetchHooks Function({bool nutrientId})
+    >;
+typedef $$SubstrateVelocitiesTableCreateCompanionBuilder =
+    SubstrateVelocitiesCompanion Function({
+      Value<int> id,
+      required int substrateId,
+      Value<String> velocityFormula,
+    });
+typedef $$SubstrateVelocitiesTableUpdateCompanionBuilder =
+    SubstrateVelocitiesCompanion Function({
+      Value<int> id,
+      Value<int> substrateId,
+      Value<String> velocityFormula,
+    });
+
+final class $$SubstrateVelocitiesTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $SubstrateVelocitiesTable,
+          SubstrateVelocity
+        > {
+  $$SubstrateVelocitiesTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $SubstratesTable _substrateIdTable(_$AppDatabase db) => db.substrates
+      .createAlias('substrate_velocities__substrate_id__substrates__id');
+
+  $$SubstratesTableProcessedTableManager get substrateId {
+    final $_column = $_itemColumn<int>('substrate_id')!;
+
+    final manager = $$SubstratesTableTableManager(
+      $_db,
+      $_db.substrates,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_substrateIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$SubstrateVelocitiesTableFilterComposer
+    extends Composer<_$AppDatabase, $SubstrateVelocitiesTable> {
+  $$SubstrateVelocitiesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get velocityFormula => $composableBuilder(
+    column: $table.velocityFormula,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$SubstratesTableFilterComposer get substrateId {
+    final $$SubstratesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.substrateId,
+      referencedTable: $db.substrates,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$SubstratesTableFilterComposer(
+            $db: $db,
+            $table: $db.substrates,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$SubstrateVelocitiesTableOrderingComposer
+    extends Composer<_$AppDatabase, $SubstrateVelocitiesTable> {
+  $$SubstrateVelocitiesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get velocityFormula => $composableBuilder(
+    column: $table.velocityFormula,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$SubstratesTableOrderingComposer get substrateId {
+    final $$SubstratesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.substrateId,
+      referencedTable: $db.substrates,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$SubstratesTableOrderingComposer(
+            $db: $db,
+            $table: $db.substrates,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$SubstrateVelocitiesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $SubstrateVelocitiesTable> {
+  $$SubstrateVelocitiesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get velocityFormula => $composableBuilder(
+    column: $table.velocityFormula,
+    builder: (column) => column,
+  );
+
+  $$SubstratesTableAnnotationComposer get substrateId {
+    final $$SubstratesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.substrateId,
+      referencedTable: $db.substrates,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$SubstratesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.substrates,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$SubstrateVelocitiesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $SubstrateVelocitiesTable,
+          SubstrateVelocity,
+          $$SubstrateVelocitiesTableFilterComposer,
+          $$SubstrateVelocitiesTableOrderingComposer,
+          $$SubstrateVelocitiesTableAnnotationComposer,
+          $$SubstrateVelocitiesTableCreateCompanionBuilder,
+          $$SubstrateVelocitiesTableUpdateCompanionBuilder,
+          (SubstrateVelocity, $$SubstrateVelocitiesTableReferences),
+          SubstrateVelocity,
+          PrefetchHooks Function({bool substrateId})
+        > {
+  $$SubstrateVelocitiesTableTableManager(
+    _$AppDatabase db,
+    $SubstrateVelocitiesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$SubstrateVelocitiesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$SubstrateVelocitiesTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$SubstrateVelocitiesTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> substrateId = const Value.absent(),
+                Value<String> velocityFormula = const Value.absent(),
+              }) => SubstrateVelocitiesCompanion(
+                id: id,
+                substrateId: substrateId,
+                velocityFormula: velocityFormula,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int substrateId,
+                Value<String> velocityFormula = const Value.absent(),
+              }) => SubstrateVelocitiesCompanion.insert(
+                id: id,
+                substrateId: substrateId,
+                velocityFormula: velocityFormula,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$SubstrateVelocitiesTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({substrateId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (substrateId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.substrateId,
+                                referencedTable:
+                                    $$SubstrateVelocitiesTableReferences
+                                        ._substrateIdTable(db),
+                                referencedColumn:
+                                    $$SubstrateVelocitiesTableReferences
+                                        ._substrateIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$SubstrateVelocitiesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $SubstrateVelocitiesTable,
+      SubstrateVelocity,
+      $$SubstrateVelocitiesTableFilterComposer,
+      $$SubstrateVelocitiesTableOrderingComposer,
+      $$SubstrateVelocitiesTableAnnotationComposer,
+      $$SubstrateVelocitiesTableCreateCompanionBuilder,
+      $$SubstrateVelocitiesTableUpdateCompanionBuilder,
+      (SubstrateVelocity, $$SubstrateVelocitiesTableReferences),
+      SubstrateVelocity,
+      PrefetchHooks Function({bool substrateId})
+    >;
 typedef $$ReproductionTableCreateCompanionBuilder =
     ReproductionCompanion Function({
       Value<int> id,
@@ -12938,6 +27075,4413 @@ typedef $$ReproductionTableProcessedTableManager =
       ReproductionData,
       PrefetchHooks Function()
     >;
+typedef $$GameteCostsTableCreateCompanionBuilder =
+    GameteCostsCompanion Function({
+      Value<int> id,
+      required String sex,
+      required int nutrientId,
+      Value<String> costFormula,
+    });
+typedef $$GameteCostsTableUpdateCompanionBuilder =
+    GameteCostsCompanion Function({
+      Value<int> id,
+      Value<String> sex,
+      Value<int> nutrientId,
+      Value<String> costFormula,
+    });
+
+final class $$GameteCostsTableReferences
+    extends BaseReferences<_$AppDatabase, $GameteCostsTable, GameteCost> {
+  $$GameteCostsTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $NutrientsTable _nutrientIdTable(_$AppDatabase db) =>
+      db.nutrients.createAlias('gamete_costs__nutrient_id__nutrients__id');
+
+  $$NutrientsTableProcessedTableManager get nutrientId {
+    final $_column = $_itemColumn<int>('nutrient_id')!;
+
+    final manager = $$NutrientsTableTableManager(
+      $_db,
+      $_db.nutrients,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_nutrientIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$GameteCostsTableFilterComposer
+    extends Composer<_$AppDatabase, $GameteCostsTable> {
+  $$GameteCostsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get sex => $composableBuilder(
+    column: $table.sex,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get costFormula => $composableBuilder(
+    column: $table.costFormula,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$NutrientsTableFilterComposer get nutrientId {
+    final $$NutrientsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.nutrientId,
+      referencedTable: $db.nutrients,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$NutrientsTableFilterComposer(
+            $db: $db,
+            $table: $db.nutrients,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$GameteCostsTableOrderingComposer
+    extends Composer<_$AppDatabase, $GameteCostsTable> {
+  $$GameteCostsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get sex => $composableBuilder(
+    column: $table.sex,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get costFormula => $composableBuilder(
+    column: $table.costFormula,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$NutrientsTableOrderingComposer get nutrientId {
+    final $$NutrientsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.nutrientId,
+      referencedTable: $db.nutrients,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$NutrientsTableOrderingComposer(
+            $db: $db,
+            $table: $db.nutrients,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$GameteCostsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $GameteCostsTable> {
+  $$GameteCostsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get sex =>
+      $composableBuilder(column: $table.sex, builder: (column) => column);
+
+  GeneratedColumn<String> get costFormula => $composableBuilder(
+    column: $table.costFormula,
+    builder: (column) => column,
+  );
+
+  $$NutrientsTableAnnotationComposer get nutrientId {
+    final $$NutrientsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.nutrientId,
+      referencedTable: $db.nutrients,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$NutrientsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.nutrients,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$GameteCostsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $GameteCostsTable,
+          GameteCost,
+          $$GameteCostsTableFilterComposer,
+          $$GameteCostsTableOrderingComposer,
+          $$GameteCostsTableAnnotationComposer,
+          $$GameteCostsTableCreateCompanionBuilder,
+          $$GameteCostsTableUpdateCompanionBuilder,
+          (GameteCost, $$GameteCostsTableReferences),
+          GameteCost,
+          PrefetchHooks Function({bool nutrientId})
+        > {
+  $$GameteCostsTableTableManager(_$AppDatabase db, $GameteCostsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$GameteCostsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$GameteCostsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$GameteCostsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> sex = const Value.absent(),
+                Value<int> nutrientId = const Value.absent(),
+                Value<String> costFormula = const Value.absent(),
+              }) => GameteCostsCompanion(
+                id: id,
+                sex: sex,
+                nutrientId: nutrientId,
+                costFormula: costFormula,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String sex,
+                required int nutrientId,
+                Value<String> costFormula = const Value.absent(),
+              }) => GameteCostsCompanion.insert(
+                id: id,
+                sex: sex,
+                nutrientId: nutrientId,
+                costFormula: costFormula,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$GameteCostsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({nutrientId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (nutrientId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.nutrientId,
+                                referencedTable: $$GameteCostsTableReferences
+                                    ._nutrientIdTable(db),
+                                referencedColumn: $$GameteCostsTableReferences
+                                    ._nutrientIdTable(db)
+                                    .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$GameteCostsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $GameteCostsTable,
+      GameteCost,
+      $$GameteCostsTableFilterComposer,
+      $$GameteCostsTableOrderingComposer,
+      $$GameteCostsTableAnnotationComposer,
+      $$GameteCostsTableCreateCompanionBuilder,
+      $$GameteCostsTableUpdateCompanionBuilder,
+      (GameteCost, $$GameteCostsTableReferences),
+      GameteCost,
+      PrefetchHooks Function({bool nutrientId})
+    >;
+typedef $$InteractionSubstratesTableCreateCompanionBuilder =
+    InteractionSubstratesCompanion Function({
+      Value<int> id,
+      required int substrateId,
+      Value<int?> perceiverStageId,
+      Value<int?> perceiverPrototypeId,
+      required int behaviorIndex,
+      Value<String> formula,
+    });
+typedef $$InteractionSubstratesTableUpdateCompanionBuilder =
+    InteractionSubstratesCompanion Function({
+      Value<int> id,
+      Value<int> substrateId,
+      Value<int?> perceiverStageId,
+      Value<int?> perceiverPrototypeId,
+      Value<int> behaviorIndex,
+      Value<String> formula,
+    });
+
+final class $$InteractionSubstratesTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $InteractionSubstratesTable,
+          InteractionSubstrate
+        > {
+  $$InteractionSubstratesTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $SubstratesTable _substrateIdTable(_$AppDatabase db) => db.substrates
+      .createAlias('interaction_substrates__substrate_id__substrates__id');
+
+  $$SubstratesTableProcessedTableManager get substrateId {
+    final $_column = $_itemColumn<int>('substrate_id')!;
+
+    final manager = $$SubstratesTableTableManager(
+      $_db,
+      $_db.substrates,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_substrateIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $StagesTable _perceiverStageIdTable(_$AppDatabase db) => db.stages
+      .createAlias('interaction_substrates__perceiver_stage_id__stages__id');
+
+  $$StagesTableProcessedTableManager? get perceiverStageId {
+    final $_column = $_itemColumn<int>('perceiver_stage_id');
+    if ($_column == null) return null;
+    final manager = $$StagesTableTableManager(
+      $_db,
+      $_db.stages,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_perceiverStageIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $PrototypesTable _perceiverPrototypeIdTable(_$AppDatabase db) =>
+      db.prototypes.createAlias(
+        'interaction_substrates__perceiver_prototype_id__prototypes__id',
+      );
+
+  $$PrototypesTableProcessedTableManager? get perceiverPrototypeId {
+    final $_column = $_itemColumn<int>('perceiver_prototype_id');
+    if ($_column == null) return null;
+    final manager = $$PrototypesTableTableManager(
+      $_db,
+      $_db.prototypes,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(
+      _perceiverPrototypeIdTable($_db),
+    );
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$InteractionSubstratesTableFilterComposer
+    extends Composer<_$AppDatabase, $InteractionSubstratesTable> {
+  $$InteractionSubstratesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get behaviorIndex => $composableBuilder(
+    column: $table.behaviorIndex,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get formula => $composableBuilder(
+    column: $table.formula,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$SubstratesTableFilterComposer get substrateId {
+    final $$SubstratesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.substrateId,
+      referencedTable: $db.substrates,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$SubstratesTableFilterComposer(
+            $db: $db,
+            $table: $db.substrates,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$StagesTableFilterComposer get perceiverStageId {
+    final $$StagesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.perceiverStageId,
+      referencedTable: $db.stages,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$StagesTableFilterComposer(
+            $db: $db,
+            $table: $db.stages,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PrototypesTableFilterComposer get perceiverPrototypeId {
+    final $$PrototypesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.perceiverPrototypeId,
+      referencedTable: $db.prototypes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PrototypesTableFilterComposer(
+            $db: $db,
+            $table: $db.prototypes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$InteractionSubstratesTableOrderingComposer
+    extends Composer<_$AppDatabase, $InteractionSubstratesTable> {
+  $$InteractionSubstratesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get behaviorIndex => $composableBuilder(
+    column: $table.behaviorIndex,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get formula => $composableBuilder(
+    column: $table.formula,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$SubstratesTableOrderingComposer get substrateId {
+    final $$SubstratesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.substrateId,
+      referencedTable: $db.substrates,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$SubstratesTableOrderingComposer(
+            $db: $db,
+            $table: $db.substrates,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$StagesTableOrderingComposer get perceiverStageId {
+    final $$StagesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.perceiverStageId,
+      referencedTable: $db.stages,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$StagesTableOrderingComposer(
+            $db: $db,
+            $table: $db.stages,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PrototypesTableOrderingComposer get perceiverPrototypeId {
+    final $$PrototypesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.perceiverPrototypeId,
+      referencedTable: $db.prototypes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PrototypesTableOrderingComposer(
+            $db: $db,
+            $table: $db.prototypes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$InteractionSubstratesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $InteractionSubstratesTable> {
+  $$InteractionSubstratesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get behaviorIndex => $composableBuilder(
+    column: $table.behaviorIndex,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get formula =>
+      $composableBuilder(column: $table.formula, builder: (column) => column);
+
+  $$SubstratesTableAnnotationComposer get substrateId {
+    final $$SubstratesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.substrateId,
+      referencedTable: $db.substrates,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$SubstratesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.substrates,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$StagesTableAnnotationComposer get perceiverStageId {
+    final $$StagesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.perceiverStageId,
+      referencedTable: $db.stages,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$StagesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.stages,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PrototypesTableAnnotationComposer get perceiverPrototypeId {
+    final $$PrototypesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.perceiverPrototypeId,
+      referencedTable: $db.prototypes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PrototypesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.prototypes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$InteractionSubstratesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $InteractionSubstratesTable,
+          InteractionSubstrate,
+          $$InteractionSubstratesTableFilterComposer,
+          $$InteractionSubstratesTableOrderingComposer,
+          $$InteractionSubstratesTableAnnotationComposer,
+          $$InteractionSubstratesTableCreateCompanionBuilder,
+          $$InteractionSubstratesTableUpdateCompanionBuilder,
+          (InteractionSubstrate, $$InteractionSubstratesTableReferences),
+          InteractionSubstrate,
+          PrefetchHooks Function({
+            bool substrateId,
+            bool perceiverStageId,
+            bool perceiverPrototypeId,
+          })
+        > {
+  $$InteractionSubstratesTableTableManager(
+    _$AppDatabase db,
+    $InteractionSubstratesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$InteractionSubstratesTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$InteractionSubstratesTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$InteractionSubstratesTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> substrateId = const Value.absent(),
+                Value<int?> perceiverStageId = const Value.absent(),
+                Value<int?> perceiverPrototypeId = const Value.absent(),
+                Value<int> behaviorIndex = const Value.absent(),
+                Value<String> formula = const Value.absent(),
+              }) => InteractionSubstratesCompanion(
+                id: id,
+                substrateId: substrateId,
+                perceiverStageId: perceiverStageId,
+                perceiverPrototypeId: perceiverPrototypeId,
+                behaviorIndex: behaviorIndex,
+                formula: formula,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int substrateId,
+                Value<int?> perceiverStageId = const Value.absent(),
+                Value<int?> perceiverPrototypeId = const Value.absent(),
+                required int behaviorIndex,
+                Value<String> formula = const Value.absent(),
+              }) => InteractionSubstratesCompanion.insert(
+                id: id,
+                substrateId: substrateId,
+                perceiverStageId: perceiverStageId,
+                perceiverPrototypeId: perceiverPrototypeId,
+                behaviorIndex: behaviorIndex,
+                formula: formula,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$InteractionSubstratesTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback:
+              ({
+                substrateId = false,
+                perceiverStageId = false,
+                perceiverPrototypeId = false,
+              }) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (substrateId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.substrateId,
+                                    referencedTable:
+                                        $$InteractionSubstratesTableReferences
+                                            ._substrateIdTable(db),
+                                    referencedColumn:
+                                        $$InteractionSubstratesTableReferences
+                                            ._substrateIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+                        if (perceiverStageId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.perceiverStageId,
+                                    referencedTable:
+                                        $$InteractionSubstratesTableReferences
+                                            ._perceiverStageIdTable(db),
+                                    referencedColumn:
+                                        $$InteractionSubstratesTableReferences
+                                            ._perceiverStageIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+                        if (perceiverPrototypeId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.perceiverPrototypeId,
+                                    referencedTable:
+                                        $$InteractionSubstratesTableReferences
+                                            ._perceiverPrototypeIdTable(db),
+                                    referencedColumn:
+                                        $$InteractionSubstratesTableReferences
+                                            ._perceiverPrototypeIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $$InteractionSubstratesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $InteractionSubstratesTable,
+      InteractionSubstrate,
+      $$InteractionSubstratesTableFilterComposer,
+      $$InteractionSubstratesTableOrderingComposer,
+      $$InteractionSubstratesTableAnnotationComposer,
+      $$InteractionSubstratesTableCreateCompanionBuilder,
+      $$InteractionSubstratesTableUpdateCompanionBuilder,
+      (InteractionSubstrate, $$InteractionSubstratesTableReferences),
+      InteractionSubstrate,
+      PrefetchHooks Function({
+        bool substrateId,
+        bool perceiverStageId,
+        bool perceiverPrototypeId,
+      })
+    >;
+typedef $$AttractivenessSubstratesTableCreateCompanionBuilder =
+    AttractivenessSubstratesCompanion Function({
+      Value<int> id,
+      required int substrateId,
+      Value<int?> perceiverStageId,
+      Value<int?> perceiverPrototypeId,
+      Value<String> attractivenessFormula,
+      Value<String> radiusFormula,
+    });
+typedef $$AttractivenessSubstratesTableUpdateCompanionBuilder =
+    AttractivenessSubstratesCompanion Function({
+      Value<int> id,
+      Value<int> substrateId,
+      Value<int?> perceiverStageId,
+      Value<int?> perceiverPrototypeId,
+      Value<String> attractivenessFormula,
+      Value<String> radiusFormula,
+    });
+
+final class $$AttractivenessSubstratesTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $AttractivenessSubstratesTable,
+          AttractivenessSubstrate
+        > {
+  $$AttractivenessSubstratesTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $SubstratesTable _substrateIdTable(_$AppDatabase db) => db.substrates
+      .createAlias('attractiveness_substrates__substrate_id__substrates__id');
+
+  $$SubstratesTableProcessedTableManager get substrateId {
+    final $_column = $_itemColumn<int>('substrate_id')!;
+
+    final manager = $$SubstratesTableTableManager(
+      $_db,
+      $_db.substrates,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_substrateIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $StagesTable _perceiverStageIdTable(_$AppDatabase db) => db.stages
+      .createAlias('attractiveness_substrates__perceiver_stage_id__stages__id');
+
+  $$StagesTableProcessedTableManager? get perceiverStageId {
+    final $_column = $_itemColumn<int>('perceiver_stage_id');
+    if ($_column == null) return null;
+    final manager = $$StagesTableTableManager(
+      $_db,
+      $_db.stages,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_perceiverStageIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $PrototypesTable _perceiverPrototypeIdTable(_$AppDatabase db) =>
+      db.prototypes.createAlias(
+        'attractiveness_substrates__perceiver_prototype_id__prototypes__id',
+      );
+
+  $$PrototypesTableProcessedTableManager? get perceiverPrototypeId {
+    final $_column = $_itemColumn<int>('perceiver_prototype_id');
+    if ($_column == null) return null;
+    final manager = $$PrototypesTableTableManager(
+      $_db,
+      $_db.prototypes,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(
+      _perceiverPrototypeIdTable($_db),
+    );
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$AttractivenessSubstratesTableFilterComposer
+    extends Composer<_$AppDatabase, $AttractivenessSubstratesTable> {
+  $$AttractivenessSubstratesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get attractivenessFormula => $composableBuilder(
+    column: $table.attractivenessFormula,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get radiusFormula => $composableBuilder(
+    column: $table.radiusFormula,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$SubstratesTableFilterComposer get substrateId {
+    final $$SubstratesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.substrateId,
+      referencedTable: $db.substrates,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$SubstratesTableFilterComposer(
+            $db: $db,
+            $table: $db.substrates,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$StagesTableFilterComposer get perceiverStageId {
+    final $$StagesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.perceiverStageId,
+      referencedTable: $db.stages,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$StagesTableFilterComposer(
+            $db: $db,
+            $table: $db.stages,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PrototypesTableFilterComposer get perceiverPrototypeId {
+    final $$PrototypesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.perceiverPrototypeId,
+      referencedTable: $db.prototypes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PrototypesTableFilterComposer(
+            $db: $db,
+            $table: $db.prototypes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$AttractivenessSubstratesTableOrderingComposer
+    extends Composer<_$AppDatabase, $AttractivenessSubstratesTable> {
+  $$AttractivenessSubstratesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get attractivenessFormula => $composableBuilder(
+    column: $table.attractivenessFormula,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get radiusFormula => $composableBuilder(
+    column: $table.radiusFormula,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$SubstratesTableOrderingComposer get substrateId {
+    final $$SubstratesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.substrateId,
+      referencedTable: $db.substrates,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$SubstratesTableOrderingComposer(
+            $db: $db,
+            $table: $db.substrates,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$StagesTableOrderingComposer get perceiverStageId {
+    final $$StagesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.perceiverStageId,
+      referencedTable: $db.stages,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$StagesTableOrderingComposer(
+            $db: $db,
+            $table: $db.stages,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PrototypesTableOrderingComposer get perceiverPrototypeId {
+    final $$PrototypesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.perceiverPrototypeId,
+      referencedTable: $db.prototypes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PrototypesTableOrderingComposer(
+            $db: $db,
+            $table: $db.prototypes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$AttractivenessSubstratesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $AttractivenessSubstratesTable> {
+  $$AttractivenessSubstratesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get attractivenessFormula => $composableBuilder(
+    column: $table.attractivenessFormula,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get radiusFormula => $composableBuilder(
+    column: $table.radiusFormula,
+    builder: (column) => column,
+  );
+
+  $$SubstratesTableAnnotationComposer get substrateId {
+    final $$SubstratesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.substrateId,
+      referencedTable: $db.substrates,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$SubstratesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.substrates,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$StagesTableAnnotationComposer get perceiverStageId {
+    final $$StagesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.perceiverStageId,
+      referencedTable: $db.stages,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$StagesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.stages,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PrototypesTableAnnotationComposer get perceiverPrototypeId {
+    final $$PrototypesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.perceiverPrototypeId,
+      referencedTable: $db.prototypes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PrototypesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.prototypes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$AttractivenessSubstratesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $AttractivenessSubstratesTable,
+          AttractivenessSubstrate,
+          $$AttractivenessSubstratesTableFilterComposer,
+          $$AttractivenessSubstratesTableOrderingComposer,
+          $$AttractivenessSubstratesTableAnnotationComposer,
+          $$AttractivenessSubstratesTableCreateCompanionBuilder,
+          $$AttractivenessSubstratesTableUpdateCompanionBuilder,
+          (AttractivenessSubstrate, $$AttractivenessSubstratesTableReferences),
+          AttractivenessSubstrate,
+          PrefetchHooks Function({
+            bool substrateId,
+            bool perceiverStageId,
+            bool perceiverPrototypeId,
+          })
+        > {
+  $$AttractivenessSubstratesTableTableManager(
+    _$AppDatabase db,
+    $AttractivenessSubstratesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$AttractivenessSubstratesTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$AttractivenessSubstratesTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$AttractivenessSubstratesTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> substrateId = const Value.absent(),
+                Value<int?> perceiverStageId = const Value.absent(),
+                Value<int?> perceiverPrototypeId = const Value.absent(),
+                Value<String> attractivenessFormula = const Value.absent(),
+                Value<String> radiusFormula = const Value.absent(),
+              }) => AttractivenessSubstratesCompanion(
+                id: id,
+                substrateId: substrateId,
+                perceiverStageId: perceiverStageId,
+                perceiverPrototypeId: perceiverPrototypeId,
+                attractivenessFormula: attractivenessFormula,
+                radiusFormula: radiusFormula,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int substrateId,
+                Value<int?> perceiverStageId = const Value.absent(),
+                Value<int?> perceiverPrototypeId = const Value.absent(),
+                Value<String> attractivenessFormula = const Value.absent(),
+                Value<String> radiusFormula = const Value.absent(),
+              }) => AttractivenessSubstratesCompanion.insert(
+                id: id,
+                substrateId: substrateId,
+                perceiverStageId: perceiverStageId,
+                perceiverPrototypeId: perceiverPrototypeId,
+                attractivenessFormula: attractivenessFormula,
+                radiusFormula: radiusFormula,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$AttractivenessSubstratesTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback:
+              ({
+                substrateId = false,
+                perceiverStageId = false,
+                perceiverPrototypeId = false,
+              }) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (substrateId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.substrateId,
+                                    referencedTable:
+                                        $$AttractivenessSubstratesTableReferences
+                                            ._substrateIdTable(db),
+                                    referencedColumn:
+                                        $$AttractivenessSubstratesTableReferences
+                                            ._substrateIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+                        if (perceiverStageId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.perceiverStageId,
+                                    referencedTable:
+                                        $$AttractivenessSubstratesTableReferences
+                                            ._perceiverStageIdTable(db),
+                                    referencedColumn:
+                                        $$AttractivenessSubstratesTableReferences
+                                            ._perceiverStageIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+                        if (perceiverPrototypeId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.perceiverPrototypeId,
+                                    referencedTable:
+                                        $$AttractivenessSubstratesTableReferences
+                                            ._perceiverPrototypeIdTable(db),
+                                    referencedColumn:
+                                        $$AttractivenessSubstratesTableReferences
+                                            ._perceiverPrototypeIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $$AttractivenessSubstratesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $AttractivenessSubstratesTable,
+      AttractivenessSubstrate,
+      $$AttractivenessSubstratesTableFilterComposer,
+      $$AttractivenessSubstratesTableOrderingComposer,
+      $$AttractivenessSubstratesTableAnnotationComposer,
+      $$AttractivenessSubstratesTableCreateCompanionBuilder,
+      $$AttractivenessSubstratesTableUpdateCompanionBuilder,
+      (AttractivenessSubstrate, $$AttractivenessSubstratesTableReferences),
+      AttractivenessSubstrate,
+      PrefetchHooks Function({
+        bool substrateId,
+        bool perceiverStageId,
+        bool perceiverPrototypeId,
+      })
+    >;
+typedef $$InteractionSourcesTableCreateCompanionBuilder =
+    InteractionSourcesCompanion Function({
+      Value<int> id,
+      required int nutrientId,
+      Value<int?> perceiverStageId,
+      Value<int?> perceiverPrototypeId,
+      required int behaviorIndex,
+      Value<String> formula,
+    });
+typedef $$InteractionSourcesTableUpdateCompanionBuilder =
+    InteractionSourcesCompanion Function({
+      Value<int> id,
+      Value<int> nutrientId,
+      Value<int?> perceiverStageId,
+      Value<int?> perceiverPrototypeId,
+      Value<int> behaviorIndex,
+      Value<String> formula,
+    });
+
+final class $$InteractionSourcesTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $InteractionSourcesTable,
+          InteractionSource
+        > {
+  $$InteractionSourcesTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $NutrientsTable _nutrientIdTable(_$AppDatabase db) => db.nutrients
+      .createAlias('interaction_sources__nutrient_id__nutrients__id');
+
+  $$NutrientsTableProcessedTableManager get nutrientId {
+    final $_column = $_itemColumn<int>('nutrient_id')!;
+
+    final manager = $$NutrientsTableTableManager(
+      $_db,
+      $_db.nutrients,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_nutrientIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $StagesTable _perceiverStageIdTable(_$AppDatabase db) => db.stages
+      .createAlias('interaction_sources__perceiver_stage_id__stages__id');
+
+  $$StagesTableProcessedTableManager? get perceiverStageId {
+    final $_column = $_itemColumn<int>('perceiver_stage_id');
+    if ($_column == null) return null;
+    final manager = $$StagesTableTableManager(
+      $_db,
+      $_db.stages,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_perceiverStageIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $PrototypesTable _perceiverPrototypeIdTable(_$AppDatabase db) =>
+      db.prototypes.createAlias(
+        'interaction_sources__perceiver_prototype_id__prototypes__id',
+      );
+
+  $$PrototypesTableProcessedTableManager? get perceiverPrototypeId {
+    final $_column = $_itemColumn<int>('perceiver_prototype_id');
+    if ($_column == null) return null;
+    final manager = $$PrototypesTableTableManager(
+      $_db,
+      $_db.prototypes,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(
+      _perceiverPrototypeIdTable($_db),
+    );
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$InteractionSourcesTableFilterComposer
+    extends Composer<_$AppDatabase, $InteractionSourcesTable> {
+  $$InteractionSourcesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get behaviorIndex => $composableBuilder(
+    column: $table.behaviorIndex,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get formula => $composableBuilder(
+    column: $table.formula,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$NutrientsTableFilterComposer get nutrientId {
+    final $$NutrientsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.nutrientId,
+      referencedTable: $db.nutrients,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$NutrientsTableFilterComposer(
+            $db: $db,
+            $table: $db.nutrients,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$StagesTableFilterComposer get perceiverStageId {
+    final $$StagesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.perceiverStageId,
+      referencedTable: $db.stages,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$StagesTableFilterComposer(
+            $db: $db,
+            $table: $db.stages,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PrototypesTableFilterComposer get perceiverPrototypeId {
+    final $$PrototypesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.perceiverPrototypeId,
+      referencedTable: $db.prototypes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PrototypesTableFilterComposer(
+            $db: $db,
+            $table: $db.prototypes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$InteractionSourcesTableOrderingComposer
+    extends Composer<_$AppDatabase, $InteractionSourcesTable> {
+  $$InteractionSourcesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get behaviorIndex => $composableBuilder(
+    column: $table.behaviorIndex,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get formula => $composableBuilder(
+    column: $table.formula,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$NutrientsTableOrderingComposer get nutrientId {
+    final $$NutrientsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.nutrientId,
+      referencedTable: $db.nutrients,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$NutrientsTableOrderingComposer(
+            $db: $db,
+            $table: $db.nutrients,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$StagesTableOrderingComposer get perceiverStageId {
+    final $$StagesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.perceiverStageId,
+      referencedTable: $db.stages,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$StagesTableOrderingComposer(
+            $db: $db,
+            $table: $db.stages,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PrototypesTableOrderingComposer get perceiverPrototypeId {
+    final $$PrototypesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.perceiverPrototypeId,
+      referencedTable: $db.prototypes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PrototypesTableOrderingComposer(
+            $db: $db,
+            $table: $db.prototypes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$InteractionSourcesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $InteractionSourcesTable> {
+  $$InteractionSourcesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get behaviorIndex => $composableBuilder(
+    column: $table.behaviorIndex,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get formula =>
+      $composableBuilder(column: $table.formula, builder: (column) => column);
+
+  $$NutrientsTableAnnotationComposer get nutrientId {
+    final $$NutrientsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.nutrientId,
+      referencedTable: $db.nutrients,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$NutrientsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.nutrients,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$StagesTableAnnotationComposer get perceiverStageId {
+    final $$StagesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.perceiverStageId,
+      referencedTable: $db.stages,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$StagesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.stages,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PrototypesTableAnnotationComposer get perceiverPrototypeId {
+    final $$PrototypesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.perceiverPrototypeId,
+      referencedTable: $db.prototypes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PrototypesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.prototypes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$InteractionSourcesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $InteractionSourcesTable,
+          InteractionSource,
+          $$InteractionSourcesTableFilterComposer,
+          $$InteractionSourcesTableOrderingComposer,
+          $$InteractionSourcesTableAnnotationComposer,
+          $$InteractionSourcesTableCreateCompanionBuilder,
+          $$InteractionSourcesTableUpdateCompanionBuilder,
+          (InteractionSource, $$InteractionSourcesTableReferences),
+          InteractionSource,
+          PrefetchHooks Function({
+            bool nutrientId,
+            bool perceiverStageId,
+            bool perceiverPrototypeId,
+          })
+        > {
+  $$InteractionSourcesTableTableManager(
+    _$AppDatabase db,
+    $InteractionSourcesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$InteractionSourcesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$InteractionSourcesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$InteractionSourcesTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> nutrientId = const Value.absent(),
+                Value<int?> perceiverStageId = const Value.absent(),
+                Value<int?> perceiverPrototypeId = const Value.absent(),
+                Value<int> behaviorIndex = const Value.absent(),
+                Value<String> formula = const Value.absent(),
+              }) => InteractionSourcesCompanion(
+                id: id,
+                nutrientId: nutrientId,
+                perceiverStageId: perceiverStageId,
+                perceiverPrototypeId: perceiverPrototypeId,
+                behaviorIndex: behaviorIndex,
+                formula: formula,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int nutrientId,
+                Value<int?> perceiverStageId = const Value.absent(),
+                Value<int?> perceiverPrototypeId = const Value.absent(),
+                required int behaviorIndex,
+                Value<String> formula = const Value.absent(),
+              }) => InteractionSourcesCompanion.insert(
+                id: id,
+                nutrientId: nutrientId,
+                perceiverStageId: perceiverStageId,
+                perceiverPrototypeId: perceiverPrototypeId,
+                behaviorIndex: behaviorIndex,
+                formula: formula,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$InteractionSourcesTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback:
+              ({
+                nutrientId = false,
+                perceiverStageId = false,
+                perceiverPrototypeId = false,
+              }) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (nutrientId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.nutrientId,
+                                    referencedTable:
+                                        $$InteractionSourcesTableReferences
+                                            ._nutrientIdTable(db),
+                                    referencedColumn:
+                                        $$InteractionSourcesTableReferences
+                                            ._nutrientIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+                        if (perceiverStageId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.perceiverStageId,
+                                    referencedTable:
+                                        $$InteractionSourcesTableReferences
+                                            ._perceiverStageIdTable(db),
+                                    referencedColumn:
+                                        $$InteractionSourcesTableReferences
+                                            ._perceiverStageIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+                        if (perceiverPrototypeId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.perceiverPrototypeId,
+                                    referencedTable:
+                                        $$InteractionSourcesTableReferences
+                                            ._perceiverPrototypeIdTable(db),
+                                    referencedColumn:
+                                        $$InteractionSourcesTableReferences
+                                            ._perceiverPrototypeIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $$InteractionSourcesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $InteractionSourcesTable,
+      InteractionSource,
+      $$InteractionSourcesTableFilterComposer,
+      $$InteractionSourcesTableOrderingComposer,
+      $$InteractionSourcesTableAnnotationComposer,
+      $$InteractionSourcesTableCreateCompanionBuilder,
+      $$InteractionSourcesTableUpdateCompanionBuilder,
+      (InteractionSource, $$InteractionSourcesTableReferences),
+      InteractionSource,
+      PrefetchHooks Function({
+        bool nutrientId,
+        bool perceiverStageId,
+        bool perceiverPrototypeId,
+      })
+    >;
+typedef $$AttractivenessSourcesTableCreateCompanionBuilder =
+    AttractivenessSourcesCompanion Function({
+      Value<int> id,
+      required int nutrientId,
+      Value<int?> perceiverStageId,
+      Value<int?> perceiverPrototypeId,
+      Value<String> attractivenessFormula,
+      Value<String> radiusFormula,
+    });
+typedef $$AttractivenessSourcesTableUpdateCompanionBuilder =
+    AttractivenessSourcesCompanion Function({
+      Value<int> id,
+      Value<int> nutrientId,
+      Value<int?> perceiverStageId,
+      Value<int?> perceiverPrototypeId,
+      Value<String> attractivenessFormula,
+      Value<String> radiusFormula,
+    });
+
+final class $$AttractivenessSourcesTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $AttractivenessSourcesTable,
+          AttractivenessSource
+        > {
+  $$AttractivenessSourcesTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $NutrientsTable _nutrientIdTable(_$AppDatabase db) => db.nutrients
+      .createAlias('attractiveness_sources__nutrient_id__nutrients__id');
+
+  $$NutrientsTableProcessedTableManager get nutrientId {
+    final $_column = $_itemColumn<int>('nutrient_id')!;
+
+    final manager = $$NutrientsTableTableManager(
+      $_db,
+      $_db.nutrients,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_nutrientIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $StagesTable _perceiverStageIdTable(_$AppDatabase db) => db.stages
+      .createAlias('attractiveness_sources__perceiver_stage_id__stages__id');
+
+  $$StagesTableProcessedTableManager? get perceiverStageId {
+    final $_column = $_itemColumn<int>('perceiver_stage_id');
+    if ($_column == null) return null;
+    final manager = $$StagesTableTableManager(
+      $_db,
+      $_db.stages,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_perceiverStageIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $PrototypesTable _perceiverPrototypeIdTable(_$AppDatabase db) =>
+      db.prototypes.createAlias(
+        'attractiveness_sources__perceiver_prototype_id__prototypes__id',
+      );
+
+  $$PrototypesTableProcessedTableManager? get perceiverPrototypeId {
+    final $_column = $_itemColumn<int>('perceiver_prototype_id');
+    if ($_column == null) return null;
+    final manager = $$PrototypesTableTableManager(
+      $_db,
+      $_db.prototypes,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(
+      _perceiverPrototypeIdTable($_db),
+    );
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$AttractivenessSourcesTableFilterComposer
+    extends Composer<_$AppDatabase, $AttractivenessSourcesTable> {
+  $$AttractivenessSourcesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get attractivenessFormula => $composableBuilder(
+    column: $table.attractivenessFormula,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get radiusFormula => $composableBuilder(
+    column: $table.radiusFormula,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$NutrientsTableFilterComposer get nutrientId {
+    final $$NutrientsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.nutrientId,
+      referencedTable: $db.nutrients,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$NutrientsTableFilterComposer(
+            $db: $db,
+            $table: $db.nutrients,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$StagesTableFilterComposer get perceiverStageId {
+    final $$StagesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.perceiverStageId,
+      referencedTable: $db.stages,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$StagesTableFilterComposer(
+            $db: $db,
+            $table: $db.stages,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PrototypesTableFilterComposer get perceiverPrototypeId {
+    final $$PrototypesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.perceiverPrototypeId,
+      referencedTable: $db.prototypes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PrototypesTableFilterComposer(
+            $db: $db,
+            $table: $db.prototypes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$AttractivenessSourcesTableOrderingComposer
+    extends Composer<_$AppDatabase, $AttractivenessSourcesTable> {
+  $$AttractivenessSourcesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get attractivenessFormula => $composableBuilder(
+    column: $table.attractivenessFormula,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get radiusFormula => $composableBuilder(
+    column: $table.radiusFormula,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$NutrientsTableOrderingComposer get nutrientId {
+    final $$NutrientsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.nutrientId,
+      referencedTable: $db.nutrients,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$NutrientsTableOrderingComposer(
+            $db: $db,
+            $table: $db.nutrients,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$StagesTableOrderingComposer get perceiverStageId {
+    final $$StagesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.perceiverStageId,
+      referencedTable: $db.stages,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$StagesTableOrderingComposer(
+            $db: $db,
+            $table: $db.stages,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PrototypesTableOrderingComposer get perceiverPrototypeId {
+    final $$PrototypesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.perceiverPrototypeId,
+      referencedTable: $db.prototypes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PrototypesTableOrderingComposer(
+            $db: $db,
+            $table: $db.prototypes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$AttractivenessSourcesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $AttractivenessSourcesTable> {
+  $$AttractivenessSourcesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get attractivenessFormula => $composableBuilder(
+    column: $table.attractivenessFormula,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get radiusFormula => $composableBuilder(
+    column: $table.radiusFormula,
+    builder: (column) => column,
+  );
+
+  $$NutrientsTableAnnotationComposer get nutrientId {
+    final $$NutrientsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.nutrientId,
+      referencedTable: $db.nutrients,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$NutrientsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.nutrients,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$StagesTableAnnotationComposer get perceiverStageId {
+    final $$StagesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.perceiverStageId,
+      referencedTable: $db.stages,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$StagesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.stages,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PrototypesTableAnnotationComposer get perceiverPrototypeId {
+    final $$PrototypesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.perceiverPrototypeId,
+      referencedTable: $db.prototypes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PrototypesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.prototypes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$AttractivenessSourcesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $AttractivenessSourcesTable,
+          AttractivenessSource,
+          $$AttractivenessSourcesTableFilterComposer,
+          $$AttractivenessSourcesTableOrderingComposer,
+          $$AttractivenessSourcesTableAnnotationComposer,
+          $$AttractivenessSourcesTableCreateCompanionBuilder,
+          $$AttractivenessSourcesTableUpdateCompanionBuilder,
+          (AttractivenessSource, $$AttractivenessSourcesTableReferences),
+          AttractivenessSource,
+          PrefetchHooks Function({
+            bool nutrientId,
+            bool perceiverStageId,
+            bool perceiverPrototypeId,
+          })
+        > {
+  $$AttractivenessSourcesTableTableManager(
+    _$AppDatabase db,
+    $AttractivenessSourcesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$AttractivenessSourcesTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$AttractivenessSourcesTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$AttractivenessSourcesTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> nutrientId = const Value.absent(),
+                Value<int?> perceiverStageId = const Value.absent(),
+                Value<int?> perceiverPrototypeId = const Value.absent(),
+                Value<String> attractivenessFormula = const Value.absent(),
+                Value<String> radiusFormula = const Value.absent(),
+              }) => AttractivenessSourcesCompanion(
+                id: id,
+                nutrientId: nutrientId,
+                perceiverStageId: perceiverStageId,
+                perceiverPrototypeId: perceiverPrototypeId,
+                attractivenessFormula: attractivenessFormula,
+                radiusFormula: radiusFormula,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int nutrientId,
+                Value<int?> perceiverStageId = const Value.absent(),
+                Value<int?> perceiverPrototypeId = const Value.absent(),
+                Value<String> attractivenessFormula = const Value.absent(),
+                Value<String> radiusFormula = const Value.absent(),
+              }) => AttractivenessSourcesCompanion.insert(
+                id: id,
+                nutrientId: nutrientId,
+                perceiverStageId: perceiverStageId,
+                perceiverPrototypeId: perceiverPrototypeId,
+                attractivenessFormula: attractivenessFormula,
+                radiusFormula: radiusFormula,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$AttractivenessSourcesTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback:
+              ({
+                nutrientId = false,
+                perceiverStageId = false,
+                perceiverPrototypeId = false,
+              }) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (nutrientId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.nutrientId,
+                                    referencedTable:
+                                        $$AttractivenessSourcesTableReferences
+                                            ._nutrientIdTable(db),
+                                    referencedColumn:
+                                        $$AttractivenessSourcesTableReferences
+                                            ._nutrientIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+                        if (perceiverStageId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.perceiverStageId,
+                                    referencedTable:
+                                        $$AttractivenessSourcesTableReferences
+                                            ._perceiverStageIdTable(db),
+                                    referencedColumn:
+                                        $$AttractivenessSourcesTableReferences
+                                            ._perceiverStageIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+                        if (perceiverPrototypeId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.perceiverPrototypeId,
+                                    referencedTable:
+                                        $$AttractivenessSourcesTableReferences
+                                            ._perceiverPrototypeIdTable(db),
+                                    referencedColumn:
+                                        $$AttractivenessSourcesTableReferences
+                                            ._perceiverPrototypeIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $$AttractivenessSourcesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $AttractivenessSourcesTable,
+      AttractivenessSource,
+      $$AttractivenessSourcesTableFilterComposer,
+      $$AttractivenessSourcesTableOrderingComposer,
+      $$AttractivenessSourcesTableAnnotationComposer,
+      $$AttractivenessSourcesTableCreateCompanionBuilder,
+      $$AttractivenessSourcesTableUpdateCompanionBuilder,
+      (AttractivenessSource, $$AttractivenessSourcesTableReferences),
+      AttractivenessSource,
+      PrefetchHooks Function({
+        bool nutrientId,
+        bool perceiverStageId,
+        bool perceiverPrototypeId,
+      })
+    >;
+typedef $$InteractionAgentsTableCreateCompanionBuilder =
+    InteractionAgentsCompanion Function({
+      Value<int> id,
+      Value<int?> observedStageId,
+      Value<int?> observedPrototypeId,
+      Value<int?> perceiverStageId,
+      Value<int?> perceiverPrototypeId,
+      required int behaviorIndex,
+      Value<String> formula,
+    });
+typedef $$InteractionAgentsTableUpdateCompanionBuilder =
+    InteractionAgentsCompanion Function({
+      Value<int> id,
+      Value<int?> observedStageId,
+      Value<int?> observedPrototypeId,
+      Value<int?> perceiverStageId,
+      Value<int?> perceiverPrototypeId,
+      Value<int> behaviorIndex,
+      Value<String> formula,
+    });
+
+final class $$InteractionAgentsTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $InteractionAgentsTable,
+          InteractionAgent
+        > {
+  $$InteractionAgentsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $StagesTable _observedStageIdTable(_$AppDatabase db) => db.stages
+      .createAlias('interaction_agents__observed_stage_id__stages__id');
+
+  $$StagesTableProcessedTableManager? get observedStageId {
+    final $_column = $_itemColumn<int>('observed_stage_id');
+    if ($_column == null) return null;
+    final manager = $$StagesTableTableManager(
+      $_db,
+      $_db.stages,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_observedStageIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $PrototypesTable _observedPrototypeIdTable(_$AppDatabase db) => db
+      .prototypes
+      .createAlias('interaction_agents__observed_prototype_id__prototypes__id');
+
+  $$PrototypesTableProcessedTableManager? get observedPrototypeId {
+    final $_column = $_itemColumn<int>('observed_prototype_id');
+    if ($_column == null) return null;
+    final manager = $$PrototypesTableTableManager(
+      $_db,
+      $_db.prototypes,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_observedPrototypeIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $StagesTable _perceiverStageIdTable(_$AppDatabase db) => db.stages
+      .createAlias('interaction_agents__perceiver_stage_id__stages__id');
+
+  $$StagesTableProcessedTableManager? get perceiverStageId {
+    final $_column = $_itemColumn<int>('perceiver_stage_id');
+    if ($_column == null) return null;
+    final manager = $$StagesTableTableManager(
+      $_db,
+      $_db.stages,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_perceiverStageIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $PrototypesTable _perceiverPrototypeIdTable(_$AppDatabase db) =>
+      db.prototypes.createAlias(
+        'interaction_agents__perceiver_prototype_id__prototypes__id',
+      );
+
+  $$PrototypesTableProcessedTableManager? get perceiverPrototypeId {
+    final $_column = $_itemColumn<int>('perceiver_prototype_id');
+    if ($_column == null) return null;
+    final manager = $$PrototypesTableTableManager(
+      $_db,
+      $_db.prototypes,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(
+      _perceiverPrototypeIdTable($_db),
+    );
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$InteractionAgentsTableFilterComposer
+    extends Composer<_$AppDatabase, $InteractionAgentsTable> {
+  $$InteractionAgentsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get behaviorIndex => $composableBuilder(
+    column: $table.behaviorIndex,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get formula => $composableBuilder(
+    column: $table.formula,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$StagesTableFilterComposer get observedStageId {
+    final $$StagesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.observedStageId,
+      referencedTable: $db.stages,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$StagesTableFilterComposer(
+            $db: $db,
+            $table: $db.stages,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PrototypesTableFilterComposer get observedPrototypeId {
+    final $$PrototypesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.observedPrototypeId,
+      referencedTable: $db.prototypes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PrototypesTableFilterComposer(
+            $db: $db,
+            $table: $db.prototypes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$StagesTableFilterComposer get perceiverStageId {
+    final $$StagesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.perceiverStageId,
+      referencedTable: $db.stages,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$StagesTableFilterComposer(
+            $db: $db,
+            $table: $db.stages,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PrototypesTableFilterComposer get perceiverPrototypeId {
+    final $$PrototypesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.perceiverPrototypeId,
+      referencedTable: $db.prototypes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PrototypesTableFilterComposer(
+            $db: $db,
+            $table: $db.prototypes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$InteractionAgentsTableOrderingComposer
+    extends Composer<_$AppDatabase, $InteractionAgentsTable> {
+  $$InteractionAgentsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get behaviorIndex => $composableBuilder(
+    column: $table.behaviorIndex,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get formula => $composableBuilder(
+    column: $table.formula,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$StagesTableOrderingComposer get observedStageId {
+    final $$StagesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.observedStageId,
+      referencedTable: $db.stages,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$StagesTableOrderingComposer(
+            $db: $db,
+            $table: $db.stages,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PrototypesTableOrderingComposer get observedPrototypeId {
+    final $$PrototypesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.observedPrototypeId,
+      referencedTable: $db.prototypes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PrototypesTableOrderingComposer(
+            $db: $db,
+            $table: $db.prototypes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$StagesTableOrderingComposer get perceiverStageId {
+    final $$StagesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.perceiverStageId,
+      referencedTable: $db.stages,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$StagesTableOrderingComposer(
+            $db: $db,
+            $table: $db.stages,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PrototypesTableOrderingComposer get perceiverPrototypeId {
+    final $$PrototypesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.perceiverPrototypeId,
+      referencedTable: $db.prototypes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PrototypesTableOrderingComposer(
+            $db: $db,
+            $table: $db.prototypes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$InteractionAgentsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $InteractionAgentsTable> {
+  $$InteractionAgentsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get behaviorIndex => $composableBuilder(
+    column: $table.behaviorIndex,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get formula =>
+      $composableBuilder(column: $table.formula, builder: (column) => column);
+
+  $$StagesTableAnnotationComposer get observedStageId {
+    final $$StagesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.observedStageId,
+      referencedTable: $db.stages,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$StagesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.stages,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PrototypesTableAnnotationComposer get observedPrototypeId {
+    final $$PrototypesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.observedPrototypeId,
+      referencedTable: $db.prototypes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PrototypesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.prototypes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$StagesTableAnnotationComposer get perceiverStageId {
+    final $$StagesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.perceiverStageId,
+      referencedTable: $db.stages,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$StagesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.stages,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PrototypesTableAnnotationComposer get perceiverPrototypeId {
+    final $$PrototypesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.perceiverPrototypeId,
+      referencedTable: $db.prototypes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PrototypesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.prototypes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$InteractionAgentsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $InteractionAgentsTable,
+          InteractionAgent,
+          $$InteractionAgentsTableFilterComposer,
+          $$InteractionAgentsTableOrderingComposer,
+          $$InteractionAgentsTableAnnotationComposer,
+          $$InteractionAgentsTableCreateCompanionBuilder,
+          $$InteractionAgentsTableUpdateCompanionBuilder,
+          (InteractionAgent, $$InteractionAgentsTableReferences),
+          InteractionAgent,
+          PrefetchHooks Function({
+            bool observedStageId,
+            bool observedPrototypeId,
+            bool perceiverStageId,
+            bool perceiverPrototypeId,
+          })
+        > {
+  $$InteractionAgentsTableTableManager(
+    _$AppDatabase db,
+    $InteractionAgentsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$InteractionAgentsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$InteractionAgentsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$InteractionAgentsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int?> observedStageId = const Value.absent(),
+                Value<int?> observedPrototypeId = const Value.absent(),
+                Value<int?> perceiverStageId = const Value.absent(),
+                Value<int?> perceiverPrototypeId = const Value.absent(),
+                Value<int> behaviorIndex = const Value.absent(),
+                Value<String> formula = const Value.absent(),
+              }) => InteractionAgentsCompanion(
+                id: id,
+                observedStageId: observedStageId,
+                observedPrototypeId: observedPrototypeId,
+                perceiverStageId: perceiverStageId,
+                perceiverPrototypeId: perceiverPrototypeId,
+                behaviorIndex: behaviorIndex,
+                formula: formula,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int?> observedStageId = const Value.absent(),
+                Value<int?> observedPrototypeId = const Value.absent(),
+                Value<int?> perceiverStageId = const Value.absent(),
+                Value<int?> perceiverPrototypeId = const Value.absent(),
+                required int behaviorIndex,
+                Value<String> formula = const Value.absent(),
+              }) => InteractionAgentsCompanion.insert(
+                id: id,
+                observedStageId: observedStageId,
+                observedPrototypeId: observedPrototypeId,
+                perceiverStageId: perceiverStageId,
+                perceiverPrototypeId: perceiverPrototypeId,
+                behaviorIndex: behaviorIndex,
+                formula: formula,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$InteractionAgentsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback:
+              ({
+                observedStageId = false,
+                observedPrototypeId = false,
+                perceiverStageId = false,
+                perceiverPrototypeId = false,
+              }) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (observedStageId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.observedStageId,
+                                    referencedTable:
+                                        $$InteractionAgentsTableReferences
+                                            ._observedStageIdTable(db),
+                                    referencedColumn:
+                                        $$InteractionAgentsTableReferences
+                                            ._observedStageIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+                        if (observedPrototypeId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.observedPrototypeId,
+                                    referencedTable:
+                                        $$InteractionAgentsTableReferences
+                                            ._observedPrototypeIdTable(db),
+                                    referencedColumn:
+                                        $$InteractionAgentsTableReferences
+                                            ._observedPrototypeIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+                        if (perceiverStageId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.perceiverStageId,
+                                    referencedTable:
+                                        $$InteractionAgentsTableReferences
+                                            ._perceiverStageIdTable(db),
+                                    referencedColumn:
+                                        $$InteractionAgentsTableReferences
+                                            ._perceiverStageIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+                        if (perceiverPrototypeId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.perceiverPrototypeId,
+                                    referencedTable:
+                                        $$InteractionAgentsTableReferences
+                                            ._perceiverPrototypeIdTable(db),
+                                    referencedColumn:
+                                        $$InteractionAgentsTableReferences
+                                            ._perceiverPrototypeIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $$InteractionAgentsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $InteractionAgentsTable,
+      InteractionAgent,
+      $$InteractionAgentsTableFilterComposer,
+      $$InteractionAgentsTableOrderingComposer,
+      $$InteractionAgentsTableAnnotationComposer,
+      $$InteractionAgentsTableCreateCompanionBuilder,
+      $$InteractionAgentsTableUpdateCompanionBuilder,
+      (InteractionAgent, $$InteractionAgentsTableReferences),
+      InteractionAgent,
+      PrefetchHooks Function({
+        bool observedStageId,
+        bool observedPrototypeId,
+        bool perceiverStageId,
+        bool perceiverPrototypeId,
+      })
+    >;
+typedef $$AttractivenessAgentsTableCreateCompanionBuilder =
+    AttractivenessAgentsCompanion Function({
+      Value<int> id,
+      Value<int?> observedStageId,
+      Value<int?> observedPrototypeId,
+      Value<int?> perceiverStageId,
+      Value<int?> perceiverPrototypeId,
+      Value<String> attractivenessFormula,
+      Value<String> radiusFormula,
+    });
+typedef $$AttractivenessAgentsTableUpdateCompanionBuilder =
+    AttractivenessAgentsCompanion Function({
+      Value<int> id,
+      Value<int?> observedStageId,
+      Value<int?> observedPrototypeId,
+      Value<int?> perceiverStageId,
+      Value<int?> perceiverPrototypeId,
+      Value<String> attractivenessFormula,
+      Value<String> radiusFormula,
+    });
+
+final class $$AttractivenessAgentsTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $AttractivenessAgentsTable,
+          AttractivenessAgent
+        > {
+  $$AttractivenessAgentsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $StagesTable _observedStageIdTable(_$AppDatabase db) => db.stages
+      .createAlias('attractiveness_agents__observed_stage_id__stages__id');
+
+  $$StagesTableProcessedTableManager? get observedStageId {
+    final $_column = $_itemColumn<int>('observed_stage_id');
+    if ($_column == null) return null;
+    final manager = $$StagesTableTableManager(
+      $_db,
+      $_db.stages,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_observedStageIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $PrototypesTable _observedPrototypeIdTable(_$AppDatabase db) =>
+      db.prototypes.createAlias(
+        'attractiveness_agents__observed_prototype_id__prototypes__id',
+      );
+
+  $$PrototypesTableProcessedTableManager? get observedPrototypeId {
+    final $_column = $_itemColumn<int>('observed_prototype_id');
+    if ($_column == null) return null;
+    final manager = $$PrototypesTableTableManager(
+      $_db,
+      $_db.prototypes,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_observedPrototypeIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $StagesTable _perceiverStageIdTable(_$AppDatabase db) => db.stages
+      .createAlias('attractiveness_agents__perceiver_stage_id__stages__id');
+
+  $$StagesTableProcessedTableManager? get perceiverStageId {
+    final $_column = $_itemColumn<int>('perceiver_stage_id');
+    if ($_column == null) return null;
+    final manager = $$StagesTableTableManager(
+      $_db,
+      $_db.stages,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_perceiverStageIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $PrototypesTable _perceiverPrototypeIdTable(_$AppDatabase db) =>
+      db.prototypes.createAlias(
+        'attractiveness_agents__perceiver_prototype_id__prototypes__id',
+      );
+
+  $$PrototypesTableProcessedTableManager? get perceiverPrototypeId {
+    final $_column = $_itemColumn<int>('perceiver_prototype_id');
+    if ($_column == null) return null;
+    final manager = $$PrototypesTableTableManager(
+      $_db,
+      $_db.prototypes,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(
+      _perceiverPrototypeIdTable($_db),
+    );
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$AttractivenessAgentsTableFilterComposer
+    extends Composer<_$AppDatabase, $AttractivenessAgentsTable> {
+  $$AttractivenessAgentsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get attractivenessFormula => $composableBuilder(
+    column: $table.attractivenessFormula,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get radiusFormula => $composableBuilder(
+    column: $table.radiusFormula,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$StagesTableFilterComposer get observedStageId {
+    final $$StagesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.observedStageId,
+      referencedTable: $db.stages,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$StagesTableFilterComposer(
+            $db: $db,
+            $table: $db.stages,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PrototypesTableFilterComposer get observedPrototypeId {
+    final $$PrototypesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.observedPrototypeId,
+      referencedTable: $db.prototypes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PrototypesTableFilterComposer(
+            $db: $db,
+            $table: $db.prototypes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$StagesTableFilterComposer get perceiverStageId {
+    final $$StagesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.perceiverStageId,
+      referencedTable: $db.stages,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$StagesTableFilterComposer(
+            $db: $db,
+            $table: $db.stages,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PrototypesTableFilterComposer get perceiverPrototypeId {
+    final $$PrototypesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.perceiverPrototypeId,
+      referencedTable: $db.prototypes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PrototypesTableFilterComposer(
+            $db: $db,
+            $table: $db.prototypes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$AttractivenessAgentsTableOrderingComposer
+    extends Composer<_$AppDatabase, $AttractivenessAgentsTable> {
+  $$AttractivenessAgentsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get attractivenessFormula => $composableBuilder(
+    column: $table.attractivenessFormula,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get radiusFormula => $composableBuilder(
+    column: $table.radiusFormula,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$StagesTableOrderingComposer get observedStageId {
+    final $$StagesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.observedStageId,
+      referencedTable: $db.stages,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$StagesTableOrderingComposer(
+            $db: $db,
+            $table: $db.stages,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PrototypesTableOrderingComposer get observedPrototypeId {
+    final $$PrototypesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.observedPrototypeId,
+      referencedTable: $db.prototypes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PrototypesTableOrderingComposer(
+            $db: $db,
+            $table: $db.prototypes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$StagesTableOrderingComposer get perceiverStageId {
+    final $$StagesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.perceiverStageId,
+      referencedTable: $db.stages,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$StagesTableOrderingComposer(
+            $db: $db,
+            $table: $db.stages,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PrototypesTableOrderingComposer get perceiverPrototypeId {
+    final $$PrototypesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.perceiverPrototypeId,
+      referencedTable: $db.prototypes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PrototypesTableOrderingComposer(
+            $db: $db,
+            $table: $db.prototypes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$AttractivenessAgentsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $AttractivenessAgentsTable> {
+  $$AttractivenessAgentsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get attractivenessFormula => $composableBuilder(
+    column: $table.attractivenessFormula,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get radiusFormula => $composableBuilder(
+    column: $table.radiusFormula,
+    builder: (column) => column,
+  );
+
+  $$StagesTableAnnotationComposer get observedStageId {
+    final $$StagesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.observedStageId,
+      referencedTable: $db.stages,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$StagesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.stages,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PrototypesTableAnnotationComposer get observedPrototypeId {
+    final $$PrototypesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.observedPrototypeId,
+      referencedTable: $db.prototypes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PrototypesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.prototypes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$StagesTableAnnotationComposer get perceiverStageId {
+    final $$StagesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.perceiverStageId,
+      referencedTable: $db.stages,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$StagesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.stages,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PrototypesTableAnnotationComposer get perceiverPrototypeId {
+    final $$PrototypesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.perceiverPrototypeId,
+      referencedTable: $db.prototypes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PrototypesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.prototypes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$AttractivenessAgentsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $AttractivenessAgentsTable,
+          AttractivenessAgent,
+          $$AttractivenessAgentsTableFilterComposer,
+          $$AttractivenessAgentsTableOrderingComposer,
+          $$AttractivenessAgentsTableAnnotationComposer,
+          $$AttractivenessAgentsTableCreateCompanionBuilder,
+          $$AttractivenessAgentsTableUpdateCompanionBuilder,
+          (AttractivenessAgent, $$AttractivenessAgentsTableReferences),
+          AttractivenessAgent,
+          PrefetchHooks Function({
+            bool observedStageId,
+            bool observedPrototypeId,
+            bool perceiverStageId,
+            bool perceiverPrototypeId,
+          })
+        > {
+  $$AttractivenessAgentsTableTableManager(
+    _$AppDatabase db,
+    $AttractivenessAgentsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$AttractivenessAgentsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$AttractivenessAgentsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$AttractivenessAgentsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int?> observedStageId = const Value.absent(),
+                Value<int?> observedPrototypeId = const Value.absent(),
+                Value<int?> perceiverStageId = const Value.absent(),
+                Value<int?> perceiverPrototypeId = const Value.absent(),
+                Value<String> attractivenessFormula = const Value.absent(),
+                Value<String> radiusFormula = const Value.absent(),
+              }) => AttractivenessAgentsCompanion(
+                id: id,
+                observedStageId: observedStageId,
+                observedPrototypeId: observedPrototypeId,
+                perceiverStageId: perceiverStageId,
+                perceiverPrototypeId: perceiverPrototypeId,
+                attractivenessFormula: attractivenessFormula,
+                radiusFormula: radiusFormula,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int?> observedStageId = const Value.absent(),
+                Value<int?> observedPrototypeId = const Value.absent(),
+                Value<int?> perceiverStageId = const Value.absent(),
+                Value<int?> perceiverPrototypeId = const Value.absent(),
+                Value<String> attractivenessFormula = const Value.absent(),
+                Value<String> radiusFormula = const Value.absent(),
+              }) => AttractivenessAgentsCompanion.insert(
+                id: id,
+                observedStageId: observedStageId,
+                observedPrototypeId: observedPrototypeId,
+                perceiverStageId: perceiverStageId,
+                perceiverPrototypeId: perceiverPrototypeId,
+                attractivenessFormula: attractivenessFormula,
+                radiusFormula: radiusFormula,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$AttractivenessAgentsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback:
+              ({
+                observedStageId = false,
+                observedPrototypeId = false,
+                perceiverStageId = false,
+                perceiverPrototypeId = false,
+              }) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (observedStageId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.observedStageId,
+                                    referencedTable:
+                                        $$AttractivenessAgentsTableReferences
+                                            ._observedStageIdTable(db),
+                                    referencedColumn:
+                                        $$AttractivenessAgentsTableReferences
+                                            ._observedStageIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+                        if (observedPrototypeId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.observedPrototypeId,
+                                    referencedTable:
+                                        $$AttractivenessAgentsTableReferences
+                                            ._observedPrototypeIdTable(db),
+                                    referencedColumn:
+                                        $$AttractivenessAgentsTableReferences
+                                            ._observedPrototypeIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+                        if (perceiverStageId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.perceiverStageId,
+                                    referencedTable:
+                                        $$AttractivenessAgentsTableReferences
+                                            ._perceiverStageIdTable(db),
+                                    referencedColumn:
+                                        $$AttractivenessAgentsTableReferences
+                                            ._perceiverStageIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+                        if (perceiverPrototypeId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.perceiverPrototypeId,
+                                    referencedTable:
+                                        $$AttractivenessAgentsTableReferences
+                                            ._perceiverPrototypeIdTable(db),
+                                    referencedColumn:
+                                        $$AttractivenessAgentsTableReferences
+                                            ._perceiverPrototypeIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $$AttractivenessAgentsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $AttractivenessAgentsTable,
+      AttractivenessAgent,
+      $$AttractivenessAgentsTableFilterComposer,
+      $$AttractivenessAgentsTableOrderingComposer,
+      $$AttractivenessAgentsTableAnnotationComposer,
+      $$AttractivenessAgentsTableCreateCompanionBuilder,
+      $$AttractivenessAgentsTableUpdateCompanionBuilder,
+      (AttractivenessAgent, $$AttractivenessAgentsTableReferences),
+      AttractivenessAgent,
+      PrefetchHooks Function({
+        bool observedStageId,
+        bool observedPrototypeId,
+        bool perceiverStageId,
+        bool perceiverPrototypeId,
+      })
+    >;
+typedef $$MemoryInfluenceTableCreateCompanionBuilder =
+    MemoryInfluenceCompanion Function({
+      Value<int> id,
+      required String memoryType,
+      required int elementIndex,
+      Value<int?> perceiverStageId,
+      Value<int?> perceiverPrototypeId,
+      Value<String> formula,
+    });
+typedef $$MemoryInfluenceTableUpdateCompanionBuilder =
+    MemoryInfluenceCompanion Function({
+      Value<int> id,
+      Value<String> memoryType,
+      Value<int> elementIndex,
+      Value<int?> perceiverStageId,
+      Value<int?> perceiverPrototypeId,
+      Value<String> formula,
+    });
+
+final class $$MemoryInfluenceTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $MemoryInfluenceTable,
+          MemoryInfluenceData
+        > {
+  $$MemoryInfluenceTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $StagesTable _perceiverStageIdTable(_$AppDatabase db) =>
+      db.stages.createAlias('memory_influence__perceiver_stage_id__stages__id');
+
+  $$StagesTableProcessedTableManager? get perceiverStageId {
+    final $_column = $_itemColumn<int>('perceiver_stage_id');
+    if ($_column == null) return null;
+    final manager = $$StagesTableTableManager(
+      $_db,
+      $_db.stages,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_perceiverStageIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $PrototypesTable _perceiverPrototypeIdTable(_$AppDatabase db) => db
+      .prototypes
+      .createAlias('memory_influence__perceiver_prototype_id__prototypes__id');
+
+  $$PrototypesTableProcessedTableManager? get perceiverPrototypeId {
+    final $_column = $_itemColumn<int>('perceiver_prototype_id');
+    if ($_column == null) return null;
+    final manager = $$PrototypesTableTableManager(
+      $_db,
+      $_db.prototypes,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(
+      _perceiverPrototypeIdTable($_db),
+    );
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$MemoryInfluenceTableFilterComposer
+    extends Composer<_$AppDatabase, $MemoryInfluenceTable> {
+  $$MemoryInfluenceTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get memoryType => $composableBuilder(
+    column: $table.memoryType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get elementIndex => $composableBuilder(
+    column: $table.elementIndex,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get formula => $composableBuilder(
+    column: $table.formula,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$StagesTableFilterComposer get perceiverStageId {
+    final $$StagesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.perceiverStageId,
+      referencedTable: $db.stages,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$StagesTableFilterComposer(
+            $db: $db,
+            $table: $db.stages,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PrototypesTableFilterComposer get perceiverPrototypeId {
+    final $$PrototypesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.perceiverPrototypeId,
+      referencedTable: $db.prototypes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PrototypesTableFilterComposer(
+            $db: $db,
+            $table: $db.prototypes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$MemoryInfluenceTableOrderingComposer
+    extends Composer<_$AppDatabase, $MemoryInfluenceTable> {
+  $$MemoryInfluenceTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get memoryType => $composableBuilder(
+    column: $table.memoryType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get elementIndex => $composableBuilder(
+    column: $table.elementIndex,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get formula => $composableBuilder(
+    column: $table.formula,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$StagesTableOrderingComposer get perceiverStageId {
+    final $$StagesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.perceiverStageId,
+      referencedTable: $db.stages,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$StagesTableOrderingComposer(
+            $db: $db,
+            $table: $db.stages,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PrototypesTableOrderingComposer get perceiverPrototypeId {
+    final $$PrototypesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.perceiverPrototypeId,
+      referencedTable: $db.prototypes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PrototypesTableOrderingComposer(
+            $db: $db,
+            $table: $db.prototypes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$MemoryInfluenceTableAnnotationComposer
+    extends Composer<_$AppDatabase, $MemoryInfluenceTable> {
+  $$MemoryInfluenceTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get memoryType => $composableBuilder(
+    column: $table.memoryType,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get elementIndex => $composableBuilder(
+    column: $table.elementIndex,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get formula =>
+      $composableBuilder(column: $table.formula, builder: (column) => column);
+
+  $$StagesTableAnnotationComposer get perceiverStageId {
+    final $$StagesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.perceiverStageId,
+      referencedTable: $db.stages,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$StagesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.stages,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PrototypesTableAnnotationComposer get perceiverPrototypeId {
+    final $$PrototypesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.perceiverPrototypeId,
+      referencedTable: $db.prototypes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PrototypesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.prototypes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$MemoryInfluenceTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $MemoryInfluenceTable,
+          MemoryInfluenceData,
+          $$MemoryInfluenceTableFilterComposer,
+          $$MemoryInfluenceTableOrderingComposer,
+          $$MemoryInfluenceTableAnnotationComposer,
+          $$MemoryInfluenceTableCreateCompanionBuilder,
+          $$MemoryInfluenceTableUpdateCompanionBuilder,
+          (MemoryInfluenceData, $$MemoryInfluenceTableReferences),
+          MemoryInfluenceData,
+          PrefetchHooks Function({
+            bool perceiverStageId,
+            bool perceiverPrototypeId,
+          })
+        > {
+  $$MemoryInfluenceTableTableManager(
+    _$AppDatabase db,
+    $MemoryInfluenceTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$MemoryInfluenceTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$MemoryInfluenceTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$MemoryInfluenceTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> memoryType = const Value.absent(),
+                Value<int> elementIndex = const Value.absent(),
+                Value<int?> perceiverStageId = const Value.absent(),
+                Value<int?> perceiverPrototypeId = const Value.absent(),
+                Value<String> formula = const Value.absent(),
+              }) => MemoryInfluenceCompanion(
+                id: id,
+                memoryType: memoryType,
+                elementIndex: elementIndex,
+                perceiverStageId: perceiverStageId,
+                perceiverPrototypeId: perceiverPrototypeId,
+                formula: formula,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String memoryType,
+                required int elementIndex,
+                Value<int?> perceiverStageId = const Value.absent(),
+                Value<int?> perceiverPrototypeId = const Value.absent(),
+                Value<String> formula = const Value.absent(),
+              }) => MemoryInfluenceCompanion.insert(
+                id: id,
+                memoryType: memoryType,
+                elementIndex: elementIndex,
+                perceiverStageId: perceiverStageId,
+                perceiverPrototypeId: perceiverPrototypeId,
+                formula: formula,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$MemoryInfluenceTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback:
+              ({perceiverStageId = false, perceiverPrototypeId = false}) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (perceiverStageId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.perceiverStageId,
+                                    referencedTable:
+                                        $$MemoryInfluenceTableReferences
+                                            ._perceiverStageIdTable(db),
+                                    referencedColumn:
+                                        $$MemoryInfluenceTableReferences
+                                            ._perceiverStageIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+                        if (perceiverPrototypeId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.perceiverPrototypeId,
+                                    referencedTable:
+                                        $$MemoryInfluenceTableReferences
+                                            ._perceiverPrototypeIdTable(db),
+                                    referencedColumn:
+                                        $$MemoryInfluenceTableReferences
+                                            ._perceiverPrototypeIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $$MemoryInfluenceTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $MemoryInfluenceTable,
+      MemoryInfluenceData,
+      $$MemoryInfluenceTableFilterComposer,
+      $$MemoryInfluenceTableOrderingComposer,
+      $$MemoryInfluenceTableAnnotationComposer,
+      $$MemoryInfluenceTableCreateCompanionBuilder,
+      $$MemoryInfluenceTableUpdateCompanionBuilder,
+      (MemoryInfluenceData, $$MemoryInfluenceTableReferences),
+      MemoryInfluenceData,
+      PrefetchHooks Function({bool perceiverStageId, bool perceiverPrototypeId})
+    >;
+typedef $$OvipositionSiteConfigTableCreateCompanionBuilder =
+    OvipositionSiteConfigCompanion Function({
+      Value<int> id,
+      Value<int> color,
+      Value<bool> enabled,
+    });
+typedef $$OvipositionSiteConfigTableUpdateCompanionBuilder =
+    OvipositionSiteConfigCompanion Function({
+      Value<int> id,
+      Value<int> color,
+      Value<bool> enabled,
+    });
+
+class $$OvipositionSiteConfigTableFilterComposer
+    extends Composer<_$AppDatabase, $OvipositionSiteConfigTable> {
+  $$OvipositionSiteConfigTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get color => $composableBuilder(
+    column: $table.color,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get enabled => $composableBuilder(
+    column: $table.enabled,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$OvipositionSiteConfigTableOrderingComposer
+    extends Composer<_$AppDatabase, $OvipositionSiteConfigTable> {
+  $$OvipositionSiteConfigTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get color => $composableBuilder(
+    column: $table.color,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get enabled => $composableBuilder(
+    column: $table.enabled,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$OvipositionSiteConfigTableAnnotationComposer
+    extends Composer<_$AppDatabase, $OvipositionSiteConfigTable> {
+  $$OvipositionSiteConfigTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get color =>
+      $composableBuilder(column: $table.color, builder: (column) => column);
+
+  GeneratedColumn<bool> get enabled =>
+      $composableBuilder(column: $table.enabled, builder: (column) => column);
+}
+
+class $$OvipositionSiteConfigTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $OvipositionSiteConfigTable,
+          OvipositionSiteConfigData,
+          $$OvipositionSiteConfigTableFilterComposer,
+          $$OvipositionSiteConfigTableOrderingComposer,
+          $$OvipositionSiteConfigTableAnnotationComposer,
+          $$OvipositionSiteConfigTableCreateCompanionBuilder,
+          $$OvipositionSiteConfigTableUpdateCompanionBuilder,
+          (
+            OvipositionSiteConfigData,
+            BaseReferences<
+              _$AppDatabase,
+              $OvipositionSiteConfigTable,
+              OvipositionSiteConfigData
+            >,
+          ),
+          OvipositionSiteConfigData,
+          PrefetchHooks Function()
+        > {
+  $$OvipositionSiteConfigTableTableManager(
+    _$AppDatabase db,
+    $OvipositionSiteConfigTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$OvipositionSiteConfigTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$OvipositionSiteConfigTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$OvipositionSiteConfigTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> color = const Value.absent(),
+                Value<bool> enabled = const Value.absent(),
+              }) => OvipositionSiteConfigCompanion(
+                id: id,
+                color: color,
+                enabled: enabled,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> color = const Value.absent(),
+                Value<bool> enabled = const Value.absent(),
+              }) => OvipositionSiteConfigCompanion.insert(
+                id: id,
+                color: color,
+                enabled: enabled,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$OvipositionSiteConfigTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $OvipositionSiteConfigTable,
+      OvipositionSiteConfigData,
+      $$OvipositionSiteConfigTableFilterComposer,
+      $$OvipositionSiteConfigTableOrderingComposer,
+      $$OvipositionSiteConfigTableAnnotationComposer,
+      $$OvipositionSiteConfigTableCreateCompanionBuilder,
+      $$OvipositionSiteConfigTableUpdateCompanionBuilder,
+      (
+        OvipositionSiteConfigData,
+        BaseReferences<
+          _$AppDatabase,
+          $OvipositionSiteConfigTable,
+          OvipositionSiteConfigData
+        >,
+      ),
+      OvipositionSiteConfigData,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -12953,8 +31497,29 @@ class $AppDatabaseManager {
   $$LociTableTableManager get loci => $$LociTableTableManager(_db, _db.loci);
   $$StagesTableTableManager get stages =>
       $$StagesTableTableManager(_db, _db.stages);
+  $$StageNutrientRequirementsTableTableManager get stageNutrientRequirements =>
+      $$StageNutrientRequirementsTableTableManager(
+        _db,
+        _db.stageNutrientRequirements,
+      );
+  $$StageTendenciesTableTableManager get stageTendencies =>
+      $$StageTendenciesTableTableManager(_db, _db.stageTendencies);
   $$PrototypesTableTableManager get prototypes =>
       $$PrototypesTableTableManager(_db, _db.prototypes);
+  $$PrototypeMorphologyTableTableManager get prototypeMorphology =>
+      $$PrototypeMorphologyTableTableManager(_db, _db.prototypeMorphology);
+  $$PrototypeTendenciesTableTableManager get prototypeTendencies =>
+      $$PrototypeTendenciesTableTableManager(_db, _db.prototypeTendencies);
+  $$PrototypeCombatTableTableManager get prototypeCombat =>
+      $$PrototypeCombatTableTableManager(_db, _db.prototypeCombat);
+  $$PrototypeCourtshipTableTableManager get prototypeCourtship =>
+      $$PrototypeCourtshipTableTableManager(_db, _db.prototypeCourtship);
+  $$PrototypeAssignmentCriteriaTableTableManager
+  get prototypeAssignmentCriteria =>
+      $$PrototypeAssignmentCriteriaTableTableManager(
+        _db,
+        _db.prototypeAssignmentCriteria,
+      );
   $$EnvironmentsTableTableManager get environments =>
       $$EnvironmentsTableTableManager(_db, _db.environments);
   $$SubstrateMapRowsTableTableManager get substrateMapRows =>
@@ -12971,6 +31536,33 @@ class $AppDatabaseManager {
       $$EnvironmentAgentsTableTableManager(_db, _db.environmentAgents);
   $$MetabolismTableTableManager get metabolism =>
       $$MetabolismTableTableManager(_db, _db.metabolism);
+  $$BehaviorCostsTableTableManager get behaviorCosts =>
+      $$BehaviorCostsTableTableManager(_db, _db.behaviorCosts);
+  $$FeedingGainsTableTableManager get feedingGains =>
+      $$FeedingGainsTableTableManager(_db, _db.feedingGains);
+  $$SubstrateVelocitiesTableTableManager get substrateVelocities =>
+      $$SubstrateVelocitiesTableTableManager(_db, _db.substrateVelocities);
   $$ReproductionTableTableManager get reproduction =>
       $$ReproductionTableTableManager(_db, _db.reproduction);
+  $$GameteCostsTableTableManager get gameteCosts =>
+      $$GameteCostsTableTableManager(_db, _db.gameteCosts);
+  $$InteractionSubstratesTableTableManager get interactionSubstrates =>
+      $$InteractionSubstratesTableTableManager(_db, _db.interactionSubstrates);
+  $$AttractivenessSubstratesTableTableManager get attractivenessSubstrates =>
+      $$AttractivenessSubstratesTableTableManager(
+        _db,
+        _db.attractivenessSubstrates,
+      );
+  $$InteractionSourcesTableTableManager get interactionSources =>
+      $$InteractionSourcesTableTableManager(_db, _db.interactionSources);
+  $$AttractivenessSourcesTableTableManager get attractivenessSources =>
+      $$AttractivenessSourcesTableTableManager(_db, _db.attractivenessSources);
+  $$InteractionAgentsTableTableManager get interactionAgents =>
+      $$InteractionAgentsTableTableManager(_db, _db.interactionAgents);
+  $$AttractivenessAgentsTableTableManager get attractivenessAgents =>
+      $$AttractivenessAgentsTableTableManager(_db, _db.attractivenessAgents);
+  $$MemoryInfluenceTableTableManager get memoryInfluence =>
+      $$MemoryInfluenceTableTableManager(_db, _db.memoryInfluence);
+  $$OvipositionSiteConfigTableTableManager get ovipositionSiteConfig =>
+      $$OvipositionSiteConfigTableTableManager(_db, _db.ovipositionSiteConfig);
 }

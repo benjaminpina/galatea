@@ -17,14 +17,33 @@ part 'database.g.dart';
     SubstrateCompositions,
     Loci,
     Stages,
+    StageNutrientRequirements,
+    StageTendencies,
     Prototypes,
+    PrototypeMorphology,
+    PrototypeTendencies,
+    PrototypeCombat,
+    PrototypeCourtship,
+    PrototypeAssignmentCriteria,
     Environments,
     SubstrateMapRows,
     EnvironmentSources,
     EnvironmentOvipositionSites,
     EnvironmentAgents,
     Metabolism,
+    BehaviorCosts,
+    FeedingGains,
+    SubstrateVelocities,
     Reproduction,
+    GameteCosts,
+    InteractionSubstrates,
+    AttractivenessSubstrates,
+    InteractionSources,
+    AttractivenessSources,
+    InteractionAgents,
+    AttractivenessAgents,
+    MemoryInfluence,
+    OvipositionSiteConfig,
   ],
   daos: [
     ProjectInfoDao,
@@ -43,11 +62,20 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.memory() : super(NativeDatabase.memory());
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
     onCreate: (Migrator m) async {
+      await m.createAll();
+    },
+    onUpgrade: (Migrator m, int from, int to) async {
+      // Destructive migration: drop all and recreate.
+      // Existing project databases will need to be recreated.
+      final allTables = m.database.allSchemaEntities.toList().reversed;
+      for (final entity in allTables) {
+        await m.drop(entity);
+      }
       await m.createAll();
     },
     beforeOpen: (details) async {

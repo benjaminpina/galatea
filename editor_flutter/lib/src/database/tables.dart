@@ -200,3 +200,267 @@ class Reproduction extends Table {
   @override
   Set<Column> get primaryKey => {id};
 }
+
+// =============================================================================
+// STAGE DETAIL TABLES
+// =============================================================================
+
+/// Nutrient requirements and metabolic costs per stage.
+class StageNutrientRequirements extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get stageId => integer().references(Stages, #id)();
+  IntColumn get nutrientId => integer().references(Nutrients, #id)();
+  TextColumn get requirementFormula =>
+      text().withDefault(const Constant('0'))();
+  TextColumn get costFormula => text().withDefault(const Constant('0'))();
+
+  @override
+  List<Set<Column>> get uniqueKeys => [
+    {stageId, nutrientId},
+  ];
+}
+
+/// Movement tendencies per stage (8 directions).
+class StageTendencies extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get stageId => integer().references(Stages, #id)();
+  IntColumn get direction => integer()(); // 1..8
+  TextColumn get formula => text().withDefault(const Constant('1'))();
+
+  @override
+  List<Set<Column>> get uniqueKeys => [
+    {stageId, direction},
+  ];
+}
+
+// =============================================================================
+// PROTOTYPE DETAIL TABLES
+// =============================================================================
+
+/// Morphological character values (genetic + environmental formula) per locus per prototype.
+class PrototypeMorphology extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get prototypeId => integer().references(Prototypes, #id)();
+  IntColumn get locusId => integer().references(Loci, #id)();
+  TextColumn get geneticFormula => text().withDefault(const Constant('0'))();
+  TextColumn get environmentalFormula =>
+      text().withDefault(const Constant('0'))();
+
+  @override
+  List<Set<Column>> get uniqueKeys => [
+    {prototypeId, locusId},
+  ];
+}
+
+/// Movement tendencies per prototype (8 directions).
+class PrototypeTendencies extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get prototypeId => integer().references(Prototypes, #id)();
+  IntColumn get direction => integer()(); // 1..8
+  TextColumn get formula => text().withDefault(const Constant('1'))();
+
+  @override
+  List<Set<Column>> get uniqueKeys => [
+    {prototypeId, direction},
+  ];
+}
+
+/// Combat strategy matrix per prototype: action × opponent_action → formula.
+class PrototypeCombat extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get prototypeId => integer().references(Prototypes, #id)();
+  IntColumn get action => integer()();
+  IntColumn get opponentAction => integer()();
+  TextColumn get formula => text().withDefault(const Constant('1'))();
+
+  @override
+  List<Set<Column>> get uniqueKeys => [
+    {prototypeId, action, opponentAction},
+  ];
+}
+
+/// Courtship strategy matrix per prototype: action × opponent_action → formula.
+class PrototypeCourtship extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get prototypeId => integer().references(Prototypes, #id)();
+  IntColumn get action => integer()();
+  IntColumn get opponentAction => integer()();
+  TextColumn get formula => text().withDefault(const Constant('1'))();
+
+  @override
+  List<Set<Column>> get uniqueKeys => [
+    {prototypeId, action, opponentAction},
+  ];
+}
+
+/// Criteria for assigning a prototype to an agent upon eclosion.
+class PrototypeAssignmentCriteria extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get prototypeId => integer().references(Prototypes, #id)();
+  IntColumn get priority => integer().withDefault(const Constant(0))();
+  TextColumn get formula => text().withDefault(const Constant('0'))();
+  TextColumn get operator => text().withDefault(const Constant('>'))();
+  RealColumn get threshold => real().withDefault(const Constant(0.0))();
+
+  @override
+  List<Set<Column>> get uniqueKeys => [
+    {prototypeId, priority},
+  ];
+}
+
+// =============================================================================
+// PHYSIOLOGY / BEHAVIOR TABLES
+// =============================================================================
+
+/// Behavioral costs per nutrient (movement, feeding, combat, courtship, oviposition).
+class BehaviorCosts extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get behavior =>
+      text()(); // e.g. 'move_active', 'feed', 'combat_attack'
+  IntColumn get nutrientId => integer().references(Nutrients, #id)();
+  TextColumn get costFormula => text().withDefault(const Constant('0'))();
+
+  @override
+  List<Set<Column>> get uniqueKeys => [
+    {behavior, nutrientId},
+  ];
+}
+
+/// Feeding gains per nutrient source.
+class FeedingGains extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get nutrientId => integer().unique().references(Nutrients, #id)();
+  TextColumn get gainFormula => text().withDefault(const Constant('10'))();
+}
+
+/// Velocity formula per substrate type.
+class SubstrateVelocities extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get substrateId => integer().unique().references(Substrates, #id)();
+  TextColumn get velocityFormula => text().withDefault(const Constant('1'))();
+}
+
+/// Gamete production costs per nutrient (separate for M and F).
+class GameteCosts extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get sex => text()(); // 'M' or 'F'
+  IntColumn get nutrientId => integer().references(Nutrients, #id)();
+  TextColumn get costFormula => text().withDefault(const Constant('5'))();
+
+  @override
+  List<Set<Column>> get uniqueKeys => [
+    {sex, nutrientId},
+  ];
+}
+
+// =============================================================================
+// INTERACTION MATRICES
+// =============================================================================
+
+/// Substrate perception/decision matrix: how a perceiver reacts to a substrate.
+class InteractionSubstrates extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get substrateId => integer().references(Substrates, #id)();
+  IntColumn get perceiverStageId =>
+      integer().nullable().references(Stages, #id)();
+  IntColumn get perceiverPrototypeId =>
+      integer().nullable().references(Prototypes, #id)();
+  IntColumn get behaviorIndex => integer()();
+  TextColumn get formula => text().withDefault(const Constant('0'))();
+}
+
+/// Substrate attractiveness.
+class AttractivenessSubstrates extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get substrateId => integer().references(Substrates, #id)();
+  IntColumn get perceiverStageId =>
+      integer().nullable().references(Stages, #id)();
+  IntColumn get perceiverPrototypeId =>
+      integer().nullable().references(Prototypes, #id)();
+  TextColumn get attractivenessFormula =>
+      text().withDefault(const Constant('0'))();
+  TextColumn get radiusFormula => text().withDefault(const Constant('5'))();
+}
+
+/// Nutrient source perception/decision matrix.
+class InteractionSources extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get nutrientId => integer().references(Nutrients, #id)();
+  IntColumn get perceiverStageId =>
+      integer().nullable().references(Stages, #id)();
+  IntColumn get perceiverPrototypeId =>
+      integer().nullable().references(Prototypes, #id)();
+  IntColumn get behaviorIndex => integer()();
+  TextColumn get formula => text().withDefault(const Constant('0'))();
+}
+
+/// Nutrient source attractiveness.
+class AttractivenessSources extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get nutrientId => integer().references(Nutrients, #id)();
+  IntColumn get perceiverStageId =>
+      integer().nullable().references(Stages, #id)();
+  IntColumn get perceiverPrototypeId =>
+      integer().nullable().references(Prototypes, #id)();
+  TextColumn get attractivenessFormula =>
+      text().withDefault(const Constant('0'))();
+  TextColumn get radiusFormula => text().withDefault(const Constant('5'))();
+}
+
+/// Agent-to-agent perception/decision matrix.
+class InteractionAgents extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get observedStageId =>
+      integer().nullable().references(Stages, #id)();
+  IntColumn get observedPrototypeId =>
+      integer().nullable().references(Prototypes, #id)();
+  @ReferenceName('perceiverStageInteractionAgents')
+  IntColumn get perceiverStageId =>
+      integer().nullable().references(Stages, #id)();
+  @ReferenceName('perceiverPrototypeInteractionAgents')
+  IntColumn get perceiverPrototypeId =>
+      integer().nullable().references(Prototypes, #id)();
+  IntColumn get behaviorIndex => integer()();
+  TextColumn get formula => text().withDefault(const Constant('0'))();
+}
+
+/// Agent-to-agent attractiveness.
+class AttractivenessAgents extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get observedStageId =>
+      integer().nullable().references(Stages, #id)();
+  IntColumn get observedPrototypeId =>
+      integer().nullable().references(Prototypes, #id)();
+  @ReferenceName('perceiverStageAttractivenessAgents')
+  IntColumn get perceiverStageId =>
+      integer().nullable().references(Stages, #id)();
+  @ReferenceName('perceiverPrototypeAttractivenessAgents')
+  IntColumn get perceiverPrototypeId =>
+      integer().nullable().references(Prototypes, #id)();
+  TextColumn get attractivenessFormula =>
+      text().withDefault(const Constant('0'))();
+  TextColumn get radiusFormula => text().withDefault(const Constant('5'))();
+}
+
+/// Memory influence matrix: how past interactions affect current behavior.
+class MemoryInfluence extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get memoryType =>
+      text()(); // e.g. 'last_perception', 'num_interactions'
+  IntColumn get elementIndex => integer()();
+  IntColumn get perceiverStageId =>
+      integer().nullable().references(Stages, #id)();
+  IntColumn get perceiverPrototypeId =>
+      integer().nullable().references(Prototypes, #id)();
+  TextColumn get formula => text().withDefault(const Constant('0'))();
+}
+
+/// Oviposition site global configuration (singleton).
+class OvipositionSiteConfig extends Table {
+  IntColumn get id => integer()();
+  IntColumn get color => integer().withDefault(const Constant(0x00FF00))();
+  BoolColumn get enabled => boolean().withDefault(const Constant(true))();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
