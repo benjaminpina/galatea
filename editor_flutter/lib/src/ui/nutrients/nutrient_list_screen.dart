@@ -289,6 +289,10 @@ class _NutrientTile extends ConsumerWidget {
     );
 
     if (confirmed == true) {
+      // Cascade: delete all sources using this nutrient from environments.
+      final envDao = ref.read(environmentDaoProvider);
+      await envDao?.deleteSourcesByNutrient(nutrient.id);
+
       final dao = ref.read(nutrientDaoProvider);
       await dao?.remove(nutrient.id);
     }

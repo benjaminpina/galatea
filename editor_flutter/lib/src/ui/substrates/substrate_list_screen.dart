@@ -491,7 +491,11 @@ class _SubstrateTile extends ConsumerWidget {
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Delete Substrate'),
-        content: Text('Delete "${substrate.name}"? This cannot be undone.'),
+        content: Text(
+          'Delete "${substrate.name}"?\n\n'
+          'This will remove it from all environment maps and '
+          'from any mixed substrate compositions.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
@@ -506,8 +510,16 @@ class _SubstrateTile extends ConsumerWidget {
       ),
     );
     if (confirmed == true) {
-      final dao = ref.read(substrateDaoProvider);
-      await dao?.remove(substrate.id);
+      // Cascade: clear this substrate from all maps.
+      final envDao = ref.read(environmentDaoProvider);
+      await envDao?.clearSubstrateFromMaps(substrate.id);
+
+      // Cascade: remove from mixed substrate compositions.
+      final subDao = ref.read(substrateDaoProvider);
+      await subDao?.deleteCompositionsReferencing(substrate.id);
+
+      // Delete the substrate.
+      await subDao?.remove(substrate.id);
     }
   }
 }
@@ -687,7 +699,10 @@ class _MixedSubstrateTile extends ConsumerWidget {
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Delete Mixed Substrate'),
-        content: Text('Delete "${substrate.name}"? This cannot be undone.'),
+        content: Text(
+          'Delete "${substrate.name}"?\n\n'
+          'This will remove it from all environment maps.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
@@ -702,7 +717,13 @@ class _MixedSubstrateTile extends ConsumerWidget {
       ),
     );
     if (confirmed == true) {
+      // Cascade: clear from maps.
+      final envDao = ref.read(environmentDaoProvider);
+      await envDao?.clearSubstrateFromMaps(substrate.id);
+
+      // Delete its compositions and the substrate itself.
       final dao = ref.read(substrateDaoProvider);
+      await dao?.replaceCompositions(substrate.id, {});
       await dao?.remove(substrate.id);
     }
   }

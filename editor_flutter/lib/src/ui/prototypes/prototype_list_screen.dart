@@ -200,12 +200,44 @@ class _PrototypeTile extends ConsumerWidget {
         ),
         trailing: IconButton(
           icon: const Icon(Icons.delete, size: 20),
-          onPressed: () async {
-            final dao = ref.read(prototypeDaoProvider);
-            await dao?.remove(prototype.id);
-          },
+          onPressed: () => _confirmDelete(context, ref),
         ),
       ),
     );
+  }
+
+  Future<void> _confirmDelete(BuildContext context, WidgetRef ref) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Delete Prototype'),
+        content: Text(
+          'Delete "${prototype.name}"?\n\n'
+          'All agents placed in environments that use this prototype '
+          'will also be removed.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true) return;
+
+    // Delete agents referencing this prototype.
+    final envDao = ref.read(environmentDaoProvider);
+    await envDao?.deleteAgentsByPrototype(prototype.id);
+
+    // Delete the prototype itself.
+    final dao = ref.read(prototypeDaoProvider);
+    await dao?.remove(prototype.id);
   }
 }

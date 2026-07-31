@@ -123,6 +123,11 @@ class SubstrateDao extends DatabaseAccessor<AppDatabase>
       }
     }
   }
+
+  /// Delete all compositions referencing a simple substrate (used when deleting a simple substrate).
+  Future<int> deleteCompositionsReferencing(int simpleSubstrateId) => (delete(
+    substrateCompositions,
+  )..where((t) => t.simpleSubstrateId.equals(simpleSubstrateId))).go();
 }
 
 @DriftAccessor(tables: [Loci])
@@ -257,4 +262,33 @@ class EnvironmentDao extends DatabaseAccessor<AppDatabase>
   Future<List<EnvironmentAgent>> getAgents(int envId) => (select(
     environmentAgents,
   )..where((t) => t.environmentId.equals(envId))).get();
+
+  /// Delete all agents that reference a given prototype.
+  Future<int> deleteAgentsByPrototype(int prototypeId) => (delete(
+    environmentAgents,
+  )..where((t) => t.prototypeId.equals(prototypeId))).go();
+
+  /// Delete all nutrient sources that reference a given nutrient.
+  Future<int> deleteSourcesByNutrient(int nutrientId) => (delete(
+    environmentSources,
+  )..where((t) => t.nutrientId.equals(nutrientId))).go();
+
+  /// Replace a substrate ID with 0 (empty) in all map rows across all environments.
+  Future<void> clearSubstrateFromMaps(int substrateId) async {
+    final allRows = await select(db.substrateMapRows).get();
+    for (final row in allRows) {
+      final parts = row.mapData.split(',');
+      bool changed = false;
+      for (var i = 0; i < parts.length; i++) {
+        if (int.tryParse(parts[i].trim()) == substrateId) {
+          parts[i] = '0';
+          changed = true;
+        }
+      }
+      if (changed) {
+        await (update(db.substrateMapRows)..where((t) => t.id.equals(row.id)))
+            .write(SubstrateMapRowsCompanion(mapData: Value(parts.join(','))));
+      }
+    }
+  }
 }

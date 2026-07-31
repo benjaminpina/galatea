@@ -239,6 +239,90 @@ class _EnvironmentEditorScreenState
     }
   }
 
+  /// Reload placed elements (sources, oviposition sites, agents) from the DB.
+  /// Called when project-level data changes (e.g. a prototype is deleted,
+  /// which cascade-deletes agents).
+  Future<void> _reloadPlacedElements() async {
+    final envDao = ref.read(environmentDaoProvider);
+    if (envDao == null) return;
+
+    final sources = await envDao.getSources(widget.environmentId);
+    final oviSites = await envDao.getOvipositionSites(widget.environmentId);
+    final agents = await envDao.getAgents(widget.environmentId);
+
+    if (!mounted) return;
+    setState(() {
+      _sources = sources
+          .map(
+            (s) => PlacedSource(
+              id: s.id,
+              posX: s.posX,
+              posY: s.posY,
+              nutrientId: s.nutrientId,
+              name: s.name,
+              quality: s.quality,
+              level: s.level,
+              maxLevel: s.maxLevel,
+              regenRate: s.regenRate,
+            ),
+          )
+          .toList();
+      _oviSites = oviSites
+          .map(
+            (o) => PlacedOvipositionSite(
+              id: o.id,
+              posX: o.posX,
+              posY: o.posY,
+              name: o.name,
+              quality: o.quality,
+              capacity: o.capacity,
+            ),
+          )
+          .toList();
+      _agents = agents
+          .map(
+            (a) => PlacedAgent(
+              id: a.id,
+              posX: a.posX,
+              posY: a.posY,
+              name: a.name,
+              sex: a.sex,
+              prototypeId: a.prototypeId,
+              stageId: a.stageId,
+              age: a.age,
+            ),
+          )
+          .toList();
+      _selectedElement = null;
+    });
+  }
+
+  /// Reload the substrate grid from the DB (called when substrates change,
+  /// e.g. a substrate was deleted and cleared from maps).
+  Future<void> _reloadSubstrateGrid() async {
+    final db = ref.read(databaseProvider);
+    if (db == null) return;
+
+    final rows =
+        await (db.select(db.substrateMapRows)
+              ..where((t) => t.environmentId.equals(widget.environmentId))
+              ..orderBy([(t) => OrderingTerm.asc(t.yCoord)]))
+            .get();
+
+    if (!mounted) return;
+    final newGrid = List.generate(_envHeight, (_) => List.filled(_envWidth, 0));
+    for (final row in rows) {
+      final y = row.yCoord;
+      if (y >= 0 && y < _envHeight) {
+        final parts = row.mapData.split(',');
+        for (var x = 0; x < parts.length && x < _envWidth; x++) {
+          newGrid[y][x] = int.tryParse(parts[x].trim()) ?? 0;
+        }
+      }
+    }
+    setState(() => _grid = newGrid);
+  }
+
   // --- Tool actions ---
 
   void _onCellTap(int x, int y) {
@@ -758,6 +842,11 @@ class _EnvironmentEditorScreenState
     final substrates = ref.watch(substratesProvider).valueOrNull ?? [];
     final nutrients = ref.watch(nutrientsProvider).valueOrNull ?? [];
     final prototypes = ref.watch(prototypesProvider).valueOrNull ?? [];
+
+    // Reload placed elements when project data changes (e.g. cascade deletes).
+    ref.listen(prototypesProvider, (prev, next) => _reloadPlacedElements());
+    ref.listen(nutrientsProvider, (prev, next) => _reloadPlacedElements());
+    ref.listen(substratesProvider, (prev, next) => _reloadSubstrateGrid());
 
     final substrateColorMap = <int, Color>{0: Colors.black};
     for (final sub in substrates) {
