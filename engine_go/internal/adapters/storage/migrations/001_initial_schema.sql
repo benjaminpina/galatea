@@ -397,6 +397,22 @@ CREATE TABLE IF NOT EXISTS environment_agents (
 -- =============================================================================
 -- SIMULATION RUNS AND RESULTS
 -- =============================================================================
+-- USER-DEFINED CUSTOM FUNCTIONS
+-- Generic mathematical functions defined by the user.
+-- These are compiled via macro-expansion: the body is inlined with params substituted.
+-- Rules: no recursion, no state, parameters are numbers only.
+-- =============================================================================
+
+CREATE TABLE IF NOT EXISTS custom_functions (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    name        TEXT    NOT NULL UNIQUE,
+    params      TEXT    NOT NULL DEFAULT '',    -- Comma-separated parameter names (e.g., 'x,k,x0')
+    body        TEXT    NOT NULL,               -- Formula body using the parameter names
+    description TEXT    NOT NULL DEFAULT '',    -- Optional description for the user
+    sort_order  INTEGER NOT NULL DEFAULT 0
+);
+
+-- =============================================================================
 
 CREATE TABLE IF NOT EXISTS sim_runs (
     id              INTEGER PRIMARY KEY AUTOINCREMENT,

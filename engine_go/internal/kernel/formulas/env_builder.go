@@ -1,13 +1,13 @@
 package formulas
 
 import (
-	"galatea/engine/internal/kernel/util"
 	"galatea/engine/internal/kernel/world"
 )
 
 // EnvBuilder populates an Evaluator's environment map with variables from
-// the current agent state. This is called once per agent per formula evaluation
-// cycle, updating values in-place to avoid map allocations.
+// the current agent state. Variable names are derived from user-defined names
+// stored in Config.Names, making formulas use the exact identifiers the user
+// chose when designing the project (e.g., "ReserveWater" instead of "Reserve1").
 type EnvBuilder struct {
 	eval *Evaluator
 	cfg  world.Config
@@ -24,77 +24,109 @@ func (b *EnvBuilder) SetWorldVars(w *world.World) {
 }
 
 // SetAgentVars populates the env with all variables for agent at index idx.
-// This corresponds to the legacy TMediador.ObtenNombreVariable functionality.
 func (b *EnvBuilder) SetAgentVars(w *world.World, idx int) {
 	a := w.Agents
 	cfg := b.cfg
+	names := cfg.Names
 
-	// Time variables
-	b.eval.Set("Age", int(a.Age[idx]))
-	b.eval.Set("CyclesInCurrentLifeStage", int(a.TimeInStage[idx]))
-	b.eval.Set("CyclesOnSubstrate", int(a.TimeOnSubstrate[idx]))
-	b.eval.Set("CyclesInCurrentInteraction", int(a.TimeInInteraction[idx]))
+	// --- Time variables ---
+	b.eval.SetInt("Age", int(a.Age[idx]))
+	b.eval.SetInt("CyclesInCurrentLifeStage", int(a.TimeInStage[idx]))
+	b.eval.SetInt("CyclesOnSubstrate", int(a.TimeOnSubstrate[idx]))
+	b.eval.SetInt("CyclesInCurrentInteraction", int(a.TimeInInteraction[idx]))
 
-	// Stage/prototype identity
-	b.eval.Set("NumLifeStage", int(a.StageID[idx]+1)) // 1-based for formulas
+	// --- Identity ---
+	b.eval.SetInt("NumLifeStage", int(a.StageID[idx]+1))
 	b.eval.Set("IsAdult", a.StageID[idx] == -1)
 	b.eval.Set("IsMale", a.Sex[idx] == world.SexMale)
 	b.eval.Set("IsFemale", a.Sex[idx] == world.SexFemale)
 
-	// Physiology: reserves
+	// --- Physiology: reserves (named by nutrient) ---
 	for n := 0; n < cfg.NumNutrients; n++ {
 		reserveIdx := idx*cfg.NumNutrients + n
-		b.eval.SetInt("Reserve"+util.Itoa(n+1), int(a.Reserves[reserveIdx]))
+		name := nutrientVarName("Reserve", n, names.NutrientNames)
+		b.eval.SetInt(name, int(a.Reserves[reserveIdx]))
 	}
 
-	// Genetics: loci (expressed values = phenotype)
+	// --- Genetics: loci (named by character) ---
 	for l := 0; l < cfg.NumLoci; l++ {
 		locusBase := idx*cfg.NumLoci*2 + l*2
-		// Continuous loci expression (codominance/dominance)
+
 		expressed := expressLocusCont(
 			a.GenotypeCont[locusBase], a.GenotypeCont[locusBase+1],
 			a.DominanceCont[locusBase], a.DominanceCont[locusBase+1],
 		)
-		b.eval.SetFloat("CL"+util.Itoa(l+1), expressed)
+		clName := locusVarName("CL", l, names.LocusNames)
+		b.eval.SetFloat(clName, expressed)
 
-		// Discrete loci expression
 		expressedDisc := expressLocusDisc(
 			a.GenotypeDisc[locusBase], a.GenotypeDisc[locusBase+1],
 			a.DominanceDisc[locusBase], a.DominanceDisc[locusBase+1],
 		)
-		b.eval.SetInt("DL"+util.Itoa(l+1), expressedDisc)
+		dlName := locusVarName("DL", l, names.LocusNames)
+		b.eval.SetInt(dlName, expressedDisc)
 	}
 
-	// Reproduction
+	// --- Reproduction ---
 	b.eval.SetInt("QuantityGametes", int(a.GametesCount[idx]))
 	b.eval.SetInt("QuantityFertilizedEggs", int(a.FertilizedCount[idx]))
 	b.eval.SetInt("QuantitySpermPacksStored", int(a.SpermPacksCount[idx]))
 	b.eval.SetInt("QuantityCarriedEggs", int(a.CarriedEggs[idx]))
 	b.eval.Set("Virginity", a.SpermPacksCount[idx] == 0 && a.Sex[idx] == world.SexFemale)
 
-	// Memory: last perceived/interacted for each perceivable element
-	memPerceptionSlots := cfg.NumSubstrates + cfg.NumResourceTypes + cfg.NumPrototypes
-	memBase := idx * memPerceptionSlots
-	for s := 0; s < memPerceptionSlots; s++ {
-		b.eval.SetInt("MemoryLastPer"+util.Itoa(s+1), int(a.MemoryLastPerceived[memBase+s]))
-		b.eval.SetInt("MemoryNumPer"+util.Itoa(s+1), int(a.MemoryNumPerceived[memBase+s]))
-		b.eval.SetInt("MemoryLastInt"+util.Itoa(s+1), int(a.MemoryLastInteracted[memBase+s]))
-		b.eval.SetInt("MemoryNumInt"+util.Itoa(s+1), int(a.MemoryNumInteracted[memBase+s]))
+	// --- Memory: perception/interaction (named by element) ---
+	// Element order: substrates, then nutrients (=resource types), then prototypes.
+	slotIdx := 0
+
+	// Substrates
+	for s := 0; s < cfg.NumSubstrates; s++ {
+		memIdx := idx*(cfg.NumSubstrates+cfg.NumResourceTypes+cfg.NumPrototypes) + slotIdx
+		name := elementVarName(s, names.SubstrateNames)
+		b.eval.SetInt("MemoryLastPer"+name, int(a.MemoryLastPerceived[memIdx]))
+		b.eval.SetInt("MemoryNumPer"+name, int(a.MemoryNumPerceived[memIdx]))
+		b.eval.SetInt("MemoryLastInt"+name, int(a.MemoryLastInteracted[memIdx]))
+		b.eval.SetInt("MemoryNumInt"+name, int(a.MemoryNumInteracted[memIdx]))
+		slotIdx++
 	}
 
-	// Memory: last behavior
+	// Nutrient sources (resource types)
+	for n := 0; n < cfg.NumResourceTypes; n++ {
+		memIdx := idx*(cfg.NumSubstrates+cfg.NumResourceTypes+cfg.NumPrototypes) + slotIdx
+		name := nutrientVarName("Source", n, names.NutrientNames)
+		b.eval.SetInt("MemoryLastPer"+name, int(a.MemoryLastPerceived[memIdx]))
+		b.eval.SetInt("MemoryNumPer"+name, int(a.MemoryNumPerceived[memIdx]))
+		b.eval.SetInt("MemoryLastInt"+name, int(a.MemoryLastInteracted[memIdx]))
+		b.eval.SetInt("MemoryNumInt"+name, int(a.MemoryNumInteracted[memIdx]))
+		slotIdx++
+	}
+
+	// Prototypes (stages + males + females)
+	allProtoNames := buildAllProtoNames(names)
+	for p := 0; p < cfg.NumPrototypes; p++ {
+		memIdx := idx*(cfg.NumSubstrates+cfg.NumResourceTypes+cfg.NumPrototypes) + slotIdx
+		name := protoVarName(p, allProtoNames)
+		b.eval.SetInt("MemoryLastPer"+name, int(a.MemoryLastPerceived[memIdx]))
+		b.eval.SetInt("MemoryNumPer"+name, int(a.MemoryNumPerceived[memIdx]))
+		b.eval.SetInt("MemoryLastInt"+name, int(a.MemoryLastInteracted[memIdx]))
+		b.eval.SetInt("MemoryNumInt"+name, int(a.MemoryNumInteracted[memIdx]))
+		slotIdx++
+	}
+
+	// --- Memory: behaviors (named) ---
 	memBehaviorBase := idx * cfg.NumBehaviors
 	for bh := 0; bh < cfg.NumBehaviors; bh++ {
-		b.eval.SetInt("MemoryLastBehavior"+util.Itoa(bh+1), int(a.MemoryLastBehavior[memBehaviorBase+bh]))
-		b.eval.SetInt("MemoryNumBehavior"+util.Itoa(bh+1), int(a.MemoryNumBehavior[memBehaviorBase+bh]))
+		name := behaviorVarName(bh, names.BehaviorNames)
+		b.eval.SetInt("MemoryLast"+name, int(a.MemoryLastBehavior[memBehaviorBase+bh]))
+		b.eval.SetInt("MemoryNum"+name, int(a.MemoryNumBehavior[memBehaviorBase+bh]))
 	}
 
-	// Morphology (fixed adult traits)
+	// --- Morphology (fixed adult traits, named by character) ---
 	if a.MorphologyFixed[idx] {
 		for l := 0; l < cfg.NumLoci; l++ {
 			morphBase := idx*cfg.NumLoci + l
-			b.eval.SetFloat("Morphology"+util.Itoa(l+1), a.MorphologyCont[morphBase])
-			b.eval.SetInt("MorphologyDisc"+util.Itoa(l+1), int(a.MorphologyDisc[morphBase]))
+			name := locusVarName("", l, names.LocusNames)
+			b.eval.SetFloat(name, a.MorphologyCont[morphBase])
+			b.eval.SetInt(name+"Disc", int(a.MorphologyDisc[morphBase]))
 		}
 	}
 }
@@ -103,6 +135,7 @@ func (b *EnvBuilder) SetAgentVars(w *world.World, idx int) {
 func (b *EnvBuilder) SetContenderVars(w *world.World, contenderIdx int) {
 	a := w.Agents
 	cfg := b.cfg
+	names := cfg.Names
 
 	b.eval.SetInt("ContenderAge", int(a.Age[contenderIdx]))
 	b.eval.Set("ContenderIsMale", a.Sex[contenderIdx] == world.SexMale)
@@ -112,8 +145,9 @@ func (b *EnvBuilder) SetContenderVars(w *world.World, contenderIdx int) {
 	if a.MorphologyFixed[contenderIdx] {
 		for l := 0; l < cfg.NumLoci; l++ {
 			morphBase := contenderIdx*cfg.NumLoci + l
-			b.eval.SetFloat("ContenderMorphology"+util.Itoa(l+1), a.MorphologyCont[morphBase])
-			b.eval.SetInt("ContenderMorphologyDisc"+util.Itoa(l+1), int(a.MorphologyDisc[morphBase]))
+			name := locusVarName("Contender", l, names.LocusNames)
+			b.eval.SetFloat(name, a.MorphologyCont[morphBase])
+			b.eval.SetInt(name+"Disc", int(a.MorphologyDisc[morphBase]))
 		}
 	}
 
@@ -124,7 +158,8 @@ func (b *EnvBuilder) SetContenderVars(w *world.World, contenderIdx int) {
 			a.GenotypeCont[locusBase], a.GenotypeCont[locusBase+1],
 			a.DominanceCont[locusBase], a.DominanceCont[locusBase+1],
 		)
-		b.eval.SetFloat("ContenderCL"+util.Itoa(l+1), expressed)
+		name := locusVarName("ContenderCL", l, names.LocusNames)
+		b.eval.SetFloat(name, expressed)
 	}
 }
 
@@ -135,24 +170,79 @@ func (b *EnvBuilder) SetResourceVars(w *world.World, resourceIdx int) {
 	b.eval.SetInt("DynamicElementQuality", int(r.Quality[resourceIdx]))
 }
 
+// --- Variable name helpers ---
+
+// nutrientVarName returns "prefix + NutrientName" or "prefix + (index+1)" as fallback.
+func nutrientVarName(prefix string, idx int, nutrientNames []string) string {
+	if idx < len(nutrientNames) && nutrientNames[idx] != "" {
+		return prefix + nutrientNames[idx]
+	}
+	return prefix + itoa(idx+1)
+}
+
+// locusVarName returns "prefix + LocusName" (with separator) or "prefix + (index+1)" as fallback (no separator).
+func locusVarName(prefix string, idx int, locusNames []string) string {
+	if idx < len(locusNames) && locusNames[idx] != "" {
+		return prefix + "_" + locusNames[idx]
+	}
+	return prefix + itoa(idx+1)
+}
+
+// elementVarName returns the substrate/element name or fallback index.
+func elementVarName(idx int, elementNames []string) string {
+	if idx < len(elementNames) && elementNames[idx] != "" {
+		return elementNames[idx]
+	}
+	return itoa(idx + 1)
+}
+
+// protoVarName returns the prototype name from the combined list.
+func protoVarName(idx int, allNames []string) string {
+	if idx < len(allNames) && allNames[idx] != "" {
+		return allNames[idx]
+	}
+	return itoa(idx + 1)
+}
+
+// behaviorVarName returns the behavior name or fallback index.
+func behaviorVarName(idx int, behaviorNames []string) string {
+	if idx < len(behaviorNames) && behaviorNames[idx] != "" {
+		return behaviorNames[idx]
+	}
+	return "Behavior" + itoa(idx+1)
+}
+
+// buildAllProtoNames concatenates stage + male + female prototype names.
+func buildAllProtoNames(names world.Names) []string {
+	all := make([]string, 0, len(names.StageNames)+len(names.PrototypeMNames)+len(names.PrototypeFNames))
+	all = append(all, names.StageNames...)
+	all = append(all, names.PrototypeMNames...)
+	all = append(all, names.PrototypeFNames...)
+	return all
+}
+
+// itoa is a minimal int-to-string helper (avoids importing strconv for hot path).
+func itoa(n int) string {
+	if n < 10 {
+		return string(rune('0' + n))
+	}
+	return string(rune('0'+n/10)) + string(rune('0'+n%10))
+}
+
 // --- Genetic expression helpers ---
 
-// expressLocusCont calculates the expressed phenotype for a continuous locus.
-// Dominance rules: both dominant = codominance (average), heterozygous = dominant wins.
 func expressLocusCont(patVal, matVal float64, patDom, matDom uint8) float64 {
 	bothDom := patDom == 1 && matDom == 1
 	bothRec := patDom == 0 && matDom == 0
 	if bothDom || bothRec {
-		// Codominance: average.
 		return (patVal + matVal) / 2.0
 	}
 	if patDom == 1 {
-		return patVal // Paternal dominance.
+		return patVal
 	}
-	return matVal // Maternal dominance.
+	return matVal
 }
 
-// expressLocusDisc calculates the expressed phenotype for a discrete locus.
 func expressLocusDisc(patVal, matVal int32, patDom, matDom uint8) int {
 	bothDom := patDom == 1 && matDom == 1
 	bothRec := patDom == 0 && matDom == 0

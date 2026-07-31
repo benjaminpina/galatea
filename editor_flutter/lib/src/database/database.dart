@@ -44,6 +44,7 @@ part 'database.g.dart';
     AttractivenessAgents,
     MemoryInfluence,
     OvipositionSiteConfig,
+    CustomFunctions,
   ],
   daos: [
     ProjectInfoDao,
@@ -62,7 +63,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.memory() : super(NativeDatabase.memory());
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(

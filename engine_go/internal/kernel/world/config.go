@@ -51,6 +51,10 @@ type Config struct {
 
 	// InitialCapacity is the pre-allocated capacity for agent/egg slices.
 	InitialCapacity int
+
+	// Names holds user-defined names for entities (nutrients, loci, substrates, etc.).
+	// Loaded from the DB during the Cold Path.
+	Names Names
 }
 
 // DefaultConfig returns a Config with sensible defaults for unset fields.

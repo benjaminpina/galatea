@@ -464,3 +464,17 @@ class OvipositionSiteConfig extends Table {
   @override
   Set<Column> get primaryKey => {id};
 }
+
+/// User-defined custom functions.
+/// Generic mathematical functions with named numeric parameters.
+/// The body is a formula that uses the parameter names.
+/// At runtime, calls are expanded by substituting params into the body (macro-expansion).
+class CustomFunctions extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get name => text().unique()();
+  TextColumn get params =>
+      text().withDefault(const Constant(''))(); // comma-separated
+  TextColumn get body => text()();
+  TextColumn get description => text().withDefault(const Constant(''))();
+  IntColumn get sortOrder => integer().withDefault(const Constant(0))();
+}

@@ -114,6 +114,33 @@ func loadConfig(db *storage.DB, environmentID int64) (Config, error) {
 		cfg.NumBehaviors = 12
 	}
 
+	// --- Populate user-defined names ---
+	cfg.Names.NutrientNames = make([]string, len(nutrients))
+	for i, n := range nutrients {
+		cfg.Names.NutrientNames[i] = n.Name
+	}
+	cfg.Names.LocusNames = make([]string, len(loci))
+	for i, l := range loci {
+		cfg.Names.LocusNames[i] = l.Name
+	}
+	cfg.Names.SubstrateNames = make([]string, len(substrates))
+	for i, s := range substrates {
+		cfg.Names.SubstrateNames[i] = s.Name
+	}
+	cfg.Names.StageNames = make([]string, len(stages))
+	for i, s := range stages {
+		cfg.Names.StageNames[i] = s.Name
+	}
+	cfg.Names.PrototypeMNames = make([]string, len(males))
+	for i, p := range males {
+		cfg.Names.PrototypeMNames[i] = p.Name
+	}
+	cfg.Names.PrototypeFNames = make([]string, len(females))
+	for i, p := range females {
+		cfg.Names.PrototypeFNames[i] = p.Name
+	}
+	cfg.Names.BehaviorNames = BuildBehaviorNames(cfg.Names.NutrientNames)
+
 	return cfg, nil
 }
 

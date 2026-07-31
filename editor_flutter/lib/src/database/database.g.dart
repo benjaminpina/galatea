@@ -14284,6 +14284,400 @@ class OvipositionSiteConfigCompanion
   }
 }
 
+class $CustomFunctionsTable extends CustomFunctions
+    with TableInfo<$CustomFunctionsTable, CustomFunction> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CustomFunctionsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'),
+  );
+  static const VerificationMeta _paramsMeta = const VerificationMeta('params');
+  @override
+  late final GeneratedColumn<String> params = GeneratedColumn<String>(
+    'params',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
+  static const VerificationMeta _bodyMeta = const VerificationMeta('body');
+  @override
+  late final GeneratedColumn<String> body = GeneratedColumn<String>(
+    'body',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _descriptionMeta = const VerificationMeta(
+    'description',
+  );
+  @override
+  late final GeneratedColumn<String> description = GeneratedColumn<String>(
+    'description',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
+  static const VerificationMeta _sortOrderMeta = const VerificationMeta(
+    'sortOrder',
+  );
+  @override
+  late final GeneratedColumn<int> sortOrder = GeneratedColumn<int>(
+    'sort_order',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    name,
+    params,
+    body,
+    description,
+    sortOrder,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'custom_functions';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<CustomFunction> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('params')) {
+      context.handle(
+        _paramsMeta,
+        params.isAcceptableOrUnknown(data['params']!, _paramsMeta),
+      );
+    }
+    if (data.containsKey('body')) {
+      context.handle(
+        _bodyMeta,
+        body.isAcceptableOrUnknown(data['body']!, _bodyMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_bodyMeta);
+    }
+    if (data.containsKey('description')) {
+      context.handle(
+        _descriptionMeta,
+        description.isAcceptableOrUnknown(
+          data['description']!,
+          _descriptionMeta,
+        ),
+      );
+    }
+    if (data.containsKey('sort_order')) {
+      context.handle(
+        _sortOrderMeta,
+        sortOrder.isAcceptableOrUnknown(data['sort_order']!, _sortOrderMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  CustomFunction map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CustomFunction(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      params: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}params'],
+      )!,
+      body: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}body'],
+      )!,
+      description: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}description'],
+      )!,
+      sortOrder: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}sort_order'],
+      )!,
+    );
+  }
+
+  @override
+  $CustomFunctionsTable createAlias(String alias) {
+    return $CustomFunctionsTable(attachedDatabase, alias);
+  }
+}
+
+class CustomFunction extends DataClass implements Insertable<CustomFunction> {
+  final int id;
+  final String name;
+  final String params;
+  final String body;
+  final String description;
+  final int sortOrder;
+  const CustomFunction({
+    required this.id,
+    required this.name,
+    required this.params,
+    required this.body,
+    required this.description,
+    required this.sortOrder,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['name'] = Variable<String>(name);
+    map['params'] = Variable<String>(params);
+    map['body'] = Variable<String>(body);
+    map['description'] = Variable<String>(description);
+    map['sort_order'] = Variable<int>(sortOrder);
+    return map;
+  }
+
+  CustomFunctionsCompanion toCompanion(bool nullToAbsent) {
+    return CustomFunctionsCompanion(
+      id: Value(id),
+      name: Value(name),
+      params: Value(params),
+      body: Value(body),
+      description: Value(description),
+      sortOrder: Value(sortOrder),
+    );
+  }
+
+  factory CustomFunction.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CustomFunction(
+      id: serializer.fromJson<int>(json['id']),
+      name: serializer.fromJson<String>(json['name']),
+      params: serializer.fromJson<String>(json['params']),
+      body: serializer.fromJson<String>(json['body']),
+      description: serializer.fromJson<String>(json['description']),
+      sortOrder: serializer.fromJson<int>(json['sortOrder']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'name': serializer.toJson<String>(name),
+      'params': serializer.toJson<String>(params),
+      'body': serializer.toJson<String>(body),
+      'description': serializer.toJson<String>(description),
+      'sortOrder': serializer.toJson<int>(sortOrder),
+    };
+  }
+
+  CustomFunction copyWith({
+    int? id,
+    String? name,
+    String? params,
+    String? body,
+    String? description,
+    int? sortOrder,
+  }) => CustomFunction(
+    id: id ?? this.id,
+    name: name ?? this.name,
+    params: params ?? this.params,
+    body: body ?? this.body,
+    description: description ?? this.description,
+    sortOrder: sortOrder ?? this.sortOrder,
+  );
+  CustomFunction copyWithCompanion(CustomFunctionsCompanion data) {
+    return CustomFunction(
+      id: data.id.present ? data.id.value : this.id,
+      name: data.name.present ? data.name.value : this.name,
+      params: data.params.present ? data.params.value : this.params,
+      body: data.body.present ? data.body.value : this.body,
+      description: data.description.present
+          ? data.description.value
+          : this.description,
+      sortOrder: data.sortOrder.present ? data.sortOrder.value : this.sortOrder,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CustomFunction(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('params: $params, ')
+          ..write('body: $body, ')
+          ..write('description: $description, ')
+          ..write('sortOrder: $sortOrder')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, name, params, body, description, sortOrder);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CustomFunction &&
+          other.id == this.id &&
+          other.name == this.name &&
+          other.params == this.params &&
+          other.body == this.body &&
+          other.description == this.description &&
+          other.sortOrder == this.sortOrder);
+}
+
+class CustomFunctionsCompanion extends UpdateCompanion<CustomFunction> {
+  final Value<int> id;
+  final Value<String> name;
+  final Value<String> params;
+  final Value<String> body;
+  final Value<String> description;
+  final Value<int> sortOrder;
+  const CustomFunctionsCompanion({
+    this.id = const Value.absent(),
+    this.name = const Value.absent(),
+    this.params = const Value.absent(),
+    this.body = const Value.absent(),
+    this.description = const Value.absent(),
+    this.sortOrder = const Value.absent(),
+  });
+  CustomFunctionsCompanion.insert({
+    this.id = const Value.absent(),
+    required String name,
+    this.params = const Value.absent(),
+    required String body,
+    this.description = const Value.absent(),
+    this.sortOrder = const Value.absent(),
+  }) : name = Value(name),
+       body = Value(body);
+  static Insertable<CustomFunction> custom({
+    Expression<int>? id,
+    Expression<String>? name,
+    Expression<String>? params,
+    Expression<String>? body,
+    Expression<String>? description,
+    Expression<int>? sortOrder,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (name != null) 'name': name,
+      if (params != null) 'params': params,
+      if (body != null) 'body': body,
+      if (description != null) 'description': description,
+      if (sortOrder != null) 'sort_order': sortOrder,
+    });
+  }
+
+  CustomFunctionsCompanion copyWith({
+    Value<int>? id,
+    Value<String>? name,
+    Value<String>? params,
+    Value<String>? body,
+    Value<String>? description,
+    Value<int>? sortOrder,
+  }) {
+    return CustomFunctionsCompanion(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      params: params ?? this.params,
+      body: body ?? this.body,
+      description: description ?? this.description,
+      sortOrder: sortOrder ?? this.sortOrder,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (params.present) {
+      map['params'] = Variable<String>(params.value);
+    }
+    if (body.present) {
+      map['body'] = Variable<String>(body.value);
+    }
+    if (description.present) {
+      map['description'] = Variable<String>(description.value);
+    }
+    if (sortOrder.present) {
+      map['sort_order'] = Variable<int>(sortOrder.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CustomFunctionsCompanion(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('params: $params, ')
+          ..write('body: $body, ')
+          ..write('description: $description, ')
+          ..write('sortOrder: $sortOrder')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -14345,6 +14739,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   );
   late final $OvipositionSiteConfigTable ovipositionSiteConfig =
       $OvipositionSiteConfigTable(this);
+  late final $CustomFunctionsTable customFunctions = $CustomFunctionsTable(
+    this,
+  );
   late final ProjectInfoDao projectInfoDao = ProjectInfoDao(
     this as AppDatabase,
   );
@@ -14394,6 +14791,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     attractivenessAgents,
     memoryInfluence,
     ovipositionSiteConfig,
+    customFunctions,
   ];
 }
 
@@ -31482,6 +31880,227 @@ typedef $$OvipositionSiteConfigTableProcessedTableManager =
       OvipositionSiteConfigData,
       PrefetchHooks Function()
     >;
+typedef $$CustomFunctionsTableCreateCompanionBuilder =
+    CustomFunctionsCompanion Function({
+      Value<int> id,
+      required String name,
+      Value<String> params,
+      required String body,
+      Value<String> description,
+      Value<int> sortOrder,
+    });
+typedef $$CustomFunctionsTableUpdateCompanionBuilder =
+    CustomFunctionsCompanion Function({
+      Value<int> id,
+      Value<String> name,
+      Value<String> params,
+      Value<String> body,
+      Value<String> description,
+      Value<int> sortOrder,
+    });
+
+class $$CustomFunctionsTableFilterComposer
+    extends Composer<_$AppDatabase, $CustomFunctionsTable> {
+  $$CustomFunctionsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get params => $composableBuilder(
+    column: $table.params,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get body => $composableBuilder(
+    column: $table.body,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get description => $composableBuilder(
+    column: $table.description,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get sortOrder => $composableBuilder(
+    column: $table.sortOrder,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$CustomFunctionsTableOrderingComposer
+    extends Composer<_$AppDatabase, $CustomFunctionsTable> {
+  $$CustomFunctionsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get params => $composableBuilder(
+    column: $table.params,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get body => $composableBuilder(
+    column: $table.body,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get description => $composableBuilder(
+    column: $table.description,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get sortOrder => $composableBuilder(
+    column: $table.sortOrder,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$CustomFunctionsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $CustomFunctionsTable> {
+  $$CustomFunctionsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get params =>
+      $composableBuilder(column: $table.params, builder: (column) => column);
+
+  GeneratedColumn<String> get body =>
+      $composableBuilder(column: $table.body, builder: (column) => column);
+
+  GeneratedColumn<String> get description => $composableBuilder(
+    column: $table.description,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get sortOrder =>
+      $composableBuilder(column: $table.sortOrder, builder: (column) => column);
+}
+
+class $$CustomFunctionsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $CustomFunctionsTable,
+          CustomFunction,
+          $$CustomFunctionsTableFilterComposer,
+          $$CustomFunctionsTableOrderingComposer,
+          $$CustomFunctionsTableAnnotationComposer,
+          $$CustomFunctionsTableCreateCompanionBuilder,
+          $$CustomFunctionsTableUpdateCompanionBuilder,
+          (
+            CustomFunction,
+            BaseReferences<
+              _$AppDatabase,
+              $CustomFunctionsTable,
+              CustomFunction
+            >,
+          ),
+          CustomFunction,
+          PrefetchHooks Function()
+        > {
+  $$CustomFunctionsTableTableManager(
+    _$AppDatabase db,
+    $CustomFunctionsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$CustomFunctionsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$CustomFunctionsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$CustomFunctionsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<String> params = const Value.absent(),
+                Value<String> body = const Value.absent(),
+                Value<String> description = const Value.absent(),
+                Value<int> sortOrder = const Value.absent(),
+              }) => CustomFunctionsCompanion(
+                id: id,
+                name: name,
+                params: params,
+                body: body,
+                description: description,
+                sortOrder: sortOrder,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String name,
+                Value<String> params = const Value.absent(),
+                required String body,
+                Value<String> description = const Value.absent(),
+                Value<int> sortOrder = const Value.absent(),
+              }) => CustomFunctionsCompanion.insert(
+                id: id,
+                name: name,
+                params: params,
+                body: body,
+                description: description,
+                sortOrder: sortOrder,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$CustomFunctionsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $CustomFunctionsTable,
+      CustomFunction,
+      $$CustomFunctionsTableFilterComposer,
+      $$CustomFunctionsTableOrderingComposer,
+      $$CustomFunctionsTableAnnotationComposer,
+      $$CustomFunctionsTableCreateCompanionBuilder,
+      $$CustomFunctionsTableUpdateCompanionBuilder,
+      (
+        CustomFunction,
+        BaseReferences<_$AppDatabase, $CustomFunctionsTable, CustomFunction>,
+      ),
+      CustomFunction,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -31565,4 +32184,6 @@ class $AppDatabaseManager {
       $$MemoryInfluenceTableTableManager(_db, _db.memoryInfluence);
   $$OvipositionSiteConfigTableTableManager get ovipositionSiteConfig =>
       $$OvipositionSiteConfigTableTableManager(_db, _db.ovipositionSiteConfig);
+  $$CustomFunctionsTableTableManager get customFunctions =>
+      $$CustomFunctionsTableTableManager(_db, _db.customFunctions);
 }

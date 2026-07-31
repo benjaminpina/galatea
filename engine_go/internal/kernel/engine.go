@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"math/rand/v2"
+	"strings"
 
 	"galatea/engine/internal/adapters/storage"
 	"galatea/engine/internal/kernel/formulas"
@@ -17,9 +18,9 @@ import (
 // builds the execution pipeline during the Cold Path, and runs the tick loop
 // during the Hot Path.
 type Engine struct {
-	World    *world.World
-	DB       *storage.DB
-	RunID    int64
+	World *world.World
+	DB    *storage.DB
+	RunID int64
 
 	// Grids for spatial queries.
 	AgentGrid    *spatial.Grid
@@ -31,9 +32,9 @@ type Engine struct {
 	EnvBuilder *formulas.EnvBuilder
 
 	// Configuration for sub-systems.
-	OntogenyCfg  systems.OntogenyConfig
-	GeneticsCfg  systems.GeneticsConfig
-	ReproCfg     systems.ReproductionConfig
+	OntogenyCfg   systems.OntogenyConfig
+	GeneticsCfg   systems.GeneticsConfig
+	ReproCfg      systems.ReproductionConfig
 	BehaviorCosts []int32 // Flat: [behavior * numNutrients + nutrient] = cost.
 	OptimalLevels []int32 // Per nutrient: level needed for reproduction.
 	Longevity     int32   // Default adult longevity (ticks).
@@ -104,8 +105,27 @@ func Build(db *storage.DB, cfg EngineConfig) (*Engine, error) {
 		resourceGrid.Insert(int32(i), w.Resources.PosX[i], w.Resources.PosY[i])
 	}
 
-	// Formula registry (compile formulas from DB in future; empty for now).
+	// Formula registry: load custom functions from DB, then compile formulas.
 	registry := formulas.NewRegistry()
+
+	// Load user-defined custom functions.
+	customFuncRows, err := db.Conn.Query(
+		"SELECT name, params, body FROM custom_functions ORDER BY sort_order")
+	if err == nil {
+		defer customFuncRows.Close()
+		for customFuncRows.Next() {
+			var name, params, body string
+			if err := customFuncRows.Scan(&name, &params, &body); err != nil {
+				continue
+			}
+			paramList := splitCSV(params)
+			if regErr := registry.CustomFuncs().Register(name, paramList, body); regErr != nil {
+				// Log but don't fail: invalid user functions are skipped.
+				_ = regErr
+			}
+		}
+	}
+
 	eval := formulas.NewEvaluator(128)
 	envBuilder := formulas.NewEnvBuilder(eval, w.Config)
 
@@ -188,24 +208,24 @@ func Build(db *storage.DB, cfg EngineConfig) (*Engine, error) {
 	permutation := make([]int, w.Agents.Cap)
 
 	e := &Engine{
-		World:        w,
-		DB:           db,
-		RunID:        runID,
-		AgentGrid:    agentGrid,
-		ResourceGrid: resourceGrid,
-		Registry:     registry,
-		Eval:         eval,
-		EnvBuilder:   envBuilder,
-		OntogenyCfg:  ontCfg,
-		GeneticsCfg:  genCfg,
-		ReproCfg:     reproCfg,
+		World:         w,
+		DB:            db,
+		RunID:         runID,
+		AgentGrid:     agentGrid,
+		ResourceGrid:  resourceGrid,
+		Registry:      registry,
+		Eval:          eval,
+		EnvBuilder:    envBuilder,
+		OntogenyCfg:   ontCfg,
+		GeneticsCfg:   genCfg,
+		ReproCfg:      reproCfg,
 		BehaviorCosts: behaviorCosts,
 		OptimalLevels: optimalLevels,
-		Longevity:    cfg.Longevity,
+		Longevity:     cfg.Longevity,
 		CombatTimeout: cfg.CombatTimeout,
 		CourtTimeout:  cfg.CourtTimeout,
-		WriteBuffer:  wb,
-		permutation:  permutation,
+		WriteBuffer:   wb,
+		permutation:   permutation,
 	}
 
 	return e, nil
@@ -498,4 +518,21 @@ func max(a, b int) int {
 		return a
 	}
 	return b
+}
+
+// splitCSV splits a comma-separated string into trimmed parts.
+// Returns nil for empty input.
+func splitCSV(s string) []string {
+	if s == "" {
+		return nil
+	}
+	parts := strings.Split(s, ",")
+	result := make([]string, 0, len(parts))
+	for _, p := range parts {
+		trimmed := strings.TrimSpace(p)
+		if trimmed != "" {
+			result = append(result, trimmed)
+		}
+	}
+	return result
 }
