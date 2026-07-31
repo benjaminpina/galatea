@@ -898,7 +898,14 @@ class _EnvironmentEditorScreenState
     // Reload placed elements when project data changes (e.g. cascade deletes).
     ref.listen(prototypesProvider, (prev, next) => _reloadPlacedElements());
     ref.listen(nutrientsProvider, (prev, next) => _reloadPlacedElements());
-    ref.listen(substratesProvider, (prev, next) => _reloadSubstrateGrid());
+    ref.listen(substratesProvider, (prev, next) {
+      _reloadSubstrateGrid();
+      // Auto-fill empty cells if we now have substrates and a default.
+      final subs = next.valueOrNull;
+      if (subs != null && subs.isNotEmpty && _defaultSubstrateId == 0) {
+        _onDefaultSubstrateChanged(subs.first.id);
+      }
+    });
 
     final substrateColorMap = <int, Color>{0: Colors.black};
     for (final sub in substrates) {

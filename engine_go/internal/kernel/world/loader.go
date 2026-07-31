@@ -21,6 +21,10 @@ func Load(db *storage.DB, environmentID int64) (*World, error) {
 		return nil, fmt.Errorf("load substrate map: %w", err)
 	}
 
+	if err := validateSubstrateMap(w); err != nil {
+		return nil, fmt.Errorf("validate substrate map: %w", err)
+	}
+
 	if err := loadResources(db, w, environmentID); err != nil {
 		return nil, fmt.Errorf("load resources: %w", err)
 	}
@@ -189,6 +193,24 @@ func loadSubstrateMap(db *storage.DB, w *World, environmentID int64) error {
 		}
 	}
 	return rows.Err()
+}
+
+// validateSubstrateMap checks that no cells are empty (value 0) when substrates exist.
+func validateSubstrateMap(w *World) error {
+	if w.Config.NumSubstrates == 0 {
+		return nil // No substrates defined yet, nothing to validate.
+	}
+	for y := 0; y < w.Substrates.Height; y++ {
+		for x := 0; x < w.Substrates.Width; x++ {
+			if w.Substrates.Get(x, y) == 0 {
+				return fmt.Errorf(
+					"substrate map has empty cell at (%d, %d); all cells must have a substrate assigned before running simulation",
+					x, y,
+				)
+			}
+		}
+	}
+	return nil
 }
 
 // loadResources reads environment_sources and populates ResourceArrays.
