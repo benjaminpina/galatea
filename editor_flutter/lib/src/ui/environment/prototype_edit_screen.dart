@@ -195,8 +195,27 @@ class _PrototypeEditScreenState extends ConsumerState<PrototypeEditScreen>
       builder: (context, snapshot) {
         final loci = snapshot.data ?? [];
         if (loci.isEmpty) {
-          return const Center(
-            child: Text('No loci defined. Add loci in the Agents panel.'),
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text(
+                    'No morphological characters defined yet.\n\n'
+                    'Each character\'s value for this prototype is defined by a formula '
+                    '(can be a constant, reference genetic loci, or any variable).',
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 16),
+                  FilledButton.icon(
+                    icon: const Icon(Icons.add),
+                    label: const Text('Add Character'),
+                    onPressed: () => _showAddCharacterDialog(context),
+                  ),
+                ],
+              ),
+            ),
           );
         }
         return FutureBuilder<List<PrototypeMorphologyData>>(
@@ -212,7 +231,7 @@ class _PrototypeEditScreenState extends ConsumerState<PrototypeEditScreen>
               padding: const EdgeInsets.all(16),
               children: [
                 Text(
-                  'Genetic and environmental expression per locus:',
+                  'Value formulas per character (can be constants, loci references, or expressions):',
                   style: Theme.of(context).textTheme.bodySmall,
                 ),
                 const SizedBox(height: 12),
@@ -235,6 +254,80 @@ class _PrototypeEditScreenState extends ConsumerState<PrototypeEditScreen>
         );
       },
     );
+  }
+
+  Future<void> _showAddCharacterDialog(BuildContext context) async {
+    final nameCtrl = TextEditingController();
+    final defaultCtrl = TextEditingController(text: '0');
+    var isContinuous = true;
+
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDialogState) => AlertDialog(
+          title: const Text('New Morphological Character'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: nameCtrl,
+                decoration: const InputDecoration(
+                  labelText: 'Name',
+                  hintText: 'e.g., BodySize, WingLength',
+                ),
+                autofocus: true,
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: defaultCtrl,
+                decoration: const InputDecoration(
+                  labelText: 'Default expression',
+                  hintText: 'e.g., 2.5 or a formula',
+                ),
+              ),
+              const SizedBox(height: 12),
+              SwitchListTile(
+                title: const Text('Continuous'),
+                subtitle: Text(isContinuous ? 'Real-valued' : 'Integer-valued'),
+                value: isContinuous,
+                onChanged: (v) => setDialogState(() => isContinuous = v),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              child: const Text('Add'),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (result != true || !mounted) return;
+    final name = nameCtrl.text.trim();
+    if (name.isEmpty) return;
+
+    final db = ref.read(databaseProvider);
+    if (db == null) return;
+    final existing = await (db.select(db.loci)).get();
+    await db
+        .into(db.loci)
+        .insert(
+          LociCompanion.insert(
+            name: name,
+            isContinuous: Value(isContinuous),
+            defaultExpression: Value(
+              defaultCtrl.text.trim().isEmpty ? '0' : defaultCtrl.text.trim(),
+            ),
+            sortOrder: Value(existing.length + 1),
+          ),
+        );
+    // Refresh the morphology tab.
+    setState(() {});
   }
 
   Future<void> _saveMorphology(

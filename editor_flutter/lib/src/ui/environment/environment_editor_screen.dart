@@ -12,10 +12,9 @@ import 'left_sidebar.dart';
 import '../nutrients/nutrient_list_screen.dart';
 import '../substrates/substrate_list_screen.dart';
 import 'agents_panel.dart';
-import 'physiology_panel.dart';
 
 /// Which configuration section is open in the right panel.
-enum ConfigSection { substrates, nutrients, agents, physiology }
+enum ConfigSection { substrates, nutrients, agents }
 
 /// Unified environment editor — the main working screen.
 ///
@@ -55,6 +54,7 @@ class _EnvironmentEditorScreenState
   // --- Brush state ---
   BrushShape _brushShape = BrushShape.square;
   int _brushRadius = 1; // 1 = single cell, up to 15
+  int _defaultSubstrateId = 0;
 
   // --- Placed elements ---
   List<PlacedSource> _sources = [];
@@ -207,12 +207,65 @@ class _EnvironmentEditorScreenState
     if (nutrients != null && nutrients.isNotEmpty) {
       _selectedNutrientId = nutrients.first.id;
     }
+
+    // Auto-select first substrate as default and fill empty cells.
+    final subs = ref.read(substratesProvider).valueOrNull;
+    if (subs != null && subs.isNotEmpty) {
+      _defaultSubstrateId = subs.first.id;
+      _fillEmptyCellsWithDefault();
+    }
+
     setState(() {});
+  }
+
+  // --- Default substrate ---
+
+  void _fillEmptyCellsWithDefault() {
+    if (_defaultSubstrateId == 0) return;
+    for (var y = 0; y < _envHeight; y++) {
+      for (var x = 0; x < _envWidth; x++) {
+        if (_grid[y][x] == 0) {
+          _grid[y][x] = _defaultSubstrateId;
+        }
+      }
+    }
+  }
+
+  void _onDefaultSubstrateChanged(int newDefault) {
+    setState(() {
+      _defaultSubstrateId = newDefault;
+      _fillEmptyCellsWithDefault();
+    });
+  }
+
+  bool _hasEmptyCells() {
+    for (var y = 0; y < _envHeight; y++) {
+      for (var x = 0; x < _envWidth; x++) {
+        if (_grid[y][x] == 0) return true;
+      }
+    }
+    return false;
   }
 
   // --- Persistence ---
 
   Future<void> _saveAll() async {
+    // Validate: no empty cells allowed.
+    if (_hasEmptyCells()) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Cannot save: some cells have no substrate assigned. '
+            'Select a default substrate to fill them.',
+          ),
+          duration: Duration(seconds: 3),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+
     final db = ref.read(databaseProvider);
     if (db == null) return;
     await db.batch((batch) {
@@ -906,6 +959,8 @@ class _EnvironmentEditorScreenState
                     onBrushShapeChanged: (s) => setState(() => _brushShape = s),
                     onBrushRadiusChanged: (r) =>
                         setState(() => _brushRadius = r),
+                    defaultSubstrateId: _defaultSubstrateId,
+                    onDefaultSubstrateChanged: _onDefaultSubstrateChanged,
                   ),
                 ),
                 const VerticalDivider(width: 1),
@@ -964,12 +1019,6 @@ class _EnvironmentEditorScreenState
             active: _openSection == ConfigSection.agents,
             onTap: () => _toggleConfig(ConfigSection.agents),
           ),
-          _BarButton(
-            icon: Icons.monitor_heart_outlined,
-            label: 'Physiology',
-            active: _openSection == ConfigSection.physiology,
-            onTap: () => _toggleConfig(ConfigSection.physiology),
-          ),
           const Spacer(),
           // Environment selector.
           PopupMenuButton<int>(
@@ -1026,7 +1075,6 @@ class _EnvironmentEditorScreenState
       ConfigSection.substrates => const SubstrateListScreen(embedded: true),
       ConfigSection.nutrients => const NutrientListScreen(embedded: true),
       ConfigSection.agents => const AgentsPanel(),
-      ConfigSection.physiology => const PhysiologyPanel(),
     };
   }
 

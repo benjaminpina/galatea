@@ -31,6 +31,8 @@ class LeftSidebar extends StatelessWidget {
     required this.brushRadius,
     required this.onBrushShapeChanged,
     required this.onBrushRadiusChanged,
+    required this.defaultSubstrateId,
+    required this.onDefaultSubstrateChanged,
   });
 
   final EditorTool currentTool;
@@ -55,6 +57,8 @@ class LeftSidebar extends StatelessWidget {
   final int brushRadius;
   final ValueChanged<BrushShape> onBrushShapeChanged;
   final ValueChanged<int> onBrushRadiusChanged;
+  final int defaultSubstrateId;
+  final ValueChanged<int> onDefaultSubstrateChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -253,17 +257,85 @@ class LeftSidebar extends StatelessWidget {
           ),
         ),
         const Divider(height: 1),
-        // Substrate palette.
+        // Default substrate selector + substrate palette.
         Expanded(
           child: ListView(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             children: [
-              _PaletteItem(
-                name: '(Erase)',
-                color: Colors.black,
-                selected: selectedSubstrateId == 0,
-                onTap: () => onSubstrateChanged(0),
+              // Default substrate (replaces "Erase").
+              Padding(
+                padding: const EdgeInsets.only(bottom: 4),
+                child: Row(
+                  children: [
+                    Text(
+                      'Default:',
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: scheme.onSurfaceVariant,
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: DropdownButton<int>(
+                        value: substrates.any((s) => s.id == defaultSubstrateId)
+                            ? defaultSubstrateId
+                            : null,
+                        isExpanded: true,
+                        isDense: true,
+                        hint: Text(
+                          'Select',
+                          style: TextStyle(fontSize: 11, color: scheme.outline),
+                        ),
+                        style: TextStyle(fontSize: 11, color: scheme.onSurface),
+                        underline: const SizedBox.shrink(),
+                        items: substrates
+                            .map(
+                              (s) => DropdownMenuItem(
+                                value: s.id,
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      width: 10,
+                                      height: 10,
+                                      decoration: BoxDecoration(
+                                        color: Color(s.color),
+                                        borderRadius: BorderRadius.circular(2),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 6),
+                                    Expanded(
+                                      child: Text(
+                                        s.name,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            )
+                            .toList(),
+                        onChanged: (v) {
+                          if (v != null) onDefaultSubstrateChanged(v);
+                        },
+                      ),
+                    ),
+                    // Paint with default button.
+                    IconButton(
+                      icon: Icon(
+                        Icons.format_color_fill,
+                        size: 16,
+                        color: selectedSubstrateId == defaultSubstrateId
+                            ? scheme.primary
+                            : scheme.onSurfaceVariant,
+                      ),
+                      tooltip: 'Paint with default',
+                      visualDensity: VisualDensity.compact,
+                      onPressed: () => onSubstrateChanged(defaultSubstrateId),
+                    ),
+                  ],
+                ),
               ),
+              const Divider(height: 8),
               ...substrates.map(
                 (sub) => _PaletteItem(
                   name: sub.name,

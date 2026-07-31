@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../database/database.dart';
 import '../../providers/database_provider.dart';
+import 'physiology_panel.dart';
 import 'prototype_edit_screen.dart';
 import 'stage_edit_screen.dart';
 
@@ -24,17 +25,34 @@ class AgentsPanel extends ConsumerWidget {
     return ListView(
       padding: const EdgeInsets.all(12),
       children: [
-        // --- Genetics (Loci) ---
+        // --- Morphological Characters ---
         _SectionHeader(
-          title: 'Genetics (Loci)',
-          icon: Icons.biotech,
+          title: 'Morphology',
+          icon: Icons.straighten,
           count: loci.length,
-          onAdd: () => _addLocus(context, ref),
+          onAdd: () => _addCharacter(context, ref),
         ),
         if (loci.isEmpty)
-          _emptyHint('No loci defined.')
+          _emptyHint(
+            'No characters defined. Define the phenotypic traits of your organisms (e.g., BodySize, Speed).',
+          )
         else
-          ...loci.map((l) => _LocusTile(locus: l)),
+          ...loci.map((l) => _CharacterTile(character: l)),
+        const SizedBox(height: 16),
+
+        // --- Genetics ---
+        _SectionHeader(
+          title: 'Genetics',
+          icon: Icons.biotech,
+          count: loci
+              .where((l) => l.dominantValue != 0 || l.mutationRateDom != 0)
+              .length,
+          onAdd: null,
+        ),
+        _emptyHint(
+          'Genetic parameters (dominance, mutation) are configured per character above. '
+          'Characters without genetic parameters behave as constants or formula-derived values.',
+        ),
         const SizedBox(height: 16),
 
         // --- Life Stages ---
@@ -76,6 +94,33 @@ class AgentsPanel extends ConsumerWidget {
           ...females.map((p) => _PrototypeTile(prototype: p)),
         const SizedBox(height: 16),
 
+        // --- Physiology ---
+        _SectionHeader(
+          title: 'Physiology',
+          icon: Icons.monitor_heart_outlined,
+          count: 0,
+          onAdd: null,
+        ),
+        _emptyHint(
+          'Metabolism, feeding gains, behavior costs, and substrate velocities. '
+          'Tap to expand.',
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 4),
+          child: OutlinedButton.icon(
+            icon: const Icon(Icons.open_in_new, size: 14),
+            label: const Text(
+              'Open Physiology Editor',
+              style: TextStyle(fontSize: 12),
+            ),
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const _PhysiologyScreen()),
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+
         // --- Interaction Matrices (placeholder) ---
         const _InteractionMatricesPlaceholder(),
       ],
@@ -94,21 +139,25 @@ class AgentsPanel extends ConsumerWidget {
 
   // --- Creation dialogs ---
 
-  Future<void> _addLocus(BuildContext context, WidgetRef ref) async {
+  Future<void> _addCharacter(BuildContext context, WidgetRef ref) async {
     final nameCtrl = TextEditingController();
+    final defaultCtrl = TextEditingController(text: '0');
     var isContinuous = true;
 
     final result = await showDialog<bool>(
       context: context,
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setState) => AlertDialog(
-          title: const Text('New Locus'),
+          title: const Text('New Morphological Character'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
                 controller: nameCtrl,
-                decoration: const InputDecoration(labelText: 'Name'),
+                decoration: const InputDecoration(
+                  labelText: 'Name',
+                  hintText: 'e.g., BodySize, WingLength',
+                ),
                 autofocus: true,
               ),
               const SizedBox(height: 12),
@@ -117,6 +166,14 @@ class AgentsPanel extends ConsumerWidget {
                 subtitle: Text(isContinuous ? 'Real-valued' : 'Integer-valued'),
                 value: isContinuous,
                 onChanged: (v) => setState(() => isContinuous = v),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: defaultCtrl,
+                decoration: const InputDecoration(
+                  labelText: 'Default expression',
+                  hintText: 'e.g., 2.5 or a formula',
+                ),
               ),
             ],
           ),
@@ -144,6 +201,9 @@ class AgentsPanel extends ConsumerWidget {
       LociCompanion.insert(
         name: name,
         isContinuous: Value(isContinuous),
+        defaultExpression: Value(
+          defaultCtrl.text.trim().isEmpty ? '0' : defaultCtrl.text.trim(),
+        ),
         sortOrder: Value(existing.length + 1),
       ),
     );
@@ -247,7 +307,7 @@ class _SectionHeader extends StatelessWidget {
   final String title;
   final IconData icon;
   final int count;
-  final VoidCallback onAdd;
+  final VoidCallback? onAdd;
 
   @override
   Widget build(BuildContext context) {
@@ -261,12 +321,13 @@ class _SectionHeader extends StatelessWidget {
             style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
           ),
         ),
-        IconButton(
-          icon: const Icon(Icons.add, size: 18),
-          onPressed: onAdd,
-          visualDensity: VisualDensity.compact,
-          tooltip: 'Add',
-        ),
+        if (onAdd != null)
+          IconButton(
+            icon: const Icon(Icons.add, size: 18),
+            onPressed: onAdd,
+            visualDensity: VisualDensity.compact,
+            tooltip: 'Add',
+          ),
       ],
     );
   }
@@ -274,25 +335,25 @@ class _SectionHeader extends StatelessWidget {
 
 // --- Locus tile ---
 
-class _LocusTile extends ConsumerWidget {
-  const _LocusTile({required this.locus});
-  final LociData locus;
+class _CharacterTile extends ConsumerWidget {
+  const _CharacterTile({required this.character});
+  final LociData character;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return ListTile(
       dense: true,
       visualDensity: VisualDensity.compact,
-      title: Text(locus.name, style: const TextStyle(fontSize: 12)),
+      title: Text(character.name, style: const TextStyle(fontSize: 12)),
       subtitle: Text(
-        locus.isContinuous ? 'Continuous' : 'Discrete',
+        '${character.isContinuous ? 'Continuous' : 'Discrete'} · Default: ${character.defaultExpression}',
         style: const TextStyle(fontSize: 10),
       ),
       trailing: IconButton(
         icon: const Icon(Icons.delete_outline, size: 16),
         onPressed: () async {
           final dao = ref.read(locusDaoProvider);
-          await dao?.remove(locus.id);
+          await dao?.remove(character.id);
         },
         visualDensity: VisualDensity.compact,
       ),
@@ -472,6 +533,19 @@ class _InteractionMatricesPlaceholder extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// Full-screen wrapper for the PhysiologyPanel.
+class _PhysiologyScreen extends StatelessWidget {
+  const _PhysiologyScreen();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Physiology')),
+      body: const PhysiologyPanel(),
     );
   }
 }
