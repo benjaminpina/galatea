@@ -47,6 +47,9 @@ type Engine struct {
 	// Reusable permutation slice for agent ordering.
 	permutation []int
 
+	// Per-agent reference values (reusable, evaluated per tick).
+	agentRef *systems.AgentRef
+
 	// Tick callback (optional, called after each tick with tick number).
 	OnTick func(tick int64)
 }
@@ -176,6 +179,123 @@ func Build(db *storage.DB, cfg EngineConfig) (*Engine, error) {
 		}
 	}
 
+	// Compile metabolism formulas.
+	metabRows, err := db.Conn.Query(
+		"SELECT nutrient_id, min_formula, critical_formula, optimal_formula, max_formula FROM metabolism ORDER BY nutrient_id")
+	if err == nil {
+		defer metabRows.Close()
+		for metabRows.Next() {
+			var nutID int64
+			var minF, critF, optF, maxF string
+			if err := metabRows.Scan(&nutID, &minF, &critF, &optF, &maxF); err != nil {
+				continue
+			}
+			nIdx := int(nutID - 1)
+			registry.Compile(fmt.Sprintf("metabolism.%d.min", nIdx), minF)
+			registry.Compile(fmt.Sprintf("metabolism.%d.critical", nIdx), critF)
+			registry.Compile(fmt.Sprintf("metabolism.%d.optimal", nIdx), optF)
+			registry.Compile(fmt.Sprintf("metabolism.%d.max", nIdx), maxF)
+		}
+	}
+
+	// Compile prototype formulas (longevity, refractories).
+	protoFormulaRows, err := db.Conn.Query(
+		"SELECT id, longevity_formula, refractory_combat_formula, refractory_courtship_formula FROM prototypes ORDER BY id")
+	if err == nil {
+		defer protoFormulaRows.Close()
+		for protoFormulaRows.Next() {
+			var protoID int64
+			var longF, refCombatF, refCourtF string
+			if err := protoFormulaRows.Scan(&protoID, &longF, &refCombatF, &refCourtF); err != nil {
+				continue
+			}
+			// protoID is 1-based in DB, but engine uses 0-based index.
+			pIdx := int(protoID - 1)
+			registry.Compile(fmt.Sprintf("prototype.%d.longevity", pIdx), longF)
+			registry.Compile(fmt.Sprintf("prototype.%d.refractory_combat", pIdx), refCombatF)
+			registry.Compile(fmt.Sprintf("prototype.%d.refractory_courtship", pIdx), refCourtF)
+		}
+	}
+
+	// Compile behavior cost formulas.
+	costRows, err := db.Conn.Query(
+		"SELECT behavior, nutrient_id, cost_formula FROM behavior_costs")
+	if err == nil {
+		defer costRows.Close()
+		for costRows.Next() {
+			var behavior string
+			var nutID int64
+			var costF string
+			if err := costRows.Scan(&behavior, &nutID, &costF); err != nil {
+				continue
+			}
+			// Map behavior name to index (simplified: use hash or fixed mapping).
+			// For now, we'll use a direct index lookup during eval.
+			nIdx := int(nutID - 1)
+			registry.Compile(fmt.Sprintf("behavior_cost_named.%s.%d", behavior, nIdx), costF)
+		}
+	}
+
+	// Compile substrate velocity formulas.
+	velRows, err := db.Conn.Query(
+		"SELECT substrate_id, velocity_formula FROM substrate_velocities")
+	if err == nil {
+		defer velRows.Close()
+		for velRows.Next() {
+			var subID int64
+			var velF string
+			if err := velRows.Scan(&subID, &velF); err != nil {
+				continue
+			}
+			registry.Compile(fmt.Sprintf("substrate_velocity.%d", subID), velF)
+		}
+	}
+
+	// Compile reproduction formulas.
+	var reproRow struct {
+		maxEggs, maxSperm, packs, fracFert, paternity, maxStored, consumption, eggsPerCycle, eggFrac, packFrac, spermDeg string
+	}
+	err = db.Conn.QueryRow(
+		`SELECT max_eggs_formula, max_sperm_packs_formula, packs_transferred_formula,
+		        fraction_fertilized_formula, paternity_formula, max_stored_packs_formula,
+		        consumption_rate_formula, eggs_per_cycle_formula, egg_fraction_formula,
+		        pack_fraction_formula, sperm_degradation_formula
+		 FROM reproduction WHERE id = 1`).Scan(
+		&reproRow.maxEggs, &reproRow.maxSperm, &reproRow.packs,
+		&reproRow.fracFert, &reproRow.paternity, &reproRow.maxStored,
+		&reproRow.consumption, &reproRow.eggsPerCycle, &reproRow.eggFrac,
+		&reproRow.packFrac, &reproRow.spermDeg)
+	if err == nil {
+		registry.Compile("reproduction.max_gametes", reproRow.maxEggs)
+		registry.Compile("reproduction.max_sperm_packs", reproRow.maxSperm)
+		registry.Compile("reproduction.packs_transferred", reproRow.packs)
+		registry.Compile("reproduction.fraction_fertilized", reproRow.fracFert)
+		registry.Compile("reproduction.paternity", reproRow.paternity)
+		registry.Compile("reproduction.max_stored_packs", reproRow.maxStored)
+		registry.Compile("reproduction.consumption_rate", reproRow.consumption)
+		registry.Compile("reproduction.eggs_per_cycle", reproRow.eggsPerCycle)
+		registry.Compile("reproduction.egg_fraction", reproRow.eggFrac)
+		registry.Compile("reproduction.pack_fraction", reproRow.packFrac)
+		registry.Compile("reproduction.sperm_degradation", reproRow.spermDeg)
+	}
+
+	// Compile gamete cost formulas.
+	gameteCostRows, err := db.Conn.Query(
+		"SELECT sex, nutrient_id, cost_formula FROM gamete_costs")
+	if err == nil {
+		defer gameteCostRows.Close()
+		for gameteCostRows.Next() {
+			var sex string
+			var nutID int64
+			var costF string
+			if err := gameteCostRows.Scan(&sex, &nutID, &costF); err != nil {
+				continue
+			}
+			nIdx := int(nutID - 1)
+			registry.Compile(fmt.Sprintf("gamete_cost.%d", nIdx), costF)
+		}
+	}
+
 	// Build write buffer.
 	wb := storage.NewWriteBuffer(db, runID, cfg.WriteBufferCfg)
 
@@ -276,6 +396,7 @@ func Build(db *storage.DB, cfg EngineConfig) (*Engine, error) {
 		CourtTimeout:  cfg.CourtTimeout,
 		WriteBuffer:   wb,
 		permutation:   permutation,
+		agentRef:      systems.NewAgentRef(numNut, numBeh),
 	}
 
 	return e, nil
@@ -326,20 +447,28 @@ func (e *Engine) Tick() {
 		systems.Act(w, idx)
 	}
 
-	// 7. Charge nutrient costs.
+	// 7. Charge nutrient costs (using per-agent evaluated costs).
 	for i := 0; i < a.Count; i++ {
-		systems.ChargeNutrients(w, i, e.BehaviorCosts)
+		systems.EvalRefValues(w, i, e.Registry, e.Eval, e.EnvBuilder, e.agentRef)
+		a.Speed[i] = e.agentRef.Speed
+		systems.ChargeNutrients(w, i, e.agentRef.BehaviorCosts)
 	}
 
-	// 8. Physiological update (age, starvation, old age).
+	// 8. Physiological update (age, starvation, old age with dynamic longevity).
 	for i := 0; i < a.Count; i++ {
-		systems.UpdateAgent(w, i, e.Longevity)
+		systems.EvalRefValues(w, i, e.Registry, e.Eval, e.EnvBuilder, e.agentRef)
+		systems.UpdateAgent(w, i, e.agentRef.Longevity)
 	}
 
 	// 9. Reproduction: gametogenesis for adults at optimal reserves.
 	for i := 0; i < a.Count; i++ {
-		if a.StageID[i] == -1 && systems.IsOptimalForReproduction(a, i, w.Config.NumNutrients, e.OptimalLevels) {
-			systems.Gametogenesis(w, i, e.ReproCfg)
+		if a.StageID[i] == -1 {
+			systems.EvalRefValues(w, i, e.Registry, e.Eval, e.EnvBuilder, e.agentRef)
+			if systems.IsOptimalForReproduction(a, i, w.Config.NumNutrients, e.agentRef.OptimalReserves) {
+				e.ReproCfg.MaxGametes = e.agentRef.MaxGametes
+				e.ReproCfg.GameteCosts = e.agentRef.GameteCosts
+				systems.Gametogenesis(w, i, e.ReproCfg)
+			}
 		}
 	}
 
