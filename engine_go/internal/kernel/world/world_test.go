@@ -11,6 +11,7 @@ func testConfig() Config {
 		ProjectName:      "Test",
 		NumNutrients:     4,
 		NumLoci:          5,
+		NumCharacters:    5,
 		NumStages:        2,
 		NumPrototypesM:   2,
 		NumPrototypesF:   2,
@@ -232,6 +233,18 @@ func setupTestDB(t *testing.T) *storage.DB {
 	// Create environment.
 	envRepo := storage.NewEnvironmentRepo(db)
 	envID, _ := envRepo.Create("TestEnv", 20, 20, "")
+
+	// Fill substrate map (all cells = substrate 1).
+	for y := 0; y < 20; y++ {
+		row := ""
+		for x := 0; x < 20; x++ {
+			if x > 0 {
+				row += ","
+			}
+			row += "1"
+		}
+		db.Conn.Exec("INSERT INTO substrate_map_rows (environment_id, y_coord, map_data) VALUES (?, ?, ?)", envID, y, row)
+	}
 
 	// Place resources.
 	envRepo.PlaceSource(&storage.EnvironmentSource{

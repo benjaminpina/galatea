@@ -12,6 +12,7 @@ func testCfg() world.Config {
 	return world.Config{
 		NumNutrients:     2,
 		NumLoci:          2,
+		NumCharacters:    2,
 		NumStages:        1,
 		NumPrototypesM:   1,
 		NumPrototypesF:   1,

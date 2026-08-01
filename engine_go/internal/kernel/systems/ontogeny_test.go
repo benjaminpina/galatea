@@ -3,6 +3,7 @@ package systems
 import (
 	"testing"
 
+	"galatea/engine/internal/kernel/formulas"
 	"galatea/engine/internal/kernel/world"
 )
 
@@ -34,6 +35,9 @@ func testOntogenyCfg() OntogenyConfig {
 		AssignmentPriorityM:  []int{0},
 		AssignmentPriorityF:  []int{0},
 		AssignmentThresholds: []float64{0.5},
+		Registry:             formulas.NewRegistry(),
+		Eval:                 formulas.NewEvaluator(16),
+		EnvBuilder:           formulas.NewEnvBuilder(formulas.NewEvaluator(16), testCfg()),
 	}
 }
 
@@ -199,6 +203,9 @@ func TestEvaluateStageTransition_AdvancesToNextStage(t *testing.T) {
 		AssignmentPriorityM:  []int{0},
 		AssignmentPriorityF:  []int{0},
 		AssignmentThresholds: []float64{0},
+		Registry:             formulas.NewRegistry(),
+		Eval:                 formulas.NewEvaluator(16),
+		EnvBuilder:           formulas.NewEnvBuilder(formulas.NewEvaluator(16), testCfg()),
 	}
 
 	idx := w.AddAgent()
@@ -242,9 +249,9 @@ func TestFixMorphology(t *testing.T) {
 	a.DominanceCont[genoBase+2] = 1
 	a.DominanceCont[genoBase+3] = 0
 
-	FixMorphology(w, idx)
+	FixMorphology(w, idx, formulas.NewRegistry(), formulas.NewEvaluator(16), formulas.NewEnvBuilder(formulas.NewEvaluator(16), cfg))
 
-	morphBase := idx * numLoci
+	morphBase := idx * cfg.NumCharacters
 	if a.MorphologyCont[morphBase+0] != 2.0 {
 		t.Fatalf("expected morph[0]=2.0, got %f", a.MorphologyCont[morphBase+0])
 	}

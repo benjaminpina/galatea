@@ -56,6 +56,18 @@ func setupTestDB(t *testing.T) *storage.DB {
 	envRepo := storage.NewEnvironmentRepo(db)
 	envID, _ := envRepo.Create("TestArena", 30, 30, "")
 
+	// Fill substrate map (all cells = substrate 1).
+	for y := 0; y < 30; y++ {
+		row := ""
+		for x := 0; x < 30; x++ {
+			if x > 0 {
+				row += ","
+			}
+			row += "1"
+		}
+		db.Conn.Exec("INSERT INTO substrate_map_rows (environment_id, y_coord, map_data) VALUES (?, ?, ?)", envID, y, row)
+	}
+
 	// Place resources.
 	envRepo.PlaceSource(&storage.EnvironmentSource{
 		EnvironmentID: envID, NutrientID: 1, Name: "spring1",

@@ -43,9 +43,9 @@ type AgentArrays struct {
 	Age         []int32 // Age in ticks.
 
 	// Behavioral state
-	State         []uint8 // StateUndecided, StateDecided, StateActing.
-	Situation     []uint8 // SituationImmature, Regular, Combat, Courtship, Dead.
-	Decision      []uint8 // Decided behavior index.
+	State          []uint8 // StateUndecided, StateDecided, StateActing.
+	Situation      []uint8 // SituationImmature, Regular, Combat, Courtship, Dead.
+	Decision       []uint8 // Decided behavior index.
 	InteractantIdx []int32 // Index of the agent/resource being interacted with (-1 = none).
 
 	// Physiology: Reserves[i*NumNutrients + n] = reserve of nutrient n for agent i.
@@ -65,13 +65,13 @@ type AgentArrays struct {
 	// Memory: tracks perception and interaction history.
 	// Flat: [i * memorySlots + slot]
 	// Slots are organized as pairs (last_tick, count) for each trackable element.
-	MemoryLastPerceived []int32 // Last tick each element was perceived.
-	MemoryNumPerceived  []int32 // Number of times perceived.
+	MemoryLastPerceived  []int32 // Last tick each element was perceived.
+	MemoryNumPerceived   []int32 // Number of times perceived.
 	MemoryLastInteracted []int32 // Last tick each element was interacted with.
 	MemoryNumInteracted  []int32 // Number of times interacted.
-	MemoryLastBehavior  []int32 // Last tick each behavior was performed.
-	MemoryNumBehavior   []int32 // Number of times each behavior performed.
-	LastOpponentAction  []uint8 // Last action by opponent in combat/courtship.
+	MemoryLastBehavior   []int32 // Last tick each behavior was performed.
+	MemoryNumBehavior    []int32 // Number of times each behavior performed.
+	LastOpponentAction   []uint8 // Last action by opponent in combat/courtship.
 
 	// Decision vectors: computed per tick by the perception system.
 	// Tendencies[i*8 + dir] = movement tendency in direction dir.
@@ -80,20 +80,21 @@ type AgentArrays struct {
 	VDecision []int32
 
 	// Reproduction
-	GametesCount       []int32 // Number of gametes in gonad.
-	FertilizedCount    []int32 // Number of fertilized eggs carried.
-	SpermPacksCount    []int32 // Number of sperm packs stored (females).
-	CarriedEggs        []int32 // Number of eggs being carried.
+	GametesCount    []int32 // Number of gametes in gonad.
+	FertilizedCount []int32 // Number of fertilized eggs carried.
+	SpermPacksCount []int32 // Number of sperm packs stored (females).
+	CarriedEggs     []int32 // Number of eggs being carried.
 
 	// Time counters
 	TimeInStage       []int32 // Ticks spent in current stage.
 	TimeOnSubstrate   []int32 // Ticks on current substrate.
 	TimeInInteraction []int32 // Ticks in current interaction.
 
-	// Fixed morphology (set when becoming adult, then constant)
-	MorphologyCont []float64 // [i * NumLoci + locus]
-	MorphologyDisc []int32   // [i * NumLoci + locus]
-	MorphologyFixed []bool   // Whether morphology has been fixed for this agent.
+	// Fixed morphology (set when becoming adult, then constant).
+	// Sized by NumCharacters (independent from loci).
+	MorphologyCont  []float64 // [i * NumCharacters + char]
+	MorphologyDisc  []int32   // [i * NumCharacters + char]
+	MorphologyFixed []bool    // Whether morphology has been fixed for this agent.
 }
 
 // NewAgentArrays allocates all slices with the given capacity and dimensional parameters.
@@ -151,8 +152,8 @@ func NewAgentArrays(cap int, cfg Config) *AgentArrays {
 		TimeOnSubstrate:   make([]int32, cap),
 		TimeInInteraction: make([]int32, cap),
 
-		MorphologyCont:  make([]float64, cap*numLoci),
-		MorphologyDisc:  make([]int32, cap*numLoci),
+		MorphologyCont:  make([]float64, cap*cfg.NumCharacters),
+		MorphologyDisc:  make([]int32, cap*cfg.NumCharacters),
 		MorphologyFixed: make([]bool, cap),
 	}
 

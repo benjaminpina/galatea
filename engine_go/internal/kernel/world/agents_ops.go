@@ -98,8 +98,10 @@ func (w *World) swapAgents(i, j int) {
 	swapSlice(a.VDecision, i*numBehaviors, j*numBehaviors, numBehaviors)
 
 	// Morphology
-	swapSliceF64(a.MorphologyCont, i*numLoci, j*numLoci, numLoci)
-	swapSlice(a.MorphologyDisc, i*numLoci, j*numLoci, numLoci)
+	// Morphology (sized by NumCharacters)
+	numChars := cfg.NumCharacters
+	swapSliceF64(a.MorphologyCont, i*numChars, j*numChars, numChars)
+	swapSlice(a.MorphologyDisc, i*numChars, j*numChars, numChars)
 }
 
 // growAgents doubles the capacity of all agent slices.
@@ -113,6 +115,7 @@ func (w *World) growAgents() {
 
 	numNutrients := cfg.NumNutrients
 	numLoci := cfg.NumLoci
+	numCharacters := cfg.NumCharacters
 	numBehaviors := cfg.NumBehaviors
 	memPerceptionSlots := cfg.NumSubstrates + cfg.NumResourceTypes + cfg.NumPrototypes
 	memBehaviorSlots := numBehaviors
@@ -150,8 +153,8 @@ func (w *World) growAgents() {
 	a.TimeInStage = growI32(a.TimeInStage, newCap)
 	a.TimeOnSubstrate = growI32(a.TimeOnSubstrate, newCap)
 	a.TimeInInteraction = growI32(a.TimeInInteraction, newCap)
-	a.MorphologyCont = growF64(a.MorphologyCont, newCap*numLoci)
-	a.MorphologyDisc = growI32(a.MorphologyDisc, newCap*numLoci)
+	a.MorphologyCont = growF64(a.MorphologyCont, newCap*numCharacters)
+	a.MorphologyDisc = growI32(a.MorphologyDisc, newCap*numCharacters)
 	a.MorphologyFixed = growBool(a.MorphologyFixed, newCap)
 
 	// Initialize new slots for sentinel values.

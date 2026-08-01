@@ -200,6 +200,18 @@ func populateReferenceProject(t *testing.T, db *storage.DB) {
 	envRepo := storage.NewEnvironmentRepo(db)
 	envID, _ := envRepo.Create("ReferenceArena", 80, 80, "80x80 reference environment")
 
+	// Fill substrate map (all cells = substrate 1).
+	for y := 0; y < 80; y++ {
+		row := ""
+		for x := 0; x < 80; x++ {
+			if x > 0 {
+				row += ","
+			}
+			row += "1"
+		}
+		db.Conn.Exec("INSERT INTO substrate_map_rows (environment_id, y_coord, map_data) VALUES (?, ?, ?)", envID, y, row)
+	}
+
 	// Place resources.
 	for i := 0; i < 12; i++ {
 		envRepo.PlaceSource(&storage.EnvironmentSource{

@@ -1,33 +1,40 @@
 package systems
 
 import (
+	"fmt"
+	"galatea/engine/internal/kernel/formulas"
 	"galatea/engine/internal/kernel/world"
 )
 
 // StageConfig holds transition parameters for a single life stage.
 type StageConfig struct {
-	CyclesRequired   int32   // Minimum cycles in stage before transition.
-	NutrientReqs     []int32 // Required reserve level per nutrient.
-	NutrientCosts    []int32 // Cost deducted on transition per nutrient.
-	Condition1Value  float64 // Custom condition 1 threshold.
-	Condition2Value  float64 // Custom condition 2 threshold.
-	LogicCyclesReqs  bool    // true=AND, false=OR between cycles and requirements.
-	LogicReqsConds   bool    // true=AND, false=OR between requirements and conditions.
-	LogicCond1Cond2  bool    // true=AND, false=OR between condition1 and condition2.
-	LinkedPrototype  int     // Linked prototype index (-1 = unlinked).
+	CyclesRequired  int32   // Minimum cycles in stage before transition.
+	NutrientReqs    []int32 // Required reserve level per nutrient.
+	NutrientCosts   []int32 // Cost deducted on transition per nutrient.
+	Condition1Value float64 // Custom condition 1 threshold.
+	Condition2Value float64 // Custom condition 2 threshold.
+	LogicCyclesReqs bool    // true=AND, false=OR between cycles and requirements.
+	LogicReqsConds  bool    // true=AND, false=OR between requirements and conditions.
+	LogicCond1Cond2 bool    // true=AND, false=OR between condition1 and condition2.
+	LinkedPrototype int     // Linked prototype index (-1 = unlinked).
 }
 
 // OntogenyConfig holds all stage configurations and prototype assignment criteria.
 type OntogenyConfig struct {
-	Stages             []StageConfig
-	NumStages          int
-	NumPrototypesM     int
-	NumPrototypesF     int
+	Stages         []StageConfig
+	NumStages      int
+	NumPrototypesM int
+	NumPrototypesF int
 	// AssignmentCriteria: indexed [prototypeIdx] = threshold value.
 	// Evaluated in priority order; first match wins.
-	AssignmentPriorityM []int // Prototype indices in evaluation order (males).
-	AssignmentPriorityF []int // Prototype indices in evaluation order (females).
+	AssignmentPriorityM  []int     // Prototype indices in evaluation order (males).
+	AssignmentPriorityF  []int     // Prototype indices in evaluation order (females).
 	AssignmentThresholds []float64 // Threshold per prototype index.
+
+	// Formula engine references for morphology evaluation.
+	Registry   *formulas.Registry
+	Eval       *formulas.Evaluator
+	EnvBuilder *formulas.EnvBuilder
 }
 
 // EvaluateEggs checks each egg for eclosion conditions and converts them to agents.
@@ -240,7 +247,7 @@ func becomeAdult(w *world.World, idx int, ontCfg OntogenyConfig) {
 	a.TimeInStage[idx] = 0
 
 	// Fix morphology.
-	FixMorphology(w, idx)
+	FixMorphology(w, idx, ontCfg.Registry, ontCfg.Eval, ontCfg.EnvBuilder)
 }
 
 // AssignPrototype determines which adult prototype an agent receives based on
@@ -282,14 +289,75 @@ func AssignPrototype(w *world.World, idx int, ontCfg OntogenyConfig) int {
 
 // FixMorphology freezes the genetically-determined morphological values for an adult agent.
 // After this, morphology no longer changes (congenital traits fixed at maturity).
-func FixMorphology(w *world.World, idx int) {
+// FixMorphology computes and freezes the morphological character values for an adult agent.
+// Each character's value is computed by evaluating its formula (which can reference
+// genetic loci CL_X/DL_X, age, reserves, or any other available variable).
+//
+// The formula lookup order:
+// 1. Per-prototype formula: "morph.<prototypeID>.<charIdx>.gen"
+// 2. Default character formula: "morph.default.<charIdx>"
+// 3. Fallback: expressed locus value at same index (if exists), or 0
+func FixMorphology(w *world.World, idx int, reg *formulas.Registry, eval *formulas.Evaluator, envBuilder *formulas.EnvBuilder) {
 	a := w.Agents
-	numLoci := w.Config.NumLoci
-	morphBase := idx * numLoci
+	cfg := w.Config
+	numChars := cfg.NumCharacters
+	numLoci := cfg.NumLoci
+	morphBase := idx * numChars
+	protoID := a.PrototypeID[idx]
 
-	for locus := 0; locus < numLoci; locus++ {
-		a.MorphologyCont[morphBase+locus] = ExpressLocusCont(a.GenotypeCont, a.DominanceCont, idx, locus, numLoci)
-		a.MorphologyDisc[morphBase+locus] = ExpressLocusDisc(a.GenotypeDisc, a.DominanceDisc, idx, locus, numLoci)
+	// Set up evaluator environment with this agent's variables.
+	envBuilder.SetWorldVars(w)
+	envBuilder.SetAgentVars(w, idx)
+
+	for char := 0; char < numChars; char++ {
+		var value float64
+		evaluated := false
+
+		// Try per-prototype formula first.
+		if protoID >= 0 {
+			// Prototype IDs in DB are 1-based, but protoID in engine is 0-based index.
+			// The formula key uses the DB prototype ID. We need to compute it.
+			// For now, use the 0-based index + 1 as approximation for DB ID.
+			dbProtoID := int(protoID) + 1
+			genKey := fmt.Sprintf("morph.%d.%d.gen", dbProtoID, char)
+			if prog := reg.Get(genKey); prog != nil {
+				result, err := eval.RunProgramFloat(prog)
+				if err == nil {
+					value = result
+					evaluated = true
+				}
+			}
+		}
+
+		// Try default character formula.
+		if !evaluated {
+			defaultKey := fmt.Sprintf("morph.default.%d", char)
+			if prog := reg.Get(defaultKey); prog != nil {
+				result, err := eval.RunProgramFloat(prog)
+				if err == nil {
+					value = result
+					evaluated = true
+				}
+			}
+		}
+
+		// Final fallback: expressed locus value at same index.
+		if !evaluated {
+			if char < numLoci {
+				value = ExpressLocusCont(a.GenotypeCont, a.DominanceCont, idx, char, numLoci)
+			}
+		}
+
+		a.MorphologyCont[morphBase+char] = value
+
+		// Discrete version: same logic but with int.
+		var discValue int32
+		if !evaluated && char < numLoci {
+			discValue = ExpressLocusDisc(a.GenotypeDisc, a.DominanceDisc, idx, char, numLoci)
+		} else {
+			discValue = int32(value)
+		}
+		a.MorphologyDisc[morphBase+char] = discValue
 	}
 	a.MorphologyFixed[idx] = true
 }

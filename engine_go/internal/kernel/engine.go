@@ -129,6 +129,53 @@ func Build(db *storage.DB, cfg EngineConfig) (*Engine, error) {
 	eval := formulas.NewEvaluator(128)
 	envBuilder := formulas.NewEnvBuilder(eval, w.Config)
 
+	// Compile morphology formulas from prototype_morphology table.
+	// Key pattern: "morph.<prototypeID>.<characterIdx>.gen" and ".env"
+	morphRows, err := db.Conn.Query(
+		`SELECT pm.prototype_id, pm.character_id, pm.genetic_formula, pm.environmental_formula,
+		        mc.sort_order
+		 FROM prototype_morphology pm
+		 JOIN morphological_characters mc ON mc.id = pm.character_id
+		 ORDER BY pm.prototype_id, mc.sort_order`)
+	if err == nil {
+		defer morphRows.Close()
+		for morphRows.Next() {
+			var protoID, charID, sortOrder int64
+			var genFormula, envFormula string
+			if err := morphRows.Scan(&protoID, &charID, &genFormula, &envFormula, &sortOrder); err != nil {
+				continue
+			}
+			charIdx := int(sortOrder - 1) // sort_order is 1-based
+			genKey := fmt.Sprintf("morph.%d.%d.gen", protoID, charIdx)
+			envKey := fmt.Sprintf("morph.%d.%d.env", protoID, charIdx)
+			if compErr := registry.Compile(genKey, genFormula); compErr != nil {
+				_ = compErr // Skip invalid formulas silently.
+			}
+			if compErr := registry.Compile(envKey, envFormula); compErr != nil {
+				_ = compErr
+			}
+		}
+	}
+
+	// Also compile default expressions for characters without prototype overrides.
+	defaultCharRows, err := db.Conn.Query(
+		"SELECT id, default_expression, sort_order FROM morphological_characters ORDER BY sort_order")
+	if err == nil {
+		defer defaultCharRows.Close()
+		for defaultCharRows.Next() {
+			var charID, sortOrder int64
+			var defaultExpr string
+			if err := defaultCharRows.Scan(&charID, &defaultExpr, &sortOrder); err != nil {
+				continue
+			}
+			charIdx := int(sortOrder - 1)
+			key := fmt.Sprintf("morph.default.%d", charIdx)
+			if compErr := registry.Compile(key, defaultExpr); compErr != nil {
+				_ = compErr
+			}
+		}
+	}
+
 	// Build write buffer.
 	wb := storage.NewWriteBuffer(db, runID, cfg.WriteBufferCfg)
 
@@ -195,6 +242,9 @@ func Build(db *storage.DB, cfg EngineConfig) (*Engine, error) {
 		AssignmentPriorityM:  buildPriorityList(w.Config.NumPrototypesM),
 		AssignmentPriorityF:  buildPriorityList(w.Config.NumPrototypesF),
 		AssignmentThresholds: make([]float64, max(w.Config.NumPrototypesM, w.Config.NumPrototypesF)),
+		Registry:             registry,
+		Eval:                 eval,
+		EnvBuilder:           envBuilder,
 	}
 
 	// Genetics config (defaults: no mutation).
