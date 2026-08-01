@@ -50,6 +50,9 @@ type Game struct {
 	// Substrate color cache.
 	substrateColors []color.RGBA
 
+	// Nutrient/resource color cache (index = nutrient type 0-based).
+	nutrientColors []color.RGBA
+
 	// Viewport dirty flag for potential future substrate pre-rendering.
 	substrateDirty bool
 
@@ -66,8 +69,8 @@ type Game struct {
 	frameBudgetMs float64 // Max milliseconds to spend on simulation per frame.
 }
 
-// NewGame creates a new visualizer game from an engine.
-func NewGame(engine *kernel.Engine) *Game {
+// NewGame creates a new visualizer game from an engine and colors from DB.
+func NewGame(engine *kernel.Engine, substrateColors, nutrientColors []color.RGBA) *Game {
 	cfg := engine.World.Config
 
 	// Calculate cell size to fit the grid in the window.
@@ -81,39 +84,14 @@ func NewGame(engine *kernel.Engine) *Game {
 		cellSize = minCellSize
 	}
 
-	// Generate substrate colors (distinct, earthy palette).
-	numSub := cfg.NumSubstrates
-	if numSub == 0 {
-		numSub = 1
-	}
-	subColors := make([]color.RGBA, numSub+1)
-	subColors[0] = color.RGBA{20, 20, 25, 255} // Default/unset = background.
-	// Predefined visually distinct palette for common substrates.
-	palette := []color.RGBA{
-		{80, 160, 60, 255},   // 1: Grass (green)
-		{210, 190, 130, 255}, // 2: Sand (beige)
-		{50, 120, 200, 255},  // 3: Water (blue)
-		{110, 110, 110, 255}, // 4: Rock (gray)
-		{30, 90, 30, 255},    // 5: Forest (dark green)
-		{180, 120, 60, 255},  // 6: Dirt (brown)
-		{240, 240, 240, 255}, // 7: Snow (white)
-		{160, 80, 160, 255},  // 8: Flowers (purple)
-	}
-	for i := 1; i <= numSub; i++ {
-		if i-1 < len(palette) {
-			subColors[i] = palette[i-1]
-		} else {
-			subColors[i] = hueToRGBA(float64(i-1)/float64(numSub), 0.5, 0.7)
-		}
-	}
-
 	return &Game{
 		engine:          engine,
 		state:           statePaused,
 		cellSize:        cellSize,
 		gridWidth:       cfg.GridWidth,
 		gridHeight:      cfg.GridHeight,
-		substrateColors: subColors,
+		substrateColors: substrateColors,
+		nutrientColors:  nutrientColors,
 		substrateDirty:  true,
 		ticksPerFrame:   1,
 		maxSpeed:        false,
@@ -263,14 +241,6 @@ func (g *Game) drawResources(screen *ebiten.Image) {
 	ox := g.offsetX
 	oy := g.offsetY
 
-	resourceColors := []color.RGBA{
-		{0, 200, 255, 200},   // Type 0: cyan (water).
-		{255, 255, 100, 200}, // Type 1: yellow (sugar).
-		{255, 180, 50, 200},  // Type 2: orange (fat).
-		{255, 80, 80, 200},   // Type 3: red (protein).
-		{100, 255, 100, 200}, // Type 4: green (oviposition).
-	}
-
 	for i := 0; i < r.Count; i++ {
 		px := float32(ox + r.PosX[i]*cs)
 		py := float32(oy + r.PosY[i]*cs)
@@ -281,8 +251,8 @@ func (g *Game) drawResources(screen *ebiten.Image) {
 
 		typeIdx := int(r.TypeID[i])
 		clr := color.RGBA{200, 200, 200, 200}
-		if typeIdx < len(resourceColors) {
-			clr = resourceColors[typeIdx]
+		if typeIdx < len(g.nutrientColors) {
+			clr = g.nutrientColors[typeIdx]
 		}
 
 		size := float32(cs * 0.8)
@@ -392,39 +362,6 @@ func directionVector(dir uint8) (float64, float64) {
 	}
 }
 
-// hueToRGBA converts HSV (hue in [0,1], sat, val) to RGBA.
-func hueToRGBA(h, s, v float64) color.RGBA {
-	h6 := h * 6
-	i := int(h6)
-	f := h6 - float64(i)
-	p := v * (1 - s)
-	q := v * (1 - s*f)
-	t := v * (1 - s*(1-f))
-
-	var r, g, b float64
-	switch i % 6 {
-	case 0:
-		r, g, b = v, t, p
-	case 1:
-		r, g, b = q, v, p
-	case 2:
-		r, g, b = p, v, t
-	case 3:
-		r, g, b = p, q, v
-	case 4:
-		r, g, b = t, p, v
-	case 5:
-		r, g, b = v, p, q
-	}
-
-	return color.RGBA{
-		R: uint8(r * 255),
-		G: uint8(g * 255),
-		B: uint8(b * 255),
-		A: 255,
-	}
-}
-
 // inputJustPressed returns true on the frame a key is first pressed.
 var prevKeys = make(map[ebiten.Key]bool)
 
@@ -509,10 +446,13 @@ func runFromDB(dbPath string, envName string, envID int64, initialSpeed, winW, w
 		return fmt.Errorf("build engine: %w", err)
 	}
 
-	// Give agents reserves if they have none (bootstrap for visualization).
-	bootstrapAgentReserves(engine)
+	// Load substrate colors from DB.
+	subColors := loadSubstrateColors(db, engine.World.Config.NumSubstrates)
 
-	game := NewGame(engine)
+	// Load nutrient colors from DB.
+	nutColors := loadNutrientColors(db, engine.World.Config.NumNutrients)
+
+	game := NewGame(engine, subColors, nutColors)
 	game.ticksPerFrame = initialSpeed
 
 	ebiten.SetWindowSize(winW, winH)
@@ -522,20 +462,60 @@ func runFromDB(dbPath string, envName string, envID int64, initialSpeed, winW, w
 	return ebiten.RunGame(game)
 }
 
-func bootstrapAgentReserves(engine *kernel.Engine) {
-	a := engine.World.Agents
-	numNut := engine.World.Config.NumNutrients
-	for i := 0; i < a.Count; i++ {
-		for n := 0; n < numNut; n++ {
-			if a.Reserves[i*numNut+n] <= 0 {
-				a.Reserves[i*numNut+n] = 5000 // High reserves for long survival.
-			}
+// loadNutrientColors reads nutrient colors from the DB.
+// Index 0-based corresponds to nutrient type index (TypeID in resources).
+func loadNutrientColors(db *storage.DB, numNutrients int) []color.RGBA {
+	colors := make([]color.RGBA, numNutrients)
+	for i := range colors {
+		colors[i] = color.RGBA{200, 200, 200, 200} // Default gray.
+	}
+
+	rows, err := db.Conn.Query("SELECT id, color FROM nutrients ORDER BY sort_order")
+	if err != nil {
+		return colors
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var id int64
+		var colorVal int
+		if err := rows.Scan(&id, &colorVal); err != nil {
+			continue
 		}
-		if a.Speed[i] <= 0 {
-			a.Speed[i] = 1
-		}
-		if a.Direction[i] == 0 {
-			a.Direction[i] = uint8(1 + i%8)
+		idx := int(id - 1) // 1-based ID to 0-based index.
+		if idx >= 0 && idx < numNutrients {
+			r := uint8((colorVal >> 16) & 0xFF)
+			g := uint8((colorVal >> 8) & 0xFF)
+			b := uint8(colorVal & 0xFF)
+			colors[idx] = color.RGBA{r, g, b, 200}
 		}
 	}
+	return colors
+}
+
+// Index 0 = empty/default (black), indices 1..N correspond to substrate IDs.
+func loadSubstrateColors(db *storage.DB, numSubstrates int) []color.RGBA {
+	colors := make([]color.RGBA, numSubstrates+1)
+	colors[0] = color.RGBA{20, 20, 25, 255} // Empty cell.
+
+	rows, err := db.Conn.Query("SELECT id, color FROM substrates ORDER BY sort_order")
+	if err != nil {
+		return colors
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var id int64
+		var colorVal int
+		if err := rows.Scan(&id, &colorVal); err != nil {
+			continue
+		}
+		if int(id) <= numSubstrates {
+			r := uint8((colorVal >> 16) & 0xFF)
+			g := uint8((colorVal >> 8) & 0xFF)
+			b := uint8(colorVal & 0xFF)
+			colors[id] = color.RGBA{r, g, b, 255}
+		}
+	}
+	return colors
 }

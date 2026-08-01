@@ -33,6 +33,21 @@ func Load(db *storage.DB, environmentID int64) (*World, error) {
 		return nil, fmt.Errorf("load agents: %w", err)
 	}
 
+	// Initialize agent reserves from metabolism initial_formula (simplified: read as int).
+	initReserves := loadInitialReserves(db, w.Config.NumNutrients)
+	for i := 0; i < w.Agents.Count; i++ {
+		for n := 0; n < w.Config.NumNutrients; n++ {
+			w.Agents.Reserves[i*w.Config.NumNutrients+n] = initReserves[n]
+		}
+		// Default speed and direction if not set.
+		if w.Agents.Speed[i] <= 0 {
+			w.Agents.Speed[i] = 1
+		}
+		if w.Agents.Direction[i] == 0 {
+			w.Agents.Direction[i] = uint8(1 + i%8)
+		}
+	}
+
 	return w, nil
 }
 
@@ -309,4 +324,51 @@ func loadCharacterNames(db *storage.DB) ([]string, error) {
 		names = append(names, name)
 	}
 	return names, rows.Err()
+}
+
+// loadInitialReserves reads the initial_formula from the metabolism table for each nutrient.
+// For now it parses the formula as a simple integer (full formula eval will come later).
+func loadInitialReserves(db *storage.DB, numNutrients int) []int32 {
+	reserves := make([]int32, numNutrients)
+	for i := range reserves {
+		reserves[i] = 50 // Default if no metabolism config.
+	}
+
+	rows, err := db.Conn.Query(
+		"SELECT nutrient_id, initial_formula FROM metabolism ORDER BY nutrient_id")
+	if err != nil {
+		return reserves
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var nutID int64
+		var formula string
+		if err := rows.Scan(&nutID, &formula); err != nil {
+			continue
+		}
+		idx := int(nutID - 1) // 1-based to 0-based.
+		if idx >= 0 && idx < numNutrients {
+			// Simple parse: try as integer. Full formula eval will be added later.
+			val := parseInt32(formula, 50)
+			reserves[idx] = val
+		}
+	}
+	return reserves
+}
+
+// parseInt32 parses a string as int32, returning defaultVal if parsing fails.
+func parseInt32(s string, defaultVal int32) int32 {
+	var v int32
+	for _, ch := range s {
+		if ch >= '0' && ch <= '9' {
+			v = v*10 + int32(ch-'0')
+		} else {
+			return defaultVal // Not a simple integer.
+		}
+	}
+	if s == "" {
+		return defaultVal
+	}
+	return v
 }
