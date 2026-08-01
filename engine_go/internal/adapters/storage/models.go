@@ -36,17 +36,16 @@ type SubstrateComposition struct {
 
 // Locus represents a genetic locus definition.
 type Locus struct {
-	ID                int64
-	Name              string
-	IsContinuous      bool
-	DominantValue     float64
-	RecessiveValue    float64
-	MutationRateDom   float64
-	MutationRateRec   float64
-	MutationRangeDom  float64
-	MutationRangeRec  float64
-	DefaultExpression string
-	SortOrder         int
+	ID               int64
+	Name             string
+	IsContinuous     bool
+	DominantValue    float64
+	RecessiveValue   float64
+	MutationRateDom  float64
+	MutationRateRec  float64
+	MutationRangeDom float64
+	MutationRangeRec float64
+	SortOrder        int
 }
 
 // Stage represents an immature life stage.

@@ -157,7 +157,7 @@ func populateReferenceProject(t *testing.T, db *storage.DB) {
 			DominantValue: 1.0, RecessiveValue: 0.5,
 			MutationRateDom: 0.01, MutationRateRec: 0.01,
 			MutationRangeDom: 0.1, MutationRangeRec: 0.1,
-			DefaultExpression: "0", SortOrder: i + 1,
+			SortOrder: i + 1,
 		})
 	}
 
@@ -196,7 +196,6 @@ func populateReferenceProject(t *testing.T, db *storage.DB) {
 		RefractoryCombatFormula: "6", RefractoryCourtshipFormula: "10",
 		SexRatioMalesFormula: "50", SexRatioFemalesFormula: "50", SortOrder: 2,
 	})
-
 
 	envRepo := storage.NewEnvironmentRepo(db)
 	envID, _ := envRepo.Create("ReferenceArena", 80, 80, "80x80 reference environment")

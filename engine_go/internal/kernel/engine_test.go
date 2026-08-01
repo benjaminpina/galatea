@@ -29,8 +29,8 @@ func setupTestDB(t *testing.T) *storage.DB {
 	subRepo.Create("Rock", 0x808080, false, 3)
 
 	locRepo := storage.NewLocusRepo(db)
-	locRepo.Create(&storage.Locus{Name: "Size", IsContinuous: true, DominantValue: 1, RecessiveValue: 0.5, SortOrder: 1, DefaultExpression: "0"})
-	locRepo.Create(&storage.Locus{Name: "Speed", IsContinuous: true, DominantValue: 1, RecessiveValue: 0.5, SortOrder: 2, DefaultExpression: "0"})
+	locRepo.Create(&storage.Locus{Name: "Size", IsContinuous: true, DominantValue: 1, RecessiveValue: 0.5, SortOrder: 1})
+	locRepo.Create(&storage.Locus{Name: "Speed", IsContinuous: true, DominantValue: 1, RecessiveValue: 0.5, SortOrder: 2})
 
 	stageRepo := storage.NewStageRepo(db)
 	stageRepo.Create(&storage.Stage{
@@ -51,7 +51,6 @@ func setupTestDB(t *testing.T) *storage.DB {
 		RefractoryCombatFormula: "10", RefractoryCourtshipFormula: "10",
 		SexRatioMalesFormula: "50", SexRatioFemalesFormula: "50", SortOrder: 1,
 	})
-
 
 	// Create environment 30x30.
 	envRepo := storage.NewEnvironmentRepo(db)

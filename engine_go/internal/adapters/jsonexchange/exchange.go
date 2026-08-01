@@ -42,16 +42,15 @@ type LociSetExport struct {
 
 // LocusExport represents a single locus in export format.
 type LocusExport struct {
-	Name              string  `json:"name"`
-	IsContinuous      bool    `json:"is_continuous"`
-	DominantValue     float64 `json:"dominant_value"`
-	RecessiveValue    float64 `json:"recessive_value"`
-	MutationRateDom   float64 `json:"mutation_rate_dom"`
-	MutationRateRec   float64 `json:"mutation_rate_rec"`
-	MutationRangeDom  float64 `json:"mutation_range_dom"`
-	MutationRangeRec  float64 `json:"mutation_range_rec"`
-	DefaultExpression string  `json:"default_expression"`
-	SortOrder         int     `json:"sort_order"`
+	Name             string  `json:"name"`
+	IsContinuous     bool    `json:"is_continuous"`
+	DominantValue    float64 `json:"dominant_value"`
+	RecessiveValue   float64 `json:"recessive_value"`
+	MutationRateDom  float64 `json:"mutation_rate_dom"`
+	MutationRateRec  float64 `json:"mutation_rate_rec"`
+	MutationRangeDom float64 `json:"mutation_range_dom"`
+	MutationRangeRec float64 `json:"mutation_range_rec"`
+	SortOrder        int     `json:"sort_order"`
 }
 
 // PrototypeSetExport represents an exported set of prototypes.
@@ -165,16 +164,15 @@ func ImportLoci(db *storage.DB, filePath string) (*ImportResult, error) {
 			continue
 		}
 		_, err := repo.Create(&storage.Locus{
-			Name:              locus.Name,
-			IsContinuous:      locus.IsContinuous,
-			DominantValue:     locus.DominantValue,
-			RecessiveValue:    locus.RecessiveValue,
-			MutationRateDom:   locus.MutationRateDom,
-			MutationRateRec:   locus.MutationRateRec,
-			MutationRangeDom:  locus.MutationRangeDom,
-			MutationRangeRec:  locus.MutationRangeRec,
-			DefaultExpression: locus.DefaultExpression,
-			SortOrder:         locus.SortOrder,
+			Name:             locus.Name,
+			IsContinuous:     locus.IsContinuous,
+			DominantValue:    locus.DominantValue,
+			RecessiveValue:   locus.RecessiveValue,
+			MutationRateDom:  locus.MutationRateDom,
+			MutationRateRec:  locus.MutationRateRec,
+			MutationRangeDom: locus.MutationRangeDom,
+			MutationRangeRec: locus.MutationRangeRec,
+			SortOrder:        locus.SortOrder,
 		})
 		if err != nil {
 			result.Errors = append(result.Errors, fmt.Sprintf("locus %s: %v", locus.Name, err))

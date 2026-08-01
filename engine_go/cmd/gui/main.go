@@ -4,12 +4,12 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"image/color"
 	"log"
 	"math"
 	"os"
-	"path/filepath"
 	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -437,39 +437,73 @@ func inputJustPressed(key ebiten.Key) bool {
 
 // --- Main ---
 
+const guiVersion = "2.0.0"
+
 func main() {
-	if len(os.Args) < 2 {
-		fmt.Println("Usage: galatea <workspace_path>")
-		fmt.Println("       galatea path/to/project/galatea.db")
-		fmt.Println("")
-		fmt.Println("If no argument provided, runs a self-contained demo.")
-		runDemo()
+	filePath := flag.String("file", "", "Path to the project database (.db file) [required]")
+	envName := flag.String("env", "", "Environment name to simulate (auto-selected if only one)")
+	envID := flag.Int64("env-id", 0, "Environment ID to simulate (alternative to --env)")
+	speed := flag.Int("speed", 1, "Initial simulation speed (ticks per frame)")
+	width := flag.Int("width", windowWidth, "Window width in pixels")
+	height := flag.Int("height", windowHeight, "Window height in pixels")
+	showVersion := flag.Bool("version", false, "Show version and exit")
+
+	flag.Usage = func() {
+		fmt.Fprintf(os.Stderr, "Galatea Simulation Visualizer v%s\n\n", guiVersion)
+		fmt.Fprintf(os.Stderr, "Usage:\n")
+		fmt.Fprintf(os.Stderr, "  galatea --file project.db [options]\n\n")
+		fmt.Fprintf(os.Stderr, "Options:\n")
+		flag.PrintDefaults()
+		fmt.Fprintf(os.Stderr, "\nControls:\n")
+		fmt.Fprintf(os.Stderr, "  Space       Start/Pause simulation\n")
+		fmt.Fprintf(os.Stderr, "  Escape      Quit\n")
+		fmt.Fprintf(os.Stderr, "  Up/Down     Double/halve tick speed\n")
+		fmt.Fprintf(os.Stderr, "  M           Toggle max-speed mode\n")
+		fmt.Fprintf(os.Stderr, "  Scroll      Zoom in/out\n")
+		fmt.Fprintf(os.Stderr, "  Left-drag   Pan viewport\n")
+	}
+
+	flag.Parse()
+
+	if *showVersion {
+		fmt.Printf("galatea v%s\n", guiVersion)
 		return
 	}
 
-	dbPath := os.Args[1]
-	if err := runFromDB(dbPath); err != nil {
+	if *filePath == "" {
+		flag.Usage()
+		fmt.Fprintf(os.Stderr, "\nerror: --file is required\n")
+		os.Exit(1)
+	}
+
+	if err := runFromDB(*filePath, *envName, *envID, *speed, *width, *height); err != nil {
 		log.Fatalf("Error: %v", err)
 	}
 }
 
 // runFromDB opens an existing project database and launches the visualizer.
-func runFromDB(dbPath string) error {
+func runFromDB(dbPath string, envName string, envID int64, initialSpeed, winW, winH int) error {
+	if _, err := os.Stat(dbPath); os.IsNotExist(err) {
+		return fmt.Errorf("file not found: %s", dbPath)
+	}
+
 	db, err := storage.Open(dbPath)
 	if err != nil {
 		return fmt.Errorf("open db: %w", err)
 	}
 	defer db.Close()
 
-	// Find the first environment.
-	envRepo := storage.NewEnvironmentRepo(db)
-	envs, err := envRepo.List()
-	if err != nil || len(envs) == 0 {
-		return fmt.Errorf("no environments found in database")
+	// Resolve environment.
+	resolvedID, resolvedName, err := storage.ResolveEnvironment(db, envName, envID)
+	if err != nil {
+		return err
 	}
 
-	cfg := kernel.DefaultEngineConfig(envs[0].ID)
-	cfg.Longevity = 2000
+	fmt.Printf("Galatea Visualizer v%s\n", guiVersion)
+	fmt.Printf("Project: %s | Environment: %s (id=%d)\n\n", dbPath, resolvedName, resolvedID)
+
+	cfg := kernel.DefaultEngineConfig(resolvedID)
+	cfg.WriteBufferCfg = storage.WriteBufferConfig{MaxRecords: 50000, TickInterval: 500}
 	engine, err := kernel.Build(db, cfg)
 	if err != nil {
 		return fmt.Errorf("build engine: %w", err)
@@ -478,44 +512,11 @@ func runFromDB(dbPath string) error {
 	// Give agents reserves if they have none (bootstrap for visualization).
 	bootstrapAgentReserves(engine)
 
-	return launchVisualizer(engine)
-}
-
-// runDemo creates a self-contained demo world and launches the visualizer.
-func runDemo() {
-	dbPath := filepath.Join(os.TempDir(), "galatea_demo.db")
-	os.Remove(dbPath)
-
-	db, err := storage.Open(dbPath)
-	if err != nil {
-		log.Fatalf("open db: %v", err)
-	}
-	defer func() {
-		db.Close()
-		os.Remove(dbPath)
-	}()
-
-	populateDemoProject(db)
-
-	cfg := kernel.DefaultEngineConfig(1)
-	cfg.Longevity = 5000
-	engine, err := kernel.Build(db, cfg)
-	if err != nil {
-		log.Fatalf("build engine: %v", err)
-	}
-
-	bootstrapAgentReserves(engine)
-
-	if err := launchVisualizer(engine); err != nil {
-		log.Fatalf("visualizer: %v", err)
-	}
-}
-
-func launchVisualizer(engine *kernel.Engine) error {
 	game := NewGame(engine)
+	game.ticksPerFrame = initialSpeed
 
-	ebiten.SetWindowSize(windowWidth, windowHeight)
-	ebiten.SetWindowTitle("Galatea — Simulation Visualizer")
+	ebiten.SetWindowSize(winW, winH)
+	ebiten.SetWindowTitle(fmt.Sprintf("Galatea — %s", resolvedName))
 	ebiten.SetWindowResizingMode(ebiten.WindowResizingModeEnabled)
 
 	return ebiten.RunGame(game)
@@ -536,131 +537,5 @@ func bootstrapAgentReserves(engine *kernel.Engine) {
 		if a.Direction[i] == 0 {
 			a.Direction[i] = uint8(1 + i%8)
 		}
-	}
-}
-
-func populateDemoProject(db *storage.DB) {
-	projRepo := storage.NewProjectInfoRepo(db)
-	projRepo.Init("Visual Demo", "Self-contained demo for the visualizer")
-
-	nutRepo := storage.NewNutrientRepo(db)
-	nutRepo.Create("Water", 0, 1)
-	nutRepo.Create("Sugar", 0, 2)
-	nutRepo.Create("Fat", 0, 3)
-
-	subRepo := storage.NewSubstrateRepo(db)
-	subRepo.Create("Grass", 0x228B22, false, 1)
-	subRepo.Create("Sand", 0xC2B280, false, 2)
-	subRepo.Create("Water", 0x1E90FF, false, 3)
-	subRepo.Create("Rock", 0x696969, false, 4)
-	subRepo.Create("Forest", 0x006400, false, 5)
-
-	locRepo := storage.NewLocusRepo(db)
-	locRepo.Create(&storage.Locus{Name: "Size", IsContinuous: true, DominantValue: 1, RecessiveValue: 0.5, SortOrder: 1, DefaultExpression: "0"})
-	locRepo.Create(&storage.Locus{Name: "Speed", IsContinuous: true, DominantValue: 1, RecessiveValue: 0.5, SortOrder: 2, DefaultExpression: "0"})
-
-	stageRepo := storage.NewStageRepo(db)
-	stageRepo.Create(&storage.Stage{
-		Name: "Juvenile", SortOrder: 1, CyclesFormula: "100",
-		Condition1Formula: "0", Condition1Op: ">", Condition1Value: 0,
-		Condition2Formula: "0", Condition2Op: ">", Condition2Value: 0,
-		LogicCyclesReqs: "AND", LogicReqsConds: "AND", LogicCond1Cond2: "AND", Color: 0x00FF00,
-	})
-
-	protoRepo := storage.NewPrototypeRepo(db)
-	protoRepo.Create(&storage.Prototype{
-		Name: "MaleA", Sex: "M", LongevityFormula: "5000",
-		RefractoryCombatFormula: "10", RefractoryCourtshipFormula: "15",
-		SexRatioMalesFormula: "50", SexRatioFemalesFormula: "50", SortOrder: 1,
-	})
-	protoRepo.Create(&storage.Prototype{
-		Name: "FemaleA", Sex: "F", LongevityFormula: "6000",
-		RefractoryCombatFormula: "10", RefractoryCourtshipFormula: "15",
-		SexRatioMalesFormula: "50", SexRatioFemalesFormula: "50", SortOrder: 1,
-	})
-
-	const gridSize = 60
-	envRepo := storage.NewEnvironmentRepo(db)
-	envID, _ := envRepo.Create("Demo Arena", gridSize, gridSize, "60x60 demo with substrate zones")
-
-	// Paint substrate map with distinct zones.
-	// Zone layout:
-	//   Top-left: Grass (1)     Top-right: Sand (2)
-	//   Center: Water (3) band
-	//   Bottom-left: Forest (5) Bottom-right: Rock (4)
-	for y := 0; y < gridSize; y++ {
-		row := ""
-		for x := 0; x < gridSize; x++ {
-			var subID int
-			switch {
-			case y >= 28 && y <= 32: // Horizontal water band.
-				subID = 3
-			case x >= 28 && x <= 32 && y < 28: // Vertical water channel (top).
-				subID = 3
-			case x < 30 && y < 28:
-				subID = 1 // Grass top-left.
-			case x >= 30 && y < 28:
-				subID = 2 // Sand top-right.
-			case x < 30 && y > 32:
-				subID = 5 // Forest bottom-left.
-			default:
-				subID = 4 // Rock bottom-right.
-			}
-			if x > 0 {
-				row += ","
-			}
-			row += fmt.Sprintf("%d", subID)
-		}
-		db.Conn.Exec(
-			"INSERT INTO substrate_map_rows (environment_id, y_coord, map_data) VALUES (?, ?, ?)",
-			envID, y, row,
-		)
-	}
-
-	// Place nutrient sources in appropriate zones.
-	// Water sources along the water band (nutrient_id=1).
-	for i := 0; i < 10; i++ {
-		envRepo.PlaceSource(&storage.EnvironmentSource{
-			EnvironmentID: envID, NutrientID: 1, Name: fmt.Sprintf("pool_%d", i),
-			PosX: 5 + i*6, PosY: 30, Quality: 10, Level: 200, MaxLevel: 300, RegenRate: 1.08,
-		})
-	}
-	// Sugar sources in the grass zone (nutrient_id=2).
-	for i := 0; i < 10; i++ {
-		envRepo.PlaceSource(&storage.EnvironmentSource{
-			EnvironmentID: envID, NutrientID: 2, Name: fmt.Sprintf("flower_%d", i),
-			PosX: 3 + i*3, PosY: 5 + i*2, Quality: 8, Level: 150, MaxLevel: 250, RegenRate: 1.1,
-		})
-	}
-	// Fat sources in the forest zone (nutrient_id=3).
-	for i := 0; i < 8; i++ {
-		envRepo.PlaceSource(&storage.EnvironmentSource{
-			EnvironmentID: envID, NutrientID: 3, Name: fmt.Sprintf("tree_%d", i),
-			PosX: 5 + i*3, PosY: 40 + i*2, Quality: 12, Level: 180, MaxLevel: 300, RegenRate: 1.06,
-		})
-	}
-
-	// Place 100 agents spread across the map.
-	for i := 0; i < 100; i++ {
-		sex := "M"
-		protoID := int64(1)
-		if i%2 == 1 {
-			sex = "F"
-			protoID = 2
-		}
-		// Distribute in a grid pattern with some offset.
-		px := 5 + (i%10)*5 + i%3
-		py := 5 + (i/10)*5 + i%4
-		if px >= gridSize {
-			px = gridSize - 2
-		}
-		if py >= gridSize {
-			py = gridSize - 2
-		}
-		envRepo.PlaceAgent(&storage.EnvironmentAgent{
-			EnvironmentID: envID, Name: fmt.Sprintf("a_%03d", i),
-			PosX: px, PosY: py,
-			PrototypeID: &protoID, Sex: sex, Age: 0,
-		})
 	}
 }

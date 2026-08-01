@@ -199,7 +199,7 @@ func setupTestDB(t *testing.T) *storage.DB {
 		locRepo.Create(&storage.Locus{
 			Name: "Locus" + string(rune('0'+i)), IsContinuous: true,
 			DominantValue: 1, RecessiveValue: 0.5,
-			DefaultExpression: "0", SortOrder: i,
+			SortOrder: i,
 		})
 	}
 
@@ -228,7 +228,6 @@ func setupTestDB(t *testing.T) *storage.DB {
 		RefractoryCombatFormula: "10", RefractoryCourtshipFormula: "10",
 		SexRatioMalesFormula: "50", SexRatioFemalesFormula: "50", SortOrder: 1,
 	})
-
 
 	// Create environment.
 	envRepo := storage.NewEnvironmentRepo(db)

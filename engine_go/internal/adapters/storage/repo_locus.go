@@ -24,11 +24,11 @@ func (r *LocusRepo) Create(l *Locus) (int64, error) {
 	res, err := r.db.Conn.Exec(
 		`INSERT INTO loci (name, is_continuous, dominant_value, recessive_value,
 		 mutation_rate_dom, mutation_rate_rec, mutation_range_dom, mutation_range_rec,
-		 default_expression, sort_order)
-		 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+		 sort_order)
+		 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
 		l.Name, continuous, l.DominantValue, l.RecessiveValue,
 		l.MutationRateDom, l.MutationRateRec, l.MutationRangeDom, l.MutationRangeRec,
-		l.DefaultExpression, l.SortOrder,
+		l.SortOrder,
 	)
 	if err != nil {
 		return 0, fmt.Errorf("locus create: %w", err)
@@ -43,11 +43,11 @@ func (r *LocusRepo) GetByID(id int64) (*Locus, error) {
 	err := r.db.Conn.QueryRow(
 		`SELECT id, name, is_continuous, dominant_value, recessive_value,
 		 mutation_rate_dom, mutation_rate_rec, mutation_range_dom, mutation_range_rec,
-		 default_expression, sort_order
+		 sort_order
 		 FROM loci WHERE id = ?`, id,
 	).Scan(&l.ID, &l.Name, &continuous, &l.DominantValue, &l.RecessiveValue,
 		&l.MutationRateDom, &l.MutationRateRec, &l.MutationRangeDom, &l.MutationRangeRec,
-		&l.DefaultExpression, &l.SortOrder)
+		&l.SortOrder)
 	if err == sql.ErrNoRows {
 		return nil, nil
 	}
@@ -63,7 +63,7 @@ func (r *LocusRepo) List() ([]Locus, error) {
 	rows, err := r.db.Conn.Query(
 		`SELECT id, name, is_continuous, dominant_value, recessive_value,
 		 mutation_rate_dom, mutation_rate_rec, mutation_range_dom, mutation_range_rec,
-		 default_expression, sort_order
+		 sort_order
 		 FROM loci ORDER BY sort_order`,
 	)
 	if err != nil {
@@ -77,7 +77,7 @@ func (r *LocusRepo) List() ([]Locus, error) {
 		var continuous int
 		if err := rows.Scan(&l.ID, &l.Name, &continuous, &l.DominantValue, &l.RecessiveValue,
 			&l.MutationRateDom, &l.MutationRateRec, &l.MutationRangeDom, &l.MutationRangeRec,
-			&l.DefaultExpression, &l.SortOrder); err != nil {
+			&l.SortOrder); err != nil {
 			return nil, fmt.Errorf("locus scan: %w", err)
 		}
 		l.IsContinuous = continuous == 1
