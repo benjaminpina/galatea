@@ -425,10 +425,14 @@ func (e *Engine) Tick() {
 	perm := e.shuffleAgents(a.Count)
 
 	// 3. Perceive (in shuffled order).
+	ctx.Ref = e.agentRef
 	for _, idx := range perm {
 		if a.Situation[idx] == world.SituationCombat || a.Situation[idx] == world.SituationCourtship {
 			continue // Combat/courtship agents skip perception.
 		}
+		// Evaluate reference values for this agent (needed by filters + speed).
+		systems.EvalRefValues(w, idx, e.Registry, e.Eval, e.EnvBuilder, e.agentRef)
+		a.Speed[idx] = e.agentRef.Speed
 		systems.Perceive(ctx, idx)
 	}
 
@@ -450,7 +454,6 @@ func (e *Engine) Tick() {
 	// 7. Charge nutrient costs (using per-agent evaluated costs).
 	for i := 0; i < a.Count; i++ {
 		systems.EvalRefValues(w, i, e.Registry, e.Eval, e.EnvBuilder, e.agentRef)
-		a.Speed[i] = e.agentRef.Speed
 		systems.ChargeNutrients(w, i, e.agentRef.BehaviorCosts)
 	}
 

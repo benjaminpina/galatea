@@ -68,6 +68,9 @@ type PerceptionContext struct {
 
 	// Agent attractiveness radii: [observed * numPerceivers + perceiverIdx]
 	AgentRadii []float64
+
+	// Per-agent reference values (set before each agent's perception).
+	Ref *AgentRef
 }
 
 // Perceive runs the full perception pipeline for agent at idx.
@@ -270,11 +273,13 @@ func applyBaseTendencies(ctx *PerceptionContext, idx int) {
 }
 
 // applyFilters zeroes out behaviors that are unavailable given current state.
+// This mirrors the legacy's VDecision filtering logic from ProveePercepciones.
 func applyFilters(ctx *PerceptionContext, idx int) {
 	w := ctx.World
 	a := w.Agents
 	cfg := w.Config
 	vdBase := idx * cfg.NumBehaviors
+	ref := ctx.Ref
 
 	fightDisplayIdx := behaviorOffsetFeed + cfg.NumResourceTypes
 	fightEscalateIdx := fightDisplayIdx + 1
@@ -282,7 +287,49 @@ func applyFilters(ctx *PerceptionContext, idx int) {
 	courtEscalateIdx := fightDisplayIdx + 3
 	ovipositIdx := fightDisplayIdx + 4
 
-	// Disable escalate if no display weight exists.
+	// --- Disable feeding if reserve is at max for that nutrient ---
+	if ref != nil {
+		for n := 0; n < cfg.NumResourceTypes && n < cfg.NumNutrients; n++ {
+			feedIdx := behaviorOffsetFeed + n
+			if feedIdx < cfg.NumBehaviors {
+				reserveBase := idx * cfg.NumNutrients
+				if n < len(ref.MaxReserves) && a.Reserves[reserveBase+n] >= ref.MaxReserves[n] {
+					a.VDecision[vdBase+feedIdx] = 0
+				}
+			}
+		}
+	}
+
+	// --- Disable fight if in refractory period ---
+	if ref != nil && ref.RefractoryCombat > 0 {
+		memBase := idx * cfg.NumBehaviors
+		// Check last retreat and last win-fight memory.
+		// Retreat is at fightDisplayIdx+4 relative to behavior offset.
+		retreatBehavior := fightDisplayIdx + 4
+		if retreatBehavior < cfg.NumBehaviors {
+			lastRetreat := a.MemoryLastBehavior[memBase+retreatBehavior]
+			if lastRetreat >= 0 && lastRetreat < int32(ref.RefractoryCombat) {
+				zeroIfValid(a.VDecision, vdBase+fightDisplayIdx, cfg.NumBehaviors)
+				zeroIfValid(a.VDecision, vdBase+fightEscalateIdx, cfg.NumBehaviors)
+			}
+		}
+	}
+
+	// --- Disable courtship if in refractory period ---
+	if ref != nil && ref.RefractoryCourtship > 0 {
+		memBase := idx * cfg.NumBehaviors
+		// Check last copulation (accept behavior = courtDisplayIdx + 2).
+		acceptBehavior := courtDisplayIdx + 2
+		if acceptBehavior < cfg.NumBehaviors {
+			lastCopulate := a.MemoryLastBehavior[memBase+acceptBehavior]
+			if lastCopulate >= 0 && lastCopulate < int32(ref.RefractoryCourtship) {
+				zeroIfValid(a.VDecision, vdBase+courtDisplayIdx, cfg.NumBehaviors)
+				zeroIfValid(a.VDecision, vdBase+courtEscalateIdx, cfg.NumBehaviors)
+			}
+		}
+	}
+
+	// --- Disable escalate if no display weight exists ---
 	if a.VDecision[vdBase+fightDisplayIdx] == 0 {
 		a.VDecision[vdBase+fightEscalateIdx] = 0
 	}
@@ -290,22 +337,37 @@ func applyFilters(ctx *PerceptionContext, idx int) {
 		a.VDecision[vdBase+courtEscalateIdx] = 0
 	}
 
-	// Disable oviposition for males or agents with no fertilized eggs.
+	// --- Disable oviposition for males, or if no fertilized eggs ---
 	if a.Sex[idx] == world.SexMale || a.FertilizedCount[idx] == 0 {
 		if ovipositIdx < cfg.NumBehaviors {
 			a.VDecision[vdBase+ovipositIdx] = 0
 		}
 	}
 
-	// Disable fight and courtship when reserves are critical.
-	if isReserveCritical(a, idx, cfg) {
+	// --- Disable fight and courtship when reserves are critical ---
+	if ref != nil {
+		isCritical := false
+		reserveBase := idx * cfg.NumNutrients
+		for n := 0; n < cfg.NumNutrients; n++ {
+			if n < len(ref.CriticalReserves) && a.Reserves[reserveBase+n] <= ref.CriticalReserves[n] {
+				isCritical = true
+				break
+			}
+		}
+		if isCritical {
+			zeroIfValid(a.VDecision, vdBase+fightDisplayIdx, cfg.NumBehaviors)
+			zeroIfValid(a.VDecision, vdBase+fightEscalateIdx, cfg.NumBehaviors)
+			zeroIfValid(a.VDecision, vdBase+courtDisplayIdx, cfg.NumBehaviors)
+			zeroIfValid(a.VDecision, vdBase+courtEscalateIdx, cfg.NumBehaviors)
+		}
+	} else if isReserveCritical(a, idx, cfg) {
 		zeroIfValid(a.VDecision, vdBase+fightDisplayIdx, cfg.NumBehaviors)
 		zeroIfValid(a.VDecision, vdBase+fightEscalateIdx, cfg.NumBehaviors)
 		zeroIfValid(a.VDecision, vdBase+courtDisplayIdx, cfg.NumBehaviors)
 		zeroIfValid(a.VDecision, vdBase+courtEscalateIdx, cfg.NumBehaviors)
 	}
 
-	// Clamp negative values to 0.
+	// --- Clamp negative values to 0 ---
 	for b := 0; b < cfg.NumBehaviors; b++ {
 		if a.VDecision[vdBase+b] < 0 {
 			a.VDecision[vdBase+b] = 0
