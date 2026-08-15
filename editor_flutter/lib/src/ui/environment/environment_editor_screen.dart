@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:drift/drift.dart' hide Column;
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -492,9 +494,21 @@ class _EnvironmentEditorScreenState
   }
 
   Future<void> _placeAgent(int x, int y) async {
+    if (_selectedPrototypeId == null) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Select a prototype first before placing an agent.'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+      return;
+    }
     final envDao = ref.read(environmentDaoProvider);
     if (envDao == null) return;
     final name = 'Agent${_agents.length + 1}';
+    final randomOrientation = Random().nextInt(8) + 1; // 1..8
     final id = await envDao.placeAgent(
       EnvironmentAgentsCompanion.insert(
         environmentId: widget.environmentId,
@@ -502,7 +516,8 @@ class _EnvironmentEditorScreenState
         posX: x,
         posY: y,
         sex: _selectedSex,
-        prototypeId: Value(_selectedPrototypeId),
+        prototypeId: _selectedPrototypeId!,
+        orientation: Value(randomOrientation),
       ),
     );
     setState(() {
@@ -513,9 +528,10 @@ class _EnvironmentEditorScreenState
           posY: y,
           name: name,
           sex: _selectedSex,
-          prototypeId: _selectedPrototypeId,
+          prototypeId: _selectedPrototypeId!,
           stageId: null,
           age: 0,
+          orientation: randomOrientation,
         ),
       );
       _selectedElement = _agents.last;
@@ -981,6 +997,10 @@ class _EnvironmentEditorScreenState
     for (final nut in nutrients) {
       nutrientColorMap[nut.id] = Color(nut.color);
     }
+    final prototypeColorMap = <int, Color>{};
+    for (final proto in prototypes) {
+      prototypeColorMap[proto.id] = Color(proto.color | 0xFF000000);
+    }
 
     final scheme = Theme.of(context).colorScheme;
 
@@ -1036,13 +1056,16 @@ class _EnvironmentEditorScreenState
                     onDefaultSubstrateChanged: _onDefaultSubstrateChanged,
                     stages: stages,
                     onElementUpdated: _reloadPlacedElements,
-                    db: ref.read(databaseProvider),
                   ),
                 ),
                 const VerticalDivider(width: 1),
                 // --- Center: canvas ---
                 Expanded(
-                  child: _buildCanvas(substrateColorMap, nutrientColorMap),
+                  child: _buildCanvas(
+                    substrateColorMap,
+                    nutrientColorMap,
+                    prototypeColorMap,
+                  ),
                 ),
                 // --- Right panel: config editor (togglable) ---
                 if (_openSection != null) ...[
@@ -1160,6 +1183,7 @@ class _EnvironmentEditorScreenState
   Widget _buildCanvas(
     Map<int, Color> substrateColorMap,
     Map<int, Color> nutrientColorMap,
+    Map<int, Color> prototypeColorMap,
   ) {
     if (_envWidth == 0 || _envHeight == 0) {
       return const Center(child: CircularProgressIndicator());
@@ -1198,6 +1222,7 @@ class _EnvironmentEditorScreenState
                               offset: _offset,
                               substrateColorMap: substrateColorMap,
                               nutrientColorMap: nutrientColorMap,
+                              prototypeColorMap: prototypeColorMap,
                               sources: _sources,
                               oviSites: _oviSites,
                               agents: _agents,

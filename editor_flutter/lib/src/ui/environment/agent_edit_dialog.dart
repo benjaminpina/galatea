@@ -26,7 +26,7 @@ class _AgentEditDialogState extends ConsumerState<AgentEditDialog> {
   late String _sex;
   late int _orientation;
   late bool _virgin;
-  int? _prototypeId;
+  late int _prototypeId;
   int? _stageId;
 
   // Reserves
@@ -217,19 +217,15 @@ class _AgentEditDialogState extends ConsumerState<AgentEditDialog> {
                 Row(
                   children: [
                     Expanded(
-                      child: DropdownButtonFormField<int?>(
+                      child: DropdownButtonFormField<int>(
                         initialValue:
                             prototypes.any((p) => p.id == _prototypeId)
                             ? _prototypeId
-                            : null,
+                            : prototypes.first.id,
                         decoration: const InputDecoration(
                           labelText: 'Prototype',
                         ),
                         items: [
-                          const DropdownMenuItem(
-                            value: null,
-                            child: Text('None'),
-                          ),
                           ...prototypes.map(
                             (p) => DropdownMenuItem(
                               value: p.id,
@@ -237,7 +233,9 @@ class _AgentEditDialogState extends ConsumerState<AgentEditDialog> {
                             ),
                           ),
                         ],
-                        onChanged: (v) => setState(() => _prototypeId = v),
+                        onChanged: (v) {
+                          if (v != null) setState(() => _prototypeId = v);
+                        },
                       ),
                     ),
                     const SizedBox(width: 12),

@@ -1,4 +1,3 @@
-import 'package:drift/drift.dart' hide Column;
 import 'package:flutter/material.dart';
 
 import '../../database/database.dart';
@@ -37,7 +36,6 @@ class LeftSidebar extends StatelessWidget {
     required this.onDefaultSubstrateChanged,
     this.stages = const [],
     this.onElementUpdated,
-    this.db,
   });
 
   final EditorTool currentTool;
@@ -66,7 +64,6 @@ class LeftSidebar extends StatelessWidget {
   final ValueChanged<int> onDefaultSubstrateChanged;
   final List<Stage> stages;
   final VoidCallback? onElementUpdated;
-  final AppDatabase? db;
 
   @override
   Widget build(BuildContext context) {
@@ -565,29 +562,34 @@ class LeftSidebar extends StatelessWidget {
   }
 
   Widget _agentProps(BuildContext context, PlacedAgent a) {
-    if (db == null) {
-      return const Text('No database', style: TextStyle(fontSize: 11));
-    }
+    final proto =
+        prototypes
+            .where((p) => p.id == a.prototypeId)
+            .map((p) => p.name)
+            .firstOrNull ??
+        '—';
+    final stage =
+        stages.where((s) => s.id == a.stageId).map((s) => s.name).firstOrNull ??
+        '—';
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _AgentPropertiesEditor(
-          key: ValueKey('agent_props_${a.id}'),
-          agent: a,
-          prototypes: prototypes,
-          stages: stages,
-          nutrients: nutrients,
-          db: db!,
-          onUpdated: onElementUpdated,
+        _PropTable(
+          rows: [
+            ('Name', a.name),
+            ('Pos', '(${a.posX}, ${a.posY})'),
+            ('Sex', a.sex == 'M' ? 'Male' : 'Female'),
+            ('Proto', proto),
+            ('Stage', stage),
+            ('Age', '${a.age}'),
+            ('Orient.', _dirLabel(a.orientation)),
+          ],
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 10),
         Center(
-          child: OutlinedButton.icon(
-            icon: const Icon(Icons.open_in_new, size: 14),
-            label: const Text(
-              'Edit all details',
-              style: TextStyle(fontSize: 11),
-            ),
+          child: FilledButton.icon(
+            icon: const Icon(Icons.edit, size: 14),
+            label: const Text('Edit agent', style: TextStyle(fontSize: 11)),
             onPressed: () async {
               final result = await Navigator.push<bool>(
                 context,
@@ -599,6 +601,12 @@ class LeftSidebar extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  static String _dirLabel(int dir) {
+    const labels = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+    if (dir >= 1 && dir <= 8) return labels[dir - 1];
+    return '?';
   }
 }
 
@@ -778,397 +786,6 @@ class _BrushShapeBtn extends StatelessWidget {
             color: active ? scheme.onPrimaryContainer : scheme.onSurface,
           ),
         ),
-      ),
-    );
-  }
-}
-
-/// Editable properties panel for a placed agent.
-/// Allows editing name, age, sex, stage, prototype, and per-nutrient reserves.
-class _AgentPropertiesEditor extends StatefulWidget {
-  const _AgentPropertiesEditor({
-    super.key,
-    required this.agent,
-    required this.prototypes,
-    required this.stages,
-    required this.nutrients,
-    required this.db,
-    this.onUpdated,
-  });
-
-  final PlacedAgent agent;
-  final List<Prototype> prototypes;
-  final List<Stage> stages;
-  final List<Nutrient> nutrients;
-  final AppDatabase db;
-  final VoidCallback? onUpdated;
-
-  @override
-  State<_AgentPropertiesEditor> createState() => _AgentPropertiesEditorState();
-}
-
-class _AgentPropertiesEditorState extends State<_AgentPropertiesEditor> {
-  late TextEditingController _nameCtrl;
-  late TextEditingController _ageCtrl;
-  Map<int, double> _reserves = {};
-  Future<Map<int, double>>? _reservesFuture;
-
-  @override
-  void initState() {
-    super.initState();
-    _nameCtrl = TextEditingController(text: widget.agent.name);
-    _ageCtrl = TextEditingController(text: '${widget.agent.age}');
-    _reservesFuture = _fetchReserves();
-  }
-
-  @override
-  void didUpdateWidget(covariant _AgentPropertiesEditor oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.agent.id != widget.agent.id) {
-      _nameCtrl.text = widget.agent.name;
-      _ageCtrl.text = '${widget.agent.age}';
-      _reservesFuture = _fetchReserves();
-    }
-  }
-
-  @override
-  void dispose() {
-    _nameCtrl.dispose();
-    _ageCtrl.dispose();
-    super.dispose();
-  }
-
-  Future<Map<int, double>> _fetchReserves() async {
-    final rows = await (widget.db.select(
-      widget.db.environmentAgentReserves,
-    )..where((t) => t.agentId.equals(widget.agent.id))).get();
-    final map = <int, double>{};
-    for (final r in rows) {
-      map[r.nutrientId] = r.initialLevel;
-    }
-    _reserves = map;
-    return map;
-  }
-
-  Future<void> _saveName() async {
-    final db = widget.db;
-    final name = _nameCtrl.text.trim();
-    if (name.isEmpty) return;
-    await (db.update(db.environmentAgents)
-          ..where((t) => t.id.equals(widget.agent.id)))
-        .write(EnvironmentAgentsCompanion(name: Value(name)));
-    widget.onUpdated?.call();
-  }
-
-  Future<void> _saveAge() async {
-    final db = widget.db;
-    final age = int.tryParse(_ageCtrl.text.trim()) ?? 0;
-    await (db.update(db.environmentAgents)
-          ..where((t) => t.id.equals(widget.agent.id)))
-        .write(EnvironmentAgentsCompanion(age: Value(age)));
-    widget.onUpdated?.call();
-  }
-
-  Future<void> _saveSex(String sex) async {
-    final db = widget.db;
-    await (db.update(db.environmentAgents)
-          ..where((t) => t.id.equals(widget.agent.id)))
-        .write(EnvironmentAgentsCompanion(sex: Value(sex)));
-    widget.onUpdated?.call();
-  }
-
-  Future<void> _savePrototype(int? protoId) async {
-    final db = widget.db;
-    await (db.update(db.environmentAgents)
-          ..where((t) => t.id.equals(widget.agent.id)))
-        .write(EnvironmentAgentsCompanion(prototypeId: Value(protoId)));
-    widget.onUpdated?.call();
-  }
-
-  Future<void> _saveStage(int? stageId) async {
-    final db = widget.db;
-    await (db.update(db.environmentAgents)
-          ..where((t) => t.id.equals(widget.agent.id)))
-        .write(EnvironmentAgentsCompanion(stageId: Value(stageId)));
-    widget.onUpdated?.call();
-  }
-
-  Future<void> _saveReserve(int nutrientId, double level) async {
-    final db = widget.db;
-    final existing =
-        await (db.select(db.environmentAgentReserves)..where(
-              (t) =>
-                  t.agentId.equals(widget.agent.id) &
-                  t.nutrientId.equals(nutrientId),
-            ))
-            .getSingleOrNull();
-    if (existing == null) {
-      await db
-          .into(db.environmentAgentReserves)
-          .insert(
-            EnvironmentAgentReservesCompanion.insert(
-              agentId: widget.agent.id,
-              nutrientId: nutrientId,
-              initialLevel: Value(level),
-            ),
-          );
-    } else {
-      await (db.update(db.environmentAgentReserves)
-            ..where((t) => t.id.equals(existing.id)))
-          .write(EnvironmentAgentReservesCompanion(initialLevel: Value(level)));
-    }
-    setState(() => _reserves[nutrientId] = level);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final a = widget.agent;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Position (read-only)
-        _propRow('Pos', '(${a.posX}, ${a.posY})'),
-        const SizedBox(height: 6),
-
-        // Name
-        TextField(
-          controller: _nameCtrl,
-          style: const TextStyle(fontSize: 11),
-          decoration: const InputDecoration(
-            labelText: 'Name',
-            labelStyle: TextStyle(fontSize: 10),
-            isDense: true,
-            contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-            border: OutlineInputBorder(),
-          ),
-          onSubmitted: (_) => _saveName(),
-        ),
-        const SizedBox(height: 6),
-
-        // Age
-        TextField(
-          controller: _ageCtrl,
-          keyboardType: TextInputType.number,
-          style: const TextStyle(fontSize: 11),
-          decoration: const InputDecoration(
-            labelText: 'Age (ticks)',
-            labelStyle: TextStyle(fontSize: 10),
-            isDense: true,
-            contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-            border: OutlineInputBorder(),
-          ),
-          onSubmitted: (_) => _saveAge(),
-        ),
-        const SizedBox(height: 6),
-
-        // Sex
-        Row(
-          children: [
-            const Text('Sex:', style: TextStyle(fontSize: 10)),
-            const SizedBox(width: 8),
-            SegmentedButton<String>(
-              segments: const [
-                ButtonSegment(value: 'M', label: Text('M')),
-                ButtonSegment(value: 'F', label: Text('F')),
-              ],
-              selected: {a.sex},
-              onSelectionChanged: (s) => _saveSex(s.first),
-              style: const ButtonStyle(
-                visualDensity: VisualDensity.compact,
-                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 6),
-
-        // Prototype
-        DropdownButtonFormField<int?>(
-          initialValue: widget.prototypes.any((p) => p.id == a.prototypeId)
-              ? a.prototypeId
-              : null,
-          isDense: true,
-          isExpanded: true,
-          decoration: const InputDecoration(
-            labelText: 'Prototype',
-            labelStyle: TextStyle(fontSize: 10),
-            isDense: true,
-            contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-            border: OutlineInputBorder(),
-          ),
-          style: TextStyle(fontSize: 11, color: scheme.onSurface),
-          items: [
-            const DropdownMenuItem(value: null, child: Text('None')),
-            ...widget.prototypes.map(
-              (p) => DropdownMenuItem(
-                value: p.id,
-                child: Text('${p.name} (${p.sex})'),
-              ),
-            ),
-          ],
-          onChanged: (v) => _savePrototype(v),
-        ),
-        const SizedBox(height: 6),
-
-        // Stage
-        DropdownButtonFormField<int?>(
-          initialValue: widget.stages.any((s) => s.id == a.stageId)
-              ? a.stageId
-              : null,
-          isDense: true,
-          isExpanded: true,
-          decoration: const InputDecoration(
-            labelText: 'Stage',
-            labelStyle: TextStyle(fontSize: 10),
-            isDense: true,
-            contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-            border: OutlineInputBorder(),
-          ),
-          style: TextStyle(fontSize: 11, color: scheme.onSurface),
-          items: [
-            const DropdownMenuItem(value: null, child: Text('None')),
-            ...widget.stages.map(
-              (s) => DropdownMenuItem(value: s.id, child: Text(s.name)),
-            ),
-          ],
-          onChanged: (v) => _saveStage(v),
-        ),
-        const SizedBox(height: 10),
-
-        // Nutrient reserves
-        if (widget.nutrients.isNotEmpty) ...[
-          Text(
-            'Initial Reserves',
-            style: TextStyle(
-              fontSize: 10,
-              fontWeight: FontWeight.w600,
-              color: scheme.onSurfaceVariant,
-            ),
-          ),
-          const SizedBox(height: 4),
-          FutureBuilder<Map<int, double>>(
-            future: _reservesFuture,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState != ConnectionState.done) {
-                return const SizedBox(
-                  height: 2,
-                  child: LinearProgressIndicator(),
-                );
-              }
-              final reserves = snapshot.data ?? {};
-              return Column(
-                children: widget.nutrients.map((n) {
-                  final level = reserves[n.id] ?? 50.0;
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 2),
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 8,
-                          height: 8,
-                          decoration: BoxDecoration(
-                            color: Color(n.color),
-                            shape: BoxShape.circle,
-                          ),
-                        ),
-                        const SizedBox(width: 4),
-                        SizedBox(
-                          width: 45,
-                          child: Text(
-                            n.name,
-                            style: const TextStyle(fontSize: 9),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        Expanded(
-                          child: _ReserveSlider(
-                            value: level,
-                            onChanged: (v) => _saveReserve(n.id, v),
-                          ),
-                        ),
-                        SizedBox(
-                          width: 28,
-                          child: Text(
-                            level.round().toString(),
-                            style: const TextStyle(fontSize: 9),
-                            textAlign: TextAlign.right,
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                }).toList(),
-              );
-            },
-          ),
-        ],
-      ],
-    );
-  }
-
-  Widget _propRow(String label, String value) {
-    return Row(
-      children: [
-        SizedBox(
-          width: 40,
-          child: Text(
-            label,
-            style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600),
-          ),
-        ),
-        Expanded(child: Text(value, style: const TextStyle(fontSize: 10))),
-      ],
-    );
-  }
-}
-
-/// Slider for nutrient reserve levels (0–100).
-class _ReserveSlider extends StatefulWidget {
-  const _ReserveSlider({required this.value, required this.onChanged});
-  final double value;
-  final ValueChanged<double> onChanged;
-
-  @override
-  State<_ReserveSlider> createState() => _ReserveSliderState();
-}
-
-class _ReserveSliderState extends State<_ReserveSlider> {
-  late double _current;
-
-  @override
-  void initState() {
-    super.initState();
-    _current = widget.value;
-  }
-
-  @override
-  void didUpdateWidget(covariant _ReserveSlider oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.value != widget.value) {
-      _current = widget.value;
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return SliderTheme(
-      data: SliderThemeData(
-        trackHeight: 3,
-        thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 5),
-        overlayShape: const RoundSliderOverlayShape(overlayRadius: 10),
-        activeTrackColor: Theme.of(context).colorScheme.primary,
-        inactiveTrackColor: Theme.of(
-          context,
-        ).colorScheme.surfaceContainerHighest,
-      ),
-      child: Slider(
-        min: 0,
-        max: 100,
-        value: _current,
-        onChanged: (v) => setState(() => _current = v),
-        onChangeEnd: widget.onChanged,
       ),
     );
   }

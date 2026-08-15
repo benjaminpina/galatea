@@ -8217,9 +8217,9 @@ class $EnvironmentAgentsTable extends EnvironmentAgents
   late final GeneratedColumn<int> prototypeId = GeneratedColumn<int>(
     'prototype_id',
     aliasedName,
-    true,
+    false,
     type: DriftSqlType.int,
-    requiredDuringInsert: false,
+    requiredDuringInsert: true,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
       'REFERENCES prototypes (id)',
     ),
@@ -8398,6 +8398,8 @@ class $EnvironmentAgentsTable extends EnvironmentAgents
           _prototypeIdMeta,
         ),
       );
+    } else if (isInserting) {
+      context.missing(_prototypeIdMeta);
     }
     if (data.containsKey('sex')) {
       context.handle(
@@ -8497,7 +8499,7 @@ class $EnvironmentAgentsTable extends EnvironmentAgents
       prototypeId: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}prototype_id'],
-      ),
+      )!,
       sex: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}sex'],
@@ -8547,7 +8549,7 @@ class EnvironmentAgent extends DataClass
   final int posX;
   final int posY;
   final int? stageId;
-  final int? prototypeId;
+  final int prototypeId;
   final String sex;
   final int age;
   final int orientation;
@@ -8563,7 +8565,7 @@ class EnvironmentAgent extends DataClass
     required this.posX,
     required this.posY,
     this.stageId,
-    this.prototypeId,
+    required this.prototypeId,
     required this.sex,
     required this.age,
     required this.orientation,
@@ -8584,9 +8586,7 @@ class EnvironmentAgent extends DataClass
     if (!nullToAbsent || stageId != null) {
       map['stage_id'] = Variable<int>(stageId);
     }
-    if (!nullToAbsent || prototypeId != null) {
-      map['prototype_id'] = Variable<int>(prototypeId);
-    }
+    map['prototype_id'] = Variable<int>(prototypeId);
     map['sex'] = Variable<String>(sex);
     map['age'] = Variable<int>(age);
     map['orientation'] = Variable<int>(orientation);
@@ -8608,9 +8608,7 @@ class EnvironmentAgent extends DataClass
       stageId: stageId == null && nullToAbsent
           ? const Value.absent()
           : Value(stageId),
-      prototypeId: prototypeId == null && nullToAbsent
-          ? const Value.absent()
-          : Value(prototypeId),
+      prototypeId: Value(prototypeId),
       sex: Value(sex),
       age: Value(age),
       orientation: Value(orientation),
@@ -8634,7 +8632,7 @@ class EnvironmentAgent extends DataClass
       posX: serializer.fromJson<int>(json['posX']),
       posY: serializer.fromJson<int>(json['posY']),
       stageId: serializer.fromJson<int?>(json['stageId']),
-      prototypeId: serializer.fromJson<int?>(json['prototypeId']),
+      prototypeId: serializer.fromJson<int>(json['prototypeId']),
       sex: serializer.fromJson<String>(json['sex']),
       age: serializer.fromJson<int>(json['age']),
       orientation: serializer.fromJson<int>(json['orientation']),
@@ -8655,7 +8653,7 @@ class EnvironmentAgent extends DataClass
       'posX': serializer.toJson<int>(posX),
       'posY': serializer.toJson<int>(posY),
       'stageId': serializer.toJson<int?>(stageId),
-      'prototypeId': serializer.toJson<int?>(prototypeId),
+      'prototypeId': serializer.toJson<int>(prototypeId),
       'sex': serializer.toJson<String>(sex),
       'age': serializer.toJson<int>(age),
       'orientation': serializer.toJson<int>(orientation),
@@ -8674,7 +8672,7 @@ class EnvironmentAgent extends DataClass
     int? posX,
     int? posY,
     Value<int?> stageId = const Value.absent(),
-    Value<int?> prototypeId = const Value.absent(),
+    int? prototypeId,
     String? sex,
     int? age,
     int? orientation,
@@ -8690,7 +8688,7 @@ class EnvironmentAgent extends DataClass
     posX: posX ?? this.posX,
     posY: posY ?? this.posY,
     stageId: stageId.present ? stageId.value : this.stageId,
-    prototypeId: prototypeId.present ? prototypeId.value : this.prototypeId,
+    prototypeId: prototypeId ?? this.prototypeId,
     sex: sex ?? this.sex,
     age: age ?? this.age,
     orientation: orientation ?? this.orientation,
@@ -8800,7 +8798,7 @@ class EnvironmentAgentsCompanion extends UpdateCompanion<EnvironmentAgent> {
   final Value<int> posX;
   final Value<int> posY;
   final Value<int?> stageId;
-  final Value<int?> prototypeId;
+  final Value<int> prototypeId;
   final Value<String> sex;
   final Value<int> age;
   final Value<int> orientation;
@@ -8833,7 +8831,7 @@ class EnvironmentAgentsCompanion extends UpdateCompanion<EnvironmentAgent> {
     required int posX,
     required int posY,
     this.stageId = const Value.absent(),
-    this.prototypeId = const Value.absent(),
+    required int prototypeId,
     required String sex,
     this.age = const Value.absent(),
     this.orientation = const Value.absent(),
@@ -8846,6 +8844,7 @@ class EnvironmentAgentsCompanion extends UpdateCompanion<EnvironmentAgent> {
        name = Value(name),
        posX = Value(posX),
        posY = Value(posY),
+       prototypeId = Value(prototypeId),
        sex = Value(sex);
   static Insertable<EnvironmentAgent> custom({
     Expression<int>? id,
@@ -8890,7 +8889,7 @@ class EnvironmentAgentsCompanion extends UpdateCompanion<EnvironmentAgent> {
     Value<int>? posX,
     Value<int>? posY,
     Value<int?>? stageId,
-    Value<int?>? prototypeId,
+    Value<int>? prototypeId,
     Value<String>? sex,
     Value<int>? age,
     Value<int>? orientation,
@@ -26880,7 +26879,7 @@ typedef $$EnvironmentAgentsTableCreateCompanionBuilder =
       required int posX,
       required int posY,
       Value<int?> stageId,
-      Value<int?> prototypeId,
+      required int prototypeId,
       required String sex,
       Value<int> age,
       Value<int> orientation,
@@ -26898,7 +26897,7 @@ typedef $$EnvironmentAgentsTableUpdateCompanionBuilder =
       Value<int> posX,
       Value<int> posY,
       Value<int?> stageId,
-      Value<int?> prototypeId,
+      Value<int> prototypeId,
       Value<String> sex,
       Value<int> age,
       Value<int> orientation,
@@ -26960,9 +26959,9 @@ final class $$EnvironmentAgentsTableReferences
   static $PrototypesTable _prototypeIdTable(_$AppDatabase db) => db.prototypes
       .createAlias('environment_agents__prototype_id__prototypes__id');
 
-  $$PrototypesTableProcessedTableManager? get prototypeId {
-    final $_column = $_itemColumn<int>('prototype_id');
-    if ($_column == null) return null;
+  $$PrototypesTableProcessedTableManager get prototypeId {
+    final $_column = $_itemColumn<int>('prototype_id')!;
+
     final manager = $$PrototypesTableTableManager(
       $_db,
       $_db.prototypes,
@@ -27578,7 +27577,7 @@ class $$EnvironmentAgentsTableTableManager
                 Value<int> posX = const Value.absent(),
                 Value<int> posY = const Value.absent(),
                 Value<int?> stageId = const Value.absent(),
-                Value<int?> prototypeId = const Value.absent(),
+                Value<int> prototypeId = const Value.absent(),
                 Value<String> sex = const Value.absent(),
                 Value<int> age = const Value.absent(),
                 Value<int> orientation = const Value.absent(),
@@ -27612,7 +27611,7 @@ class $$EnvironmentAgentsTableTableManager
                 required int posX,
                 required int posY,
                 Value<int?> stageId = const Value.absent(),
-                Value<int?> prototypeId = const Value.absent(),
+                required int prototypeId,
                 required String sex,
                 Value<int> age = const Value.absent(),
                 Value<int> orientation = const Value.absent(),

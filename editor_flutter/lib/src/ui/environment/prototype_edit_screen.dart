@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../database/database.dart';
 import '../../providers/database_provider.dart';
 import '../formula/formula_field.dart';
+import '../substrates/substrate_list_screen.dart';
 
 /// Dedicated edit screen for a single prototype.
 /// Tabs: General, Morphology, Fighting, Courtship, Movement.
@@ -29,6 +30,7 @@ class _PrototypeEditScreenState extends ConsumerState<PrototypeEditScreen>
   final _refCourtshipCtrl = TextEditingController();
   final _ratioMalesCtrl = TextEditingController();
   final _ratioFemalesCtrl = TextEditingController();
+  int _color = 0;
 
   @override
   void initState() {
@@ -64,6 +66,7 @@ class _PrototypeEditScreenState extends ConsumerState<PrototypeEditScreen>
       _refCourtshipCtrl.text = proto.refractoryCourtshipFormula;
       _ratioMalesCtrl.text = proto.sexRatioMalesFormula;
       _ratioFemalesCtrl.text = proto.sexRatioFemalesFormula;
+      _color = proto.color;
     });
   }
 
@@ -80,6 +83,7 @@ class _PrototypeEditScreenState extends ConsumerState<PrototypeEditScreen>
         refractoryCourtshipFormula: Value(_refCourtshipCtrl.text.trim()),
         sexRatioMalesFormula: Value(_ratioMalesCtrl.text.trim()),
         sexRatioFemalesFormula: Value(_ratioFemalesCtrl.text.trim()),
+        color: Value(_color),
       ),
     );
     if (mounted) {
@@ -89,6 +93,14 @@ class _PrototypeEditScreenState extends ConsumerState<PrototypeEditScreen>
           duration: Duration(seconds: 1),
         ),
       );
+    }
+  }
+
+  Future<void> _pickColor() async {
+    final current = _color != 0 ? Color(_color | 0xFF000000) : Colors.grey;
+    final picked = await SubstrateListScreen.pickColor(context, current);
+    if (picked != null) {
+      setState(() => _color = picked.toARGB32() & 0x00FFFFFF);
     }
   }
 
@@ -140,6 +152,37 @@ class _PrototypeEditScreenState extends ConsumerState<PrototypeEditScreen>
         TextField(
           controller: _nameCtrl,
           decoration: const InputDecoration(labelText: 'Name'),
+        ),
+        const SizedBox(height: 12),
+        // Color picker
+        Row(
+          children: [
+            const Text('Body color:', style: TextStyle(fontSize: 13)),
+            const SizedBox(width: 12),
+            GestureDetector(
+              onTap: _pickColor,
+              child: Container(
+                width: 28,
+                height: 28,
+                decoration: BoxDecoration(
+                  color: _color != 0
+                      ? Color(_color | 0xFF000000)
+                      : Colors.grey.shade600,
+                  border: Border.all(
+                    color: Theme.of(context).colorScheme.outline,
+                  ),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              _color != 0
+                  ? '#${(_color & 0xFFFFFF).toRadixString(16).padLeft(6, '0').toUpperCase()}'
+                  : 'Not set',
+              style: const TextStyle(fontSize: 11, fontFamily: 'monospace'),
+            ),
+          ],
         ),
         const SizedBox(height: 12),
         FormulaField(

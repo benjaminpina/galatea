@@ -135,7 +135,7 @@ class PlacedAgent extends PlacedElement {
   final int posY;
   final String name;
   final String sex;
-  final int? prototypeId;
+  final int prototypeId;
   final int? stageId;
   final int age;
   final int orientation; // 1..8

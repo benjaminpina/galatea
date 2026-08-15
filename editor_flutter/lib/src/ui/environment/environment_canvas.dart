@@ -14,6 +14,7 @@ class EnvironmentCanvasPainter extends CustomPainter {
     required this.offset,
     required this.substrateColorMap,
     required this.nutrientColorMap,
+    required this.prototypeColorMap,
     required this.sources,
     required this.oviSites,
     required this.agents,
@@ -30,6 +31,7 @@ class EnvironmentCanvasPainter extends CustomPainter {
   final Offset offset;
   final Map<int, Color> substrateColorMap;
   final Map<int, Color> nutrientColorMap;
+  final Map<int, Color> prototypeColorMap;
   final List<PlacedSource> sources;
   final List<PlacedOvipositionSite> oviSites;
   final List<PlacedAgent> agents;
@@ -145,53 +147,92 @@ class EnvironmentCanvasPainter extends CustomPainter {
       if (!_isVisible(rect, size)) continue;
 
       final center = rect.center;
-      final radius = cellSize * 0.35;
+      final r = cellSize * 0.4;
 
-      // Triangle pointing up for agents.
+      // Orientation angle: 1=N, 2=NE, 3=E, 4=SE, 5=S, 6=SW, 7=W, 8=NW
+      const angles = <int, double>{
+        1: -1.5708, // N
+        2: -0.7854, // NE
+        3: 0.0, // E
+        4: 0.7854, // SE
+        5: 1.5708, // S
+        6: 2.3562, // SW
+        7: 3.1416, // W
+        8: -2.3562, // NW
+      };
+      final angle = angles[agent.orientation] ?? -1.5708;
+
+      // Colors: head = sex color, body = prototype color.
       final isMale = agent.sex == 'M';
-      final color = isMale ? Colors.blue : Colors.pinkAccent;
+      final headColor = isMale
+          ? const Color(0xFF5599EE) // blue for male
+          : const Color(0xFFEE6699); // pink for female
+      final bodyColor =
+          prototypeColorMap[agent.prototypeId] ??
+          (isMale ? const Color(0xFF336699) : const Color(0xFF993366));
 
-      if (isMale) {
-        // Upward triangle.
-        final path = Path()
-          ..moveTo(center.dx, center.dy - radius)
-          ..lineTo(center.dx + radius, center.dy + radius * 0.7)
-          ..lineTo(center.dx - radius, center.dy + radius * 0.7)
-          ..close();
-        canvas.drawPath(
-          path,
-          Paint()
-            ..color = color
-            ..style = PaintingStyle.fill,
+      canvas.save();
+      canvas.translate(center.dx, center.dy);
+      canvas.rotate(angle);
+
+      // --- Body circle (larger, at back) ---
+      final bodyRadius = r * 0.55;
+      final bodyCenter = Offset(-r * 0.2, 0);
+      canvas.drawCircle(bodyCenter, bodyRadius, Paint()..color = bodyColor);
+      canvas.drawCircle(
+        bodyCenter,
+        bodyRadius,
+        Paint()
+          ..color = Colors.black26
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 0.8,
+      );
+
+      // --- Head circle (smaller, at front) ---
+      final headRadius = r * 0.38;
+      final headCenter = Offset(r * 0.4, 0);
+      canvas.drawCircle(headCenter, headRadius, Paint()..color = headColor);
+      canvas.drawCircle(
+        headCenter,
+        headRadius,
+        Paint()
+          ..color = Colors.black38
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 0.8,
+      );
+
+      // --- Eyes on the head (when zoomed in enough) ---
+      if (cellSize >= 10) {
+        final eyeR = headRadius * 0.25;
+        final eyeX = headCenter.dx + headRadius * 0.35;
+        final eyeSpread = headRadius * 0.45;
+        final eyePaint = Paint()..color = Colors.white;
+        final pupilPaint = Paint()..color = Colors.black;
+
+        canvas.drawCircle(Offset(eyeX, -eyeSpread), eyeR, eyePaint);
+        canvas.drawCircle(
+          Offset(eyeX + eyeR * 0.2, -eyeSpread),
+          eyeR * 0.55,
+          pupilPaint,
         );
-        canvas.drawPath(
-          path,
-          Paint()
-            ..color = Colors.white
-            ..style = PaintingStyle.stroke
-            ..strokeWidth = 1.2,
-        );
-      } else {
-        // Downward triangle.
-        final path = Path()
-          ..moveTo(center.dx, center.dy + radius)
-          ..lineTo(center.dx + radius, center.dy - radius * 0.7)
-          ..lineTo(center.dx - radius, center.dy - radius * 0.7)
-          ..close();
-        canvas.drawPath(
-          path,
-          Paint()
-            ..color = color
-            ..style = PaintingStyle.fill,
-        );
-        canvas.drawPath(
-          path,
-          Paint()
-            ..color = Colors.white
-            ..style = PaintingStyle.stroke
-            ..strokeWidth = 1.2,
+        canvas.drawCircle(Offset(eyeX, eyeSpread), eyeR, eyePaint);
+        canvas.drawCircle(
+          Offset(eyeX + eyeR * 0.2, eyeSpread),
+          eyeR * 0.55,
+          pupilPaint,
         );
       }
+
+      // --- Egg indicator: white dot on body for females with eggs ---
+      if (!isMale && agent.fertilizedEggs > 0) {
+        canvas.drawCircle(
+          bodyCenter,
+          bodyRadius * 0.3,
+          Paint()..color = Colors.white,
+        );
+      }
+
+      canvas.restore();
     }
   }
 

@@ -163,8 +163,7 @@ class EnvironmentAgents extends Table {
   IntColumn get posX => integer()();
   IntColumn get posY => integer()();
   IntColumn get stageId => integer().nullable().references(Stages, #id)();
-  IntColumn get prototypeId =>
-      integer().nullable().references(Prototypes, #id)();
+  IntColumn get prototypeId => integer().references(Prototypes, #id)();
   TextColumn get sex => text()();
   IntColumn get age => integer().withDefault(const Constant(0))();
   IntColumn get orientation =>
