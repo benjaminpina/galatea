@@ -8243,6 +8243,79 @@ class $EnvironmentAgentsTable extends EnvironmentAgents
     requiredDuringInsert: false,
     defaultValue: const Constant(0),
   );
+  static const VerificationMeta _orientationMeta = const VerificationMeta(
+    'orientation',
+  );
+  @override
+  late final GeneratedColumn<int> orientation = GeneratedColumn<int>(
+    'orientation',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(1),
+  );
+  static const VerificationMeta _cyclesInStageMeta = const VerificationMeta(
+    'cyclesInStage',
+  );
+  @override
+  late final GeneratedColumn<int> cyclesInStage = GeneratedColumn<int>(
+    'cycles_in_stage',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _gametesMeta = const VerificationMeta(
+    'gametes',
+  );
+  @override
+  late final GeneratedColumn<int> gametes = GeneratedColumn<int>(
+    'gametes',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _fertilizedEggsMeta = const VerificationMeta(
+    'fertilizedEggs',
+  );
+  @override
+  late final GeneratedColumn<int> fertilizedEggs = GeneratedColumn<int>(
+    'fertilized_eggs',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _storedSpermPacksMeta = const VerificationMeta(
+    'storedSpermPacks',
+  );
+  @override
+  late final GeneratedColumn<int> storedSpermPacks = GeneratedColumn<int>(
+    'stored_sperm_packs',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _virginMeta = const VerificationMeta('virgin');
+  @override
+  late final GeneratedColumn<bool> virgin = GeneratedColumn<bool>(
+    'virgin',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("virgin" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -8254,6 +8327,12 @@ class $EnvironmentAgentsTable extends EnvironmentAgents
     prototypeId,
     sex,
     age,
+    orientation,
+    cyclesInStage,
+    gametes,
+    fertilizedEggs,
+    storedSpermPacks,
+    virgin,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -8334,6 +8413,54 @@ class $EnvironmentAgentsTable extends EnvironmentAgents
         age.isAcceptableOrUnknown(data['age']!, _ageMeta),
       );
     }
+    if (data.containsKey('orientation')) {
+      context.handle(
+        _orientationMeta,
+        orientation.isAcceptableOrUnknown(
+          data['orientation']!,
+          _orientationMeta,
+        ),
+      );
+    }
+    if (data.containsKey('cycles_in_stage')) {
+      context.handle(
+        _cyclesInStageMeta,
+        cyclesInStage.isAcceptableOrUnknown(
+          data['cycles_in_stage']!,
+          _cyclesInStageMeta,
+        ),
+      );
+    }
+    if (data.containsKey('gametes')) {
+      context.handle(
+        _gametesMeta,
+        gametes.isAcceptableOrUnknown(data['gametes']!, _gametesMeta),
+      );
+    }
+    if (data.containsKey('fertilized_eggs')) {
+      context.handle(
+        _fertilizedEggsMeta,
+        fertilizedEggs.isAcceptableOrUnknown(
+          data['fertilized_eggs']!,
+          _fertilizedEggsMeta,
+        ),
+      );
+    }
+    if (data.containsKey('stored_sperm_packs')) {
+      context.handle(
+        _storedSpermPacksMeta,
+        storedSpermPacks.isAcceptableOrUnknown(
+          data['stored_sperm_packs']!,
+          _storedSpermPacksMeta,
+        ),
+      );
+    }
+    if (data.containsKey('virgin')) {
+      context.handle(
+        _virginMeta,
+        virgin.isAcceptableOrUnknown(data['virgin']!, _virginMeta),
+      );
+    }
     return context;
   }
 
@@ -8379,6 +8506,30 @@ class $EnvironmentAgentsTable extends EnvironmentAgents
         DriftSqlType.int,
         data['${effectivePrefix}age'],
       )!,
+      orientation: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}orientation'],
+      )!,
+      cyclesInStage: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}cycles_in_stage'],
+      )!,
+      gametes: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}gametes'],
+      )!,
+      fertilizedEggs: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}fertilized_eggs'],
+      )!,
+      storedSpermPacks: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}stored_sperm_packs'],
+      )!,
+      virgin: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}virgin'],
+      )!,
     );
   }
 
@@ -8399,6 +8550,12 @@ class EnvironmentAgent extends DataClass
   final int? prototypeId;
   final String sex;
   final int age;
+  final int orientation;
+  final int cyclesInStage;
+  final int gametes;
+  final int fertilizedEggs;
+  final int storedSpermPacks;
+  final bool virgin;
   const EnvironmentAgent({
     required this.id,
     required this.environmentId,
@@ -8409,6 +8566,12 @@ class EnvironmentAgent extends DataClass
     this.prototypeId,
     required this.sex,
     required this.age,
+    required this.orientation,
+    required this.cyclesInStage,
+    required this.gametes,
+    required this.fertilizedEggs,
+    required this.storedSpermPacks,
+    required this.virgin,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -8426,6 +8589,12 @@ class EnvironmentAgent extends DataClass
     }
     map['sex'] = Variable<String>(sex);
     map['age'] = Variable<int>(age);
+    map['orientation'] = Variable<int>(orientation);
+    map['cycles_in_stage'] = Variable<int>(cyclesInStage);
+    map['gametes'] = Variable<int>(gametes);
+    map['fertilized_eggs'] = Variable<int>(fertilizedEggs);
+    map['stored_sperm_packs'] = Variable<int>(storedSpermPacks);
+    map['virgin'] = Variable<bool>(virgin);
     return map;
   }
 
@@ -8444,6 +8613,12 @@ class EnvironmentAgent extends DataClass
           : Value(prototypeId),
       sex: Value(sex),
       age: Value(age),
+      orientation: Value(orientation),
+      cyclesInStage: Value(cyclesInStage),
+      gametes: Value(gametes),
+      fertilizedEggs: Value(fertilizedEggs),
+      storedSpermPacks: Value(storedSpermPacks),
+      virgin: Value(virgin),
     );
   }
 
@@ -8462,6 +8637,12 @@ class EnvironmentAgent extends DataClass
       prototypeId: serializer.fromJson<int?>(json['prototypeId']),
       sex: serializer.fromJson<String>(json['sex']),
       age: serializer.fromJson<int>(json['age']),
+      orientation: serializer.fromJson<int>(json['orientation']),
+      cyclesInStage: serializer.fromJson<int>(json['cyclesInStage']),
+      gametes: serializer.fromJson<int>(json['gametes']),
+      fertilizedEggs: serializer.fromJson<int>(json['fertilizedEggs']),
+      storedSpermPacks: serializer.fromJson<int>(json['storedSpermPacks']),
+      virgin: serializer.fromJson<bool>(json['virgin']),
     );
   }
   @override
@@ -8477,6 +8658,12 @@ class EnvironmentAgent extends DataClass
       'prototypeId': serializer.toJson<int?>(prototypeId),
       'sex': serializer.toJson<String>(sex),
       'age': serializer.toJson<int>(age),
+      'orientation': serializer.toJson<int>(orientation),
+      'cyclesInStage': serializer.toJson<int>(cyclesInStage),
+      'gametes': serializer.toJson<int>(gametes),
+      'fertilizedEggs': serializer.toJson<int>(fertilizedEggs),
+      'storedSpermPacks': serializer.toJson<int>(storedSpermPacks),
+      'virgin': serializer.toJson<bool>(virgin),
     };
   }
 
@@ -8490,6 +8677,12 @@ class EnvironmentAgent extends DataClass
     Value<int?> prototypeId = const Value.absent(),
     String? sex,
     int? age,
+    int? orientation,
+    int? cyclesInStage,
+    int? gametes,
+    int? fertilizedEggs,
+    int? storedSpermPacks,
+    bool? virgin,
   }) => EnvironmentAgent(
     id: id ?? this.id,
     environmentId: environmentId ?? this.environmentId,
@@ -8500,6 +8693,12 @@ class EnvironmentAgent extends DataClass
     prototypeId: prototypeId.present ? prototypeId.value : this.prototypeId,
     sex: sex ?? this.sex,
     age: age ?? this.age,
+    orientation: orientation ?? this.orientation,
+    cyclesInStage: cyclesInStage ?? this.cyclesInStage,
+    gametes: gametes ?? this.gametes,
+    fertilizedEggs: fertilizedEggs ?? this.fertilizedEggs,
+    storedSpermPacks: storedSpermPacks ?? this.storedSpermPacks,
+    virgin: virgin ?? this.virgin,
   );
   EnvironmentAgent copyWithCompanion(EnvironmentAgentsCompanion data) {
     return EnvironmentAgent(
@@ -8516,6 +8715,20 @@ class EnvironmentAgent extends DataClass
           : this.prototypeId,
       sex: data.sex.present ? data.sex.value : this.sex,
       age: data.age.present ? data.age.value : this.age,
+      orientation: data.orientation.present
+          ? data.orientation.value
+          : this.orientation,
+      cyclesInStage: data.cyclesInStage.present
+          ? data.cyclesInStage.value
+          : this.cyclesInStage,
+      gametes: data.gametes.present ? data.gametes.value : this.gametes,
+      fertilizedEggs: data.fertilizedEggs.present
+          ? data.fertilizedEggs.value
+          : this.fertilizedEggs,
+      storedSpermPacks: data.storedSpermPacks.present
+          ? data.storedSpermPacks.value
+          : this.storedSpermPacks,
+      virgin: data.virgin.present ? data.virgin.value : this.virgin,
     );
   }
 
@@ -8530,7 +8743,13 @@ class EnvironmentAgent extends DataClass
           ..write('stageId: $stageId, ')
           ..write('prototypeId: $prototypeId, ')
           ..write('sex: $sex, ')
-          ..write('age: $age')
+          ..write('age: $age, ')
+          ..write('orientation: $orientation, ')
+          ..write('cyclesInStage: $cyclesInStage, ')
+          ..write('gametes: $gametes, ')
+          ..write('fertilizedEggs: $fertilizedEggs, ')
+          ..write('storedSpermPacks: $storedSpermPacks, ')
+          ..write('virgin: $virgin')
           ..write(')'))
         .toString();
   }
@@ -8546,6 +8765,12 @@ class EnvironmentAgent extends DataClass
     prototypeId,
     sex,
     age,
+    orientation,
+    cyclesInStage,
+    gametes,
+    fertilizedEggs,
+    storedSpermPacks,
+    virgin,
   );
   @override
   bool operator ==(Object other) =>
@@ -8559,7 +8784,13 @@ class EnvironmentAgent extends DataClass
           other.stageId == this.stageId &&
           other.prototypeId == this.prototypeId &&
           other.sex == this.sex &&
-          other.age == this.age);
+          other.age == this.age &&
+          other.orientation == this.orientation &&
+          other.cyclesInStage == this.cyclesInStage &&
+          other.gametes == this.gametes &&
+          other.fertilizedEggs == this.fertilizedEggs &&
+          other.storedSpermPacks == this.storedSpermPacks &&
+          other.virgin == this.virgin);
 }
 
 class EnvironmentAgentsCompanion extends UpdateCompanion<EnvironmentAgent> {
@@ -8572,6 +8803,12 @@ class EnvironmentAgentsCompanion extends UpdateCompanion<EnvironmentAgent> {
   final Value<int?> prototypeId;
   final Value<String> sex;
   final Value<int> age;
+  final Value<int> orientation;
+  final Value<int> cyclesInStage;
+  final Value<int> gametes;
+  final Value<int> fertilizedEggs;
+  final Value<int> storedSpermPacks;
+  final Value<bool> virgin;
   const EnvironmentAgentsCompanion({
     this.id = const Value.absent(),
     this.environmentId = const Value.absent(),
@@ -8582,6 +8819,12 @@ class EnvironmentAgentsCompanion extends UpdateCompanion<EnvironmentAgent> {
     this.prototypeId = const Value.absent(),
     this.sex = const Value.absent(),
     this.age = const Value.absent(),
+    this.orientation = const Value.absent(),
+    this.cyclesInStage = const Value.absent(),
+    this.gametes = const Value.absent(),
+    this.fertilizedEggs = const Value.absent(),
+    this.storedSpermPacks = const Value.absent(),
+    this.virgin = const Value.absent(),
   });
   EnvironmentAgentsCompanion.insert({
     this.id = const Value.absent(),
@@ -8593,6 +8836,12 @@ class EnvironmentAgentsCompanion extends UpdateCompanion<EnvironmentAgent> {
     this.prototypeId = const Value.absent(),
     required String sex,
     this.age = const Value.absent(),
+    this.orientation = const Value.absent(),
+    this.cyclesInStage = const Value.absent(),
+    this.gametes = const Value.absent(),
+    this.fertilizedEggs = const Value.absent(),
+    this.storedSpermPacks = const Value.absent(),
+    this.virgin = const Value.absent(),
   }) : environmentId = Value(environmentId),
        name = Value(name),
        posX = Value(posX),
@@ -8608,6 +8857,12 @@ class EnvironmentAgentsCompanion extends UpdateCompanion<EnvironmentAgent> {
     Expression<int>? prototypeId,
     Expression<String>? sex,
     Expression<int>? age,
+    Expression<int>? orientation,
+    Expression<int>? cyclesInStage,
+    Expression<int>? gametes,
+    Expression<int>? fertilizedEggs,
+    Expression<int>? storedSpermPacks,
+    Expression<bool>? virgin,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -8619,6 +8874,12 @@ class EnvironmentAgentsCompanion extends UpdateCompanion<EnvironmentAgent> {
       if (prototypeId != null) 'prototype_id': prototypeId,
       if (sex != null) 'sex': sex,
       if (age != null) 'age': age,
+      if (orientation != null) 'orientation': orientation,
+      if (cyclesInStage != null) 'cycles_in_stage': cyclesInStage,
+      if (gametes != null) 'gametes': gametes,
+      if (fertilizedEggs != null) 'fertilized_eggs': fertilizedEggs,
+      if (storedSpermPacks != null) 'stored_sperm_packs': storedSpermPacks,
+      if (virgin != null) 'virgin': virgin,
     });
   }
 
@@ -8632,6 +8893,12 @@ class EnvironmentAgentsCompanion extends UpdateCompanion<EnvironmentAgent> {
     Value<int?>? prototypeId,
     Value<String>? sex,
     Value<int>? age,
+    Value<int>? orientation,
+    Value<int>? cyclesInStage,
+    Value<int>? gametes,
+    Value<int>? fertilizedEggs,
+    Value<int>? storedSpermPacks,
+    Value<bool>? virgin,
   }) {
     return EnvironmentAgentsCompanion(
       id: id ?? this.id,
@@ -8643,6 +8910,12 @@ class EnvironmentAgentsCompanion extends UpdateCompanion<EnvironmentAgent> {
       prototypeId: prototypeId ?? this.prototypeId,
       sex: sex ?? this.sex,
       age: age ?? this.age,
+      orientation: orientation ?? this.orientation,
+      cyclesInStage: cyclesInStage ?? this.cyclesInStage,
+      gametes: gametes ?? this.gametes,
+      fertilizedEggs: fertilizedEggs ?? this.fertilizedEggs,
+      storedSpermPacks: storedSpermPacks ?? this.storedSpermPacks,
+      virgin: virgin ?? this.virgin,
     );
   }
 
@@ -8676,6 +8949,24 @@ class EnvironmentAgentsCompanion extends UpdateCompanion<EnvironmentAgent> {
     if (age.present) {
       map['age'] = Variable<int>(age.value);
     }
+    if (orientation.present) {
+      map['orientation'] = Variable<int>(orientation.value);
+    }
+    if (cyclesInStage.present) {
+      map['cycles_in_stage'] = Variable<int>(cyclesInStage.value);
+    }
+    if (gametes.present) {
+      map['gametes'] = Variable<int>(gametes.value);
+    }
+    if (fertilizedEggs.present) {
+      map['fertilized_eggs'] = Variable<int>(fertilizedEggs.value);
+    }
+    if (storedSpermPacks.present) {
+      map['stored_sperm_packs'] = Variable<int>(storedSpermPacks.value);
+    }
+    if (virgin.present) {
+      map['virgin'] = Variable<bool>(virgin.value);
+    }
     return map;
   }
 
@@ -8690,7 +8981,13 @@ class EnvironmentAgentsCompanion extends UpdateCompanion<EnvironmentAgent> {
           ..write('stageId: $stageId, ')
           ..write('prototypeId: $prototypeId, ')
           ..write('sex: $sex, ')
-          ..write('age: $age')
+          ..write('age: $age, ')
+          ..write('orientation: $orientation, ')
+          ..write('cyclesInStage: $cyclesInStage, ')
+          ..write('gametes: $gametes, ')
+          ..write('fertilizedEggs: $fertilizedEggs, ')
+          ..write('storedSpermPacks: $storedSpermPacks, ')
+          ..write('virgin: $virgin')
           ..write(')'))
         .toString();
   }
@@ -9013,6 +9310,316 @@ class EnvironmentAgentReservesCompanion
           ..write('agentId: $agentId, ')
           ..write('nutrientId: $nutrientId, ')
           ..write('initialLevel: $initialLevel')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $EnvironmentAgentMemoryTable extends EnvironmentAgentMemory
+    with TableInfo<$EnvironmentAgentMemoryTable, EnvironmentAgentMemoryData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $EnvironmentAgentMemoryTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _agentIdMeta = const VerificationMeta(
+    'agentId',
+  );
+  @override
+  late final GeneratedColumn<int> agentId = GeneratedColumn<int>(
+    'agent_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES environment_agents (id)',
+    ),
+  );
+  static const VerificationMeta _memoryKeyMeta = const VerificationMeta(
+    'memoryKey',
+  );
+  @override
+  late final GeneratedColumn<String> memoryKey = GeneratedColumn<String>(
+    'memory_key',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _valueMeta = const VerificationMeta('value');
+  @override
+  late final GeneratedColumn<double> value = GeneratedColumn<double>(
+    'value',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0.0),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, agentId, memoryKey, value];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'environment_agent_memory';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<EnvironmentAgentMemoryData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('agent_id')) {
+      context.handle(
+        _agentIdMeta,
+        agentId.isAcceptableOrUnknown(data['agent_id']!, _agentIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_agentIdMeta);
+    }
+    if (data.containsKey('memory_key')) {
+      context.handle(
+        _memoryKeyMeta,
+        memoryKey.isAcceptableOrUnknown(data['memory_key']!, _memoryKeyMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_memoryKeyMeta);
+    }
+    if (data.containsKey('value')) {
+      context.handle(
+        _valueMeta,
+        value.isAcceptableOrUnknown(data['value']!, _valueMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  List<Set<GeneratedColumn>> get uniqueKeys => [
+    {agentId, memoryKey},
+  ];
+  @override
+  EnvironmentAgentMemoryData map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return EnvironmentAgentMemoryData(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      agentId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}agent_id'],
+      )!,
+      memoryKey: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}memory_key'],
+      )!,
+      value: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}value'],
+      )!,
+    );
+  }
+
+  @override
+  $EnvironmentAgentMemoryTable createAlias(String alias) {
+    return $EnvironmentAgentMemoryTable(attachedDatabase, alias);
+  }
+}
+
+class EnvironmentAgentMemoryData extends DataClass
+    implements Insertable<EnvironmentAgentMemoryData> {
+  final int id;
+  final int agentId;
+  final String memoryKey;
+  final double value;
+  const EnvironmentAgentMemoryData({
+    required this.id,
+    required this.agentId,
+    required this.memoryKey,
+    required this.value,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['agent_id'] = Variable<int>(agentId);
+    map['memory_key'] = Variable<String>(memoryKey);
+    map['value'] = Variable<double>(value);
+    return map;
+  }
+
+  EnvironmentAgentMemoryCompanion toCompanion(bool nullToAbsent) {
+    return EnvironmentAgentMemoryCompanion(
+      id: Value(id),
+      agentId: Value(agentId),
+      memoryKey: Value(memoryKey),
+      value: Value(value),
+    );
+  }
+
+  factory EnvironmentAgentMemoryData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return EnvironmentAgentMemoryData(
+      id: serializer.fromJson<int>(json['id']),
+      agentId: serializer.fromJson<int>(json['agentId']),
+      memoryKey: serializer.fromJson<String>(json['memoryKey']),
+      value: serializer.fromJson<double>(json['value']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'agentId': serializer.toJson<int>(agentId),
+      'memoryKey': serializer.toJson<String>(memoryKey),
+      'value': serializer.toJson<double>(value),
+    };
+  }
+
+  EnvironmentAgentMemoryData copyWith({
+    int? id,
+    int? agentId,
+    String? memoryKey,
+    double? value,
+  }) => EnvironmentAgentMemoryData(
+    id: id ?? this.id,
+    agentId: agentId ?? this.agentId,
+    memoryKey: memoryKey ?? this.memoryKey,
+    value: value ?? this.value,
+  );
+  EnvironmentAgentMemoryData copyWithCompanion(
+    EnvironmentAgentMemoryCompanion data,
+  ) {
+    return EnvironmentAgentMemoryData(
+      id: data.id.present ? data.id.value : this.id,
+      agentId: data.agentId.present ? data.agentId.value : this.agentId,
+      memoryKey: data.memoryKey.present ? data.memoryKey.value : this.memoryKey,
+      value: data.value.present ? data.value.value : this.value,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('EnvironmentAgentMemoryData(')
+          ..write('id: $id, ')
+          ..write('agentId: $agentId, ')
+          ..write('memoryKey: $memoryKey, ')
+          ..write('value: $value')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, agentId, memoryKey, value);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is EnvironmentAgentMemoryData &&
+          other.id == this.id &&
+          other.agentId == this.agentId &&
+          other.memoryKey == this.memoryKey &&
+          other.value == this.value);
+}
+
+class EnvironmentAgentMemoryCompanion
+    extends UpdateCompanion<EnvironmentAgentMemoryData> {
+  final Value<int> id;
+  final Value<int> agentId;
+  final Value<String> memoryKey;
+  final Value<double> value;
+  const EnvironmentAgentMemoryCompanion({
+    this.id = const Value.absent(),
+    this.agentId = const Value.absent(),
+    this.memoryKey = const Value.absent(),
+    this.value = const Value.absent(),
+  });
+  EnvironmentAgentMemoryCompanion.insert({
+    this.id = const Value.absent(),
+    required int agentId,
+    required String memoryKey,
+    this.value = const Value.absent(),
+  }) : agentId = Value(agentId),
+       memoryKey = Value(memoryKey);
+  static Insertable<EnvironmentAgentMemoryData> custom({
+    Expression<int>? id,
+    Expression<int>? agentId,
+    Expression<String>? memoryKey,
+    Expression<double>? value,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (agentId != null) 'agent_id': agentId,
+      if (memoryKey != null) 'memory_key': memoryKey,
+      if (value != null) 'value': value,
+    });
+  }
+
+  EnvironmentAgentMemoryCompanion copyWith({
+    Value<int>? id,
+    Value<int>? agentId,
+    Value<String>? memoryKey,
+    Value<double>? value,
+  }) {
+    return EnvironmentAgentMemoryCompanion(
+      id: id ?? this.id,
+      agentId: agentId ?? this.agentId,
+      memoryKey: memoryKey ?? this.memoryKey,
+      value: value ?? this.value,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (agentId.present) {
+      map['agent_id'] = Variable<int>(agentId.value);
+    }
+    if (memoryKey.present) {
+      map['memory_key'] = Variable<String>(memoryKey.value);
+    }
+    if (value.present) {
+      map['value'] = Variable<double>(value.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('EnvironmentAgentMemoryCompanion(')
+          ..write('id: $id, ')
+          ..write('agentId: $agentId, ')
+          ..write('memoryKey: $memoryKey, ')
+          ..write('value: $value')
           ..write(')'))
         .toString();
   }
@@ -15358,6 +15965,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       $EnvironmentAgentsTable(this);
   late final $EnvironmentAgentReservesTable environmentAgentReserves =
       $EnvironmentAgentReservesTable(this);
+  late final $EnvironmentAgentMemoryTable environmentAgentMemory =
+      $EnvironmentAgentMemoryTable(this);
   late final $MetabolismTable metabolism = $MetabolismTable(this);
   late final $BehaviorCostsTable behaviorCosts = $BehaviorCostsTable(this);
   late final $FeedingGainsTable feedingGains = $FeedingGainsTable(this);
@@ -15423,6 +16032,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     environmentOvipositionSites,
     environmentAgents,
     environmentAgentReserves,
+    environmentAgentMemory,
     metabolism,
     behaviorCosts,
     feedingGains,
@@ -26273,6 +26883,12 @@ typedef $$EnvironmentAgentsTableCreateCompanionBuilder =
       Value<int?> prototypeId,
       required String sex,
       Value<int> age,
+      Value<int> orientation,
+      Value<int> cyclesInStage,
+      Value<int> gametes,
+      Value<int> fertilizedEggs,
+      Value<int> storedSpermPacks,
+      Value<bool> virgin,
     });
 typedef $$EnvironmentAgentsTableUpdateCompanionBuilder =
     EnvironmentAgentsCompanion Function({
@@ -26285,6 +26901,12 @@ typedef $$EnvironmentAgentsTableUpdateCompanionBuilder =
       Value<int?> prototypeId,
       Value<String> sex,
       Value<int> age,
+      Value<int> orientation,
+      Value<int> cyclesInStage,
+      Value<int> gametes,
+      Value<int> fertilizedEggs,
+      Value<int> storedSpermPacks,
+      Value<bool> virgin,
     });
 
 final class $$EnvironmentAgentsTableReferences
@@ -26377,6 +26999,31 @@ final class $$EnvironmentAgentsTableReferences
       manager.$state.copyWith(prefetchedData: cache),
     );
   }
+
+  static MultiTypedResultKey<
+    $EnvironmentAgentMemoryTable,
+    List<EnvironmentAgentMemoryData>
+  >
+  _environmentAgentMemoryRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.environmentAgentMemory,
+        aliasName: 'environment_agents__id__environment_agent_memory__agent_id',
+      );
+
+  $$EnvironmentAgentMemoryTableProcessedTableManager
+  get environmentAgentMemoryRefs {
+    final manager = $$EnvironmentAgentMemoryTableTableManager(
+      $_db,
+      $_db.environmentAgentMemory,
+    ).filter((f) => f.agentId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _environmentAgentMemoryRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$EnvironmentAgentsTableFilterComposer
@@ -26415,6 +27062,36 @@ class $$EnvironmentAgentsTableFilterComposer
 
   ColumnFilters<int> get age => $composableBuilder(
     column: $table.age,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get orientation => $composableBuilder(
+    column: $table.orientation,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get cyclesInStage => $composableBuilder(
+    column: $table.cyclesInStage,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get gametes => $composableBuilder(
+    column: $table.gametes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get fertilizedEggs => $composableBuilder(
+    column: $table.fertilizedEggs,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get storedSpermPacks => $composableBuilder(
+    column: $table.storedSpermPacks,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get virgin => $composableBuilder(
+    column: $table.virgin,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -26513,6 +27190,32 @@ class $$EnvironmentAgentsTableFilterComposer
         );
     return f(composer);
   }
+
+  Expression<bool> environmentAgentMemoryRefs(
+    Expression<bool> Function($$EnvironmentAgentMemoryTableFilterComposer f) f,
+  ) {
+    final $$EnvironmentAgentMemoryTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.environmentAgentMemory,
+          getReferencedColumn: (t) => t.agentId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$EnvironmentAgentMemoryTableFilterComposer(
+                $db: $db,
+                $table: $db.environmentAgentMemory,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
 }
 
 class $$EnvironmentAgentsTableOrderingComposer
@@ -26551,6 +27254,36 @@ class $$EnvironmentAgentsTableOrderingComposer
 
   ColumnOrderings<int> get age => $composableBuilder(
     column: $table.age,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get orientation => $composableBuilder(
+    column: $table.orientation,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get cyclesInStage => $composableBuilder(
+    column: $table.cyclesInStage,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get gametes => $composableBuilder(
+    column: $table.gametes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get fertilizedEggs => $composableBuilder(
+    column: $table.fertilizedEggs,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get storedSpermPacks => $composableBuilder(
+    column: $table.storedSpermPacks,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get virgin => $composableBuilder(
+    column: $table.virgin,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -26651,6 +27384,32 @@ class $$EnvironmentAgentsTableAnnotationComposer
   GeneratedColumn<int> get age =>
       $composableBuilder(column: $table.age, builder: (column) => column);
 
+  GeneratedColumn<int> get orientation => $composableBuilder(
+    column: $table.orientation,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get cyclesInStage => $composableBuilder(
+    column: $table.cyclesInStage,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get gametes =>
+      $composableBuilder(column: $table.gametes, builder: (column) => column);
+
+  GeneratedColumn<int> get fertilizedEggs => $composableBuilder(
+    column: $table.fertilizedEggs,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get storedSpermPacks => $composableBuilder(
+    column: $table.storedSpermPacks,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get virgin =>
+      $composableBuilder(column: $table.virgin, builder: (column) => column);
+
   $$EnvironmentsTableAnnotationComposer get environmentId {
     final $$EnvironmentsTableAnnotationComposer composer = $composerBuilder(
       composer: this,
@@ -26746,6 +27505,32 @@ class $$EnvironmentAgentsTableAnnotationComposer
         );
     return f(composer);
   }
+
+  Expression<T> environmentAgentMemoryRefs<T extends Object>(
+    Expression<T> Function($$EnvironmentAgentMemoryTableAnnotationComposer a) f,
+  ) {
+    final $$EnvironmentAgentMemoryTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.environmentAgentMemory,
+          getReferencedColumn: (t) => t.agentId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$EnvironmentAgentMemoryTableAnnotationComposer(
+                $db: $db,
+                $table: $db.environmentAgentMemory,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
 }
 
 class $$EnvironmentAgentsTableTableManager
@@ -26766,6 +27551,7 @@ class $$EnvironmentAgentsTableTableManager
             bool stageId,
             bool prototypeId,
             bool environmentAgentReservesRefs,
+            bool environmentAgentMemoryRefs,
           })
         > {
   $$EnvironmentAgentsTableTableManager(
@@ -26795,6 +27581,12 @@ class $$EnvironmentAgentsTableTableManager
                 Value<int?> prototypeId = const Value.absent(),
                 Value<String> sex = const Value.absent(),
                 Value<int> age = const Value.absent(),
+                Value<int> orientation = const Value.absent(),
+                Value<int> cyclesInStage = const Value.absent(),
+                Value<int> gametes = const Value.absent(),
+                Value<int> fertilizedEggs = const Value.absent(),
+                Value<int> storedSpermPacks = const Value.absent(),
+                Value<bool> virgin = const Value.absent(),
               }) => EnvironmentAgentsCompanion(
                 id: id,
                 environmentId: environmentId,
@@ -26805,6 +27597,12 @@ class $$EnvironmentAgentsTableTableManager
                 prototypeId: prototypeId,
                 sex: sex,
                 age: age,
+                orientation: orientation,
+                cyclesInStage: cyclesInStage,
+                gametes: gametes,
+                fertilizedEggs: fertilizedEggs,
+                storedSpermPacks: storedSpermPacks,
+                virgin: virgin,
               ),
           createCompanionCallback:
               ({
@@ -26817,6 +27615,12 @@ class $$EnvironmentAgentsTableTableManager
                 Value<int?> prototypeId = const Value.absent(),
                 required String sex,
                 Value<int> age = const Value.absent(),
+                Value<int> orientation = const Value.absent(),
+                Value<int> cyclesInStage = const Value.absent(),
+                Value<int> gametes = const Value.absent(),
+                Value<int> fertilizedEggs = const Value.absent(),
+                Value<int> storedSpermPacks = const Value.absent(),
+                Value<bool> virgin = const Value.absent(),
               }) => EnvironmentAgentsCompanion.insert(
                 id: id,
                 environmentId: environmentId,
@@ -26827,6 +27631,12 @@ class $$EnvironmentAgentsTableTableManager
                 prototypeId: prototypeId,
                 sex: sex,
                 age: age,
+                orientation: orientation,
+                cyclesInStage: cyclesInStage,
+                gametes: gametes,
+                fertilizedEggs: fertilizedEggs,
+                storedSpermPacks: storedSpermPacks,
+                virgin: virgin,
               ),
           withReferenceMapper: (p0) => p0
               .map(
@@ -26842,12 +27652,14 @@ class $$EnvironmentAgentsTableTableManager
                 stageId = false,
                 prototypeId = false,
                 environmentAgentReservesRefs = false,
+                environmentAgentMemoryRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
                   explicitlyWatchedTables: [
                     if (environmentAgentReservesRefs)
                       db.environmentAgentReserves,
+                    if (environmentAgentMemoryRefs) db.environmentAgentMemory,
                   ],
                   addJoins:
                       <
@@ -26936,6 +27748,27 @@ class $$EnvironmentAgentsTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (environmentAgentMemoryRefs)
+                        await $_getPrefetchedData<
+                          EnvironmentAgent,
+                          $EnvironmentAgentsTable,
+                          EnvironmentAgentMemoryData
+                        >(
+                          currentTable: table,
+                          referencedTable: $$EnvironmentAgentsTableReferences
+                              ._environmentAgentMemoryRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$EnvironmentAgentsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).environmentAgentMemoryRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.agentId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -26961,6 +27794,7 @@ typedef $$EnvironmentAgentsTableProcessedTableManager =
         bool stageId,
         bool prototypeId,
         bool environmentAgentReservesRefs,
+        bool environmentAgentMemoryRefs,
       })
     >;
 typedef $$EnvironmentAgentReservesTableCreateCompanionBuilder =
@@ -27369,6 +28203,323 @@ typedef $$EnvironmentAgentReservesTableProcessedTableManager =
       (EnvironmentAgentReserve, $$EnvironmentAgentReservesTableReferences),
       EnvironmentAgentReserve,
       PrefetchHooks Function({bool agentId, bool nutrientId})
+    >;
+typedef $$EnvironmentAgentMemoryTableCreateCompanionBuilder =
+    EnvironmentAgentMemoryCompanion Function({
+      Value<int> id,
+      required int agentId,
+      required String memoryKey,
+      Value<double> value,
+    });
+typedef $$EnvironmentAgentMemoryTableUpdateCompanionBuilder =
+    EnvironmentAgentMemoryCompanion Function({
+      Value<int> id,
+      Value<int> agentId,
+      Value<String> memoryKey,
+      Value<double> value,
+    });
+
+final class $$EnvironmentAgentMemoryTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $EnvironmentAgentMemoryTable,
+          EnvironmentAgentMemoryData
+        > {
+  $$EnvironmentAgentMemoryTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $EnvironmentAgentsTable _agentIdTable(_$AppDatabase db) =>
+      db.environmentAgents.createAlias(
+        'environment_agent_memory__agent_id__environment_agents__id',
+      );
+
+  $$EnvironmentAgentsTableProcessedTableManager get agentId {
+    final $_column = $_itemColumn<int>('agent_id')!;
+
+    final manager = $$EnvironmentAgentsTableTableManager(
+      $_db,
+      $_db.environmentAgents,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_agentIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$EnvironmentAgentMemoryTableFilterComposer
+    extends Composer<_$AppDatabase, $EnvironmentAgentMemoryTable> {
+  $$EnvironmentAgentMemoryTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get memoryKey => $composableBuilder(
+    column: $table.memoryKey,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get value => $composableBuilder(
+    column: $table.value,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$EnvironmentAgentsTableFilterComposer get agentId {
+    final $$EnvironmentAgentsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.agentId,
+      referencedTable: $db.environmentAgents,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$EnvironmentAgentsTableFilterComposer(
+            $db: $db,
+            $table: $db.environmentAgents,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$EnvironmentAgentMemoryTableOrderingComposer
+    extends Composer<_$AppDatabase, $EnvironmentAgentMemoryTable> {
+  $$EnvironmentAgentMemoryTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get memoryKey => $composableBuilder(
+    column: $table.memoryKey,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get value => $composableBuilder(
+    column: $table.value,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$EnvironmentAgentsTableOrderingComposer get agentId {
+    final $$EnvironmentAgentsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.agentId,
+      referencedTable: $db.environmentAgents,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$EnvironmentAgentsTableOrderingComposer(
+            $db: $db,
+            $table: $db.environmentAgents,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$EnvironmentAgentMemoryTableAnnotationComposer
+    extends Composer<_$AppDatabase, $EnvironmentAgentMemoryTable> {
+  $$EnvironmentAgentMemoryTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get memoryKey =>
+      $composableBuilder(column: $table.memoryKey, builder: (column) => column);
+
+  GeneratedColumn<double> get value =>
+      $composableBuilder(column: $table.value, builder: (column) => column);
+
+  $$EnvironmentAgentsTableAnnotationComposer get agentId {
+    final $$EnvironmentAgentsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.agentId,
+          referencedTable: $db.environmentAgents,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$EnvironmentAgentsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.environmentAgents,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+}
+
+class $$EnvironmentAgentMemoryTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $EnvironmentAgentMemoryTable,
+          EnvironmentAgentMemoryData,
+          $$EnvironmentAgentMemoryTableFilterComposer,
+          $$EnvironmentAgentMemoryTableOrderingComposer,
+          $$EnvironmentAgentMemoryTableAnnotationComposer,
+          $$EnvironmentAgentMemoryTableCreateCompanionBuilder,
+          $$EnvironmentAgentMemoryTableUpdateCompanionBuilder,
+          (EnvironmentAgentMemoryData, $$EnvironmentAgentMemoryTableReferences),
+          EnvironmentAgentMemoryData,
+          PrefetchHooks Function({bool agentId})
+        > {
+  $$EnvironmentAgentMemoryTableTableManager(
+    _$AppDatabase db,
+    $EnvironmentAgentMemoryTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$EnvironmentAgentMemoryTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$EnvironmentAgentMemoryTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$EnvironmentAgentMemoryTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> agentId = const Value.absent(),
+                Value<String> memoryKey = const Value.absent(),
+                Value<double> value = const Value.absent(),
+              }) => EnvironmentAgentMemoryCompanion(
+                id: id,
+                agentId: agentId,
+                memoryKey: memoryKey,
+                value: value,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int agentId,
+                required String memoryKey,
+                Value<double> value = const Value.absent(),
+              }) => EnvironmentAgentMemoryCompanion.insert(
+                id: id,
+                agentId: agentId,
+                memoryKey: memoryKey,
+                value: value,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$EnvironmentAgentMemoryTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({agentId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (agentId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.agentId,
+                                referencedTable:
+                                    $$EnvironmentAgentMemoryTableReferences
+                                        ._agentIdTable(db),
+                                referencedColumn:
+                                    $$EnvironmentAgentMemoryTableReferences
+                                        ._agentIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$EnvironmentAgentMemoryTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $EnvironmentAgentMemoryTable,
+      EnvironmentAgentMemoryData,
+      $$EnvironmentAgentMemoryTableFilterComposer,
+      $$EnvironmentAgentMemoryTableOrderingComposer,
+      $$EnvironmentAgentMemoryTableAnnotationComposer,
+      $$EnvironmentAgentMemoryTableCreateCompanionBuilder,
+      $$EnvironmentAgentMemoryTableUpdateCompanionBuilder,
+      (EnvironmentAgentMemoryData, $$EnvironmentAgentMemoryTableReferences),
+      EnvironmentAgentMemoryData,
+      PrefetchHooks Function({bool agentId})
     >;
 typedef $$MetabolismTableCreateCompanionBuilder =
     MetabolismCompanion Function({
@@ -33634,6 +34785,11 @@ class $AppDatabaseManager {
       $$EnvironmentAgentReservesTableTableManager(
         _db,
         _db.environmentAgentReserves,
+      );
+  $$EnvironmentAgentMemoryTableTableManager get environmentAgentMemory =>
+      $$EnvironmentAgentMemoryTableTableManager(
+        _db,
+        _db.environmentAgentMemory,
       );
   $$MetabolismTableTableManager get metabolism =>
       $$MetabolismTableTableManager(_db, _db.metabolism);

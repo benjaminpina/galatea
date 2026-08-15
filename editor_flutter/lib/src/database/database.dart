@@ -32,6 +32,7 @@ part 'database.g.dart';
     EnvironmentOvipositionSites,
     EnvironmentAgents,
     EnvironmentAgentReserves,
+    EnvironmentAgentMemory,
     Metabolism,
     BehaviorCosts,
     FeedingGains,
@@ -66,7 +67,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.memory() : super(NativeDatabase.memory());
 
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -74,13 +75,30 @@ class AppDatabase extends _$AppDatabase {
       await m.createAll();
     },
     onUpgrade: (Migrator m, int from, int to) async {
-      // Destructive migration: drop all and recreate.
-      // Existing project databases will need to be recreated.
-      final allTables = m.database.allSchemaEntities.toList().reversed;
-      for (final entity in allTables) {
-        await m.drop(entity);
+      if (from < 5) {
+        // v4 → v5: Add new columns to environment_agents + new tables.
+        await customStatement(
+          'ALTER TABLE environment_agents ADD COLUMN orientation INTEGER NOT NULL DEFAULT 1',
+        );
+        await customStatement(
+          'ALTER TABLE environment_agents ADD COLUMN cycles_in_stage INTEGER NOT NULL DEFAULT 0',
+        );
+        await customStatement(
+          'ALTER TABLE environment_agents ADD COLUMN gametes INTEGER NOT NULL DEFAULT 0',
+        );
+        await customStatement(
+          'ALTER TABLE environment_agents ADD COLUMN fertilized_eggs INTEGER NOT NULL DEFAULT 0',
+        );
+        await customStatement(
+          'ALTER TABLE environment_agents ADD COLUMN stored_sperm_packs INTEGER NOT NULL DEFAULT 0',
+        );
+        await customStatement(
+          'ALTER TABLE environment_agents ADD COLUMN virgin INTEGER NOT NULL DEFAULT 1',
+        );
+        // Create new tables.
+        await m.createTable(environmentAgentReserves);
+        await m.createTable(environmentAgentMemory);
       }
-      await m.createAll();
     },
     beforeOpen: (details) async {
       // Enable foreign keys and WAL mode.

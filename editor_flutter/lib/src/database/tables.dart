@@ -167,6 +167,32 @@ class EnvironmentAgents extends Table {
       integer().nullable().references(Prototypes, #id)();
   TextColumn get sex => text()();
   IntColumn get age => integer().withDefault(const Constant(0))();
+  IntColumn get orientation =>
+      integer().withDefault(const Constant(1))(); // 1..8 (N,NE,E,SE,S,SW,W,NW)
+  IntColumn get cyclesInStage =>
+      integer().withDefault(const Constant(0))(); // ticks in current stage
+  IntColumn get gametes =>
+      integer().withDefault(const Constant(0))(); // available gametes
+  IntColumn get fertilizedEggs =>
+      integer().withDefault(const Constant(0))(); // fertilized eggs
+  IntColumn get storedSpermPacks =>
+      integer().withDefault(const Constant(0))(); // stored sperm packs
+  BoolColumn get virgin =>
+      boolean().withDefault(const Constant(true))(); // mating status
+}
+
+/// Per-agent initial memory entries.
+/// Stores initial memory values (e.g., last perception tick, interaction count).
+class EnvironmentAgentMemory extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get agentId => integer().references(EnvironmentAgents, #id)();
+  TextColumn get memoryKey => text()(); // e.g. 'lastPerGrass', 'numMove'
+  RealColumn get value => real().withDefault(const Constant(0.0))();
+
+  @override
+  List<Set<Column>> get uniqueKeys => [
+    {agentId, memoryKey},
+  ];
 }
 
 /// Per-agent initial nutrient reserve levels.

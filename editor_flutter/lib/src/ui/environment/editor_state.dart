@@ -119,6 +119,12 @@ class PlacedAgent extends PlacedElement {
     required this.prototypeId,
     required this.stageId,
     required this.age,
+    this.orientation = 1,
+    this.cyclesInStage = 0,
+    this.gametes = 0,
+    this.fertilizedEggs = 0,
+    this.storedSpermPacks = 0,
+    this.virgin = true,
   });
 
   @override
@@ -132,4 +138,10 @@ class PlacedAgent extends PlacedElement {
   final int? prototypeId;
   final int? stageId;
   final int age;
+  final int orientation; // 1..8
+  final int cyclesInStage;
+  final int gametes;
+  final int fertilizedEggs;
+  final int storedSpermPacks;
+  final bool virgin;
 }

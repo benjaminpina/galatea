@@ -2,6 +2,7 @@ import 'package:drift/drift.dart' hide Column;
 import 'package:flutter/material.dart';
 
 import '../../database/database.dart';
+import 'agent_edit_dialog.dart';
 import 'editor_state.dart';
 
 /// Left panel content when showing tool-specific options.
@@ -567,14 +568,36 @@ class LeftSidebar extends StatelessWidget {
     if (db == null) {
       return const Text('No database', style: TextStyle(fontSize: 11));
     }
-    return _AgentPropertiesEditor(
-      key: ValueKey('agent_props_${a.id}'),
-      agent: a,
-      prototypes: prototypes,
-      stages: stages,
-      nutrients: nutrients,
-      db: db!,
-      onUpdated: onElementUpdated,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _AgentPropertiesEditor(
+          key: ValueKey('agent_props_${a.id}'),
+          agent: a,
+          prototypes: prototypes,
+          stages: stages,
+          nutrients: nutrients,
+          db: db!,
+          onUpdated: onElementUpdated,
+        ),
+        const SizedBox(height: 8),
+        Center(
+          child: OutlinedButton.icon(
+            icon: const Icon(Icons.open_in_new, size: 14),
+            label: const Text(
+              'Edit all details',
+              style: TextStyle(fontSize: 11),
+            ),
+            onPressed: () async {
+              final result = await Navigator.push<bool>(
+                context,
+                MaterialPageRoute(builder: (_) => AgentEditDialog(agent: a)),
+              );
+              if (result == true) onElementUpdated?.call();
+            },
+          ),
+        ),
+      ],
     );
   }
 }

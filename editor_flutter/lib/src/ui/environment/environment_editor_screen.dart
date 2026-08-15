@@ -200,6 +200,12 @@ class _EnvironmentEditorScreenState
             prototypeId: a.prototypeId,
             stageId: a.stageId,
             age: a.age,
+            orientation: a.orientation,
+            cyclesInStage: a.cyclesInStage,
+            gametes: a.gametes,
+            fertilizedEggs: a.fertilizedEggs,
+            storedSpermPacks: a.storedSpermPacks,
+            virgin: a.virgin,
           ),
         )
         .toList();
@@ -343,6 +349,12 @@ class _EnvironmentEditorScreenState
               prototypeId: a.prototypeId,
               stageId: a.stageId,
               age: a.age,
+              orientation: a.orientation,
+              cyclesInStage: a.cyclesInStage,
+              gametes: a.gametes,
+              fertilizedEggs: a.fertilizedEggs,
+              storedSpermPacks: a.storedSpermPacks,
+              virgin: a.virgin,
             ),
           )
           .toList();
@@ -905,11 +917,16 @@ class _EnvironmentEditorScreenState
     ref.listen(prototypesProvider, (prev, next) => _reloadPlacedElements());
     ref.listen(nutrientsProvider, (prev, next) => _reloadPlacedElements());
     ref.listen(substratesProvider, (prev, next) {
-      _reloadSubstrateGrid();
+      final prevSubs = prev?.valueOrNull ?? [];
+      final nextSubs = next.valueOrNull ?? [];
+      // Only reload grid if a substrate was DELETED (could leave orphan IDs).
+      // Adding a new substrate doesn't affect the existing grid.
+      if (nextSubs.length < prevSubs.length) {
+        _reloadSubstrateGrid();
+      }
       // Auto-fill empty cells if we now have substrates and a default.
-      final subs = next.valueOrNull;
-      if (subs != null && subs.isNotEmpty && _defaultSubstrateId == 0) {
-        _onDefaultSubstrateChanged(subs.first.id);
+      if (nextSubs.isNotEmpty && _defaultSubstrateId == 0) {
+        _onDefaultSubstrateChanged(nextSubs.first.id);
       }
     });
 
