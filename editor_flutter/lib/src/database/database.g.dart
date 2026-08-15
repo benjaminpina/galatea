@@ -8696,6 +8696,328 @@ class EnvironmentAgentsCompanion extends UpdateCompanion<EnvironmentAgent> {
   }
 }
 
+class $EnvironmentAgentReservesTable extends EnvironmentAgentReserves
+    with TableInfo<$EnvironmentAgentReservesTable, EnvironmentAgentReserve> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $EnvironmentAgentReservesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _agentIdMeta = const VerificationMeta(
+    'agentId',
+  );
+  @override
+  late final GeneratedColumn<int> agentId = GeneratedColumn<int>(
+    'agent_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES environment_agents (id)',
+    ),
+  );
+  static const VerificationMeta _nutrientIdMeta = const VerificationMeta(
+    'nutrientId',
+  );
+  @override
+  late final GeneratedColumn<int> nutrientId = GeneratedColumn<int>(
+    'nutrient_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES nutrients (id)',
+    ),
+  );
+  static const VerificationMeta _initialLevelMeta = const VerificationMeta(
+    'initialLevel',
+  );
+  @override
+  late final GeneratedColumn<double> initialLevel = GeneratedColumn<double>(
+    'initial_level',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(50.0),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, agentId, nutrientId, initialLevel];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'environment_agent_reserves';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<EnvironmentAgentReserve> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('agent_id')) {
+      context.handle(
+        _agentIdMeta,
+        agentId.isAcceptableOrUnknown(data['agent_id']!, _agentIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_agentIdMeta);
+    }
+    if (data.containsKey('nutrient_id')) {
+      context.handle(
+        _nutrientIdMeta,
+        nutrientId.isAcceptableOrUnknown(data['nutrient_id']!, _nutrientIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nutrientIdMeta);
+    }
+    if (data.containsKey('initial_level')) {
+      context.handle(
+        _initialLevelMeta,
+        initialLevel.isAcceptableOrUnknown(
+          data['initial_level']!,
+          _initialLevelMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  List<Set<GeneratedColumn>> get uniqueKeys => [
+    {agentId, nutrientId},
+  ];
+  @override
+  EnvironmentAgentReserve map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return EnvironmentAgentReserve(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      agentId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}agent_id'],
+      )!,
+      nutrientId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}nutrient_id'],
+      )!,
+      initialLevel: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}initial_level'],
+      )!,
+    );
+  }
+
+  @override
+  $EnvironmentAgentReservesTable createAlias(String alias) {
+    return $EnvironmentAgentReservesTable(attachedDatabase, alias);
+  }
+}
+
+class EnvironmentAgentReserve extends DataClass
+    implements Insertable<EnvironmentAgentReserve> {
+  final int id;
+  final int agentId;
+  final int nutrientId;
+  final double initialLevel;
+  const EnvironmentAgentReserve({
+    required this.id,
+    required this.agentId,
+    required this.nutrientId,
+    required this.initialLevel,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['agent_id'] = Variable<int>(agentId);
+    map['nutrient_id'] = Variable<int>(nutrientId);
+    map['initial_level'] = Variable<double>(initialLevel);
+    return map;
+  }
+
+  EnvironmentAgentReservesCompanion toCompanion(bool nullToAbsent) {
+    return EnvironmentAgentReservesCompanion(
+      id: Value(id),
+      agentId: Value(agentId),
+      nutrientId: Value(nutrientId),
+      initialLevel: Value(initialLevel),
+    );
+  }
+
+  factory EnvironmentAgentReserve.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return EnvironmentAgentReserve(
+      id: serializer.fromJson<int>(json['id']),
+      agentId: serializer.fromJson<int>(json['agentId']),
+      nutrientId: serializer.fromJson<int>(json['nutrientId']),
+      initialLevel: serializer.fromJson<double>(json['initialLevel']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'agentId': serializer.toJson<int>(agentId),
+      'nutrientId': serializer.toJson<int>(nutrientId),
+      'initialLevel': serializer.toJson<double>(initialLevel),
+    };
+  }
+
+  EnvironmentAgentReserve copyWith({
+    int? id,
+    int? agentId,
+    int? nutrientId,
+    double? initialLevel,
+  }) => EnvironmentAgentReserve(
+    id: id ?? this.id,
+    agentId: agentId ?? this.agentId,
+    nutrientId: nutrientId ?? this.nutrientId,
+    initialLevel: initialLevel ?? this.initialLevel,
+  );
+  EnvironmentAgentReserve copyWithCompanion(
+    EnvironmentAgentReservesCompanion data,
+  ) {
+    return EnvironmentAgentReserve(
+      id: data.id.present ? data.id.value : this.id,
+      agentId: data.agentId.present ? data.agentId.value : this.agentId,
+      nutrientId: data.nutrientId.present
+          ? data.nutrientId.value
+          : this.nutrientId,
+      initialLevel: data.initialLevel.present
+          ? data.initialLevel.value
+          : this.initialLevel,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('EnvironmentAgentReserve(')
+          ..write('id: $id, ')
+          ..write('agentId: $agentId, ')
+          ..write('nutrientId: $nutrientId, ')
+          ..write('initialLevel: $initialLevel')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, agentId, nutrientId, initialLevel);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is EnvironmentAgentReserve &&
+          other.id == this.id &&
+          other.agentId == this.agentId &&
+          other.nutrientId == this.nutrientId &&
+          other.initialLevel == this.initialLevel);
+}
+
+class EnvironmentAgentReservesCompanion
+    extends UpdateCompanion<EnvironmentAgentReserve> {
+  final Value<int> id;
+  final Value<int> agentId;
+  final Value<int> nutrientId;
+  final Value<double> initialLevel;
+  const EnvironmentAgentReservesCompanion({
+    this.id = const Value.absent(),
+    this.agentId = const Value.absent(),
+    this.nutrientId = const Value.absent(),
+    this.initialLevel = const Value.absent(),
+  });
+  EnvironmentAgentReservesCompanion.insert({
+    this.id = const Value.absent(),
+    required int agentId,
+    required int nutrientId,
+    this.initialLevel = const Value.absent(),
+  }) : agentId = Value(agentId),
+       nutrientId = Value(nutrientId);
+  static Insertable<EnvironmentAgentReserve> custom({
+    Expression<int>? id,
+    Expression<int>? agentId,
+    Expression<int>? nutrientId,
+    Expression<double>? initialLevel,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (agentId != null) 'agent_id': agentId,
+      if (nutrientId != null) 'nutrient_id': nutrientId,
+      if (initialLevel != null) 'initial_level': initialLevel,
+    });
+  }
+
+  EnvironmentAgentReservesCompanion copyWith({
+    Value<int>? id,
+    Value<int>? agentId,
+    Value<int>? nutrientId,
+    Value<double>? initialLevel,
+  }) {
+    return EnvironmentAgentReservesCompanion(
+      id: id ?? this.id,
+      agentId: agentId ?? this.agentId,
+      nutrientId: nutrientId ?? this.nutrientId,
+      initialLevel: initialLevel ?? this.initialLevel,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (agentId.present) {
+      map['agent_id'] = Variable<int>(agentId.value);
+    }
+    if (nutrientId.present) {
+      map['nutrient_id'] = Variable<int>(nutrientId.value);
+    }
+    if (initialLevel.present) {
+      map['initial_level'] = Variable<double>(initialLevel.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('EnvironmentAgentReservesCompanion(')
+          ..write('id: $id, ')
+          ..write('agentId: $agentId, ')
+          ..write('nutrientId: $nutrientId, ')
+          ..write('initialLevel: $initialLevel')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $MetabolismTable extends Metabolism
     with TableInfo<$MetabolismTable, MetabolismData> {
   @override
@@ -15034,6 +15356,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       $EnvironmentOvipositionSitesTable(this);
   late final $EnvironmentAgentsTable environmentAgents =
       $EnvironmentAgentsTable(this);
+  late final $EnvironmentAgentReservesTable environmentAgentReserves =
+      $EnvironmentAgentReservesTable(this);
   late final $MetabolismTable metabolism = $MetabolismTable(this);
   late final $BehaviorCostsTable behaviorCosts = $BehaviorCostsTable(this);
   late final $FeedingGainsTable feedingGains = $FeedingGainsTable(this);
@@ -15098,6 +15422,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     environmentSources,
     environmentOvipositionSites,
     environmentAgents,
+    environmentAgentReserves,
     metabolism,
     behaviorCosts,
     feedingGains,
@@ -15377,6 +15702,31 @@ final class $$NutrientsTableReferences
     );
   }
 
+  static MultiTypedResultKey<
+    $EnvironmentAgentReservesTable,
+    List<EnvironmentAgentReserve>
+  >
+  _environmentAgentReservesRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.environmentAgentReserves,
+        aliasName: 'nutrients__id__environment_agent_reserves__nutrient_id',
+      );
+
+  $$EnvironmentAgentReservesTableProcessedTableManager
+  get environmentAgentReservesRefs {
+    final manager = $$EnvironmentAgentReservesTableTableManager(
+      $_db,
+      $_db.environmentAgentReserves,
+    ).filter((f) => f.nutrientId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _environmentAgentReservesRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
   static MultiTypedResultKey<$MetabolismTable, List<MetabolismData>>
   _metabolismRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
     db.metabolism,
@@ -15574,6 +15924,33 @@ class $$NutrientsTableFilterComposer
                 $removeJoinBuilderFromRootComposer,
           ),
     );
+    return f(composer);
+  }
+
+  Expression<bool> environmentAgentReservesRefs(
+    Expression<bool> Function($$EnvironmentAgentReservesTableFilterComposer f)
+    f,
+  ) {
+    final $$EnvironmentAgentReservesTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.environmentAgentReserves,
+          getReferencedColumn: (t) => t.nutrientId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$EnvironmentAgentReservesTableFilterComposer(
+                $db: $db,
+                $table: $db.environmentAgentReserves,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
     return f(composer);
   }
 
@@ -15833,6 +16210,33 @@ class $$NutrientsTableAnnotationComposer
     return f(composer);
   }
 
+  Expression<T> environmentAgentReservesRefs<T extends Object>(
+    Expression<T> Function($$EnvironmentAgentReservesTableAnnotationComposer a)
+    f,
+  ) {
+    final $$EnvironmentAgentReservesTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.environmentAgentReserves,
+          getReferencedColumn: (t) => t.nutrientId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$EnvironmentAgentReservesTableAnnotationComposer(
+                $db: $db,
+                $table: $db.environmentAgentReserves,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
   Expression<T> metabolismRefs<T extends Object>(
     Expression<T> Function($$MetabolismTableAnnotationComposer a) f,
   ) {
@@ -16002,6 +16406,7 @@ class $$NutrientsTableTableManager
           PrefetchHooks Function({
             bool stageNutrientRequirementsRefs,
             bool environmentSourcesRefs,
+            bool environmentAgentReservesRefs,
             bool metabolismRefs,
             bool behaviorCostsRefs,
             bool feedingGainsRefs,
@@ -16057,6 +16462,7 @@ class $$NutrientsTableTableManager
               ({
                 stageNutrientRequirementsRefs = false,
                 environmentSourcesRefs = false,
+                environmentAgentReservesRefs = false,
                 metabolismRefs = false,
                 behaviorCostsRefs = false,
                 feedingGainsRefs = false,
@@ -16070,6 +16476,8 @@ class $$NutrientsTableTableManager
                     if (stageNutrientRequirementsRefs)
                       db.stageNutrientRequirements,
                     if (environmentSourcesRefs) db.environmentSources,
+                    if (environmentAgentReservesRefs)
+                      db.environmentAgentReserves,
                     if (metabolismRefs) db.metabolism,
                     if (behaviorCostsRefs) db.behaviorCosts,
                     if (feedingGainsRefs) db.feedingGains,
@@ -16116,6 +16524,27 @@ class $$NutrientsTableTableManager
                                 table,
                                 p0,
                               ).environmentSourcesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.nutrientId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (environmentAgentReservesRefs)
+                        await $_getPrefetchedData<
+                          Nutrient,
+                          $NutrientsTable,
+                          EnvironmentAgentReserve
+                        >(
+                          currentTable: table,
+                          referencedTable: $$NutrientsTableReferences
+                              ._environmentAgentReservesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$NutrientsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).environmentAgentReservesRefs,
                           referencedItemsForCurrentItem:
                               (item, referencedItems) => referencedItems.where(
                                 (e) => e.nutrientId == item.id,
@@ -16271,6 +16700,7 @@ typedef $$NutrientsTableProcessedTableManager =
       PrefetchHooks Function({
         bool stageNutrientRequirementsRefs,
         bool environmentSourcesRefs,
+        bool environmentAgentReservesRefs,
         bool metabolismRefs,
         bool behaviorCostsRefs,
         bool feedingGainsRefs,
@@ -25921,6 +26351,32 @@ final class $$EnvironmentAgentsTableReferences
       manager.$state.copyWith(prefetchedData: [item]),
     );
   }
+
+  static MultiTypedResultKey<
+    $EnvironmentAgentReservesTable,
+    List<EnvironmentAgentReserve>
+  >
+  _environmentAgentReservesRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.environmentAgentReserves,
+        aliasName:
+            'environment_agents__id__environment_agent_reserves__agent_id',
+      );
+
+  $$EnvironmentAgentReservesTableProcessedTableManager
+  get environmentAgentReservesRefs {
+    final manager = $$EnvironmentAgentReservesTableTableManager(
+      $_db,
+      $_db.environmentAgentReserves,
+    ).filter((f) => f.agentId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _environmentAgentReservesRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$EnvironmentAgentsTableFilterComposer
@@ -26029,6 +26485,33 @@ class $$EnvironmentAgentsTableFilterComposer
           ),
     );
     return composer;
+  }
+
+  Expression<bool> environmentAgentReservesRefs(
+    Expression<bool> Function($$EnvironmentAgentReservesTableFilterComposer f)
+    f,
+  ) {
+    final $$EnvironmentAgentReservesTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.environmentAgentReserves,
+          getReferencedColumn: (t) => t.agentId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$EnvironmentAgentReservesTableFilterComposer(
+                $db: $db,
+                $table: $db.environmentAgentReserves,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
   }
 }
 
@@ -26236,6 +26719,33 @@ class $$EnvironmentAgentsTableAnnotationComposer
     );
     return composer;
   }
+
+  Expression<T> environmentAgentReservesRefs<T extends Object>(
+    Expression<T> Function($$EnvironmentAgentReservesTableAnnotationComposer a)
+    f,
+  ) {
+    final $$EnvironmentAgentReservesTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.environmentAgentReserves,
+          getReferencedColumn: (t) => t.agentId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$EnvironmentAgentReservesTableAnnotationComposer(
+                $db: $db,
+                $table: $db.environmentAgentReserves,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
 }
 
 class $$EnvironmentAgentsTableTableManager
@@ -26255,6 +26765,7 @@ class $$EnvironmentAgentsTableTableManager
             bool environmentId,
             bool stageId,
             bool prototypeId,
+            bool environmentAgentReservesRefs,
           })
         > {
   $$EnvironmentAgentsTableTableManager(
@@ -26326,10 +26837,18 @@ class $$EnvironmentAgentsTableTableManager
               )
               .toList(),
           prefetchHooksCallback:
-              ({environmentId = false, stageId = false, prototypeId = false}) {
+              ({
+                environmentId = false,
+                stageId = false,
+                prototypeId = false,
+                environmentAgentReservesRefs = false,
+              }) {
                 return PrefetchHooks(
                   db: db,
-                  explicitlyWatchedTables: [],
+                  explicitlyWatchedTables: [
+                    if (environmentAgentReservesRefs)
+                      db.environmentAgentReserves,
+                  ],
                   addJoins:
                       <
                         T extends TableManagerState<
@@ -26395,7 +26914,29 @@ class $$EnvironmentAgentsTableTableManager
                         return state;
                       },
                   getPrefetchedDataCallback: (items) async {
-                    return [];
+                    return [
+                      if (environmentAgentReservesRefs)
+                        await $_getPrefetchedData<
+                          EnvironmentAgent,
+                          $EnvironmentAgentsTable,
+                          EnvironmentAgentReserve
+                        >(
+                          currentTable: table,
+                          referencedTable: $$EnvironmentAgentsTableReferences
+                              ._environmentAgentReservesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$EnvironmentAgentsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).environmentAgentReservesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.agentId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
                   },
                 );
               },
@@ -26419,7 +26960,415 @@ typedef $$EnvironmentAgentsTableProcessedTableManager =
         bool environmentId,
         bool stageId,
         bool prototypeId,
+        bool environmentAgentReservesRefs,
       })
+    >;
+typedef $$EnvironmentAgentReservesTableCreateCompanionBuilder =
+    EnvironmentAgentReservesCompanion Function({
+      Value<int> id,
+      required int agentId,
+      required int nutrientId,
+      Value<double> initialLevel,
+    });
+typedef $$EnvironmentAgentReservesTableUpdateCompanionBuilder =
+    EnvironmentAgentReservesCompanion Function({
+      Value<int> id,
+      Value<int> agentId,
+      Value<int> nutrientId,
+      Value<double> initialLevel,
+    });
+
+final class $$EnvironmentAgentReservesTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $EnvironmentAgentReservesTable,
+          EnvironmentAgentReserve
+        > {
+  $$EnvironmentAgentReservesTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $EnvironmentAgentsTable _agentIdTable(_$AppDatabase db) =>
+      db.environmentAgents.createAlias(
+        'environment_agent_reserves__agent_id__environment_agents__id',
+      );
+
+  $$EnvironmentAgentsTableProcessedTableManager get agentId {
+    final $_column = $_itemColumn<int>('agent_id')!;
+
+    final manager = $$EnvironmentAgentsTableTableManager(
+      $_db,
+      $_db.environmentAgents,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_agentIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $NutrientsTable _nutrientIdTable(_$AppDatabase db) => db.nutrients
+      .createAlias('environment_agent_reserves__nutrient_id__nutrients__id');
+
+  $$NutrientsTableProcessedTableManager get nutrientId {
+    final $_column = $_itemColumn<int>('nutrient_id')!;
+
+    final manager = $$NutrientsTableTableManager(
+      $_db,
+      $_db.nutrients,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_nutrientIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$EnvironmentAgentReservesTableFilterComposer
+    extends Composer<_$AppDatabase, $EnvironmentAgentReservesTable> {
+  $$EnvironmentAgentReservesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get initialLevel => $composableBuilder(
+    column: $table.initialLevel,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$EnvironmentAgentsTableFilterComposer get agentId {
+    final $$EnvironmentAgentsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.agentId,
+      referencedTable: $db.environmentAgents,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$EnvironmentAgentsTableFilterComposer(
+            $db: $db,
+            $table: $db.environmentAgents,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$NutrientsTableFilterComposer get nutrientId {
+    final $$NutrientsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.nutrientId,
+      referencedTable: $db.nutrients,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$NutrientsTableFilterComposer(
+            $db: $db,
+            $table: $db.nutrients,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$EnvironmentAgentReservesTableOrderingComposer
+    extends Composer<_$AppDatabase, $EnvironmentAgentReservesTable> {
+  $$EnvironmentAgentReservesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get initialLevel => $composableBuilder(
+    column: $table.initialLevel,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$EnvironmentAgentsTableOrderingComposer get agentId {
+    final $$EnvironmentAgentsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.agentId,
+      referencedTable: $db.environmentAgents,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$EnvironmentAgentsTableOrderingComposer(
+            $db: $db,
+            $table: $db.environmentAgents,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$NutrientsTableOrderingComposer get nutrientId {
+    final $$NutrientsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.nutrientId,
+      referencedTable: $db.nutrients,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$NutrientsTableOrderingComposer(
+            $db: $db,
+            $table: $db.nutrients,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$EnvironmentAgentReservesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $EnvironmentAgentReservesTable> {
+  $$EnvironmentAgentReservesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<double> get initialLevel => $composableBuilder(
+    column: $table.initialLevel,
+    builder: (column) => column,
+  );
+
+  $$EnvironmentAgentsTableAnnotationComposer get agentId {
+    final $$EnvironmentAgentsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.agentId,
+          referencedTable: $db.environmentAgents,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$EnvironmentAgentsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.environmentAgents,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+
+  $$NutrientsTableAnnotationComposer get nutrientId {
+    final $$NutrientsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.nutrientId,
+      referencedTable: $db.nutrients,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$NutrientsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.nutrients,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$EnvironmentAgentReservesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $EnvironmentAgentReservesTable,
+          EnvironmentAgentReserve,
+          $$EnvironmentAgentReservesTableFilterComposer,
+          $$EnvironmentAgentReservesTableOrderingComposer,
+          $$EnvironmentAgentReservesTableAnnotationComposer,
+          $$EnvironmentAgentReservesTableCreateCompanionBuilder,
+          $$EnvironmentAgentReservesTableUpdateCompanionBuilder,
+          (EnvironmentAgentReserve, $$EnvironmentAgentReservesTableReferences),
+          EnvironmentAgentReserve,
+          PrefetchHooks Function({bool agentId, bool nutrientId})
+        > {
+  $$EnvironmentAgentReservesTableTableManager(
+    _$AppDatabase db,
+    $EnvironmentAgentReservesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$EnvironmentAgentReservesTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$EnvironmentAgentReservesTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$EnvironmentAgentReservesTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> agentId = const Value.absent(),
+                Value<int> nutrientId = const Value.absent(),
+                Value<double> initialLevel = const Value.absent(),
+              }) => EnvironmentAgentReservesCompanion(
+                id: id,
+                agentId: agentId,
+                nutrientId: nutrientId,
+                initialLevel: initialLevel,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int agentId,
+                required int nutrientId,
+                Value<double> initialLevel = const Value.absent(),
+              }) => EnvironmentAgentReservesCompanion.insert(
+                id: id,
+                agentId: agentId,
+                nutrientId: nutrientId,
+                initialLevel: initialLevel,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$EnvironmentAgentReservesTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({agentId = false, nutrientId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (agentId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.agentId,
+                                referencedTable:
+                                    $$EnvironmentAgentReservesTableReferences
+                                        ._agentIdTable(db),
+                                referencedColumn:
+                                    $$EnvironmentAgentReservesTableReferences
+                                        ._agentIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+                    if (nutrientId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.nutrientId,
+                                referencedTable:
+                                    $$EnvironmentAgentReservesTableReferences
+                                        ._nutrientIdTable(db),
+                                referencedColumn:
+                                    $$EnvironmentAgentReservesTableReferences
+                                        ._nutrientIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$EnvironmentAgentReservesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $EnvironmentAgentReservesTable,
+      EnvironmentAgentReserve,
+      $$EnvironmentAgentReservesTableFilterComposer,
+      $$EnvironmentAgentReservesTableOrderingComposer,
+      $$EnvironmentAgentReservesTableAnnotationComposer,
+      $$EnvironmentAgentReservesTableCreateCompanionBuilder,
+      $$EnvironmentAgentReservesTableUpdateCompanionBuilder,
+      (EnvironmentAgentReserve, $$EnvironmentAgentReservesTableReferences),
+      EnvironmentAgentReserve,
+      PrefetchHooks Function({bool agentId, bool nutrientId})
     >;
 typedef $$MetabolismTableCreateCompanionBuilder =
     MetabolismCompanion Function({
@@ -32681,6 +33630,11 @@ class $AppDatabaseManager {
       );
   $$EnvironmentAgentsTableTableManager get environmentAgents =>
       $$EnvironmentAgentsTableTableManager(_db, _db.environmentAgents);
+  $$EnvironmentAgentReservesTableTableManager get environmentAgentReserves =>
+      $$EnvironmentAgentReservesTableTableManager(
+        _db,
+        _db.environmentAgentReserves,
+      );
   $$MetabolismTableTableManager get metabolism =>
       $$MetabolismTableTableManager(_db, _db.metabolism);
   $$BehaviorCostsTableTableManager get behaviorCosts =>

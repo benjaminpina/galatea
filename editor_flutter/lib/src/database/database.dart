@@ -31,6 +31,7 @@ part 'database.g.dart';
     EnvironmentSources,
     EnvironmentOvipositionSites,
     EnvironmentAgents,
+    EnvironmentAgentReserves,
     Metabolism,
     BehaviorCosts,
     FeedingGains,

@@ -36,6 +36,8 @@ class _FormulaEditorDialog extends ConsumerStatefulWidget {
 class _FormulaEditorDialogState extends ConsumerState<_FormulaEditorDialog>
     with SingleTickerProviderStateMixin {
   late final TextEditingController _formulaCtrl;
+  final FocusNode _formulaFocus = FocusNode();
+  final LayerLink _layerLink = LayerLink();
   TabController? _tabCtrl;
   List<VariableCategory> _categories = [];
   FormulaValidator _validator = FormulaValidator(
@@ -46,18 +48,27 @@ class _FormulaEditorDialogState extends ConsumerState<_FormulaEditorDialog>
   List<CustomFunction> _customFunctions = [];
   bool _loaded = false;
 
+  // Autocomplete state.
+  List<_AutocompleteEntry> _allSymbols = [];
+  List<_AutocompleteEntry> _suggestions = [];
+  OverlayEntry? _overlayEntry;
+  int _selectedSuggestion = 0;
+
   @override
   void initState() {
     super.initState();
     _formulaCtrl = TextEditingController(text: widget.initialFormula);
     _formulaCtrl.addListener(_onFormulaChanged);
+    _formulaFocus.addListener(_onFocusChanged);
     _loadData();
   }
 
   @override
   void dispose() {
+    _hideOverlay();
     _formulaCtrl.removeListener(_onFormulaChanged);
     _formulaCtrl.dispose();
+    _formulaFocus.dispose();
     _tabCtrl?.dispose();
     super.dispose();
   }
@@ -105,6 +116,32 @@ class _FormulaEditorDialogState extends ConsumerState<_FormulaEditorDialog>
       knownFunctions: knownFuncs,
     );
 
+    // Build autocomplete symbols list.
+    _allSymbols = [
+      for (final cat in _categories)
+        for (final v in cat.variables)
+          if (v.name != '—')
+            _AutocompleteEntry(
+              name: v.name,
+              detail: v.description,
+              isFunction: false,
+            ),
+      for (final f in builtInFunctions)
+        _AutocompleteEntry(
+          name: f.name,
+          detail: f.description,
+          isFunction: true,
+          insertText: '${f.name}(',
+        ),
+      for (final cf in _customFunctions)
+        _AutocompleteEntry(
+          name: cf.name,
+          detail: cf.description.isEmpty ? cf.body : cf.description,
+          isFunction: true,
+          insertText: '${cf.name}(',
+        ),
+    ];
+
     if (!mounted) return;
     _tabCtrl = TabController(length: _categories.length + 1, vsync: this);
     _loaded = true;
@@ -116,6 +153,97 @@ class _FormulaEditorDialogState extends ConsumerState<_FormulaEditorDialog>
     setState(() {
       _validation = _validator.validate(_formulaCtrl.text);
     });
+    _updateAutocomplete();
+  }
+
+  void _onFocusChanged() {
+    if (!_formulaFocus.hasFocus) {
+      _hideOverlay();
+    }
+  }
+
+  /// Extract the identifier prefix being typed at the cursor position.
+  String _currentPrefix() {
+    final text = _formulaCtrl.text;
+    final cursor = _formulaCtrl.selection.baseOffset.clamp(0, text.length);
+    // Walk backward from cursor to find start of identifier.
+    int start = cursor;
+    while (start > 0) {
+      final ch = text[start - 1];
+      if (_isIdentChar(ch)) {
+        start--;
+      } else {
+        break;
+      }
+    }
+    if (start == cursor) return '';
+    return text.substring(start, cursor);
+  }
+
+  bool _isIdentChar(String ch) {
+    final c = ch.codeUnitAt(0);
+    return (c >= 65 && c <= 90) || // A-Z
+        (c >= 97 && c <= 122) || // a-z
+        (c >= 48 && c <= 57) || // 0-9
+        c == 95; // _
+  }
+
+  void _updateAutocomplete() {
+    final prefix = _currentPrefix();
+    if (prefix.length < 2) {
+      _hideOverlay();
+      return;
+    }
+
+    final lower = prefix.toLowerCase();
+    final matches = _allSymbols
+        .where((s) => s.name.toLowerCase().startsWith(lower))
+        .take(8)
+        .toList();
+
+    if (matches.isEmpty) {
+      _hideOverlay();
+      return;
+    }
+
+    _suggestions = matches;
+    _selectedSuggestion = 0;
+    _showOverlay();
+  }
+
+  void _showOverlay() {
+    _hideOverlay();
+    _overlayEntry = OverlayEntry(
+      builder: (context) {
+        return _AutocompletePopup(
+          link: _layerLink,
+          suggestions: _suggestions,
+          selectedIndex: _selectedSuggestion,
+          onSelect: _acceptSuggestion,
+        );
+      },
+    );
+    Overlay.of(context).insert(_overlayEntry!);
+  }
+
+  void _hideOverlay() {
+    _overlayEntry?.remove();
+    _overlayEntry = null;
+  }
+
+  void _acceptSuggestion(_AutocompleteEntry entry) {
+    final prefix = _currentPrefix();
+    final text = _formulaCtrl.text;
+    final cursor = _formulaCtrl.selection.baseOffset.clamp(0, text.length);
+    final start = cursor - prefix.length;
+    final insertText = entry.insertText ?? entry.name;
+    final newText =
+        text.substring(0, start) + insertText + text.substring(cursor);
+    _formulaCtrl.text = newText;
+    _formulaCtrl.selection = TextSelection.collapsed(
+      offset: start + insertText.length,
+    );
+    _hideOverlay();
   }
 
   void _insertText(String text) {
@@ -167,26 +295,34 @@ class _FormulaEditorDialogState extends ConsumerState<_FormulaEditorDialog>
             // --- Formula field ---
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
-              child: TextField(
-                controller: _formulaCtrl,
-                autofocus: true,
-                style: const TextStyle(fontSize: 14, fontFamily: 'monospace'),
-                decoration: InputDecoration(
-                  border: const OutlineInputBorder(),
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 10,
+              child: CompositedTransformTarget(
+                link: _layerLink,
+                child: TextField(
+                  controller: _formulaCtrl,
+                  focusNode: _formulaFocus,
+                  autofocus: true,
+                  style: const TextStyle(fontSize: 14, fontFamily: 'monospace'),
+                  decoration: InputDecoration(
+                    border: const OutlineInputBorder(),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 10,
+                    ),
+                    suffixIcon: _validation.isValid
+                        ? const Icon(
+                            Icons.check_circle,
+                            color: Colors.green,
+                            size: 20,
+                          )
+                        : const Icon(
+                            Icons.error,
+                            color: Colors.orange,
+                            size: 20,
+                          ),
                   ),
-                  suffixIcon: _validation.isValid
-                      ? const Icon(
-                          Icons.check_circle,
-                          color: Colors.green,
-                          size: 20,
-                        )
-                      : const Icon(Icons.error, color: Colors.orange, size: 20),
+                  maxLines: 2,
+                  minLines: 1,
                 ),
-                maxLines: 2,
-                minLines: 1,
               ),
             ),
 
@@ -460,6 +596,121 @@ class _FunctionTile extends StatelessWidget {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+// --- Autocomplete ---
+
+class _AutocompleteEntry {
+  const _AutocompleteEntry({
+    required this.name,
+    required this.detail,
+    required this.isFunction,
+    this.insertText,
+  });
+
+  final String name;
+  final String detail;
+  final bool isFunction;
+
+  /// If provided, this text is inserted instead of [name].
+  final String? insertText;
+}
+
+class _AutocompletePopup extends StatelessWidget {
+  const _AutocompletePopup({
+    required this.link,
+    required this.suggestions,
+    required this.selectedIndex,
+    required this.onSelect,
+  });
+
+  final LayerLink link;
+  final List<_AutocompleteEntry> suggestions;
+  final int selectedIndex;
+  final ValueChanged<_AutocompleteEntry> onSelect;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+
+    return Positioned(
+      width: 320,
+      child: CompositedTransformFollower(
+        link: link,
+        showWhenUnlinked: false,
+        offset: const Offset(0, 48),
+        child: Material(
+          elevation: 8,
+          borderRadius: BorderRadius.circular(8),
+          color: scheme.surfaceContainer,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxHeight: 200),
+            child: ListView.builder(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              shrinkWrap: true,
+              itemCount: suggestions.length,
+              itemBuilder: (context, index) {
+                final entry = suggestions[index];
+                final selected = index == selectedIndex;
+                return InkWell(
+                  onTap: () => onSelect(entry),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
+                    color: selected
+                        ? scheme.primaryContainer.withValues(alpha: 0.3)
+                        : null,
+                    child: Row(
+                      children: [
+                        Icon(
+                          entry.isFunction
+                              ? Icons.functions
+                              : Icons.data_object,
+                          size: 14,
+                          color: entry.isFunction
+                              ? Colors.amber.shade400
+                              : scheme.primary,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                entry.name,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontFamily: 'monospace',
+                                  fontWeight: FontWeight.w600,
+                                  color: scheme.onSurface,
+                                ),
+                              ),
+                              if (entry.detail.isNotEmpty)
+                                Text(
+                                  entry.detail,
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    color: scheme.onSurfaceVariant,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
         ),
       ),
     );

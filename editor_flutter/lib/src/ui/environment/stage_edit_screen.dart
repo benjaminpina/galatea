@@ -23,15 +23,17 @@ class _StageEditScreenState extends ConsumerState<StageEditScreen> {
   // General fields.
   final _nameCtrl = TextEditingController();
   final _cyclesCtrl = TextEditingController();
-  final _cond1FormulaCtrl = TextEditingController();
+  String _cond1Formula = '0';
   final _cond1OpCtrl = TextEditingController();
   final _cond1ValueCtrl = TextEditingController();
-  final _cond2FormulaCtrl = TextEditingController();
+  String _cond2Formula = '0';
   final _cond2OpCtrl = TextEditingController();
   final _cond2ValueCtrl = TextEditingController();
   String _logicCyclesReqs = 'AND';
   String _logicReqsConds = 'AND';
   String _logicCond1Cond2 = 'AND';
+  int _color = 0;
+  int? _linkedPrototypeId;
 
   @override
   void initState() {
@@ -43,10 +45,8 @@ class _StageEditScreenState extends ConsumerState<StageEditScreen> {
   void dispose() {
     _nameCtrl.dispose();
     _cyclesCtrl.dispose();
-    _cond1FormulaCtrl.dispose();
     _cond1OpCtrl.dispose();
     _cond1ValueCtrl.dispose();
-    _cond2FormulaCtrl.dispose();
     _cond2OpCtrl.dispose();
     _cond2ValueCtrl.dispose();
     super.dispose();
@@ -63,15 +63,17 @@ class _StageEditScreenState extends ConsumerState<StageEditScreen> {
       _stage = stage;
       _nameCtrl.text = stage.name;
       _cyclesCtrl.text = stage.cyclesFormula;
-      _cond1FormulaCtrl.text = stage.condition1Formula;
+      _cond1Formula = stage.condition1Formula;
       _cond1OpCtrl.text = stage.condition1Op;
       _cond1ValueCtrl.text = stage.condition1Value.toString();
-      _cond2FormulaCtrl.text = stage.condition2Formula;
+      _cond2Formula = stage.condition2Formula;
       _cond2OpCtrl.text = stage.condition2Op;
       _cond2ValueCtrl.text = stage.condition2Value.toString();
       _logicCyclesReqs = stage.logicCyclesReqs;
       _logicReqsConds = stage.logicReqsConds;
       _logicCond1Cond2 = stage.logicCond1Cond2;
+      _color = stage.color;
+      _linkedPrototypeId = stage.linkedPrototypeId;
     });
   }
 
@@ -84,12 +86,12 @@ class _StageEditScreenState extends ConsumerState<StageEditScreen> {
       StagesCompanion(
         name: Value(_nameCtrl.text.trim()),
         cyclesFormula: Value(_cyclesCtrl.text.trim()),
-        condition1Formula: Value(_cond1FormulaCtrl.text.trim()),
+        condition1Formula: Value(_cond1Formula),
         condition1Op: Value(_cond1OpCtrl.text.trim()),
         condition1Value: Value(
           double.tryParse(_cond1ValueCtrl.text.trim()) ?? 0,
         ),
-        condition2Formula: Value(_cond2FormulaCtrl.text.trim()),
+        condition2Formula: Value(_cond2Formula),
         condition2Op: Value(_cond2OpCtrl.text.trim()),
         condition2Value: Value(
           double.tryParse(_cond2ValueCtrl.text.trim()) ?? 0,
@@ -97,6 +99,8 @@ class _StageEditScreenState extends ConsumerState<StageEditScreen> {
         logicCyclesReqs: Value(_logicCyclesReqs),
         logicReqsConds: Value(_logicReqsConds),
         logicCond1Cond2: Value(_logicCond1Cond2),
+        color: Value(_color),
+        linkedPrototypeId: Value(_linkedPrototypeId),
       ),
     );
     if (mounted) {
@@ -107,6 +111,94 @@ class _StageEditScreenState extends ConsumerState<StageEditScreen> {
         ),
       );
     }
+  }
+
+  Future<void> _pickColor() async {
+    final controller = TextEditingController(
+      text: _color != 0
+          ? (_color & 0xFFFFFF).toRadixString(16).padLeft(6, '0')
+          : '',
+    );
+    final result = await showDialog<int>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Stage Color'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: controller,
+              decoration: const InputDecoration(
+                labelText: 'Hex color (RRGGBB)',
+                prefixText: '#',
+              ),
+              maxLength: 6,
+            ),
+            const SizedBox(height: 12),
+            ValueListenableBuilder<TextEditingValue>(
+              valueListenable: controller,
+              builder: (_, val, _) {
+                final parsed = int.tryParse(val.text, radix: 16);
+                return Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: parsed != null
+                        ? Color(parsed | 0xFF000000)
+                        : Colors.grey,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.grey),
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () {
+              final parsed = int.tryParse(controller.text, radix: 16);
+              Navigator.pop(ctx, parsed ?? 0);
+            },
+            child: const Text('Apply'),
+          ),
+        ],
+      ),
+    );
+    if (result != null) {
+      setState(() => _color = result);
+    }
+  }
+
+  Widget _buildLinkedPrototypeDropdown() {
+    final prototypes = ref.watch(prototypesProvider).valueOrNull ?? [];
+    return DropdownButtonFormField<int?>(
+      initialValue: prototypes.any((p) => p.id == _linkedPrototypeId)
+          ? _linkedPrototypeId
+          : null,
+      isDense: true,
+      isExpanded: true,
+      decoration: const InputDecoration(
+        labelText: 'Linked Prototype (on eclosion)',
+        helperText: 'Prototype assigned when agent exits this stage',
+        helperMaxLines: 2,
+        border: OutlineInputBorder(),
+      ),
+      items: [
+        const DropdownMenuItem(value: null, child: Text('None')),
+        ...prototypes.map(
+          (p) => DropdownMenuItem(
+            value: p.id,
+            child: Text('${p.name} (${p.sex})'),
+          ),
+        ),
+      ],
+      onChanged: (v) => setState(() => _linkedPrototypeId = v),
+    );
   }
 
   @override
@@ -143,6 +235,42 @@ class _StageEditScreenState extends ConsumerState<StageEditScreen> {
             value: _cyclesCtrl.text,
             onChanged: (v) => setState(() => _cyclesCtrl.text = v),
           ),
+          const SizedBox(height: 12),
+
+          // Color picker
+          Row(
+            children: [
+              const Text('Color:', style: TextStyle(fontSize: 13)),
+              const SizedBox(width: 12),
+              GestureDetector(
+                onTap: _pickColor,
+                child: Container(
+                  width: 28,
+                  height: 28,
+                  decoration: BoxDecoration(
+                    color: _color != 0
+                        ? Color(_color | 0xFF000000)
+                        : Colors.grey.shade400,
+                    border: Border.all(
+                      color: Theme.of(context).colorScheme.outline,
+                    ),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                _color != 0
+                    ? '#${(_color & 0xFFFFFF).toRadixString(16).padLeft(6, '0').toUpperCase()}'
+                    : 'None',
+                style: const TextStyle(fontSize: 11, fontFamily: 'monospace'),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+
+          // Linked prototype dropdown
+          _buildLinkedPrototypeDropdown(),
           const SizedBox(height: 24),
 
           // --- Transition conditions ---
@@ -152,56 +280,124 @@ class _StageEditScreenState extends ConsumerState<StageEditScreen> {
           ),
           const SizedBox(height: 12),
           Text('Condition 1:', style: Theme.of(context).textTheme.labelLarge),
+          const SizedBox(height: 4),
           Row(
             children: [
               Expanded(
-                child: TextField(
-                  controller: _cond1FormulaCtrl,
-                  decoration: const InputDecoration(labelText: 'Formula'),
-                ),
-              ),
-              const SizedBox(width: 8),
-              SizedBox(
-                width: 50,
-                child: TextField(
-                  controller: _cond1OpCtrl,
-                  decoration: const InputDecoration(labelText: 'Op'),
+                child: FormulaField(
+                  label: 'Formula',
+                  title: 'Condition 1 formula',
+                  value: _cond1Formula,
+                  onChanged: (v) => setState(() => _cond1Formula = v),
                 ),
               ),
               const SizedBox(width: 8),
               SizedBox(
                 width: 60,
+                child: DropdownButtonFormField<String>(
+                  initialValue: _cond1OpCtrl.text.isEmpty
+                      ? '>'
+                      : _cond1OpCtrl.text,
+                  isDense: true,
+                  decoration: const InputDecoration(
+                    labelText: 'Op',
+                    isDense: true,
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 8,
+                    ),
+                    border: OutlineInputBorder(),
+                  ),
+                  items: const [
+                    DropdownMenuItem(value: '>', child: Text('>')),
+                    DropdownMenuItem(value: '>=', child: Text('>=')),
+                    DropdownMenuItem(value: '<', child: Text('<')),
+                    DropdownMenuItem(value: '<=', child: Text('<=')),
+                    DropdownMenuItem(value: '==', child: Text('==')),
+                    DropdownMenuItem(value: '!=', child: Text('!=')),
+                  ],
+                  onChanged: (v) {
+                    if (v != null) _cond1OpCtrl.text = v;
+                  },
+                ),
+              ),
+              const SizedBox(width: 8),
+              SizedBox(
+                width: 70,
                 child: TextField(
                   controller: _cond1ValueCtrl,
-                  decoration: const InputDecoration(labelText: 'Value'),
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(
+                    labelText: 'Value',
+                    isDense: true,
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 8,
+                    ),
+                    border: OutlineInputBorder(),
+                  ),
                 ),
               ),
             ],
           ),
           const SizedBox(height: 12),
           Text('Condition 2:', style: Theme.of(context).textTheme.labelLarge),
+          const SizedBox(height: 4),
           Row(
             children: [
               Expanded(
-                child: TextField(
-                  controller: _cond2FormulaCtrl,
-                  decoration: const InputDecoration(labelText: 'Formula'),
-                ),
-              ),
-              const SizedBox(width: 8),
-              SizedBox(
-                width: 50,
-                child: TextField(
-                  controller: _cond2OpCtrl,
-                  decoration: const InputDecoration(labelText: 'Op'),
+                child: FormulaField(
+                  label: 'Formula',
+                  title: 'Condition 2 formula',
+                  value: _cond2Formula,
+                  onChanged: (v) => setState(() => _cond2Formula = v),
                 ),
               ),
               const SizedBox(width: 8),
               SizedBox(
                 width: 60,
+                child: DropdownButtonFormField<String>(
+                  initialValue: _cond2OpCtrl.text.isEmpty
+                      ? '>'
+                      : _cond2OpCtrl.text,
+                  isDense: true,
+                  decoration: const InputDecoration(
+                    labelText: 'Op',
+                    isDense: true,
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 8,
+                    ),
+                    border: OutlineInputBorder(),
+                  ),
+                  items: const [
+                    DropdownMenuItem(value: '>', child: Text('>')),
+                    DropdownMenuItem(value: '>=', child: Text('>=')),
+                    DropdownMenuItem(value: '<', child: Text('<')),
+                    DropdownMenuItem(value: '<=', child: Text('<=')),
+                    DropdownMenuItem(value: '==', child: Text('==')),
+                    DropdownMenuItem(value: '!=', child: Text('!=')),
+                  ],
+                  onChanged: (v) {
+                    if (v != null) _cond2OpCtrl.text = v;
+                  },
+                ),
+              ),
+              const SizedBox(width: 8),
+              SizedBox(
+                width: 70,
                 child: TextField(
                   controller: _cond2ValueCtrl,
-                  decoration: const InputDecoration(labelText: 'Value'),
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(
+                    labelText: 'Value',
+                    isDense: true,
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 8,
+                    ),
+                    border: OutlineInputBorder(),
+                  ),
                 ),
               ),
             ],

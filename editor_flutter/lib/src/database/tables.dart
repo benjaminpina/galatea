@@ -169,6 +169,20 @@ class EnvironmentAgents extends Table {
   IntColumn get age => integer().withDefault(const Constant(0))();
 }
 
+/// Per-agent initial nutrient reserve levels.
+/// Allows overriding the global metabolism defaults for specific placed agents.
+class EnvironmentAgentReserves extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get agentId => integer().references(EnvironmentAgents, #id)();
+  IntColumn get nutrientId => integer().references(Nutrients, #id)();
+  RealColumn get initialLevel => real().withDefault(const Constant(50.0))();
+
+  @override
+  List<Set<Column>> get uniqueKeys => [
+    {agentId, nutrientId},
+  ];
+}
+
 /// Metabolism configuration per nutrient.
 class Metabolism extends Table {
   IntColumn get id => integer().autoIncrement()();

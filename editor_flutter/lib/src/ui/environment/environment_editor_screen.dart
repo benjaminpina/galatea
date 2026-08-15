@@ -603,6 +603,10 @@ class _EnvironmentEditorScreenState
     final (x, y) = _localToGrid(d.localPosition);
     if (x >= 0 && x < _envWidth && y >= 0 && y < _envHeight) {
       _selectElementAt(x, y);
+      // Auto-switch to Pointer tool to show properties panel.
+      if (_selectedElement != null && _currentTool != EditorTool.pointer) {
+        setState(() => _currentTool = EditorTool.pointer);
+      }
     }
   }
 
@@ -895,6 +899,7 @@ class _EnvironmentEditorScreenState
     final substrates = ref.watch(substratesProvider).valueOrNull ?? [];
     final nutrients = ref.watch(nutrientsProvider).valueOrNull ?? [];
     final prototypes = ref.watch(prototypesProvider).valueOrNull ?? [];
+    final stages = ref.watch(stagesProvider).valueOrNull ?? [];
 
     // Reload placed elements when project data changes (e.g. cascade deletes).
     ref.listen(prototypesProvider, (prev, next) => _reloadPlacedElements());
@@ -969,6 +974,8 @@ class _EnvironmentEditorScreenState
                         setState(() => _brushRadius = r),
                     defaultSubstrateId: _defaultSubstrateId,
                     onDefaultSubstrateChanged: _onDefaultSubstrateChanged,
+                    stages: stages,
+                    onElementUpdated: _reloadPlacedElements,
                   ),
                 ),
                 const VerticalDivider(width: 1),
