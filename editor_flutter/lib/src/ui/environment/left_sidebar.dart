@@ -1,9 +1,7 @@
 import 'package:drift/drift.dart' hide Column;
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../database/database.dart';
-import '../../providers/database_provider.dart';
 import 'editor_state.dart';
 
 /// Left panel content when showing tool-specific options.
@@ -38,6 +36,7 @@ class LeftSidebar extends StatelessWidget {
     required this.onDefaultSubstrateChanged,
     this.stages = const [],
     this.onElementUpdated,
+    this.db,
   });
 
   final EditorTool currentTool;
@@ -66,6 +65,7 @@ class LeftSidebar extends StatelessWidget {
   final ValueChanged<int> onDefaultSubstrateChanged;
   final List<Stage> stages;
   final VoidCallback? onElementUpdated;
+  final AppDatabase? db;
 
   @override
   Widget build(BuildContext context) {
@@ -564,11 +564,16 @@ class LeftSidebar extends StatelessWidget {
   }
 
   Widget _agentProps(BuildContext context, PlacedAgent a) {
+    if (db == null) {
+      return const Text('No database', style: TextStyle(fontSize: 11));
+    }
     return _AgentPropertiesEditor(
+      key: ValueKey('agent_props_${a.id}'),
       agent: a,
       prototypes: prototypes,
       stages: stages,
       nutrients: nutrients,
+      db: db!,
       onUpdated: onElementUpdated,
     );
   }
@@ -757,12 +762,14 @@ class _BrushShapeBtn extends StatelessWidget {
 
 /// Editable properties panel for a placed agent.
 /// Allows editing name, age, sex, stage, prototype, and per-nutrient reserves.
-class _AgentPropertiesEditor extends ConsumerStatefulWidget {
+class _AgentPropertiesEditor extends StatefulWidget {
   const _AgentPropertiesEditor({
+    super.key,
     required this.agent,
     required this.prototypes,
     required this.stages,
     required this.nutrients,
+    required this.db,
     this.onUpdated,
   });
 
@@ -770,26 +777,25 @@ class _AgentPropertiesEditor extends ConsumerStatefulWidget {
   final List<Prototype> prototypes;
   final List<Stage> stages;
   final List<Nutrient> nutrients;
+  final AppDatabase db;
   final VoidCallback? onUpdated;
 
   @override
-  ConsumerState<_AgentPropertiesEditor> createState() =>
-      _AgentPropertiesEditorState();
+  State<_AgentPropertiesEditor> createState() => _AgentPropertiesEditorState();
 }
 
-class _AgentPropertiesEditorState
-    extends ConsumerState<_AgentPropertiesEditor> {
+class _AgentPropertiesEditorState extends State<_AgentPropertiesEditor> {
   late TextEditingController _nameCtrl;
   late TextEditingController _ageCtrl;
   Map<int, double> _reserves = {};
-  bool _reservesLoaded = false;
+  Future<Map<int, double>>? _reservesFuture;
 
   @override
   void initState() {
     super.initState();
     _nameCtrl = TextEditingController(text: widget.agent.name);
     _ageCtrl = TextEditingController(text: '${widget.agent.age}');
-    _loadReserves();
+    _reservesFuture = _fetchReserves();
   }
 
   @override
@@ -798,7 +804,7 @@ class _AgentPropertiesEditorState
     if (oldWidget.agent.id != widget.agent.id) {
       _nameCtrl.text = widget.agent.name;
       _ageCtrl.text = '${widget.agent.age}';
-      _loadReserves();
+      _reservesFuture = _fetchReserves();
     }
   }
 
@@ -809,27 +815,20 @@ class _AgentPropertiesEditorState
     super.dispose();
   }
 
-  Future<void> _loadReserves() async {
-    final db = ref.read(databaseProvider);
-    if (db == null) return;
-    final rows = await (db.select(
-      db.environmentAgentReserves,
+  Future<Map<int, double>> _fetchReserves() async {
+    final rows = await (widget.db.select(
+      widget.db.environmentAgentReserves,
     )..where((t) => t.agentId.equals(widget.agent.id))).get();
     final map = <int, double>{};
     for (final r in rows) {
       map[r.nutrientId] = r.initialLevel;
     }
-    if (mounted) {
-      setState(() {
-        _reserves = map;
-        _reservesLoaded = true;
-      });
-    }
+    _reserves = map;
+    return map;
   }
 
   Future<void> _saveName() async {
-    final db = ref.read(databaseProvider);
-    if (db == null) return;
+    final db = widget.db;
     final name = _nameCtrl.text.trim();
     if (name.isEmpty) return;
     await (db.update(db.environmentAgents)
@@ -839,8 +838,7 @@ class _AgentPropertiesEditorState
   }
 
   Future<void> _saveAge() async {
-    final db = ref.read(databaseProvider);
-    if (db == null) return;
+    final db = widget.db;
     final age = int.tryParse(_ageCtrl.text.trim()) ?? 0;
     await (db.update(db.environmentAgents)
           ..where((t) => t.id.equals(widget.agent.id)))
@@ -849,8 +847,7 @@ class _AgentPropertiesEditorState
   }
 
   Future<void> _saveSex(String sex) async {
-    final db = ref.read(databaseProvider);
-    if (db == null) return;
+    final db = widget.db;
     await (db.update(db.environmentAgents)
           ..where((t) => t.id.equals(widget.agent.id)))
         .write(EnvironmentAgentsCompanion(sex: Value(sex)));
@@ -858,8 +855,7 @@ class _AgentPropertiesEditorState
   }
 
   Future<void> _savePrototype(int? protoId) async {
-    final db = ref.read(databaseProvider);
-    if (db == null) return;
+    final db = widget.db;
     await (db.update(db.environmentAgents)
           ..where((t) => t.id.equals(widget.agent.id)))
         .write(EnvironmentAgentsCompanion(prototypeId: Value(protoId)));
@@ -867,8 +863,7 @@ class _AgentPropertiesEditorState
   }
 
   Future<void> _saveStage(int? stageId) async {
-    final db = ref.read(databaseProvider);
-    if (db == null) return;
+    final db = widget.db;
     await (db.update(db.environmentAgents)
           ..where((t) => t.id.equals(widget.agent.id)))
         .write(EnvironmentAgentsCompanion(stageId: Value(stageId)));
@@ -876,8 +871,7 @@ class _AgentPropertiesEditorState
   }
 
   Future<void> _saveReserve(int nutrientId, double level) async {
-    final db = ref.read(databaseProvider);
-    if (db == null) return;
+    final db = widget.db;
     final existing =
         await (db.select(db.environmentAgentReserves)..where(
               (t) =>
@@ -1031,50 +1025,61 @@ class _AgentPropertiesEditorState
             ),
           ),
           const SizedBox(height: 4),
-          if (!_reservesLoaded)
-            const LinearProgressIndicator()
-          else
-            ...widget.nutrients.map((n) {
-              final level = _reserves[n.id] ?? 50.0;
-              return Padding(
-                padding: const EdgeInsets.symmetric(vertical: 2),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 8,
-                      height: 8,
-                      decoration: BoxDecoration(
-                        color: Color(n.color),
-                        shape: BoxShape.circle,
-                      ),
+          FutureBuilder<Map<int, double>>(
+            future: _reservesFuture,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState != ConnectionState.done) {
+                return const SizedBox(
+                  height: 2,
+                  child: LinearProgressIndicator(),
+                );
+              }
+              final reserves = snapshot.data ?? {};
+              return Column(
+                children: widget.nutrients.map((n) {
+                  final level = reserves[n.id] ?? 50.0;
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 2),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 8,
+                          height: 8,
+                          decoration: BoxDecoration(
+                            color: Color(n.color),
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        SizedBox(
+                          width: 45,
+                          child: Text(
+                            n.name,
+                            style: const TextStyle(fontSize: 9),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        Expanded(
+                          child: _ReserveSlider(
+                            value: level,
+                            onChanged: (v) => _saveReserve(n.id, v),
+                          ),
+                        ),
+                        SizedBox(
+                          width: 28,
+                          child: Text(
+                            level.round().toString(),
+                            style: const TextStyle(fontSize: 9),
+                            textAlign: TextAlign.right,
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(width: 4),
-                    SizedBox(
-                      width: 45,
-                      child: Text(
-                        n.name,
-                        style: const TextStyle(fontSize: 9),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    Expanded(
-                      child: _ReserveSlider(
-                        value: level,
-                        onChanged: (v) => _saveReserve(n.id, v),
-                      ),
-                    ),
-                    SizedBox(
-                      width: 28,
-                      child: Text(
-                        level.round().toString(),
-                        style: const TextStyle(fontSize: 9),
-                        textAlign: TextAlign.right,
-                      ),
-                    ),
-                  ],
-                ),
+                  );
+                }).toList(),
               );
-            }),
+            },
+          ),
         ],
       ],
     );

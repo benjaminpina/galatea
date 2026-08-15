@@ -976,6 +976,7 @@ class _EnvironmentEditorScreenState
                     onDefaultSubstrateChanged: _onDefaultSubstrateChanged,
                     stages: stages,
                     onElementUpdated: _reloadPlacedElements,
+                    db: ref.read(databaseProvider),
                   ),
                 ),
                 const VerticalDivider(width: 1),
