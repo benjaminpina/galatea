@@ -71,6 +71,9 @@ class _EnvironmentEditorScreenState
   Offset _offsetStart = Offset.zero;
   bool _panning = false;
 
+  // --- Dirty state (unsaved changes) ---
+  bool _dirty = false;
+
   // --- Hover ---
   int _hoverX = -1;
   int _hoverY = -1;
@@ -292,6 +295,7 @@ class _EnvironmentEditorScreenState
       }
     });
     if (mounted) {
+      _dirty = false;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Saved'), duration: Duration(seconds: 1)),
       );
@@ -426,7 +430,7 @@ class _EnvironmentEditorScreenState
         }
       }
     }
-    if (changed) setState(() {});
+    if (changed) setState(() => _dirty = true);
   }
 
   Future<void> _placeSource(int x, int y) async {
@@ -904,6 +908,45 @@ class _EnvironmentEditorScreenState
     await _saveAll();
   }
 
+  // --- Close with confirmation ---
+
+  Future<void> _confirmClose() async {
+    if (!_dirty) {
+      ref.read(workspacePathProvider.notifier).state = null;
+      return;
+    }
+    final result = await showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Unsaved Changes'),
+        content: const Text(
+          'The terrain map has unsaved changes. What would you like to do?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, 'cancel'),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, 'discard'),
+            child: const Text('Discard changes'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, 'save'),
+            child: const Text('Save & close'),
+          ),
+        ],
+      ),
+    );
+    if (!mounted || result == null || result == 'cancel') return;
+    if (result == 'save') {
+      await _saveAll();
+    }
+    if (mounted) {
+      ref.read(workspacePathProvider.notifier).state = null;
+    }
+  }
+
   // --- Build ---
 
   @override
@@ -1098,11 +1141,7 @@ class _EnvironmentEditorScreenState
           ),
           const SizedBox(width: 12),
           // Close project.
-          _BarButton(
-            icon: Icons.close,
-            label: 'Close',
-            onTap: () => ref.read(workspacePathProvider.notifier).state = null,
-          ),
+          _BarButton(icon: Icons.close, label: 'Close', onTap: _confirmClose),
         ],
       ),
     );
