@@ -183,6 +183,21 @@ class _PrototypeEditScreenState extends ConsumerState<PrototypeEditScreen>
             onChanged: (v) => setState(() => _ratioFemalesCtrl.text = v),
           ),
         ],
+        const SizedBox(height: 24),
+        const Divider(),
+        const SizedBox(height: 8),
+        Text(
+          'Assignment Criteria',
+          style: Theme.of(context).textTheme.titleSmall,
+        ),
+        const SizedBox(height: 4),
+        Text(
+          'Rules for assigning new agents to this prototype. '
+          'Evaluated in priority order; first match wins.',
+          style: Theme.of(context).textTheme.bodySmall,
+        ),
+        const SizedBox(height: 8),
+        _AssignmentCriteriaList(prototypeId: widget.prototypeId),
       ],
     );
   }
@@ -742,4 +757,218 @@ class _InlineFormulaState extends State<_InlineFormula> {
       onSubmitted: widget.onSubmitted,
     );
   }
+}
+
+/// Lists assignment criteria for a prototype, with add/edit/delete.
+class _AssignmentCriteriaList extends ConsumerStatefulWidget {
+  const _AssignmentCriteriaList({required this.prototypeId});
+  final int prototypeId;
+
+  @override
+  ConsumerState<_AssignmentCriteriaList> createState() =>
+      _AssignmentCriteriaListState();
+}
+
+class _AssignmentCriteriaListState
+    extends ConsumerState<_AssignmentCriteriaList> {
+  List<PrototypeAssignmentCriteriaData> _criteria = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    final db = ref.read(databaseProvider);
+    if (db == null) return;
+    final rows =
+        await (db.select(db.prototypeAssignmentCriteria)
+              ..where((t) => t.prototypeId.equals(widget.prototypeId))
+              ..orderBy([(t) => OrderingTerm.asc(t.priority)]))
+            .get();
+    if (mounted) setState(() => _criteria = rows);
+  }
+
+  Future<void> _add() async {
+    final result = await _showCriterionDialog(context);
+    if (result == null) return;
+    final db = ref.read(databaseProvider);
+    if (db == null) return;
+    await db
+        .into(db.prototypeAssignmentCriteria)
+        .insert(
+          PrototypeAssignmentCriteriaCompanion.insert(
+            prototypeId: widget.prototypeId,
+            priority: Value(result.priority),
+            formula: Value(result.formula),
+            operator: Value(result.operator),
+            threshold: Value(result.threshold),
+          ),
+        );
+    _load();
+  }
+
+  Future<void> _edit(PrototypeAssignmentCriteriaData existing) async {
+    final result = await _showCriterionDialog(context, initial: existing);
+    if (result == null) return;
+    final db = ref.read(databaseProvider);
+    if (db == null) return;
+    await (db.update(
+      db.prototypeAssignmentCriteria,
+    )..where((t) => t.id.equals(existing.id))).write(
+      PrototypeAssignmentCriteriaCompanion(
+        priority: Value(result.priority),
+        formula: Value(result.formula),
+        operator: Value(result.operator),
+        threshold: Value(result.threshold),
+      ),
+    );
+    _load();
+  }
+
+  Future<void> _delete(int id) async {
+    final db = ref.read(databaseProvider);
+    if (db == null) return;
+    await (db.delete(
+      db.prototypeAssignmentCriteria,
+    )..where((t) => t.id.equals(id))).go();
+    _load();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        ..._criteria.map(
+          (c) => Card(
+            margin: const EdgeInsets.symmetric(vertical: 4),
+            child: ListTile(
+              dense: true,
+              title: Text(
+                '${c.formula} ${c.operator} ${c.threshold}',
+                style: const TextStyle(fontFamily: 'monospace', fontSize: 12),
+              ),
+              subtitle: Text('Priority: ${c.priority}'),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.edit, size: 18),
+                    onPressed: () => _edit(c),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.delete, size: 18),
+                    onPressed: () => _delete(c.id),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 8),
+        OutlinedButton.icon(
+          icon: const Icon(Icons.add, size: 16),
+          label: const Text('Add criterion'),
+          onPressed: _add,
+        ),
+      ],
+    );
+  }
+
+  Future<_CriterionResult?> _showCriterionDialog(
+    BuildContext context, {
+    PrototypeAssignmentCriteriaData? initial,
+  }) async {
+    final priorityCtrl = TextEditingController(
+      text: '${initial?.priority ?? (_criteria.length + 1)}',
+    );
+    final formulaCtrl = TextEditingController(text: initial?.formula ?? 'Age');
+    final thresholdCtrl = TextEditingController(
+      text: '${initial?.threshold ?? 0.0}',
+    );
+    String selectedOp = initial?.operator ?? '>=';
+
+    const operators = ['>', '>=', '<', '<=', '==', '!='];
+
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDialogState) => AlertDialog(
+          title: Text(
+            initial == null ? 'New Assignment Criterion' : 'Edit Criterion',
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: priorityCtrl,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                  labelText: 'Priority (lower = first)',
+                ),
+              ),
+              const SizedBox(height: 12),
+              FormulaField(
+                label: 'Formula',
+                title: 'Assignment criterion formula',
+                value: formulaCtrl.text,
+                onChanged: (v) => formulaCtrl.text = v,
+              ),
+              const SizedBox(height: 12),
+              DropdownButtonFormField<String>(
+                initialValue: selectedOp,
+                decoration: const InputDecoration(labelText: 'Operator'),
+                items: operators
+                    .map((op) => DropdownMenuItem(value: op, child: Text(op)))
+                    .toList(),
+                onChanged: (v) {
+                  if (v != null) setDialogState(() => selectedOp = v);
+                },
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: thresholdCtrl,
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
+                decoration: const InputDecoration(labelText: 'Threshold'),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              child: const Text('Save'),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (result != true) return null;
+
+    return _CriterionResult(
+      priority: int.tryParse(priorityCtrl.text.trim()) ?? 1,
+      formula: formulaCtrl.text.trim(),
+      operator: selectedOp,
+      threshold: double.tryParse(thresholdCtrl.text.trim()) ?? 0.0,
+    );
+  }
+}
+
+class _CriterionResult {
+  final int priority;
+  final String formula;
+  final String operator;
+  final double threshold;
+  const _CriterionResult({
+    required this.priority,
+    required this.formula,
+    required this.operator,
+    required this.threshold,
+  });
 }

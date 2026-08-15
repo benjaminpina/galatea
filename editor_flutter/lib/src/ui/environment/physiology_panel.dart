@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../database/database.dart';
 import '../../providers/database_provider.dart';
+import '../formula/formula_field.dart';
 
 /// Right panel for Physiology configuration:
 /// - Metabolism (levels per nutrient)
@@ -51,20 +52,19 @@ class PhysiologyPanel extends ConsumerWidget {
         // --- Behavior Costs ---
         _SectionTitle(title: 'Behavior Costs', icon: Icons.fitness_center),
         const SizedBox(height: 4),
-        _hint(
-          'Behavior costs per nutrient are configured per behavior type '
-          '(movement, feeding, combat, courtship, oviposition). '
-          'Full editor coming in a future update.',
-        ),
+        const _BehaviorCostsEditor(),
+        const SizedBox(height: 16),
+
+        // --- Gamete Costs ---
+        _SectionTitle(title: 'Gamete Costs', icon: Icons.egg),
+        const SizedBox(height: 4),
+        const _GameteCostsEditor(),
         const SizedBox(height: 16),
 
         // --- Reproduction ---
         _SectionTitle(title: 'Reproduction', icon: Icons.child_care),
         const SizedBox(height: 4),
-        _hint(
-          'Reproduction parameters (max eggs, sperm packs, transfer rates, etc.) '
-          'are configured here. Full editor coming in a future update.',
-        ),
+        const _ReproductionEditor(),
       ],
     );
   }
@@ -72,7 +72,10 @@ class PhysiologyPanel extends ConsumerWidget {
   Widget _hint(String text) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
-      child: Text(text, style: const TextStyle(fontSize: 11, color: Colors.grey)),
+      child: Text(
+        text,
+        style: const TextStyle(fontSize: 11, color: Colors.grey),
+      ),
     );
   }
 }
@@ -88,7 +91,10 @@ class _SectionTitle extends StatelessWidget {
       children: [
         Icon(icon, size: 16, color: Theme.of(context).colorScheme.primary),
         const SizedBox(width: 6),
-        Text(title, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+        Text(
+          title,
+          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+        ),
       ],
     );
   }
@@ -116,15 +122,20 @@ class _MetabolismTileState extends ConsumerState<_MetabolismTile> {
             dense: true,
             visualDensity: VisualDensity.compact,
             leading: Container(
-              width: 12, height: 12,
+              width: 12,
+              height: 12,
               decoration: BoxDecoration(
                 color: Color(widget.nutrient.color),
                 shape: BoxShape.circle,
               ),
             ),
-            title: Text(widget.nutrient.name, style: const TextStyle(fontSize: 12)),
+            title: Text(
+              widget.nutrient.name,
+              style: const TextStyle(fontSize: 12),
+            ),
             trailing: Icon(
-              _expanded ? Icons.expand_less : Icons.expand_more, size: 18,
+              _expanded ? Icons.expand_less : Icons.expand_more,
+              size: 18,
             ),
             onTap: () => setState(() => _expanded = !_expanded),
           ),
@@ -140,25 +151,41 @@ class _MetabolismTileState extends ConsumerState<_MetabolismTile> {
     if (db == null) return const SizedBox.shrink();
 
     return FutureBuilder<MetabolismData?>(
-      future: (db.select(db.metabolism)
-            ..where((t) => t.nutrientId.equals(widget.nutrient.id)))
-          .getSingleOrNull(),
+      future:
+          (db.select(db.metabolism)
+                ..where((t) => t.nutrientId.equals(widget.nutrient.id)))
+              .getSingleOrNull(),
       builder: (context, snapshot) {
         final data = snapshot.data;
         return Padding(
           padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
           child: Column(
             children: [
-              _FormulaField(label: 'Min', initial: data?.minFormula ?? '0',
-                onSaved: (v) => _save(db, min: v)),
-              _FormulaField(label: 'Critical', initial: data?.criticalFormula ?? '10',
-                onSaved: (v) => _save(db, critical: v)),
-              _FormulaField(label: 'Optimal', initial: data?.optimalFormula ?? '50',
-                onSaved: (v) => _save(db, optimal: v)),
-              _FormulaField(label: 'Initial', initial: data?.initialFormula ?? '50',
-                onSaved: (v) => _save(db, initial: v)),
-              _FormulaField(label: 'Max', initial: data?.maxFormula ?? '100',
-                onSaved: (v) => _save(db, max: v)),
+              _FormulaField(
+                label: 'Min',
+                initial: data?.minFormula ?? '0',
+                onSaved: (v) => _save(db, min: v),
+              ),
+              _FormulaField(
+                label: 'Critical',
+                initial: data?.criticalFormula ?? '10',
+                onSaved: (v) => _save(db, critical: v),
+              ),
+              _FormulaField(
+                label: 'Optimal',
+                initial: data?.optimalFormula ?? '50',
+                onSaved: (v) => _save(db, optimal: v),
+              ),
+              _FormulaField(
+                label: 'Initial',
+                initial: data?.initialFormula ?? '50',
+                onSaved: (v) => _save(db, initial: v),
+              ),
+              _FormulaField(
+                label: 'Max',
+                initial: data?.maxFormula ?? '100',
+                onSaved: (v) => _save(db, max: v),
+              ),
             ],
           ),
         );
@@ -166,31 +193,49 @@ class _MetabolismTileState extends ConsumerState<_MetabolismTile> {
     );
   }
 
-  Future<void> _save(AppDatabase db, {
-    String? min, String? critical, String? optimal, String? initial, String? max,
+  Future<void> _save(
+    AppDatabase db, {
+    String? min,
+    String? critical,
+    String? optimal,
+    String? initial,
+    String? max,
   }) async {
-    final existing = await (db.select(db.metabolism)
-          ..where((t) => t.nutrientId.equals(widget.nutrient.id)))
-        .getSingleOrNull();
+    final existing = await (db.select(
+      db.metabolism,
+    )..where((t) => t.nutrientId.equals(widget.nutrient.id))).getSingleOrNull();
 
     if (existing == null) {
-      await db.into(db.metabolism).insert(MetabolismCompanion.insert(
-        nutrientId: widget.nutrient.id,
-        minFormula: Value(min ?? '0'),
-        criticalFormula: Value(critical ?? '10'),
-        optimalFormula: Value(optimal ?? '50'),
-        initialFormula: Value(initial ?? '50'),
-        maxFormula: Value(max ?? '100'),
-      ));
+      await db
+          .into(db.metabolism)
+          .insert(
+            MetabolismCompanion.insert(
+              nutrientId: widget.nutrient.id,
+              minFormula: Value(min ?? '0'),
+              criticalFormula: Value(critical ?? '10'),
+              optimalFormula: Value(optimal ?? '50'),
+              initialFormula: Value(initial ?? '50'),
+              maxFormula: Value(max ?? '100'),
+            ),
+          );
     } else {
-      await (db.update(db.metabolism)..where((t) => t.nutrientId.equals(widget.nutrient.id)))
-          .write(MetabolismCompanion(
-        minFormula: min != null ? Value(min) : const Value.absent(),
-        criticalFormula: critical != null ? Value(critical) : const Value.absent(),
-        optimalFormula: optimal != null ? Value(optimal) : const Value.absent(),
-        initialFormula: initial != null ? Value(initial) : const Value.absent(),
-        maxFormula: max != null ? Value(max) : const Value.absent(),
-      ));
+      await (db.update(
+        db.metabolism,
+      )..where((t) => t.nutrientId.equals(widget.nutrient.id))).write(
+        MetabolismCompanion(
+          minFormula: min != null ? Value(min) : const Value.absent(),
+          criticalFormula: critical != null
+              ? Value(critical)
+              : const Value.absent(),
+          optimalFormula: optimal != null
+              ? Value(optimal)
+              : const Value.absent(),
+          initialFormula: initial != null
+              ? Value(initial)
+              : const Value.absent(),
+          maxFormula: max != null ? Value(max) : const Value.absent(),
+        ),
+      );
     }
   }
 }
@@ -206,31 +251,51 @@ class _FeedingGainTile extends ConsumerWidget {
     if (db == null) return const SizedBox.shrink();
 
     return FutureBuilder<FeedingGain?>(
-      future: (db.select(db.feedingGains)
-            ..where((t) => t.nutrientId.equals(nutrient.id)))
-          .getSingleOrNull(),
+      future: (db.select(
+        db.feedingGains,
+      )..where((t) => t.nutrientId.equals(nutrient.id))).getSingleOrNull(),
       builder: (context, snapshot) {
         final gain = snapshot.data?.gainFormula ?? '10';
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 2),
           child: Row(
             children: [
-              Container(width: 10, height: 10,
-                decoration: BoxDecoration(color: Color(nutrient.color), shape: BoxShape.circle)),
+              Container(
+                width: 10,
+                height: 10,
+                decoration: BoxDecoration(
+                  color: Color(nutrient.color),
+                  shape: BoxShape.circle,
+                ),
+              ),
               const SizedBox(width: 8),
-              SizedBox(width: 60, child: Text(nutrient.name, style: const TextStyle(fontSize: 11))),
+              SizedBox(
+                width: 60,
+                child: Text(
+                  nutrient.name,
+                  style: const TextStyle(fontSize: 11),
+                ),
+              ),
               Expanded(
                 child: _InlineFormulaField(
                   initial: gain,
                   onSubmitted: (v) async {
-                    final existing = await (db.select(db.feedingGains)
-                          ..where((t) => t.nutrientId.equals(nutrient.id)))
-                        .getSingleOrNull();
+                    final existing =
+                        await (db.select(db.feedingGains)
+                              ..where((t) => t.nutrientId.equals(nutrient.id)))
+                            .getSingleOrNull();
                     if (existing == null) {
-                      await db.into(db.feedingGains).insert(
-                        FeedingGainsCompanion.insert(nutrientId: nutrient.id, gainFormula: Value(v)));
+                      await db
+                          .into(db.feedingGains)
+                          .insert(
+                            FeedingGainsCompanion.insert(
+                              nutrientId: nutrient.id,
+                              gainFormula: Value(v),
+                            ),
+                          );
                     } else {
-                      await (db.update(db.feedingGains)..where((t) => t.nutrientId.equals(nutrient.id)))
+                      await (db.update(db.feedingGains)
+                            ..where((t) => t.nutrientId.equals(nutrient.id)))
                           .write(FeedingGainsCompanion(gainFormula: Value(v)));
                     }
                   },
@@ -255,32 +320,58 @@ class _VelocityTile extends ConsumerWidget {
     if (db == null) return const SizedBox.shrink();
 
     return FutureBuilder<SubstrateVelocity?>(
-      future: (db.select(db.substrateVelocities)
-            ..where((t) => t.substrateId.equals(substrate.id)))
-          .getSingleOrNull(),
+      future: (db.select(
+        db.substrateVelocities,
+      )..where((t) => t.substrateId.equals(substrate.id))).getSingleOrNull(),
       builder: (context, snapshot) {
         final vel = snapshot.data?.velocityFormula ?? '1';
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 2),
           child: Row(
             children: [
-              Container(width: 10, height: 10,
-                decoration: BoxDecoration(color: Color(substrate.color), borderRadius: BorderRadius.circular(2))),
+              Container(
+                width: 10,
+                height: 10,
+                decoration: BoxDecoration(
+                  color: Color(substrate.color),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
               const SizedBox(width: 8),
-              SizedBox(width: 60, child: Text(substrate.name, style: const TextStyle(fontSize: 11), overflow: TextOverflow.ellipsis)),
+              SizedBox(
+                width: 60,
+                child: Text(
+                  substrate.name,
+                  style: const TextStyle(fontSize: 11),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
               Expanded(
                 child: _InlineFormulaField(
                   initial: vel,
                   onSubmitted: (v) async {
-                    final existing = await (db.select(db.substrateVelocities)
-                          ..where((t) => t.substrateId.equals(substrate.id)))
-                        .getSingleOrNull();
+                    final existing =
+                        await (db.select(
+                              db.substrateVelocities,
+                            )..where((t) => t.substrateId.equals(substrate.id)))
+                            .getSingleOrNull();
                     if (existing == null) {
-                      await db.into(db.substrateVelocities).insert(
-                        SubstrateVelocitiesCompanion.insert(substrateId: substrate.id, velocityFormula: Value(v)));
+                      await db
+                          .into(db.substrateVelocities)
+                          .insert(
+                            SubstrateVelocitiesCompanion.insert(
+                              substrateId: substrate.id,
+                              velocityFormula: Value(v),
+                            ),
+                          );
                     } else {
-                      await (db.update(db.substrateVelocities)..where((t) => t.substrateId.equals(substrate.id)))
-                          .write(SubstrateVelocitiesCompanion(velocityFormula: Value(v)));
+                      await (db.update(db.substrateVelocities)
+                            ..where((t) => t.substrateId.equals(substrate.id)))
+                          .write(
+                            SubstrateVelocitiesCompanion(
+                              velocityFormula: Value(v),
+                            ),
+                          );
                     }
                   },
                 ),
@@ -296,7 +387,11 @@ class _VelocityTile extends ConsumerWidget {
 // --- Helper widgets ---
 
 class _FormulaField extends StatefulWidget {
-  const _FormulaField({required this.label, required this.initial, required this.onSaved});
+  const _FormulaField({
+    required this.label,
+    required this.initial,
+    required this.onSaved,
+  });
   final String label;
   final String initial;
   final ValueChanged<String> onSaved;
@@ -326,14 +421,20 @@ class _FormulaFieldState extends State<_FormulaField> {
       padding: const EdgeInsets.symmetric(vertical: 2),
       child: Row(
         children: [
-          SizedBox(width: 55, child: Text(widget.label, style: const TextStyle(fontSize: 11))),
+          SizedBox(
+            width: 55,
+            child: Text(widget.label, style: const TextStyle(fontSize: 11)),
+          ),
           Expanded(
             child: TextField(
               controller: _ctrl,
               style: const TextStyle(fontSize: 11),
               decoration: const InputDecoration(
                 isDense: true,
-                contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: 8,
+                  vertical: 6,
+                ),
                 border: OutlineInputBorder(),
               ),
               onSubmitted: widget.onSaved,
@@ -382,5 +483,380 @@ class _InlineFormulaFieldState extends State<_InlineFormulaField> {
       ),
       onSubmitted: widget.onSubmitted,
     );
+  }
+}
+
+/// Editor for the reproduction singleton table (11 formula fields).
+class _ReproductionEditor extends ConsumerStatefulWidget {
+  const _ReproductionEditor();
+
+  @override
+  ConsumerState<_ReproductionEditor> createState() =>
+      _ReproductionEditorState();
+}
+
+class _ReproductionEditorState extends ConsumerState<_ReproductionEditor> {
+  ReproductionData? _data;
+  bool _loaded = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    final db = ref.read(databaseProvider);
+    if (db == null) return;
+    var data = await (db.select(
+      db.reproduction,
+    )..where((t) => t.id.equals(1))).getSingleOrNull();
+    if (data == null) {
+      // Create default singleton row.
+      await db
+          .into(db.reproduction)
+          .insert(ReproductionCompanion.insert(id: const Value(1)));
+      data = await (db.select(
+        db.reproduction,
+      )..where((t) => t.id.equals(1))).getSingleOrNull();
+    }
+    if (mounted) {
+      setState(() {
+        _data = data;
+        _loaded = true;
+      });
+    }
+  }
+
+  Future<void> _save(ReproductionCompanion companion) async {
+    final db = ref.read(databaseProvider);
+    if (db == null) return;
+    await (db.update(
+      db.reproduction,
+    )..where((t) => t.id.equals(1))).write(companion);
+    _load(); // Refresh.
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!_loaded || _data == null) {
+      return const Padding(
+        padding: EdgeInsets.all(8),
+        child: Center(child: CircularProgressIndicator()),
+      );
+    }
+    final d = _data!;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _reproField(
+          'Max eggs',
+          d.maxEggsFormula,
+          (v) => _save(ReproductionCompanion(maxEggsFormula: Value(v))),
+        ),
+        _reproField(
+          'Max sperm packs',
+          d.maxSpermPacksFormula,
+          (v) => _save(ReproductionCompanion(maxSpermPacksFormula: Value(v))),
+        ),
+        _reproField(
+          'Packs transferred',
+          d.packsTransferredFormula,
+          (v) =>
+              _save(ReproductionCompanion(packsTransferredFormula: Value(v))),
+        ),
+        _reproField(
+          'Fraction fertilized',
+          d.fractionFertilizedFormula,
+          (v) =>
+              _save(ReproductionCompanion(fractionFertilizedFormula: Value(v))),
+        ),
+        _reproField(
+          'Paternity',
+          d.paternityFormula,
+          (v) => _save(ReproductionCompanion(paternityFormula: Value(v))),
+        ),
+        _reproField(
+          'Max stored packs',
+          d.maxStoredPacksFormula,
+          (v) => _save(ReproductionCompanion(maxStoredPacksFormula: Value(v))),
+        ),
+        _reproField(
+          'Consumption rate',
+          d.consumptionRateFormula,
+          (v) => _save(ReproductionCompanion(consumptionRateFormula: Value(v))),
+        ),
+        _reproField(
+          'Eggs per cycle',
+          d.eggsPerCycleFormula,
+          (v) => _save(ReproductionCompanion(eggsPerCycleFormula: Value(v))),
+        ),
+        _reproField(
+          'Egg fraction',
+          d.eggFractionFormula,
+          (v) => _save(ReproductionCompanion(eggFractionFormula: Value(v))),
+        ),
+        _reproField(
+          'Pack fraction',
+          d.packFractionFormula,
+          (v) => _save(ReproductionCompanion(packFractionFormula: Value(v))),
+        ),
+        _reproField(
+          'Sperm degradation',
+          d.spermDegradationFormula,
+          (v) =>
+              _save(ReproductionCompanion(spermDegradationFormula: Value(v))),
+        ),
+      ],
+    );
+  }
+
+  Widget _reproField(
+    String label,
+    String value,
+    ValueChanged<String> onChanged,
+  ) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 3),
+      child: FormulaField(
+        label: label,
+        title: 'Reproduction — $label',
+        value: value,
+        onChanged: onChanged,
+      ),
+    );
+  }
+}
+
+/// Editor for behavior costs: each behavior × each nutrient = one formula.
+class _BehaviorCostsEditor extends ConsumerWidget {
+  const _BehaviorCostsEditor();
+
+  static const _behaviors = [
+    'move_active',
+    'move_rest',
+    'feed',
+    'fight_display',
+    'fight_escalate',
+    'fight_retreat',
+    'court_display',
+    'court_escalate',
+    'court_accept',
+    'court_reject',
+    'oviposit',
+  ];
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final nutrients = ref.watch(nutrientsProvider).valueOrNull ?? [];
+    final db = ref.read(databaseProvider);
+    if (db == null || nutrients.isEmpty) {
+      return const Text(
+        'Define nutrients first.',
+        style: TextStyle(fontSize: 11, color: Colors.grey),
+      );
+    }
+
+    return FutureBuilder<List<BehaviorCost>>(
+      future: db.select(db.behaviorCosts).get(),
+      builder: (context, snapshot) {
+        final existing = <String, String>{};
+        for (final row in snapshot.data ?? []) {
+          existing['${row.behavior}.${row.nutrientId}'] = row.costFormula;
+        }
+
+        return ExpansionTile(
+          title: const Text('Edit costs', style: TextStyle(fontSize: 12)),
+          tilePadding: EdgeInsets.zero,
+          childrenPadding: const EdgeInsets.only(left: 8),
+          children: _behaviors.map((behavior) {
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    behavior,
+                    style: const TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  ...nutrients.map((n) {
+                    final key = '$behavior.${n.id}';
+                    final value = existing[key] ?? '1';
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 2),
+                      child: Row(
+                        children: [
+                          SizedBox(
+                            width: 60,
+                            child: Text(
+                              n.name,
+                              style: const TextStyle(fontSize: 10),
+                            ),
+                          ),
+                          Expanded(
+                            child: FormulaField(
+                              label: n.name,
+                              title: '$behavior — ${n.name} cost',
+                              value: value,
+                              onChanged: (v) =>
+                                  _saveCost(db, behavior, n.id, v),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }),
+                ],
+              ),
+            );
+          }).toList(),
+        );
+      },
+    );
+  }
+
+  Future<void> _saveCost(
+    AppDatabase db,
+    String behavior,
+    int nutrientId,
+    String formula,
+  ) async {
+    final existing =
+        await (db.select(db.behaviorCosts)..where(
+              (t) =>
+                  t.behavior.equals(behavior) & t.nutrientId.equals(nutrientId),
+            ))
+            .getSingleOrNull();
+    if (existing == null) {
+      await db
+          .into(db.behaviorCosts)
+          .insert(
+            BehaviorCostsCompanion.insert(
+              behavior: behavior,
+              nutrientId: nutrientId,
+              costFormula: Value(formula),
+            ),
+          );
+    } else {
+      await (db.update(db.behaviorCosts)
+            ..where((t) => t.id.equals(existing.id)))
+          .write(BehaviorCostsCompanion(costFormula: Value(formula)));
+    }
+  }
+}
+
+/// Editor for gamete costs: sex × nutrient = one formula.
+class _GameteCostsEditor extends ConsumerWidget {
+  const _GameteCostsEditor();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final nutrients = ref.watch(nutrientsProvider).valueOrNull ?? [];
+    final db = ref.read(databaseProvider);
+    if (db == null || nutrients.isEmpty) {
+      return const Text(
+        'Define nutrients first.',
+        style: TextStyle(fontSize: 11, color: Colors.grey),
+      );
+    }
+
+    return FutureBuilder<List<GameteCost>>(
+      future: db.select(db.gameteCosts).get(),
+      builder: (context, snapshot) {
+        final existing = <String, String>{};
+        for (final row in snapshot.data ?? []) {
+          existing['${row.sex}.${row.nutrientId}'] = row.costFormula;
+        }
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Male gamete costs:',
+              style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
+            ),
+            ...nutrients.map((n) {
+              final value = existing['M.${n.id}'] ?? '5';
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 2),
+                child: Row(
+                  children: [
+                    SizedBox(
+                      width: 60,
+                      child: Text(n.name, style: const TextStyle(fontSize: 10)),
+                    ),
+                    Expanded(
+                      child: FormulaField(
+                        label: n.name,
+                        title: 'Male gamete — ${n.name} cost',
+                        value: value,
+                        onChanged: (v) => _saveCost(db, 'M', n.id, v),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }),
+            const SizedBox(height: 8),
+            const Text(
+              'Female gamete costs:',
+              style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
+            ),
+            ...nutrients.map((n) {
+              final value = existing['F.${n.id}'] ?? '5';
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 2),
+                child: Row(
+                  children: [
+                    SizedBox(
+                      width: 60,
+                      child: Text(n.name, style: const TextStyle(fontSize: 10)),
+                    ),
+                    Expanded(
+                      child: FormulaField(
+                        label: n.name,
+                        title: 'Female gamete — ${n.name} cost',
+                        value: value,
+                        onChanged: (v) => _saveCost(db, 'F', n.id, v),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _saveCost(
+    AppDatabase db,
+    String sex,
+    int nutrientId,
+    String formula,
+  ) async {
+    final existing =
+        await (db.select(db.gameteCosts)..where(
+              (t) => t.sex.equals(sex) & t.nutrientId.equals(nutrientId),
+            ))
+            .getSingleOrNull();
+    if (existing == null) {
+      await db
+          .into(db.gameteCosts)
+          .insert(
+            GameteCostsCompanion.insert(
+              sex: sex,
+              nutrientId: nutrientId,
+              costFormula: Value(formula),
+            ),
+          );
+    } else {
+      await (db.update(db.gameteCosts)..where((t) => t.id.equals(existing.id)))
+          .write(GameteCostsCompanion(costFormula: Value(formula)));
+    }
   }
 }

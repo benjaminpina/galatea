@@ -122,6 +122,22 @@ class AgentsPanel extends ConsumerWidget {
         ),
         const SizedBox(height: 16),
 
+        // --- Custom Functions ---
+        _SectionHeader(
+          title: 'Custom Functions',
+          icon: Icons.functions,
+          count: ref.watch(customFunctionsProvider).valueOrNull?.length ?? 0,
+          onAdd: () => _addCustomFunction(context, ref),
+        ),
+        ...(ref.watch(customFunctionsProvider).valueOrNull ?? []).map(
+          (f) => _CustomFunctionTile(func: f),
+        ),
+        if ((ref.watch(customFunctionsProvider).valueOrNull ?? []).isEmpty)
+          _emptyHint(
+            'No custom functions. Define reusable mathematical functions for your formulas.',
+          ),
+        const SizedBox(height: 16),
+
         // --- Interaction Matrices (placeholder) ---
         const _InteractionMatricesPlaceholder(),
       ],
@@ -351,6 +367,89 @@ class AgentsPanel extends ConsumerWidget {
         sortOrder: Value(existing.length + 1),
       ),
     );
+  }
+
+  Future<void> _addCustomFunction(BuildContext context, WidgetRef ref) async {
+    final nameCtrl = TextEditingController();
+    final paramsCtrl = TextEditingController();
+    final bodyCtrl = TextEditingController();
+    final descCtrl = TextEditingController();
+
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('New Custom Function'),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: nameCtrl,
+                decoration: const InputDecoration(
+                  labelText: 'Name',
+                  hintText: 'e.g., Sigmoid, Growth',
+                ),
+                autofocus: true,
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: paramsCtrl,
+                decoration: const InputDecoration(
+                  labelText: 'Parameters (comma-separated)',
+                  hintText: 'e.g., x, k, x0',
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: bodyCtrl,
+                decoration: const InputDecoration(
+                  labelText: 'Body (formula using the parameters)',
+                  hintText: 'e.g., 1 / (1 + exp(-k * (x - x0)))',
+                ),
+                maxLines: 3,
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: descCtrl,
+                decoration: const InputDecoration(
+                  labelText: 'Description (optional)',
+                  hintText: 'e.g., Logistic sigmoid curve',
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Add'),
+          ),
+        ],
+      ),
+    );
+    if (result != true) return;
+    final name = nameCtrl.text.trim();
+    final body = bodyCtrl.text.trim();
+    if (name.isEmpty || body.isEmpty) return;
+
+    final db = ref.read(databaseProvider);
+    if (db == null) return;
+    final existing = await db.select(db.customFunctions).get();
+    await db
+        .into(db.customFunctions)
+        .insert(
+          CustomFunctionsCompanion.insert(
+            name: name,
+            params: Value(paramsCtrl.text.trim()),
+            body: body,
+            description: Value(descCtrl.text.trim()),
+            sortOrder: Value(existing.length + 1),
+          ),
+        );
   }
 }
 
@@ -597,6 +696,122 @@ class _LocusTile extends ConsumerWidget {
         mutationRangeRec: Value(
           double.tryParse(mutRangeRecCtrl.text.trim()) ?? 0,
         ),
+      ),
+    );
+  }
+}
+
+// --- Custom Function tile ---
+
+class _CustomFunctionTile extends ConsumerWidget {
+  const _CustomFunctionTile({required this.func});
+  final CustomFunction func;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return ListTile(
+      dense: true,
+      visualDensity: VisualDensity.compact,
+      title: Text(
+        '${func.name}(${func.params})',
+        style: const TextStyle(fontSize: 12, fontFamily: 'monospace'),
+      ),
+      subtitle: Text(
+        func.description.isNotEmpty ? func.description : func.body,
+        style: const TextStyle(fontSize: 10),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      ),
+      onTap: () => _showEditDialog(context, ref),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconButton(
+            icon: const Icon(Icons.edit_outlined, size: 16),
+            onPressed: () => _showEditDialog(context, ref),
+            visualDensity: VisualDensity.compact,
+          ),
+          IconButton(
+            icon: const Icon(Icons.delete_outline, size: 16),
+            onPressed: () async {
+              final db = ref.read(databaseProvider);
+              if (db == null) return;
+              await (db.delete(db.customFunctions)..where((t) => t.id.equals(func.id))).go();
+            },
+
+
+
+
+
+
+            visualDensity: VisualDensity.compact,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _showEditDialog(BuildContext context, WidgetRef ref) async {
+    final nameCtrl = TextEditingController(text: func.name);
+    final paramsCtrl = TextEditingController(text: func.params);
+    final bodyCtrl = TextEditingController(text: func.body);
+    final descCtrl = TextEditingController(text: func.description);
+
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('Edit: ${func.name}'),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: nameCtrl,
+                decoration: const InputDecoration(labelText: 'Name'),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: paramsCtrl,
+                decoration: const InputDecoration(labelText: 'Parameters'),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: bodyCtrl,
+                decoration: const InputDecoration(labelText: 'Body'),
+                maxLines: 3,
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: descCtrl,
+                decoration: const InputDecoration(labelText: 'Description'),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+    if (result != true) return;
+
+    final db = ref.read(databaseProvider);
+    if (db == null) return;
+    await (db.update(
+      db.customFunctions,
+    )..where((t) => t.id.equals(func.id))).write(
+      CustomFunctionsCompanion(
+        name: Value(nameCtrl.text.trim()),
+        params: Value(paramsCtrl.text.trim()),
+        body: Value(bodyCtrl.text.trim()),
+        description: Value(descCtrl.text.trim()),
       ),
     );
   }

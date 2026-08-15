@@ -1,3 +1,4 @@
+import 'package:drift/drift.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../database/database.dart';
@@ -12,7 +13,8 @@ export '../database/database.dart'
         MorphologicalCharacter,
         Stage,
         Prototype,
-        Environment;
+        Environment,
+        CustomFunction;
 
 /// The workspace database path. Must be set before accessing the database.
 final workspacePathProvider = StateProvider<String?>((ref) => null);
@@ -98,6 +100,14 @@ final charactersProvider = StreamProvider<List<MorphologicalCharacter>>((ref) {
   final dao = ref.watch(characterDaoProvider);
   if (dao == null) return const Stream.empty();
   return dao.watchAll();
+});
+
+final customFunctionsProvider = StreamProvider<List<CustomFunction>>((ref) {
+  final db = ref.watch(databaseProvider);
+  if (db == null) return const Stream.empty();
+  return (db.select(
+    db.customFunctions,
+  )..orderBy([(t) => OrderingTerm.asc(t.sortOrder)])).watch();
 });
 
 final stagesProvider = StreamProvider<List<Stage>>((ref) {
