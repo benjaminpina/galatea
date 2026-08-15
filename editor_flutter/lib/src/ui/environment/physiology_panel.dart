@@ -65,6 +65,12 @@ class PhysiologyPanel extends ConsumerWidget {
         _SectionTitle(title: 'Reproduction', icon: Icons.child_care),
         const SizedBox(height: 4),
         const _ReproductionEditor(),
+        const SizedBox(height: 16),
+
+        // --- Oviposition Site Config ---
+        _SectionTitle(title: 'Oviposition Sites', icon: Icons.egg_alt),
+        const SizedBox(height: 4),
+        const _OvipositionConfigEditor(),
       ],
     );
   }
@@ -857,6 +863,191 @@ class _GameteCostsEditor extends ConsumerWidget {
     } else {
       await (db.update(db.gameteCosts)..where((t) => t.id.equals(existing.id)))
           .write(GameteCostsCompanion(costFormula: Value(formula)));
+    }
+  }
+}
+
+/// Editor for the oviposition site global configuration singleton.
+/// Controls the default color and enabled/disabled state of oviposition sites.
+class _OvipositionConfigEditor extends ConsumerStatefulWidget {
+  const _OvipositionConfigEditor();
+
+  @override
+  ConsumerState<_OvipositionConfigEditor> createState() =>
+      _OvipositionConfigEditorState();
+}
+
+class _OvipositionConfigEditorState
+    extends ConsumerState<_OvipositionConfigEditor> {
+  OvipositionSiteConfigData? _data;
+  bool _loaded = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    final db = ref.read(databaseProvider);
+    if (db == null) return;
+    var data = await (db.select(
+      db.ovipositionSiteConfig,
+    )..where((t) => t.id.equals(1))).getSingleOrNull();
+    if (data == null) {
+      // Create default singleton row.
+      await db
+          .into(db.ovipositionSiteConfig)
+          .insert(OvipositionSiteConfigCompanion.insert(id: const Value(1)));
+      data = await (db.select(
+        db.ovipositionSiteConfig,
+      )..where((t) => t.id.equals(1))).getSingleOrNull();
+    }
+    if (mounted) {
+      setState(() {
+        _data = data;
+        _loaded = true;
+      });
+    }
+  }
+
+  Future<void> _save(OvipositionSiteConfigCompanion companion) async {
+    final db = ref.read(databaseProvider);
+    if (db == null) return;
+    await (db.update(
+      db.ovipositionSiteConfig,
+    )..where((t) => t.id.equals(1))).write(companion);
+    _load();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!_loaded || _data == null) {
+      return const Padding(
+        padding: EdgeInsets.all(8),
+        child: Center(child: CircularProgressIndicator()),
+      );
+    }
+    final d = _data!;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Enabled toggle
+        SwitchListTile(
+          dense: true,
+          contentPadding: EdgeInsets.zero,
+          title: const Text(
+            'Oviposition sites enabled',
+            style: TextStyle(fontSize: 12),
+          ),
+          subtitle: const Text(
+            'When disabled, agents cannot oviposit.',
+            style: TextStyle(fontSize: 10),
+          ),
+          value: d.enabled,
+          onChanged: (val) =>
+              _save(OvipositionSiteConfigCompanion(enabled: Value(val))),
+        ),
+        const SizedBox(height: 8),
+        // Color picker
+        Row(
+          children: [
+            const Text('Site color:', style: TextStyle(fontSize: 11)),
+            const SizedBox(width: 8),
+            GestureDetector(
+              onTap: () => _pickColor(context, d.color),
+              child: Container(
+                width: 24,
+                height: 24,
+                decoration: BoxDecoration(
+                  color: Color(d.color | 0xFF000000),
+                  border: Border.all(
+                    color: Theme.of(context).colorScheme.outline,
+                  ),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              '#${(d.color & 0xFFFFFF).toRadixString(16).padLeft(6, '0').toUpperCase()}',
+              style: const TextStyle(fontSize: 10, fontFamily: 'monospace'),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        Text(
+          'Oviposition sites are placed on the map using the drawing tools.\n'
+          'Quality and capacity are configured per site instance.',
+          style: TextStyle(
+            fontSize: 10,
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Future<void> _pickColor(BuildContext context, int currentColor) async {
+    final controller = TextEditingController(
+      text: (currentColor & 0xFFFFFF).toRadixString(16).padLeft(6, '0'),
+    );
+    final result = await showDialog<int>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Oviposition Site Color'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: controller,
+              decoration: const InputDecoration(
+                labelText: 'Hex color (RRGGBB)',
+                prefixText: '#',
+              ),
+              maxLength: 6,
+            ),
+            const SizedBox(height: 12),
+            // Preview
+            ValueListenableBuilder<TextEditingValue>(
+              valueListenable: controller,
+              builder: (_, val, _) {
+                final parsed = int.tryParse(val.text, radix: 16);
+                return Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: parsed != null
+                        ? Color(parsed | 0xFF000000)
+                        : Colors.grey,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.grey),
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () {
+              final parsed = int.tryParse(controller.text, radix: 16);
+              if (parsed != null) {
+                Navigator.pop(ctx, parsed);
+              }
+            },
+            child: const Text('Apply'),
+          ),
+        ],
+      ),
+    );
+    if (result != null) {
+      _save(OvipositionSiteConfigCompanion(color: Value(result)));
     }
   }
 }

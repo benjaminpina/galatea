@@ -587,7 +587,7 @@ class _MorphologyLocusRow extends StatelessWidget {
   }
 }
 
-class _StrategyMatrixEditor extends ConsumerWidget {
+class _StrategyMatrixEditor extends ConsumerStatefulWidget {
   const _StrategyMatrixEditor({
     required this.prototypeId,
     required this.tableName,
@@ -600,22 +600,66 @@ class _StrategyMatrixEditor extends ConsumerWidget {
   final List<String> colLabels;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_StrategyMatrixEditor> createState() =>
+      _StrategyMatrixEditorState();
+}
+
+class _StrategyMatrixEditorState extends ConsumerState<_StrategyMatrixEditor> {
+  Map<String, String> _values = {}; // 'action.opponentAction' → formula
+  bool _loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    final db = ref.read(databaseProvider);
+    if (db == null) return;
+    final map = <String, String>{};
+    if (widget.tableName == 'combat') {
+      final rows = await (db.select(
+        db.prototypeCombat,
+      )..where((t) => t.prototypeId.equals(widget.prototypeId))).get();
+      for (final row in rows) {
+        map['${row.action}.${row.opponentAction}'] = row.formula;
+      }
+    } else {
+      final rows = await (db.select(
+        db.prototypeCourtship,
+      )..where((t) => t.prototypeId.equals(widget.prototypeId))).get();
+      for (final row in rows) {
+        map['${row.action}.${row.opponentAction}'] = row.formula;
+      }
+    }
+    if (mounted) {
+      setState(() {
+        _values = map;
+        _loading = false;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final db = ref.read(databaseProvider);
     if (db == null) return const SizedBox.shrink();
+    if (_loading) return const LinearProgressIndicator();
 
     // Build a grid of formula fields.
     return Table(
       columnWidths: {
         0: const FixedColumnWidth(60),
-        for (var i = 1; i <= colLabels.length; i++) i: const FlexColumnWidth(),
+        for (var i = 1; i <= widget.colLabels.length; i++)
+          i: const FlexColumnWidth(),
       },
       children: [
         // Header row.
         TableRow(
           children: [
             const SizedBox.shrink(),
-            ...colLabels.map(
+            ...widget.colLabels.map(
               (l) => Padding(
                 padding: const EdgeInsets.all(4),
                 child: Text(
@@ -631,25 +675,31 @@ class _StrategyMatrixEditor extends ConsumerWidget {
           ],
         ),
         // Data rows.
-        ...List.generate(rowLabels.length, (row) {
+        ...List.generate(widget.rowLabels.length, (row) {
           return TableRow(
             children: [
               Padding(
                 padding: const EdgeInsets.all(4),
                 child: Text(
-                  rowLabels[row],
+                  widget.rowLabels[row],
                   style: const TextStyle(
                     fontSize: 10,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
               ),
-              ...List.generate(colLabels.length, (col) {
+              ...List.generate(widget.colLabels.length, (col) {
+                final action = row + 1;
+                final opponentAction = col + 1;
+                final key = '$action.$opponentAction';
                 return Padding(
                   padding: const EdgeInsets.all(2),
                   child: _InlineFormula(
-                    initial: '0',
-                    onSubmitted: (v) => _saveCell(db, row + 1, col + 1, v),
+                    initial: _values[key] ?? '0',
+                    onSubmitted: (v) {
+                      _saveCell(db, action, opponentAction, v);
+                      setState(() => _values[key] = v);
+                    },
                   ),
                 );
               }),
@@ -666,11 +716,11 @@ class _StrategyMatrixEditor extends ConsumerWidget {
     int opponentAction,
     String formula,
   ) async {
-    if (tableName == 'combat') {
+    if (widget.tableName == 'combat') {
       final existing =
           await (db.select(db.prototypeCombat)..where(
                 (t) =>
-                    t.prototypeId.equals(prototypeId) &
+                    t.prototypeId.equals(widget.prototypeId) &
                     t.action.equals(action) &
                     t.opponentAction.equals(opponentAction),
               ))
@@ -680,7 +730,7 @@ class _StrategyMatrixEditor extends ConsumerWidget {
             .into(db.prototypeCombat)
             .insert(
               PrototypeCombatCompanion.insert(
-                prototypeId: prototypeId,
+                prototypeId: widget.prototypeId,
                 action: action,
                 opponentAction: opponentAction,
                 formula: Value(formula),
@@ -695,7 +745,7 @@ class _StrategyMatrixEditor extends ConsumerWidget {
       final existing =
           await (db.select(db.prototypeCourtship)..where(
                 (t) =>
-                    t.prototypeId.equals(prototypeId) &
+                    t.prototypeId.equals(widget.prototypeId) &
                     t.action.equals(action) &
                     t.opponentAction.equals(opponentAction),
               ))
@@ -705,7 +755,7 @@ class _StrategyMatrixEditor extends ConsumerWidget {
             .into(db.prototypeCourtship)
             .insert(
               PrototypeCourtshipCompanion.insert(
-                prototypeId: prototypeId,
+                prototypeId: widget.prototypeId,
                 action: action,
                 opponentAction: opponentAction,
                 formula: Value(formula),

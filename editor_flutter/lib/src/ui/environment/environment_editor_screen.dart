@@ -12,9 +12,10 @@ import 'left_sidebar.dart';
 import '../nutrients/nutrient_list_screen.dart';
 import '../substrates/substrate_list_screen.dart';
 import 'agents_panel.dart';
+import 'interactions_panel.dart';
 
 /// Which configuration section is open in the right panel.
-enum ConfigSection { substrates, nutrients, agents }
+enum ConfigSection { substrates, nutrients, agents, interactions }
 
 /// Unified environment editor — the main working screen.
 ///
@@ -1026,6 +1027,12 @@ class _EnvironmentEditorScreenState
             active: _openSection == ConfigSection.agents,
             onTap: () => _toggleConfig(ConfigSection.agents),
           ),
+          _BarButton(
+            icon: Icons.sync_alt,
+            label: 'Interactions',
+            active: _openSection == ConfigSection.interactions,
+            onTap: () => _toggleConfig(ConfigSection.interactions),
+          ),
           const Spacer(),
           // Environment selector.
           PopupMenuButton<int>(
@@ -1082,6 +1089,7 @@ class _EnvironmentEditorScreenState
       ConfigSection.substrates => const SubstrateListScreen(embedded: true),
       ConfigSection.nutrients => const NutrientListScreen(embedded: true),
       ConfigSection.agents => const AgentsPanel(),
+      ConfigSection.interactions => const InteractionsPanel(),
     };
   }
 
