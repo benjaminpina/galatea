@@ -53,6 +53,9 @@ type Game struct {
 	// Nutrient/resource color cache (index = nutrient type 0-based).
 	nutrientColors []color.RGBA
 
+	// Prototype color cache (index = prototype ID).
+	prototypeColors []color.RGBA
+
 	// Viewport dirty flag for potential future substrate pre-rendering.
 	substrateDirty bool
 
@@ -70,7 +73,7 @@ type Game struct {
 }
 
 // NewGame creates a new visualizer game from an engine and colors from DB.
-func NewGame(engine *kernel.Engine, substrateColors, nutrientColors []color.RGBA) *Game {
+func NewGame(engine *kernel.Engine, substrateColors, nutrientColors, prototypeColors []color.RGBA) *Game {
 	cfg := engine.World.Config
 
 	// Calculate cell size to fit the grid in the window.
@@ -92,6 +95,7 @@ func NewGame(engine *kernel.Engine, substrateColors, nutrientColors []color.RGBA
 		gridHeight:      cfg.GridHeight,
 		substrateColors: substrateColors,
 		nutrientColors:  nutrientColors,
+		prototypeColors: prototypeColors,
 		substrateDirty:  true,
 		ticksPerFrame:   1,
 		maxSpeed:        false,
@@ -233,7 +237,7 @@ func (g *Game) drawSubstrates(screen *ebiten.Image) {
 	}
 }
 
-// drawResources renders resource instances as colored squares.
+// drawResources renders resource instances as colored diamonds centered in cells.
 func (g *Game) drawResources(screen *ebiten.Image) {
 	w := g.engine.World
 	r := w.Resources
@@ -242,8 +246,9 @@ func (g *Game) drawResources(screen *ebiten.Image) {
 	oy := g.offsetY
 
 	for i := 0; i < r.Count; i++ {
-		px := float32(ox + r.PosX[i]*cs)
-		py := float32(oy + r.PosY[i]*cs)
+		// Center within the cell.
+		px := float32(ox + (r.PosX[i]+0.5)*cs)
+		py := float32(oy + (r.PosY[i]+0.5)*cs)
 
 		if px < -10 || px > windowWidth+10 || py < -10 || py > windowHeight+10 {
 			continue
@@ -255,15 +260,20 @@ func (g *Game) drawResources(screen *ebiten.Image) {
 			clr = g.nutrientColors[typeIdx]
 		}
 
-		size := float32(cs * 0.8)
+		size := float32(cs * 0.7)
 		if size < 4 {
 			size = 4
 		}
-		vector.FillRect(screen, px-size/2, py-size/2, size, size, clr, false)
+		half := size / 2
+		// Draw as a small diamond.
+		vector.FillRect(screen, px-half, py-half, size, size, clr, false)
+		// Border.
+		vector.StrokeRect(screen, px-half, py-half, size, size, 1, color.RGBA{255, 255, 255, 60}, false)
 	}
 }
 
-// drawAgents renders agents as colored circles with direction indicators.
+// drawAgents renders agents as two-circle "bugs" (body + head) centered in cells.
+// Body color = prototype color, Head color = sex color (blue/pink).
 func (g *Game) drawAgents(screen *ebiten.Image) {
 	w := g.engine.World
 	a := w.Agents
@@ -271,45 +281,81 @@ func (g *Game) drawAgents(screen *ebiten.Image) {
 	ox := g.offsetX
 	oy := g.offsetY
 
-	radius := float32(cs * 0.4)
-	if radius < 2 {
-		radius = 2
+	r := float32(cs * 0.4)
+	if r < 2 {
+		r = 2
 	}
 
 	for i := 0; i < a.Count; i++ {
-		px := float32(ox + a.PosX[i]*cs)
-		py := float32(oy + a.PosY[i]*cs)
+		// Center within the cell.
+		cx := float32(ox + (a.PosX[i]+0.5)*cs)
+		cy := float32(oy + (a.PosY[i]+0.5)*cs)
 
-		if px < -10 || px > windowWidth+10 || py < -10 || py > windowHeight+10 {
+		if cx < -20 || cx > windowWidth+20 || cy < -20 || cy > windowHeight+20 {
 			continue
 		}
 
-		// Color by sex.
-		var clr color.RGBA
-		switch a.Sex[i] {
-		case world.SexMale:
-			clr = color.RGBA{80, 130, 255, 230}
-		case world.SexFemale:
-			clr = color.RGBA{255, 100, 180, 230}
-		default:
-			clr = color.RGBA{200, 200, 200, 200} // Immature.
+		// Head color by sex.
+		var headClr color.RGBA
+		isMale := a.Sex[i] == world.SexMale
+		if isMale {
+			headClr = color.RGBA{85, 153, 238, 255} // Blue
+		} else {
+			headClr = color.RGBA{238, 102, 153, 255} // Pink
 		}
 
-		// Dead agents flash red (shouldn't normally appear, but just in case).
+		// Body color by prototype.
+		bodyClr := color.RGBA{80, 80, 100, 255} // Default
+		protoIdx := int(a.PrototypeID[i])
+		if protoIdx >= 0 && protoIdx < len(g.prototypeColors) {
+			bodyClr = g.prototypeColors[protoIdx]
+		}
+
+		// Dead agents: gray out.
 		if a.Situation[i] == world.SituationDead {
-			clr = color.RGBA{255, 0, 0, 150}
+			bodyClr = color.RGBA{100, 50, 50, 150}
+			headClr = color.RGBA{150, 50, 50, 150}
 		}
 
-		// Draw body.
-		vector.FillCircle(screen, px, py, radius, clr, false)
+		// Direction vector for orienting the bug.
+		dirX, dirY := directionVector(a.Direction[i])
 
-		// Draw direction indicator (small line pointing forward).
-		if a.Direction[i] >= 1 && a.Direction[i] <= 8 {
-			dirX, dirY := directionVector(a.Direction[i])
-			lineLen := float32(cs * 0.5)
-			ex := px + float32(dirX)*lineLen
-			ey := py + float32(dirY)*lineLen
-			vector.StrokeLine(screen, px, py, ex, ey, 1.5, color.RGBA{255, 255, 255, 150}, false)
+		// Body: larger circle offset backward from center.
+		bodyR := r * 0.55
+		bodyX := cx - float32(dirX)*r*0.2
+		bodyY := cy - float32(dirY)*r*0.2
+		vector.FillCircle(screen, bodyX, bodyY, bodyR, bodyClr, false)
+		vector.StrokeCircle(screen, bodyX, bodyY, bodyR, 0.8, color.RGBA{0, 0, 0, 80}, false)
+
+		// Head: smaller circle offset forward from center.
+		headR := r * 0.38
+		headX := cx + float32(dirX)*r*0.4
+		headY := cy + float32(dirY)*r*0.4
+		vector.FillCircle(screen, headX, headY, headR, headClr, false)
+		vector.StrokeCircle(screen, headX, headY, headR, 0.8, color.RGBA{0, 0, 0, 100}, false)
+
+		// Eyes (only if zoomed in enough).
+		if cs >= 10 {
+			eyeR := headR * 0.25
+			// Perpendicular to direction for eye spread.
+			perpX := float32(-dirY)
+			perpY := float32(dirX)
+			eyeSpread := headR * 0.45
+			eyeFwd := headR * 0.35
+
+			e1x := headX + float32(dirX)*eyeFwd + perpX*eyeSpread
+			e1y := headY + float32(dirY)*eyeFwd + perpY*eyeSpread
+			e2x := headX + float32(dirX)*eyeFwd - perpX*eyeSpread
+			e2y := headY + float32(dirY)*eyeFwd - perpY*eyeSpread
+
+			white := color.RGBA{255, 255, 255, 255}
+			vector.FillCircle(screen, e1x, e1y, eyeR, white, false)
+			vector.FillCircle(screen, e2x, e2y, eyeR, white, false)
+		}
+
+		// Egg indicator for females.
+		if !isMale && a.FertilizedCount[i] > 0 {
+			vector.FillCircle(screen, bodyX, bodyY, bodyR*0.3, color.RGBA{255, 255, 255, 220}, false)
 		}
 	}
 }
@@ -452,7 +498,10 @@ func runFromDB(dbPath string, envName string, envID int64, initialSpeed, winW, w
 	// Load nutrient colors from DB.
 	nutColors := loadNutrientColors(db, engine.World.Config.NumNutrients)
 
-	game := NewGame(engine, subColors, nutColors)
+	// Load prototype colors from DB.
+	protoColors := loadPrototypeColors(db, engine.World.Config.NumPrototypes)
+
+	game := NewGame(engine, subColors, nutColors, protoColors)
 	game.ticksPerFrame = initialSpeed
 
 	ebiten.SetWindowSize(winW, winH)
@@ -515,6 +564,37 @@ func loadSubstrateColors(db *storage.DB, numSubstrates int) []color.RGBA {
 			g := uint8((colorVal >> 8) & 0xFF)
 			b := uint8(colorVal & 0xFF)
 			colors[id] = color.RGBA{r, g, b, 255}
+		}
+	}
+	return colors
+}
+
+// loadPrototypeColors reads prototype colors from the DB.
+// Index 0-based corresponds to prototype internal index (PrototypeID in agents).
+func loadPrototypeColors(db *storage.DB, numPrototypes int) []color.RGBA {
+	colors := make([]color.RGBA, numPrototypes)
+	for i := range colors {
+		colors[i] = color.RGBA{80, 80, 100, 255} // Default dark gray.
+	}
+
+	rows, err := db.Conn.Query("SELECT id, color FROM prototypes ORDER BY sort_order")
+	if err != nil {
+		return colors
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var id int64
+		var colorVal int
+		if err := rows.Scan(&id, &colorVal); err != nil {
+			continue
+		}
+		idx := int(id - 1) // 1-based ID to 0-based index.
+		if idx >= 0 && idx < numPrototypes {
+			r := uint8((colorVal >> 16) & 0xFF)
+			g := uint8((colorVal >> 8) & 0xFF)
+			b := uint8(colorVal & 0xFF)
+			colors[idx] = color.RGBA{r, g, b, 255}
 		}
 	}
 	return colors
