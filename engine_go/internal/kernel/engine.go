@@ -41,6 +41,14 @@ type Engine struct {
 	CombatTimeout int32   // Max ticks in combat before timeout.
 	CourtTimeout  int32   // Max ticks in courtship before timeout.
 
+	// Precomputed perception config from the DB (attractiveness tables).
+	// Layouts:
+	//   agentAttrArr:    [observedIdx * NumPrototypes + perceiverIdx]
+	//   resourceAttrArr: [resourceType * NumPrototypes + perceiverIdx]
+	// Both default to 0 (no attraction) when not configured.
+	agentAttrArr    []int32
+	resourceAttrArr []int32
+
 	// Write buffer for simulation results.
 	WriteBuffer *storage.WriteBuffer
 
@@ -229,10 +237,18 @@ func Build(db *storage.DB, cfg EngineConfig) (*Engine, error) {
 			if err := costRows.Scan(&behavior, &nutID, &costF); err != nil {
 				continue
 			}
-			// Map behavior name to index (simplified: use hash or fixed mapping).
-			// For now, we'll use a direct index lookup during eval.
 			nIdx := int(nutID - 1)
-			registry.Compile(fmt.Sprintf("behavior_cost_named.%s.%d", behavior, nIdx), costF)
+			// Map the editor's behavior name to the engine's numeric behavior
+			// index, then compile under the SAME key reference.go reads
+			// ("behavior_cost.<behaviorIdx>.<nutrientIdx>"). Previously this
+			// used a "behavior_cost_named.*" key that reference.go never read,
+			// so the behavior_costs table had no effect at all.
+			bIdx := behaviorNameToIndex(behavior, nIdx, w.Config)
+			if bIdx < 0 {
+				continue
+			}
+			registry.Compile(
+				fmt.Sprintf("behavior_cost.%d.%d", bIdx, nIdx), costF)
 		}
 	}
 
@@ -251,7 +267,19 @@ func Build(db *storage.DB, cfg EngineConfig) (*Engine, error) {
 		}
 	}
 
-	// Compile reproduction formulas.
+	// Load and evaluate reproduction formulas from the singleton table.
+	// These are global (not per-agent), so we evaluate them once here and use
+	// the values directly in reproCfg instead of hardcoded constants.
+	// Defaults (used if the row is missing) mirror the schema defaults.
+	reproVals := struct {
+		maxGametes, maxSperm, packs, paternity, maxStored, eggsPerCycle int32
+		fracFert, consumption, eggFrac, packFrac, spermDeg              float64
+	}{
+		maxGametes: 10, maxSperm: 10, packs: 1, paternity: 100,
+		maxStored: 5, eggsPerCycle: 1,
+		fracFert: 0.5, consumption: 0.1, eggFrac: 0.5, packFrac: 0.5,
+		spermDeg: 0.05,
+	}
 	var reproRow struct {
 		maxEggs, maxSperm, packs, fracFert, paternity, maxStored, consumption, eggsPerCycle, eggFrac, packFrac, spermDeg string
 	}
@@ -266,20 +294,31 @@ func Build(db *storage.DB, cfg EngineConfig) (*Engine, error) {
 		&reproRow.consumption, &reproRow.eggsPerCycle, &reproRow.eggFrac,
 		&reproRow.packFrac, &reproRow.spermDeg)
 	if err == nil {
+		// max_gametes is also compiled into the registry because it is
+		// re-evaluated per-agent (agents may have formulas referencing their
+		// own state). The rest are global scalars used directly in reproCfg.
 		registry.Compile("reproduction.max_gametes", reproRow.maxEggs)
-		registry.Compile("reproduction.max_sperm_packs", reproRow.maxSperm)
-		registry.Compile("reproduction.packs_transferred", reproRow.packs)
-		registry.Compile("reproduction.fraction_fertilized", reproRow.fracFert)
-		registry.Compile("reproduction.paternity", reproRow.paternity)
-		registry.Compile("reproduction.max_stored_packs", reproRow.maxStored)
-		registry.Compile("reproduction.consumption_rate", reproRow.consumption)
-		registry.Compile("reproduction.eggs_per_cycle", reproRow.eggsPerCycle)
-		registry.Compile("reproduction.egg_fraction", reproRow.eggFrac)
-		registry.Compile("reproduction.pack_fraction", reproRow.packFrac)
-		registry.Compile("reproduction.sperm_degradation", reproRow.spermDeg)
+
+		reproVals.maxGametes = evalConstFormula(eval, reproRow.maxEggs, reproVals.maxGametes)
+		reproVals.maxSperm = evalConstFormula(eval, reproRow.maxSperm, reproVals.maxSperm)
+		reproVals.packs = evalConstFormula(eval, reproRow.packs, reproVals.packs)
+		reproVals.paternity = evalConstFormula(eval, reproRow.paternity, reproVals.paternity)
+		reproVals.maxStored = evalConstFormula(eval, reproRow.maxStored, reproVals.maxStored)
+		reproVals.eggsPerCycle = evalConstFormula(eval, reproRow.eggsPerCycle, reproVals.eggsPerCycle)
+		reproVals.fracFert = evalConstFloatFormula(eval, reproRow.fracFert, reproVals.fracFert)
+		reproVals.consumption = evalConstFloatFormula(eval, reproRow.consumption, reproVals.consumption)
+		reproVals.eggFrac = evalConstFloatFormula(eval, reproRow.eggFrac, reproVals.eggFrac)
+		reproVals.packFrac = evalConstFloatFormula(eval, reproRow.packFrac, reproVals.packFrac)
+		reproVals.spermDeg = evalConstFloatFormula(eval, reproRow.spermDeg, reproVals.spermDeg)
+	} else {
+		// No reproduction row: still register a default max_gametes so the
+		// per-agent lookup has something.
+		registry.Compile("reproduction.max_gametes", "10")
 	}
 
-	// Compile gamete cost formulas.
+	// Compile gamete cost formulas, keyed by sex so male and female costs are
+	// kept separate ("gamete_cost.<M|F>.<nutrientIdx>"). Previously the sex was
+	// dropped and whichever row compiled last won for both sexes.
 	gameteCostRows, err := db.Conn.Query(
 		"SELECT sex, nutrient_id, cost_formula FROM gamete_costs")
 	if err == nil {
@@ -292,7 +331,7 @@ func Build(db *storage.DB, cfg EngineConfig) (*Engine, error) {
 				continue
 			}
 			nIdx := int(nutID - 1)
-			registry.Compile(fmt.Sprintf("gamete_cost.%d", nIdx), costF)
+			registry.Compile(fmt.Sprintf("gamete_cost.%s.%d", sex, nIdx), costF)
 		}
 	}
 
@@ -302,22 +341,14 @@ func Build(db *storage.DB, cfg EngineConfig) (*Engine, error) {
 	// turnSlotToEngine maps the DB turnIndex to the engine tendency slot.
 	compileTendencies(db, registry, w.Config)
 
+	// Precompute attractiveness arrays from the DB (default 0 = no attraction).
+	// This ensures agents/resources only attract when the user configures it,
+	// instead of a hardcoded constant.
+	agentAttrArr := buildAgentAttractiveness(db, w.Config, eval, envBuilder)
+	resourceAttrArr := buildResourceAttractiveness(db, w.Config, eval, envBuilder)
+
 	// Build write buffer.
 	wb := storage.NewWriteBuffer(db, runID, cfg.WriteBufferCfg)
-
-	// Build perception radii (default: all elements perceive at cellSize).
-	numProtos := w.Config.NumPrototypes
-	numResTypes := w.Config.NumResourceTypes
-	resourceRadii := make([]float64, numResTypes*numProtos)
-	resourceAttr := make([]int32, numResTypes*numProtos)
-	for i := range resourceRadii {
-		resourceRadii[i] = cellSize
-		resourceAttr[i] = 10
-	}
-	agentRadii := make([]float64, numProtos*numProtos)
-	for i := range agentRadii {
-		agentRadii[i] = cellSize
-	}
 
 	// Build default behavior costs (1 per nutrient per non-rest behavior).
 	numBeh := w.Config.NumBehaviors
@@ -344,27 +375,29 @@ func Build(db *storage.DB, cfg EngineConfig) (*Engine, error) {
 		gameteCosts[n] = 5
 	}
 	reproCfg := systems.ReproductionConfig{
-		MaxGametes:         10,
+		MaxGametes:         reproVals.maxGametes,
 		GameteCosts:        gameteCosts,
-		PacksTransferred:   2,
-		MaxStoredPacks:     5,
-		FractionFertilized: 0.5,
-		PackFraction:       0.5,
-		EggFraction:        0.1,
-		EggsPerCycle:       2,
-		Paternity:          100,
-		ConsumptionRate:    0.05,
-		SpermDegradation:   0.05,
-		MaleRatio:          50,
+		PacksTransferred:   reproVals.packs,
+		MaxStoredPacks:     reproVals.maxStored,
+		FractionFertilized: reproVals.fracFert,
+		PackFraction:       reproVals.packFrac,
+		EggFraction:        reproVals.eggFrac,
+		EggsPerCycle:       reproVals.eggsPerCycle,
+		Paternity:          reproVals.paternity,
+		ConsumptionRate:    reproVals.consumption,
+		SpermDegradation:   reproVals.spermDeg,
+		MaleRatio:          50, // From prototype sex_ratio_*, not the reproduction table.
 		FemaleRatio:        50,
 	}
 
-	// Default ontogeny config (minimal: 1 stage then adult).
+	// Ontogeny config: load real stages from the DB (falls back to sensible
+	// defaults only when the stages table is empty).
+	stageConfigs := buildStagesFromDB(db, w.Config, numNut, eval)
 	ontCfg := systems.OntogenyConfig{
 		NumStages:            w.Config.NumStages,
 		NumPrototypesM:       w.Config.NumPrototypesM,
 		NumPrototypesF:       w.Config.NumPrototypesF,
-		Stages:               buildDefaultStages(w.Config.NumStages, numNut),
+		Stages:               stageConfigs,
 		AssignmentPriorityM:  buildPriorityList(w.Config.NumPrototypesM),
 		AssignmentPriorityF:  buildPriorityList(w.Config.NumPrototypesF),
 		AssignmentThresholds: make([]float64, max(w.Config.NumPrototypesM, w.Config.NumPrototypesF)),
@@ -384,25 +417,27 @@ func Build(db *storage.DB, cfg EngineConfig) (*Engine, error) {
 	permutation := make([]int, w.Agents.Cap)
 
 	e := &Engine{
-		World:         w,
-		DB:            db,
-		RunID:         runID,
-		AgentGrid:     agentGrid,
-		ResourceGrid:  resourceGrid,
-		Registry:      registry,
-		Eval:          eval,
-		EnvBuilder:    envBuilder,
-		OntogenyCfg:   ontCfg,
-		GeneticsCfg:   genCfg,
-		ReproCfg:      reproCfg,
-		BehaviorCosts: behaviorCosts,
-		OptimalLevels: optimalLevels,
-		Longevity:     cfg.Longevity,
-		CombatTimeout: cfg.CombatTimeout,
-		CourtTimeout:  cfg.CourtTimeout,
-		WriteBuffer:   wb,
-		permutation:   permutation,
-		agentRef:      systems.NewAgentRef(numNut, numBeh),
+		World:           w,
+		DB:              db,
+		RunID:           runID,
+		AgentGrid:       agentGrid,
+		ResourceGrid:    resourceGrid,
+		Registry:        registry,
+		Eval:            eval,
+		EnvBuilder:      envBuilder,
+		OntogenyCfg:     ontCfg,
+		GeneticsCfg:     genCfg,
+		ReproCfg:        reproCfg,
+		BehaviorCosts:   behaviorCosts,
+		OptimalLevels:   optimalLevels,
+		Longevity:       cfg.Longevity,
+		CombatTimeout:   cfg.CombatTimeout,
+		CourtTimeout:    cfg.CourtTimeout,
+		WriteBuffer:     wb,
+		permutation:     permutation,
+		agentRef:        systems.NewAgentRef(numNut, numBeh),
+		agentAttrArr:    agentAttrArr,
+		resourceAttrArr: resourceAttrArr,
 	}
 
 	return e, nil
@@ -425,6 +460,7 @@ func (e *Engine) Tick() {
 		ResourceRadii: e.resourceRadii(),
 		ResourceAttr:  e.resourceAttr(),
 		AgentRadii:    e.agentRadii(),
+		AgentAttr:     e.agentAttrArr,
 	}
 
 	// 2. Generate random permutation for agent processing order.
@@ -584,14 +620,9 @@ func (e *Engine) resourceRadii() []float64 {
 }
 
 func (e *Engine) resourceAttr() []int32 {
-	numProtos := e.World.Config.NumPrototypes
-	numResTypes := e.World.Config.NumResourceTypes
-	n := numResTypes * numProtos
-	attr := make([]int32, n)
-	for i := range attr {
-		attr[i] = 10
-	}
-	return attr
+	// Precomputed from the attractiveness_sources table (default 0 = no
+	// attraction). See buildPerceptionAttractiveness.
+	return e.resourceAttrArr
 }
 
 func (e *Engine) agentRadii() []float64 {
@@ -824,4 +855,301 @@ func compileTendencies(db *storage.DB, registry *formulas.Registry, cfg world.Co
 				fmt.Sprintf("tendency.%d.%d", perceiverIdx, slot), formula)
 		}
 	}
+}
+
+// buildProtoPerceiverMap returns a map from prototype DB id to the unified
+// perceiver index used by the perception system (stages [0..NumStages),
+// then males by sort_order, then females by sort_order).
+func buildProtoPerceiverMap(db *storage.DB, cfg world.Config) map[int64]int {
+	protoPerceiver := make(map[int64]int)
+	assign := func(sex string, base int) {
+		rows, qErr := db.Conn.Query(
+			"SELECT id FROM prototypes WHERE sex = ? ORDER BY sort_order", sex)
+		if qErr != nil {
+			return
+		}
+		defer rows.Close()
+		i := 0
+		for rows.Next() {
+			var id int64
+			if err := rows.Scan(&id); err != nil {
+				continue
+			}
+			protoPerceiver[id] = base + i
+			i++
+		}
+	}
+	assign("M", cfg.NumStages)
+	assign("F", cfg.NumStages+cfg.NumPrototypesM)
+	return protoPerceiver
+}
+
+// resolvePerceiverIdx maps a (stageID, prototypeID) pair from an attractiveness
+// row to the unified perceiver index. Stage takes precedence (immature agents);
+// otherwise the prototype map is used. Returns -1 if it cannot be resolved.
+func resolvePerceiverIdx(stageID, protoID *int64, protoMap map[int64]int) int {
+	if stageID != nil {
+		return int(*stageID - 1) // 1-based DB id -> 0-based stage index.
+	}
+	if protoID != nil {
+		if idx, ok := protoMap[*protoID]; ok {
+			return idx
+		}
+	}
+	return -1
+}
+
+// evalConstFormula compiles and evaluates a formula with no agent context,
+// returning defaultVal on any error. Intended for build-time scalar config
+// like attractiveness weights (typically constants).
+func evalConstFormula(eval *formulas.Evaluator, formula string, defaultVal int32) int32 {
+	reg := formulas.NewRegistry()
+	if err := reg.Compile("_tmp", formula); err != nil {
+		return defaultVal
+	}
+	p := reg.Get("_tmp")
+	if p == nil {
+		return defaultVal
+	}
+	v, err := eval.RunProgramInt(p)
+	if err != nil {
+		return defaultVal
+	}
+	return int32(v)
+}
+
+// evalConstFloatFormula is the float64 variant of evalConstFormula, for
+// fractional config values (fertilization fraction, degradation rate, etc.).
+func evalConstFloatFormula(eval *formulas.Evaluator, formula string, defaultVal float64) float64 {
+	reg := formulas.NewRegistry()
+	if err := reg.Compile("_tmp", formula); err != nil {
+		return defaultVal
+	}
+	p := reg.Get("_tmp")
+	if p == nil {
+		return defaultVal
+	}
+	v, err := eval.RunProgramFloat(p)
+	if err != nil {
+		return defaultVal
+	}
+	return v
+}
+
+// buildAgentAttractiveness precomputes the agent-to-agent attractiveness array
+// from the attractiveness_agents table. Layout: [observedIdx * NumPrototypes +
+// perceiverIdx]. Defaults to 0 (no attraction) for unconfigured pairs.
+func buildAgentAttractiveness(
+	db *storage.DB, cfg world.Config,
+	eval *formulas.Evaluator, envBuilder *formulas.EnvBuilder,
+) []int32 {
+	n := cfg.NumPrototypes * cfg.NumPrototypes
+	attr := make([]int32, n) // all zeros by default
+	protoMap := buildProtoPerceiverMap(db, cfg)
+
+	rows, err := db.Conn.Query(
+		`SELECT observed_stage_id, observed_prototype_id,
+		        perceiver_stage_id, perceiver_prototype_id, attractiveness_formula
+		 FROM attractiveness_agents`)
+	if err != nil {
+		return attr
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var obsStage, obsProto, perStage, perProto *int64
+		var formula string
+		if err := rows.Scan(&obsStage, &obsProto, &perStage, &perProto, &formula); err != nil {
+			continue
+		}
+		observedIdx := resolvePerceiverIdx(obsStage, obsProto, protoMap)
+		perceiverIdx := resolvePerceiverIdx(perStage, perProto, protoMap)
+		if observedIdx < 0 || perceiverIdx < 0 {
+			continue
+		}
+		key := observedIdx*cfg.NumPrototypes + perceiverIdx
+		if key < 0 || key >= n {
+			continue
+		}
+		attr[key] = evalConstFormula(eval, formula, 0)
+	}
+	return attr
+}
+
+// buildResourceAttractiveness precomputes the resource attractiveness array
+// from the attractiveness_sources table. Layout: [resourceType * NumPrototypes +
+// perceiverIdx]. Defaults to 0 (no attraction) for unconfigured pairs.
+func buildResourceAttractiveness(
+	db *storage.DB, cfg world.Config,
+	eval *formulas.Evaluator, envBuilder *formulas.EnvBuilder,
+) []int32 {
+	n := cfg.NumResourceTypes * cfg.NumPrototypes
+	attr := make([]int32, n) // all zeros by default
+	protoMap := buildProtoPerceiverMap(db, cfg)
+
+	rows, err := db.Conn.Query(
+		`SELECT nutrient_id, perceiver_stage_id, perceiver_prototype_id,
+		        attractiveness_formula
+		 FROM attractiveness_sources`)
+	if err != nil {
+		return attr
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var nutrientID int64
+		var perStage, perProto *int64
+		var formula string
+		if err := rows.Scan(&nutrientID, &perStage, &perProto, &formula); err != nil {
+			continue
+		}
+		resourceType := int(nutrientID - 1) // 1-based nutrient id -> 0-based type.
+		perceiverIdx := resolvePerceiverIdx(perStage, perProto, protoMap)
+		if resourceType < 0 || perceiverIdx < 0 {
+			continue
+		}
+		key := resourceType*cfg.NumPrototypes + perceiverIdx
+		if key < 0 || key >= n {
+			continue
+		}
+		attr[key] = evalConstFormula(eval, formula, 0)
+	}
+	return attr
+}
+
+// behaviorNameToIndex maps an editor behavior-cost name to the engine's numeric
+// behavior index, for a given nutrient index. Returns -1 if the name is unknown.
+//
+// Engine behavior layout (see world.BuildBehaviorNames):
+//
+//	0            Move
+//	1            Rest
+//	2..2+N-1     Feed_<nutrient n>
+//	2+N          Fight_Attack
+//	2+N+1        Fight_Defend
+//	2+N+2        Fight_Retreat
+//	2+N+3        Court_Display
+//	2+N+4        Court_Accept
+//	2+N+5        Court_Reject
+//	2+N+6        Oviposit
+//
+// The editor's "feed" is generic per-nutrient, so it maps to Feed_<nIdx>.
+func behaviorNameToIndex(name string, nIdx int, cfg world.Config) int {
+	feedBase := 2
+	fightBase := feedBase + cfg.NumResourceTypes
+	switch name {
+	case "move_active":
+		return 0
+	case "move_rest":
+		return 1
+	case "feed":
+		if nIdx < 0 || nIdx >= cfg.NumResourceTypes {
+			return -1
+		}
+		return feedBase + nIdx
+	case "fight_display":
+		return fightBase + 0 // Fight_Attack
+	case "fight_escalate":
+		return fightBase + 1 // Fight_Defend
+	case "fight_retreat":
+		return fightBase + 2
+	case "court_display":
+		return fightBase + 3 // Court_Display
+	case "court_accept":
+		return fightBase + 4 // Court_Accept
+	case "court_reject":
+		return fightBase + 5 // Court_Reject
+	case "oviposit":
+		return fightBase + 6
+	case "court_escalate":
+		// The editor exposes a "court_escalate" behavior that the engine's
+		// behavior model does not have (engine courtship is Display/Accept/
+		// Reject). Ignore it rather than collide with court_accept.
+		return -1
+	default:
+		return -1
+	}
+}
+
+// buildStagesFromDB loads stage configurations from the `stages` and
+// `stage_nutrient_requirements` tables, evaluating their formulas. The returned
+// slice is ordered by sort_order so its index matches the agent StageID.
+// Falls back to buildDefaultStages when the stages table is empty.
+func buildStagesFromDB(
+	db *storage.DB, cfg world.Config, numNut int, eval *formulas.Evaluator,
+) []systems.StageConfig {
+	stageRepo := storage.NewStageRepo(db)
+	stages, err := stageRepo.List() // Ordered by sort_order.
+	if err != nil || len(stages) == 0 {
+		return buildDefaultStages(cfg.NumStages, numNut)
+	}
+
+	protoMap := buildProtoPerceiverMap(db, cfg)
+
+	// Preload nutrient requirements/costs per stage id.
+	// reqByStage[stageID][nutrientIdx] = (requirement, cost).
+	type reqCost struct{ req, cost int32 }
+	reqByStage := make(map[int64][]reqCost)
+	reqRows, rErr := db.Conn.Query(
+		`SELECT stage_id, nutrient_id, requirement_formula, cost_formula
+		 FROM stage_nutrient_requirements`)
+	if rErr == nil {
+		defer reqRows.Close()
+		for reqRows.Next() {
+			var stageID, nutID int64
+			var reqF, costF string
+			if err := reqRows.Scan(&stageID, &nutID, &reqF, &costF); err != nil {
+				continue
+			}
+			nIdx := int(nutID - 1)
+			if nIdx < 0 || nIdx >= numNut {
+				continue
+			}
+			if reqByStage[stageID] == nil {
+				reqByStage[stageID] = make([]reqCost, numNut)
+			}
+			reqByStage[stageID][nIdx] = reqCost{
+				req:  evalConstFormula(eval, reqF, 0),
+				cost: evalConstFormula(eval, costF, 0),
+			}
+		}
+	}
+
+	result := make([]systems.StageConfig, len(stages))
+	for i, s := range stages {
+		reqs := make([]int32, numNut)
+		costs := make([]int32, numNut)
+		if rc := reqByStage[s.ID]; rc != nil {
+			for n := 0; n < numNut; n++ {
+				reqs[n] = rc[n].req
+				costs[n] = rc[n].cost
+			}
+		}
+
+		linked := -1
+		if s.LinkedPrototypeID != nil {
+			if idx, ok := protoMap[*s.LinkedPrototypeID]; ok {
+				linked = idx
+			}
+		}
+
+		result[i] = systems.StageConfig{
+			CyclesRequired:  evalConstFormula(eval, s.CyclesFormula, 0),
+			NutrientReqs:    reqs,
+			NutrientCosts:   costs,
+			Condition1Value: s.Condition1Value,
+			Condition2Value: s.Condition2Value,
+			LogicCyclesReqs: logicIsAnd(s.LogicCyclesReqs),
+			LogicReqsConds:  logicIsAnd(s.LogicReqsConds),
+			LogicCond1Cond2: logicIsAnd(s.LogicCond1Cond2),
+			LinkedPrototype: linked,
+		}
+	}
+	return result
+}
+
+// logicIsAnd maps the DB logic string ("AND"/"OR") to the engine's bool
+// convention (true = AND).
+func logicIsAnd(s string) bool {
+	return s != "OR"
 }

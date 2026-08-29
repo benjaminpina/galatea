@@ -27,7 +27,6 @@ const (
 // Behavioral tuning constants.
 const (
 	contiguousDistance   = 1.5 // Max distance to consider elements "adjacent".
-	defaultAgentAttr     = 5   // Default base attractiveness for agents.
 	fightBoostDisplay    = 5   // VDecision boost for fight when contender detected.
 	fightBoostEscalate   = 3   // VDecision boost for escalate when contender detected.
 	courtBoostDisplay    = 5   // VDecision boost for courtship when mate detected.
@@ -68,6 +67,10 @@ type PerceptionContext struct {
 
 	// Agent attractiveness radii: [observed * numPerceivers + perceiverIdx]
 	AgentRadii []float64
+
+	// Agent attractiveness values: [observed * numPerceivers + perceiverIdx].
+	// Defaults to 0 (no attraction) when not configured in the DB.
+	AgentAttr []int32
 
 	// Per-agent reference values (set before each agent's perception).
 	Ref *AgentRef
@@ -189,7 +192,7 @@ func perceiveAgents(ctx *PerceptionContext, idx int) {
 			continue
 		}
 
-		attractiveness := computeAgentAttractiveness(dist)
+		attractiveness := getAgentAttractiveness(ctx, radiusKey, dist)
 		accumulateTendency(a, tendBase, aDir, ax, ay, cx, cy, attractiveness)
 
 		if dist <= contiguousDistance {
@@ -531,9 +534,16 @@ func getResourceAttractiveness(ctx *PerceptionContext, radiusKey int, dist float
 	return attr
 }
 
-func computeAgentAttractiveness(dist float64) int32 {
-	attr := int32(defaultAgentAttr)
-	if dist > 0 {
+// getAgentAttractiveness reads the configured agent-to-agent attractiveness
+// from the perception context (populated from the attractiveness_agents table),
+// falling off with distance. Returns 0 when no attraction is configured, so by
+// default agents do NOT attract each other.
+func getAgentAttractiveness(ctx *PerceptionContext, radiusKey int, dist float64) int32 {
+	if radiusKey < 0 || radiusKey >= len(ctx.AgentAttr) {
+		return 0
+	}
+	attr := ctx.AgentAttr[radiusKey]
+	if dist > 0 && attr != 0 {
 		attr /= int32(math.Max(1, dist))
 	}
 	return attr

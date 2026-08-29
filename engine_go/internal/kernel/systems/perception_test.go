@@ -196,6 +196,67 @@ func TestPerceiveAgentDetectsMate(t *testing.T) {
 	}
 }
 
+// TestPerceiveAgentNoAttractionByDefault verifies that with no configured
+// agent attractiveness (AgentAttr nil/zero), a nearby agent contributes ZERO
+// movement tendency toward itself. This guards the clumping bug where a
+// hardcoded positive attractiveness made agents stick together with defaults.
+func TestPerceiveAgentNoAttractionByDefault(t *testing.T) {
+	cfg := testCfg()
+	w := world.New(cfg)
+
+	// Agent 0 facing north at (25, 25).
+	idx0 := w.AddAgent()
+	w.Agents.PosX[idx0] = 25
+	w.Agents.PosY[idx0] = 25
+	w.Agents.Direction[idx0] = 2
+	w.Agents.Speed[idx0] = 1
+	w.Agents.Sex[idx0] = world.SexMale
+	w.Agents.StageID[idx0] = -1
+	w.Agents.PrototypeID[idx0] = 0
+	w.Agents.Situation[idx0] = world.SituationRegular
+	w.Agents.Reserves[idx0*cfg.NumNutrients+0] = 50
+	w.Agents.Reserves[idx0*cfg.NumNutrients+1] = 50
+
+	// Agent 1 nearby.
+	idx1 := w.AddAgent()
+	w.Agents.PosX[idx1] = 27
+	w.Agents.PosY[idx1] = 25
+	w.Agents.Direction[idx1] = 2
+	w.Agents.Speed[idx1] = 1
+	w.Agents.Sex[idx1] = world.SexMale
+	w.Agents.StageID[idx1] = -1
+	w.Agents.PrototypeID[idx1] = 0
+	w.Agents.Situation[idx1] = world.SituationRegular
+	w.Agents.Reserves[idx1*cfg.NumNutrients+0] = 50
+	w.Agents.Reserves[idx1*cfg.NumNutrients+1] = 50
+
+	ctx := setupPerceptionContext(w) // AgentAttr is nil -> no attraction.
+	Perceive(ctx, idx0)
+
+	// No resources, no base tendencies configured, no agent attraction:
+	// all tendency slots contributed by perception must be zero. (Base
+	// tendencies and boundary avoidance add later, but here the registry has
+	// no tendency formulas, so perception+base contribute nothing except the
+	// boundary-avoidance +1 which is uniform. We assert the perceived neighbor
+	// did NOT bias any single direction toward it.)
+	tendBase := idx0 * 8
+	// The neighbor is due East. Without attraction, the East-ward tendency
+	// must not exceed the others (no directional bias toward the neighbor).
+	// With the old bug it would be strictly higher. We check it's uniform.
+	first := w.Agents.Tendencies[tendBase]
+	uniform := true
+	for d := 1; d < 8; d++ {
+		if w.Agents.Tendencies[tendBase+d] != first {
+			uniform = false
+			break
+		}
+	}
+	if !uniform {
+		t.Fatalf("expected uniform tendencies with no attraction, got %v",
+			w.Agents.Tendencies[tendBase:tendBase+8])
+	}
+}
+
 func TestFilterDisablesOvipositForMale(t *testing.T) {
 	cfg := testCfg()
 	w := world.New(cfg)

@@ -47,7 +47,7 @@ func NewAgentRef(numNutrients, numBehaviors int) *AgentRef {
 //   - "metabolism.<nutrientIdx>.min", ".critical", ".optimal", ".max"
 //   - "prototype.<protoIdx>.longevity", ".refractory_combat", ".refractory_courtship"
 //   - "behavior_cost.<behaviorIdx>.<nutrientIdx>"
-//   - "gamete_cost.<nutrientIdx>"
+//   - "gamete_cost.<M|F>.<nutrientIdx>"
 //   - "reproduction.max_gametes"
 //   - "substrate_velocity.<substrateId>"
 func EvalRefValues(
@@ -83,9 +83,14 @@ func EvalRefValues(
 		ref.MaxReserves[n] = evalIntFormula(reg, eval, metaKey+"max", 100)
 	}
 
-	// Gamete costs per nutrient.
+	// Gamete costs per nutrient, keyed by the agent's sex ("M"/"F"). This
+	// respects per-sex configuration from the gamete_costs table.
+	sexKey := "M"
+	if a.Sex[idx] == world.SexFemale {
+		sexKey = "F"
+	}
 	for n := 0; n < cfg.NumNutrients; n++ {
-		ref.GameteCosts[n] = evalIntFormula(reg, eval, "gamete_cost."+itoa(n), 5)
+		ref.GameteCosts[n] = evalIntFormula(reg, eval, "gamete_cost."+sexKey+"."+itoa(n), 5)
 	}
 	ref.MaxGametes = evalIntFormula(reg, eval, "reproduction.max_gametes", 10)
 
