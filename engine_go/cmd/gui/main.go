@@ -354,7 +354,7 @@ func (g *Game) drawAgents(screen *ebiten.Image) {
 		}
 
 		// Egg indicator for females.
-		if !isMale && a.FertilizedCount[i] > 0 {
+		if !isMale && a.FertilizedCount(i) > 0 {
 			vector.FillCircle(screen, bodyX, bodyY, bodyR*0.3, color.RGBA{255, 255, 255, 220}, false)
 		}
 	}

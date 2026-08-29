@@ -368,7 +368,7 @@ func applyFilters(ctx *PerceptionContext, idx int) {
 	}
 
 	// --- Disable oviposition for males, or if no fertilized eggs ---
-	if a.Sex[idx] == world.SexMale || a.FertilizedCount[idx] == 0 {
+	if a.Sex[idx] == world.SexMale || a.FertilizedCount(idx) == 0 {
 		if ovipositIdx < cfg.NumBehaviors {
 			a.VDecision[vdBase+ovipositIdx] = 0
 		}

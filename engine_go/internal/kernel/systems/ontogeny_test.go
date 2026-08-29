@@ -325,8 +325,13 @@ func TestResolveCourtshipDynamics_MutualAcceptance(t *testing.T) {
 	if a.Situation[male] != world.SituationRegular {
 		t.Fatalf("male should be regular after copulation, got %d", a.Situation[male])
 	}
-	if a.SpermPackCount(female) != 2 {
-		t.Fatalf("female should have 2 sperm packs, got %d", a.SpermPackCount(female))
+	// 2 packs transferred; fertilization (target 5, capped by 2 packs)
+	// consumes both packs and produces 2 retained fertilized eggs.
+	if a.SpermPackCount(female) != 0 {
+		t.Fatalf("female should have 0 sperm packs after fertilization, got %d", a.SpermPackCount(female))
+	}
+	if a.FertilizedCount(female) != 2 {
+		t.Fatalf("female should have 2 fertilized eggs, got %d", a.FertilizedCount(female))
 	}
 }
 

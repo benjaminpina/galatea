@@ -247,26 +247,31 @@ func TestCopulate(t *testing.T) {
 	if w.Agents.GametesCount[male] != 2 {
 		t.Fatalf("male gametes: expected 2, got %d", w.Agents.GametesCount[male])
 	}
-	// Female: received 3 sperm packs.
-	if w.Agents.SpermPackCount(female) != 3 {
-		t.Fatalf("female sperm packs: expected 3, got %d", w.Agents.SpermPackCount(female))
+	// Copulate transfers 3 packs, then fertilizes: target = 8 gametes * 0.5 = 4,
+	// but capped by the 3 available packs, so 3 gametes get fertilized and all
+	// 3 packs are consumed (each fertilization uses one pack).
+	if w.Agents.SpermPackCount(female) != 0 {
+		t.Fatalf("expected 0 packs after copulate+fertilize, got %d", w.Agents.SpermPackCount(female))
 	}
-	// Each stored pack must carry the donor male's genotype and identity.
-	for i, pack := range w.Agents.SpermPacks[female] {
-		if len(pack.GenotypeCont) != cfg.NumLoci*2 {
-			t.Fatalf("pack %d: expected genotype len %d, got %d", i, cfg.NumLoci*2, len(pack.GenotypeCont))
+	// 3 retained fertilized eggs, each carrying a crossed genotype from the
+	// donor male, with a sex and a recorded sire.
+	if w.Agents.FertilizedCount(female) != 3 {
+		t.Fatalf("female fertilized: expected 3, got %d", w.Agents.FertilizedCount(female))
+	}
+	for i, egg := range w.Agents.FertilizedEggs[female] {
+		if len(egg.GenotypeCont) != cfg.NumLoci*2 {
+			t.Fatalf("fertilized egg %d: expected genotype len %d, got %d", i, cfg.NumLoci*2, len(egg.GenotypeCont))
 		}
-		if pack.Donor == "" {
-			t.Fatalf("pack %d: expected a donor identifier", i)
+		if egg.Sex != world.SexMale && egg.Sex != world.SexFemale {
+			t.Fatalf("fertilized egg %d: invalid sex %d", i, egg.Sex)
+		}
+		if egg.Donor != donorID(male) {
+			t.Fatalf("fertilized egg %d: expected sire %q, got %q", i, donorID(male), egg.Donor)
 		}
 	}
-	// Female: 8 gametes * 0.5 = 4 fertilized.
-	if w.Agents.FertilizedCount[female] != 4 {
-		t.Fatalf("female fertilized: expected 4, got %d", w.Agents.FertilizedCount[female])
-	}
-	// Female: 8 - 4 = 4 unfertilized gametes remaining.
-	if w.Agents.GametesCount[female] != 4 {
-		t.Fatalf("female gametes: expected 4, got %d", w.Agents.GametesCount[female])
+	// Female: 8 - 3 fertilized = 5 unfertilized gametes remaining.
+	if w.Agents.GametesCount[female] != 5 {
+		t.Fatalf("female gametes: expected 5, got %d", w.Agents.GametesCount[female])
 	}
 	// Both back to regular.
 	if w.Agents.Situation[male] != world.SituationRegular {
@@ -285,16 +290,26 @@ func TestOviposit(t *testing.T) {
 	w.Agents.Sex[female] = world.SexFemale
 	w.Agents.PosX[female] = 30
 	w.Agents.PosY[female] = 40
-	w.Agents.FertilizedCount[female] = 5
 	w.Agents.Reserves[female*cfg.NumNutrients+0] = 100
 	w.Agents.Reserves[female*cfg.NumNutrients+1] = 100
-	// Set genotype so crossover has something to work with.
-	genoBase := female * cfg.NumLoci * 2
-	for i := 0; i < cfg.NumLoci*2; i++ {
-		w.Agents.GenotypeCont[genoBase+i] = float64(i + 1)
-		w.Agents.GenotypeDisc[genoBase+i] = int32(i + 10)
-		w.Agents.DominanceCont[genoBase+i] = uint8(i % 2)
-		w.Agents.DominanceDisc[genoBase+i] = uint8((i + 1) % 2)
+
+	// Seed 5 retained fertilized eggs, each carrying a distinct genotype and a
+	// known donor, so we can verify the deposited egg keeps its genotype.
+	genoSize := cfg.NumLoci * 2
+	for e := 0; e < 5; e++ {
+		egg := world.FertilizedEgg{
+			GenotypeCont:  make([]float64, genoSize),
+			GenotypeDisc:  make([]int32, genoSize),
+			DominanceCont: make([]uint8, genoSize),
+			DominanceDisc: make([]uint8, genoSize),
+			Sex:           world.SexMale,
+			Donor:         "M7",
+		}
+		for i := 0; i < genoSize; i++ {
+			egg.GenotypeCont[i] = float64(e*100 + i + 1)
+			egg.GenotypeDisc[i] = int32(e*100 + i + 10)
+		}
+		w.Agents.AddFertilizedEgg(female, egg)
 	}
 
 	reproCfg := ReproductionConfig{
@@ -317,8 +332,16 @@ func TestOviposit(t *testing.T) {
 	if w.Eggs.Count != 3 {
 		t.Fatalf("expected 3 eggs in world, got %d", w.Eggs.Count)
 	}
-	if w.Agents.FertilizedCount[female] != 2 {
-		t.Fatalf("expected 2 fertilized remaining, got %d", w.Agents.FertilizedCount[female])
+	if w.Agents.FertilizedCount(female) != 2 {
+		t.Fatalf("expected 2 fertilized remaining, got %d", w.Agents.FertilizedCount(female))
+	}
+	// The first laid egg must keep the genotype of the first retained egg
+	// (FIFO): GenotypeCont[0] was 0*100 + 0 + 1 = 1, and parentage recorded.
+	if w.Eggs.GenotypeCont[0] != 1 {
+		t.Fatalf("egg 0 genotype not preserved: expected 1, got %f", w.Eggs.GenotypeCont[0])
+	}
+	if w.Eggs.ParentMale[0] != "M7" {
+		t.Fatalf("egg 0 sire not recorded: expected M7, got %q", w.Eggs.ParentMale[0])
 	}
 	if w.Agents.CarriedEggs[female] != 3 {
 		t.Fatalf("expected 3 carried eggs, got %d", w.Agents.CarriedEggs[female])
@@ -332,6 +355,92 @@ func TestOviposit(t *testing.T) {
 	for i := 0; i < 3; i++ {
 		if w.Eggs.Sex[i] != world.SexMale && w.Eggs.Sex[i] != world.SexFemale {
 			t.Fatalf("egg %d has invalid sex: %d", i, w.Eggs.Sex[i])
+		}
+	}
+}
+
+// TestPaternalInheritance is the end-to-end guarantee for point 2: after a real
+// copulation + oviposition, offspring genotypes must carry alleles from the
+// FATHER, not just the mother. We give the male a distinctive allele value the
+// mother can never have, then verify every laid egg has at least one paternal
+// allele at each locus (crossover takes one allele from each parent).
+func TestPaternalInheritance(t *testing.T) {
+	cfg := testCfg()
+	w := world.New(cfg)
+	genoSize := cfg.NumLoci * 2
+
+	const paternalMark = 1000.0 // Impossible for the mother.
+	const maternalMark = 1.0
+
+	male := w.AddAgent()
+	w.Agents.Sex[male] = world.SexMale
+	w.Agents.GametesCount[male] = 10
+	w.Agents.Situation[male] = world.SituationCourtship
+	maleGenoBase := male * genoSize
+	for i := 0; i < genoSize; i++ {
+		w.Agents.GenotypeCont[maleGenoBase+i] = paternalMark
+	}
+
+	female := w.AddAgent()
+	w.Agents.Sex[female] = world.SexFemale
+	w.Agents.GametesCount[female] = 10
+	w.Agents.Situation[female] = world.SituationCourtship
+	w.Agents.InteractantIdx[male] = int32(female)
+	w.Agents.InteractantIdx[female] = int32(male)
+	femaleGenoBase := female * genoSize
+	for i := 0; i < genoSize; i++ {
+		w.Agents.GenotypeCont[femaleGenoBase+i] = maternalMark
+	}
+	for n := 0; n < cfg.NumNutrients; n++ {
+		w.Agents.Reserves[female*cfg.NumNutrients+n] = 100
+	}
+
+	reproCfg := ReproductionConfig{
+		PacksTransferred:   6,
+		MaxStoredPacks:     10,
+		FractionFertilized: 1.0, // Fertilize all available gametes.
+		EggsPerCycle:       6,
+		EggFraction:        0.1,
+		MaleRatio:          50,
+		FemaleRatio:        50,
+	}
+	// No mutation, so allele values stay exactly paternal or maternal.
+	genCfg := GeneticsConfig{
+		NumLoci:  cfg.NumLoci,
+		LociCont: make([]LocusConfig, cfg.NumLoci),
+		LociDisc: make([]LocusConfig, cfg.NumLoci),
+	}
+
+	Copulate(w, male, female, reproCfg, genCfg)
+
+	if w.Agents.FertilizedCount(female) == 0 {
+		t.Fatal("expected the female to have fertilized eggs after copulation")
+	}
+
+	laid := Oviposit(w, female, reproCfg, genCfg)
+	if laid == 0 {
+		t.Fatal("expected at least one egg laid")
+	}
+
+	// Every egg, at every locus, must have exactly one paternal and one
+	// maternal allele (crossover picks one allele from each parent).
+	for e := 0; e < laid; e++ {
+		base := e * genoSize
+		for locus := 0; locus < cfg.NumLoci; locus++ {
+			a0 := w.Eggs.GenotypeCont[base+locus*2]
+			a1 := w.Eggs.GenotypeCont[base+locus*2+1]
+			hasPaternal := a0 == paternalMark || a1 == paternalMark
+			hasMaternal := a0 == maternalMark || a1 == maternalMark
+			if !hasPaternal {
+				t.Fatalf("egg %d locus %d: no paternal allele (got %v, %v)", e, locus, a0, a1)
+			}
+			if !hasMaternal {
+				t.Fatalf("egg %d locus %d: no maternal allele (got %v, %v)", e, locus, a0, a1)
+			}
+		}
+		// Sire must be recorded.
+		if w.Eggs.ParentMale[e] != donorID(male) {
+			t.Fatalf("egg %d: expected sire %q, got %q", e, donorID(male), w.Eggs.ParentMale[e])
 		}
 	}
 }

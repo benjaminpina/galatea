@@ -20,7 +20,8 @@ func (w *World) AddAgent() int {
 	a.Direction[idx] = 1
 	a.Speed[idx] = 1
 	a.MorphologyFixed[idx] = false
-	a.SpermPacks[idx] = nil // Clear any packs left by a previous occupant.
+	a.SpermPacks[idx] = nil     // Clear any packs left by a previous occupant.
+	a.FertilizedEggs[idx] = nil // Clear any retained eggs from a previous occupant.
 
 	return idx
 }
@@ -67,8 +68,8 @@ func (w *World) swapAgents(i, j int) {
 	a.Decision[i], a.Decision[j] = a.Decision[j], a.Decision[i]
 	a.InteractantIdx[i], a.InteractantIdx[j] = a.InteractantIdx[j], a.InteractantIdx[i]
 	a.GametesCount[i], a.GametesCount[j] = a.GametesCount[j], a.GametesCount[i]
-	a.FertilizedCount[i], a.FertilizedCount[j] = a.FertilizedCount[j], a.FertilizedCount[i]
 	a.SpermPacks[i], a.SpermPacks[j] = a.SpermPacks[j], a.SpermPacks[i]
+	a.FertilizedEggs[i], a.FertilizedEggs[j] = a.FertilizedEggs[j], a.FertilizedEggs[i]
 	a.CarriedEggs[i], a.CarriedEggs[j] = a.CarriedEggs[j], a.CarriedEggs[i]
 	a.TimeInStage[i], a.TimeInStage[j] = a.TimeInStage[j], a.TimeInStage[i]
 	a.TimeOnSubstrate[i], a.TimeOnSubstrate[j] = a.TimeOnSubstrate[j], a.TimeOnSubstrate[i]
@@ -148,8 +149,8 @@ func (w *World) growAgents() {
 	a.Tendencies = growI32(a.Tendencies, newCap*8)
 	a.VDecision = growI32(a.VDecision, newCap*numBehaviors)
 	a.GametesCount = growI32(a.GametesCount, newCap)
-	a.FertilizedCount = growI32(a.FertilizedCount, newCap)
 	a.SpermPacks = growSpermPacks(a.SpermPacks, newCap)
+	a.FertilizedEggs = growFertilizedEggs(a.FertilizedEggs, newCap)
 	a.CarriedEggs = growI32(a.CarriedEggs, newCap)
 	a.TimeInStage = growI32(a.TimeInStage, newCap)
 	a.TimeOnSubstrate = growI32(a.TimeOnSubstrate, newCap)
@@ -221,6 +222,12 @@ func growBool(old []bool, newLen int) []bool {
 
 func growSpermPacks(old [][]SpermPack, newLen int) [][]SpermPack {
 	s := make([][]SpermPack, newLen)
+	copy(s, old)
+	return s
+}
+
+func growFertilizedEggs(old [][]FertilizedEgg, newLen int) [][]FertilizedEgg {
+	s := make([][]FertilizedEgg, newLen)
 	copy(s, old)
 	return s
 }

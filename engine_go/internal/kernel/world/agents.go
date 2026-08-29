@@ -80,15 +80,21 @@ type AgentArrays struct {
 	VDecision []int32
 
 	// Reproduction
-	GametesCount    []int32 // Number of gametes in gonad.
-	FertilizedCount []int32 // Number of fertilized eggs carried.
-	CarriedEggs     []int32 // Number of eggs being carried.
+	GametesCount []int32 // Number of gametes in gonad.
+	CarriedEggs  []int32 // Number of eggs being carried.
 
 	// SpermPacks holds, per female agent, the list of stored spermatophores.
 	// Each pack carries the donor male's genotype so paternal inheritance is
 	// possible (mirrors the legacy TEspermateca). SpermPacks[i] is the list
 	// for agent i; nil/empty for males and virgin females.
 	SpermPacks [][]SpermPack
+
+	// FertilizedEggs holds, per female agent, the list of internally-fertilized
+	// eggs retained until oviposition. Each entry carries the crossed child
+	// genotype (mother × chosen sperm pack), mirroring the legacy Fertilizados
+	// list. This replaces the former FertilizedCount counter; use
+	// FertilizedCount(idx) for the count.
+	FertilizedEggs [][]FertilizedEgg
 
 	// Time counters
 	TimeInStage       []int32 // Ticks spent in current stage.
@@ -148,10 +154,10 @@ func NewAgentArrays(cap int, cfg Config) *AgentArrays {
 		Tendencies: make([]int32, cap*8),
 		VDecision:  make([]int32, cap*numBehaviors),
 
-		GametesCount:    make([]int32, cap),
-		FertilizedCount: make([]int32, cap),
-		CarriedEggs:     make([]int32, cap),
-		SpermPacks:      make([][]SpermPack, cap),
+		GametesCount:   make([]int32, cap),
+		CarriedEggs:    make([]int32, cap),
+		SpermPacks:     make([][]SpermPack, cap),
+		FertilizedEggs: make([][]FertilizedEgg, cap),
 
 		TimeInStage:       make([]int32, cap),
 		TimeOnSubstrate:   make([]int32, cap),

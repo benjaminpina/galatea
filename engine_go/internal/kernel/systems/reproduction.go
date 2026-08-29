@@ -34,7 +34,7 @@ func Gametogenesis(w *world.World, idx int, cfg ReproductionConfig) {
 	}
 
 	reserveBase := idx * numNut
-	currentGametes := a.GametesCount[idx] + a.FertilizedCount[idx]
+	currentGametes := a.GametesCount[idx] + a.FertilizedCount(idx)
 	maxProducible := cfg.MaxGametes - currentGametes
 	if maxProducible <= 0 {
 		return
@@ -118,14 +118,13 @@ func Copulate(w *world.World, maleIdx, femaleIdx int, cfg ReproductionConfig, ge
 		a.AddSpermPack(femaleIdx, pack)
 	}
 
-	// Fertilize a fraction of the female's unfertilized gametes.
+	// Fertilize a fraction of the female's unfertilized gametes, crossing each
+	// with a sperm pack chosen by paternity-weighted roulette.
 	fertilizeCount := int32(float64(a.GametesCount[femaleIdx]) * cfg.FractionFertilized)
 	if fertilizeCount > a.GametesCount[femaleIdx] {
 		fertilizeCount = a.GametesCount[femaleIdx]
 	}
-
-	a.GametesCount[femaleIdx] -= fertilizeCount
-	a.FertilizedCount[femaleIdx] += fertilizeCount
+	FertilizeGametes(w, femaleIdx, fertilizeCount, cfg, genCfg)
 
 	// Return both to regular state.
 	a.Situation[maleIdx] = world.SituationRegular
@@ -143,8 +142,93 @@ func donorID(maleIdx int) string {
 	return "M" + itoa(maleIdx)
 }
 
-// Oviposit deposits fertilized eggs into the world's EggArrays.
-// Creates new egg entries with genotype from crossover of parents.
+// FertilizeGametes fertilizes up to `count` of the female's unfertilized
+// gametes. For each gamete it selects a stored sperm pack by paternity-weighted
+// roulette, crosses the mother's genotype with that pack's (paternal) genotype,
+// applies mutations, and retains the resulting FertilizedEgg on the female
+// (mirrors the legacy FertilizaFraccion/FertilizaCantidad). Gametes are only
+// fertilized while packs are available and the female has unfertilized gametes.
+//
+// The sex of each fertilized egg is drawn from the offspring sex ratio.
+// Returns the number of eggs actually fertilized.
+func FertilizeGametes(w *world.World, femaleIdx int, count int32, cfg ReproductionConfig, genCfg GeneticsConfig) int32 {
+	a := w.Agents
+	numLoci := w.Config.NumLoci
+
+	packs := a.SpermPacks[femaleIdx]
+	if count <= 0 || len(packs) == 0 || a.GametesCount[femaleIdx] <= 0 {
+		return 0
+	}
+	if count > a.GametesCount[femaleIdx] {
+		count = a.GametesCount[femaleIdx]
+	}
+
+	// Mother's genotype (constant across this batch).
+	motherContGeno := CopyGenotypeCont(a.GenotypeCont, femaleIdx, numLoci)
+	motherDiscGeno := CopyGenotypeDisc(a.GenotypeDisc, femaleIdx, numLoci)
+	motherContDom := CopyDominance(a.DominanceCont, femaleIdx, numLoci)
+	motherDiscDom := CopyDominance(a.DominanceDisc, femaleIdx, numLoci)
+
+	genoSize := numLoci * 2
+	fertilized := int32(0)
+
+	for fertilized < count {
+		packs = a.SpermPacks[femaleIdx]
+		if len(packs) == 0 {
+			break // No more sperm to fertilize with.
+		}
+
+		// Choose a pack by paternity-weighted roulette.
+		weights := make([]int32, len(packs))
+		for i := range packs {
+			weights[i] = packs[i].Paternity
+		}
+		p := Roulette(weights)
+		pack := packs[p]
+
+		// Cross mother × pack (father). The child receives one allele from each.
+		childCont := make([]float64, genoSize)
+		childContDom := make([]uint8, genoSize)
+		CrossoverCont(pack.GenotypeCont, motherContGeno, pack.DominanceCont, motherContDom, childCont, childContDom, numLoci)
+
+		childDisc := make([]int32, genoSize)
+		childDiscDom := make([]uint8, genoSize)
+		CrossoverDisc(pack.GenotypeDisc, motherDiscGeno, pack.DominanceDisc, motherDiscDom, childDisc, childDiscDom, numLoci)
+
+		// Apply mutations.
+		if len(genCfg.LociCont) >= numLoci {
+			MutateCont(childCont, childContDom, numLoci, genCfg.LociCont)
+		}
+		if len(genCfg.LociDisc) >= numLoci {
+			MutateDisc(childDisc, childDiscDom, numLoci, genCfg.LociDisc)
+		}
+
+		egg := world.FertilizedEgg{
+			GenotypeCont:  childCont,
+			GenotypeDisc:  childDisc,
+			DominanceCont: childContDom,
+			DominanceDisc: childDiscDom,
+			Sex:           DetermineSex(cfg.MaleRatio, cfg.FemaleRatio),
+			Donor:         pack.Donor,
+		}
+		a.AddFertilizedEgg(femaleIdx, egg)
+
+		// Consume one gamete and one sperm pack (mirrors the legacy, where each
+		// fertilization retires a gamete from the gonad and uses up a pack).
+		a.GametesCount[femaleIdx]--
+		a.RemoveSpermPack(femaleIdx, p)
+
+		fertilized++
+	}
+
+	return fertilized
+}
+
+// Oviposit deposits the female's retained fertilized eggs into the world's
+// EggArrays. Each deposited egg keeps the genotype produced at fertilization
+// (mother × sperm pack), so paternal inheritance flows through to offspring —
+// no crossover is redone here (mirrors the legacy Oviposita, which just moves
+// eggs from Fertilizados into the environment). Returns the number laid.
 func Oviposit(w *world.World, femaleIdx int, cfg ReproductionConfig, genCfg GeneticsConfig) int {
 	a := w.Agents
 	wcfg := w.Config
@@ -152,30 +236,26 @@ func Oviposit(w *world.World, femaleIdx int, cfg ReproductionConfig, genCfg Gene
 	numNut := wcfg.NumNutrients
 
 	eggsToLay := cfg.EggsPerCycle
-	if eggsToLay > a.FertilizedCount[femaleIdx] {
-		eggsToLay = a.FertilizedCount[femaleIdx]
+	available := a.FertilizedCount(femaleIdx)
+	if eggsToLay > available {
+		eggsToLay = available
 	}
 	if eggsToLay <= 0 {
 		return 0
 	}
 
-	// Get mother's genotype for crossover.
-	motherContGeno := CopyGenotypeCont(a.GenotypeCont, femaleIdx, numLoci)
-	motherDiscGeno := CopyGenotypeDisc(a.GenotypeDisc, femaleIdx, numLoci)
-	motherContDom := CopyDominance(a.DominanceCont, femaleIdx, numLoci)
-	motherDiscDom := CopyDominance(a.DominanceDisc, femaleIdx, numLoci)
-
-	// For simplicity, use mother's own genotype as "father" placeholder.
-	// In a full implementation, sperm packs would carry the father's genotype.
-	fatherContGeno := motherContGeno
-	fatherDiscGeno := motherDiscGeno
-	fatherContDom := motherContDom
-	fatherDiscDom := motherDiscDom
-
+	genoSize := numLoci * 2
 	laid := 0
 	for i := int32(0); i < eggsToLay; i++ {
+		fEgg, ok := a.PopFertilizedEgg(femaleIdx)
+		if !ok {
+			break
+		}
+
 		eggIdx := addEgg(w)
 		if eggIdx < 0 {
+			// Could not allocate; put the egg back to avoid losing it.
+			a.AddFertilizedEgg(femaleIdx, fEgg)
 			break
 		}
 
@@ -186,29 +266,15 @@ func Oviposit(w *world.World, femaleIdx int, cfg ReproductionConfig, genCfg Gene
 		eggs.PosY[eggIdx] = a.PosY[femaleIdx]
 		eggs.Age[eggIdx] = 0
 
-		// Determine sex.
-		eggs.Sex[eggIdx] = DetermineSex(cfg.MaleRatio, cfg.FemaleRatio)
+		// Sex and genotype come from the retained fertilized egg.
+		eggs.Sex[eggIdx] = fEgg.Sex
 
-		// Crossover to produce egg genotype.
-		eggGenoSize := numLoci * 2
-		eggContBase := eggIdx * eggGenoSize
-		eggDiscBase := eggIdx * eggGenoSize
-
-		childCont := eggs.GenotypeCont[eggContBase : eggContBase+eggGenoSize]
-		childContDom := eggs.DominanceCont[eggContBase : eggContBase+eggGenoSize]
-		CrossoverCont(motherContGeno, fatherContGeno, motherContDom, fatherContDom, childCont, childContDom, numLoci)
-
-		childDisc := eggs.GenotypeDisc[eggDiscBase : eggDiscBase+eggGenoSize]
-		childDiscDom := eggs.DominanceDisc[eggDiscBase : eggDiscBase+eggGenoSize]
-		CrossoverDisc(motherDiscGeno, fatherDiscGeno, motherDiscDom, fatherDiscDom, childDisc, childDiscDom, numLoci)
-
-		// Apply mutations.
-		if len(genCfg.LociCont) >= numLoci {
-			MutateCont(childCont, childContDom, numLoci, genCfg.LociCont)
-		}
-		if len(genCfg.LociDisc) >= numLoci {
-			MutateDisc(childDisc, childDiscDom, numLoci, genCfg.LociDisc)
-		}
+		eggContBase := eggIdx * genoSize
+		eggDiscBase := eggIdx * genoSize
+		copy(eggs.GenotypeCont[eggContBase:eggContBase+genoSize], fEgg.GenotypeCont)
+		copy(eggs.DominanceCont[eggContBase:eggContBase+genoSize], fEgg.DominanceCont)
+		copy(eggs.GenotypeDisc[eggDiscBase:eggDiscBase+genoSize], fEgg.GenotypeDisc)
+		copy(eggs.DominanceDisc[eggDiscBase:eggDiscBase+genoSize], fEgg.DominanceDisc)
 
 		// Allocate fraction of mother's reserves to egg.
 		eggResBase := eggIdx * numNut
@@ -218,14 +284,15 @@ func Oviposit(w *world.World, femaleIdx int, cfg ReproductionConfig, genCfg Gene
 			eggs.Reserves[eggResBase+n] = eggReserve
 		}
 
-		// Set carrier to mother agent index.
+		// Set carrier to mother agent index; record parentage.
 		eggs.CarrierAgentIdx[eggIdx] = int32(femaleIdx)
 		eggs.CarrierResourceIdx[eggIdx] = -1
+		eggs.ParentMale[eggIdx] = fEgg.Donor
+		eggs.ParentFemale[eggIdx] = "F" + itoa(femaleIdx)
 
 		laid++
 	}
 
-	a.FertilizedCount[femaleIdx] -= int32(laid)
 	a.CarriedEggs[femaleIdx] += int32(laid)
 
 	return laid
