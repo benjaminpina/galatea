@@ -475,12 +475,44 @@ class _LogicToggle extends StatelessWidget {
 
 // --- Nutrient requirements per stage ---
 
-class _NutrientRequirementsSection extends ConsumerWidget {
+class _NutrientRequirementsSection extends ConsumerStatefulWidget {
   const _NutrientRequirementsSection({required this.stageId});
   final int stageId;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_NutrientRequirementsSection> createState() =>
+      _NutrientRequirementsSectionState();
+}
+
+class _NutrientRequirementsSectionState
+    extends ConsumerState<_NutrientRequirementsSection> {
+  // nutrientId → (requirement, cost)
+  final Map<int, (String, String)> _values = {};
+  bool _loaded = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    final db = ref.read(databaseProvider);
+    if (db == null) {
+      setState(() => _loaded = true);
+      return;
+    }
+    final rows = await (db.select(
+      db.stageNutrientRequirements,
+    )..where((t) => t.stageId.equals(widget.stageId))).get();
+    for (final r in rows) {
+      _values[r.nutrientId] = (r.requirementFormula, r.costFormula);
+    }
+    if (mounted) setState(() => _loaded = true);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final nutrients = ref.watch(nutrientsProvider).valueOrNull ?? [];
     final db = ref.read(databaseProvider);
     if (db == null || nutrients.isEmpty) {
@@ -489,50 +521,40 @@ class _NutrientRequirementsSection extends ConsumerWidget {
         style: TextStyle(fontSize: 12, color: Colors.grey),
       );
     }
+    if (!_loaded) return const LinearProgressIndicator();
 
-    return FutureBuilder<List<StageNutrientRequirement>>(
-      future: (db.select(
-        db.stageNutrientRequirements,
-      )..where((t) => t.stageId.equals(stageId))).get(),
-      builder: (context, snapshot) {
-        final reqMap = <int, StageNutrientRequirement>{};
-        for (final r in snapshot.data ?? []) {
-          reqMap[r.nutrientId] = r;
-        }
-        return Column(
-          children: nutrients.map((n) {
-            final req = reqMap[n.id];
-            return Padding(
-              padding: const EdgeInsets.symmetric(vertical: 4),
-              child: Row(
-                children: [
-                  SizedBox(
-                    width: 70,
-                    child: Text(n.name, style: const TextStyle(fontSize: 12)),
-                  ),
-                  Expanded(
-                    child: FormulaField(
-                      label: 'Requirement',
-                      title: '${n.name} — Requirement',
-                      value: req?.requirementFormula ?? '0',
-                      onChanged: (v) => _save(db, n.id, requirement: v),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: FormulaField(
-                      label: 'Cost',
-                      title: '${n.name} — Cost',
-                      value: req?.costFormula ?? '0',
-                      onChanged: (v) => _save(db, n.id, cost: v),
-                    ),
-                  ),
-                ],
+    return Column(
+      children: nutrients.map((n) {
+        final vals = _values[n.id] ?? ('0', '0');
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 4),
+          child: Row(
+            children: [
+              SizedBox(
+                width: 70,
+                child: Text(n.name, style: const TextStyle(fontSize: 12)),
               ),
-            );
-          }).toList(),
+              Expanded(
+                child: FormulaField(
+                  label: 'Requirement',
+                  title: '${n.name} — Requirement',
+                  value: vals.$1,
+                  onChanged: (v) => _save(db, n.id, requirement: v),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: FormulaField(
+                  label: 'Cost',
+                  title: '${n.name} — Cost',
+                  value: vals.$2,
+                  onChanged: (v) => _save(db, n.id, cost: v),
+                ),
+              ),
+            ],
+          ),
         );
-      },
+      }).toList(),
     );
   }
 
@@ -545,7 +567,8 @@ class _NutrientRequirementsSection extends ConsumerWidget {
     final existing =
         await (db.select(db.stageNutrientRequirements)..where(
               (t) =>
-                  t.stageId.equals(stageId) & t.nutrientId.equals(nutrientId),
+                  t.stageId.equals(widget.stageId) &
+                  t.nutrientId.equals(nutrientId),
             ))
             .getSingleOrNull();
     if (existing == null) {
@@ -553,7 +576,7 @@ class _NutrientRequirementsSection extends ConsumerWidget {
           .into(db.stageNutrientRequirements)
           .insert(
             StageNutrientRequirementsCompanion.insert(
-              stageId: stageId,
+              stageId: widget.stageId,
               nutrientId: nutrientId,
               requirementFormula: Value(requirement ?? '0'),
               costFormula: Value(cost ?? '0'),
@@ -571,71 +594,130 @@ class _NutrientRequirementsSection extends ConsumerWidget {
         ),
       );
     }
+    // Update local state so the UI reflects the change immediately.
+    final prev = _values[nutrientId] ?? ('0', '0');
+    setState(() {
+      _values[nutrientId] = (requirement ?? prev.$1, cost ?? prev.$2);
+    });
   }
 }
 
 // --- Movement tendencies per stage ---
 
-class _TendenciesSection extends ConsumerWidget {
+class _TendenciesSection extends ConsumerStatefulWidget {
   const _TendenciesSection({required this.stageId});
   final int stageId;
 
-  static const _dirs = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+  @override
+  ConsumerState<_TendenciesSection> createState() => _TendenciesSectionState();
+}
+
+class _TendenciesSectionState extends ConsumerState<_TendenciesSection> {
+  // Directions are RELATIVE to the agent's heading, in the engine's order
+  // (index d = direction-1): [NW, N, NE, W, E, SW, S, SE].
+  // Labels describe the relative turn: forward, diagonals, sides, back.
+  static const _dirs = [
+    '↖ Fwd-L',
+    '↑ Forward',
+    '↗ Fwd-R',
+    '← Left',
+    '→ Right',
+    '↙ Back-L',
+    '↓ Back',
+    '↘ Back-R',
+  ];
+
+  // Legacy default weights (relative movement): strong forward bias,
+  // occasional gentle turns, rare 90° turns, almost never backward.
+  // Order matches _dirs: [NW, N, NE, W, E, SW, S, SE].
+  static const _defaults = ['25', '50', '25', '10', '10', '1', '1', '1'];
+
+  final Map<int, String> _values = {}; // direction → formula
+  bool _loaded = false;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final db = ref.read(databaseProvider);
-    if (db == null) return const SizedBox.shrink();
+  void initState() {
+    super.initState();
+    _load();
+  }
 
-    return FutureBuilder<List<StageTendency>>(
-      future:
-          (db.select(db.stageTendencies)
-                ..where((t) => t.stageId.equals(stageId))
-                ..orderBy([(t) => OrderingTerm.asc(t.direction)]))
-              .get(),
-      builder: (context, snapshot) {
-        final tendMap = <int, String>{};
-        for (final t in snapshot.data ?? []) {
-          tendMap[t.direction] = t.formula;
-        }
-        return Column(
-          children: List.generate(8, (i) {
-            final dir = i + 1;
-            return Padding(
-              padding: const EdgeInsets.symmetric(vertical: 3),
-              child: Row(
-                children: [
-                  SizedBox(
-                    width: 30,
-                    child: Text(
-                      _dirs[i],
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: FormulaField(
-                      label: _dirs[i],
-                      title: 'Tendency ${_dirs[i]}',
-                      value: tendMap[dir] ?? '1',
-                      onChanged: (v) => _save(db, dir, v),
-                    ),
-                  ),
-                ],
+  Future<void> _load() async {
+    final db = ref.read(databaseProvider);
+    if (db == null) {
+      setState(() => _loaded = true);
+      return;
+    }
+    final rows =
+        await (db.select(db.stageTendencies)
+              ..where((t) => t.stageId.equals(widget.stageId))
+              ..orderBy([(t) => OrderingTerm.asc(t.direction)]))
+            .get();
+    for (final t in rows) {
+      _values[t.direction] = t.formula;
+    }
+    // Seed defaults for any missing directions so they persist to the DB.
+    for (var i = 0; i < 8; i++) {
+      final dir = i + 1;
+      if (!_values.containsKey(dir)) {
+        await db
+            .into(db.stageTendencies)
+            .insert(
+              StageTendenciesCompanion.insert(
+                stageId: widget.stageId,
+                direction: dir,
+                formula: Value(_defaults[i]),
               ),
             );
-          }),
+        _values[dir] = _defaults[i];
+      }
+    }
+    if (mounted) setState(() => _loaded = true);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final db = ref.read(databaseProvider);
+    if (db == null) return const SizedBox.shrink();
+    if (!_loaded) return const LinearProgressIndicator();
+
+    return Column(
+      children: List.generate(8, (i) {
+        final dir = i + 1;
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 3),
+          child: Row(
+            children: [
+              SizedBox(
+                width: 30,
+                child: Text(
+                  _dirs[i],
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 12,
+                  ),
+                ),
+              ),
+              Expanded(
+                child: FormulaField(
+                  label: _dirs[i],
+                  title: 'Tendency ${_dirs[i]}',
+                  value: _values[dir] ?? _defaults[i],
+                  onChanged: (v) => _save(db, dir, v),
+                ),
+              ),
+            ],
+          ),
         );
-      },
+      }),
     );
   }
 
   Future<void> _save(AppDatabase db, int direction, String formula) async {
     final existing =
         await (db.select(db.stageTendencies)..where(
-              (t) => t.stageId.equals(stageId) & t.direction.equals(direction),
+              (t) =>
+                  t.stageId.equals(widget.stageId) &
+                  t.direction.equals(direction),
             ))
             .getSingleOrNull();
     if (existing == null) {
@@ -643,7 +725,7 @@ class _TendenciesSection extends ConsumerWidget {
           .into(db.stageTendencies)
           .insert(
             StageTendenciesCompanion.insert(
-              stageId: stageId,
+              stageId: widget.stageId,
               direction: direction,
               formula: Value(formula),
             ),
@@ -653,6 +735,7 @@ class _TendenciesSection extends ConsumerWidget {
             ..where((t) => t.id.equals(existing.id)))
           .write(StageTendenciesCompanion(formula: Value(formula)));
     }
+    setState(() => _values[direction] = formula);
   }
 }
 

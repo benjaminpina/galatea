@@ -32,6 +32,23 @@ class _PrototypeEditScreenState extends ConsumerState<PrototypeEditScreen>
   final _ratioFemalesCtrl = TextEditingController();
   int _color = 0;
 
+  // Movement tendencies cache: direction → formula.
+  final Map<int, String> _tendencyValues = {};
+  bool _tendenciesLoaded = false;
+
+  // Legacy default weights (relative movement), order = direction 1..8:
+  // [Fwd-L, Forward, Fwd-R, Left, Right, Back-L, Back, Back-R].
+  static const _tendencyDefaults = [
+    '25',
+    '50',
+    '25',
+    '10',
+    '10',
+    '1',
+    '1',
+    '1',
+  ];
+
   @override
   void initState() {
     super.initState();
@@ -68,6 +85,30 @@ class _PrototypeEditScreenState extends ConsumerState<PrototypeEditScreen>
       _ratioFemalesCtrl.text = proto.sexRatioFemalesFormula;
       _color = proto.color;
     });
+    // Load movement tendencies into local cache.
+    final tendencies = await (db.select(
+      db.prototypeTendencies,
+    )..where((t) => t.prototypeId.equals(widget.prototypeId))).get();
+    for (final t in tendencies) {
+      _tendencyValues[t.direction] = t.formula;
+    }
+    // Seed legacy defaults for missing directions (relative movement weights).
+    for (var i = 0; i < 8; i++) {
+      final dir = i + 1;
+      if (!_tendencyValues.containsKey(dir)) {
+        await db
+            .into(db.prototypeTendencies)
+            .insert(
+              PrototypeTendenciesCompanion.insert(
+                prototypeId: widget.prototypeId,
+                direction: dir,
+                formula: Value(_tendencyDefaults[i]),
+              ),
+            );
+        _tendencyValues[dir] = _tendencyDefaults[i];
+      }
+    }
+    if (mounted) setState(() => _tendenciesLoaded = true);
   }
 
   Future<void> _save() async {
@@ -491,62 +532,63 @@ class _PrototypeEditScreenState extends ConsumerState<PrototypeEditScreen>
   Widget _buildMovementTab() {
     final db = ref.read(databaseProvider);
     if (db == null) return const SizedBox.shrink();
+    if (!_tendenciesLoaded) {
+      return const Center(child: CircularProgressIndicator());
+    }
 
-    final directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+    // Directions RELATIVE to the agent's heading, in engine order
+    // (index d = direction-1): [NW, N, NE, W, E, SW, S, SE].
+    final directions = [
+      '↖ Fwd-L',
+      '↑ Forward',
+      '↗ Fwd-R',
+      '← Left',
+      '→ Right',
+      '↙ Back-L',
+      '↓ Back',
+      '↘ Back-R',
+    ];
 
-    return FutureBuilder<List<PrototypeTendency>>(
-      future:
-          (db.select(db.prototypeTendencies)
-                ..where((t) => t.prototypeId.equals(widget.prototypeId))
-                ..orderBy([(t) => OrderingTerm.asc(t.direction)]))
-              .get(),
-      builder: (context, snapshot) {
-        final tendencies = <int, String>{};
-        for (final t in snapshot.data ?? []) {
-          tendencies[t.direction] = t.formula;
-        }
-        return ListView(
-          padding: const EdgeInsets.all(16),
-          children: [
-            Text(
-              'Movement Tendencies',
-              style: Theme.of(context).textTheme.titleSmall,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Relative probability weights for each direction.\n'
-              'Higher = more likely to move that way.',
-              style: Theme.of(context).textTheme.bodySmall,
-            ),
-            const SizedBox(height: 16),
-            ...List.generate(8, (i) {
-              final dir = i + 1;
-              return Padding(
-                padding: const EdgeInsets.symmetric(vertical: 4),
-                child: Row(
-                  children: [
-                    SizedBox(
-                      width: 30,
-                      child: Text(
-                        directions[i],
-                        style: const TextStyle(fontWeight: FontWeight.w600),
-                      ),
-                    ),
-                    Expanded(
-                      child: FormulaField(
-                        label: directions[i],
-                        title: '${_nameCtrl.text} — Tendency ${directions[i]}',
-                        value: tendencies[dir] ?? '1',
-                        onChanged: (v) => _saveTendency(db, dir, v),
-                      ),
-                    ),
-                  ],
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        Text(
+          'Movement Tendencies',
+          style: Theme.of(context).textTheme.titleSmall,
+        ),
+        const SizedBox(height: 8),
+        Text(
+          'Relative probability weights per direction, relative to where the '
+          'agent is facing. Higher = more likely to move that way.',
+          style: Theme.of(context).textTheme.bodySmall,
+        ),
+        const SizedBox(height: 16),
+        ...List.generate(8, (i) {
+          final dir = i + 1;
+          return Padding(
+            padding: const EdgeInsets.symmetric(vertical: 4),
+            child: Row(
+              children: [
+                SizedBox(
+                  width: 30,
+                  child: Text(
+                    directions[i],
+                    style: const TextStyle(fontWeight: FontWeight.w600),
+                  ),
                 ),
-              );
-            }),
-          ],
-        );
-      },
+                Expanded(
+                  child: FormulaField(
+                    label: directions[i],
+                    title: '${_nameCtrl.text} — Tendency ${directions[i]}',
+                    value: _tendencyValues[dir] ?? _tendencyDefaults[i],
+                    onChanged: (v) => _saveTendency(db, dir, v),
+                  ),
+                ),
+              ],
+            ),
+          );
+        }),
+      ],
     );
   }
 
@@ -577,6 +619,7 @@ class _PrototypeEditScreenState extends ConsumerState<PrototypeEditScreen>
             ..where((t) => t.id.equals(existing.id)))
           .write(PrototypeTendenciesCompanion(formula: Value(formula)));
     }
+    setState(() => _tendencyValues[direction] = formula);
   }
 }
 

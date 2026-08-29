@@ -77,8 +77,10 @@ class _EnvironmentEditorScreenState
   bool _dirty = false;
 
   // --- Hover ---
-  int _hoverX = -1;
-  int _hoverY = -1;
+  // Hover position is stored in a ValueNotifier so only the canvas and status
+  // bar rebuild on mouse move, not the entire screen (which would rebuild the
+  // sidebar and its formula editors on every pixel of movement).
+  final ValueNotifier<(int, int)> _hover = ValueNotifier((-1, -1));
 
   // --- Right config panel ---
   ConfigSection? _openSection;
@@ -101,6 +103,7 @@ class _EnvironmentEditorScreenState
     _vScrollCtrl.removeListener(_onVScroll);
     _hScrollCtrl.dispose();
     _vScrollCtrl.dispose();
+    _hover.dispose();
     super.dispose();
   }
 
@@ -644,11 +647,11 @@ class _EnvironmentEditorScreenState
 
   void _handleHover(PointerHoverEvent e) {
     final (x, y) = _localToGrid(e.localPosition);
-    if (x != _hoverX || y != _hoverY) {
-      setState(() {
-        _hoverX = x;
-        _hoverY = y;
-      });
+    final (hx, hy) = _hover.value;
+    if (x != hx || y != hy) {
+      // Update the notifier only — no setState, so the sidebar and config
+      // panels do NOT rebuild. Only listeners (canvas, status bar) react.
+      _hover.value = (x, y);
     }
   }
 
@@ -1212,25 +1215,30 @@ class _EnvironmentEditorScreenState
                         onPanEnd: _handlePanEnd,
                         onSecondaryTapDown: _handleSecondaryTap,
                         child: ClipRect(
-                          child: CustomPaint(
-                            size: Size.infinite,
-                            painter: EnvironmentCanvasPainter(
-                              grid: _grid,
-                              width: _envWidth,
-                              height: _envHeight,
-                              cellSize: _cellSize,
-                              offset: _offset,
-                              substrateColorMap: substrateColorMap,
-                              nutrientColorMap: nutrientColorMap,
-                              prototypeColorMap: prototypeColorMap,
-                              sources: _sources,
-                              oviSites: _oviSites,
-                              agents: _agents,
-                              selectedElement: _selectedElement,
-                              hoverX: _hoverX,
-                              hoverY: _hoverY,
-                              currentTool: _currentTool,
-                            ),
+                          child: ValueListenableBuilder<(int, int)>(
+                            valueListenable: _hover,
+                            builder: (context, hover, _) {
+                              return CustomPaint(
+                                size: Size.infinite,
+                                painter: EnvironmentCanvasPainter(
+                                  grid: _grid,
+                                  width: _envWidth,
+                                  height: _envHeight,
+                                  cellSize: _cellSize,
+                                  offset: _offset,
+                                  substrateColorMap: substrateColorMap,
+                                  nutrientColorMap: nutrientColorMap,
+                                  prototypeColorMap: prototypeColorMap,
+                                  sources: _sources,
+                                  oviSites: _oviSites,
+                                  agents: _agents,
+                                  selectedElement: _selectedElement,
+                                  hoverX: hover.$1,
+                                  hoverY: hover.$2,
+                                  currentTool: _currentTool,
+                                ),
+                              );
+                            },
                           ),
                         ),
                       ),
@@ -1291,13 +1299,6 @@ class _EnvironmentEditorScreenState
   }
 
   Widget _buildStatusBar(ColorScheme scheme) {
-    final coord =
-        (_hoverX >= 0 &&
-            _hoverX < _envWidth &&
-            _hoverY >= 0 &&
-            _hoverY < _envHeight)
-        ? '($_hoverX, $_hoverY)'
-        : '—';
     final tool = switch (_currentTool) {
       EditorTool.pointer => 'Pointer',
       EditorTool.substrateBrush => 'Terrain',
@@ -1316,9 +1317,20 @@ class _EnvironmentEditorScreenState
       ),
       child: Row(
         children: [
-          Text(
-            coord,
-            style: TextStyle(fontSize: 11, color: scheme.onSurfaceVariant),
+          // Only the coordinate readout rebuilds on hover.
+          ValueListenableBuilder<(int, int)>(
+            valueListenable: _hover,
+            builder: (context, hover, _) {
+              final (hx, hy) = hover;
+              final coord =
+                  (hx >= 0 && hx < _envWidth && hy >= 0 && hy < _envHeight)
+                  ? '($hx, $hy)'
+                  : '—';
+              return Text(
+                coord,
+                style: TextStyle(fontSize: 11, color: scheme.onSurfaceVariant),
+              );
+            },
           ),
           const SizedBox(width: 16),
           Text(
