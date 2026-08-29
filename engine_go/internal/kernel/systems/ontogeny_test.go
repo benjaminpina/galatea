@@ -317,7 +317,7 @@ func TestResolveCourtshipDynamics_MutualAcceptance(t *testing.T) {
 	}
 	genCfg := GeneticsConfig{NumLoci: cfg.NumLoci}
 
-	copulations := ResolveCourtshipDynamics(w, 100, reproCfg, genCfg)
+	copulations := ResolveCourtshipDynamics(w, 100, reproCfg, genCfg, nil, nil, nil, nil)
 
 	if copulations != 1 {
 		t.Fatalf("expected 1 copulation, got %d", copulations)
@@ -350,7 +350,7 @@ func TestResolveCourtshipDynamics_Timeout(t *testing.T) {
 	reproCfg := ReproductionConfig{}
 	genCfg := GeneticsConfig{NumLoci: cfg.NumLoci}
 
-	ResolveCourtshipDynamics(w, 30, reproCfg, genCfg) // maxTicks=30, both exceed.
+	ResolveCourtshipDynamics(w, 30, reproCfg, genCfg, nil, nil, nil, nil) // maxTicks=30, both exceed.
 
 	if a.Situation[idx0] != world.SituationRegular {
 		t.Fatalf("idx0 should be regular after timeout, got %d", a.Situation[idx0])

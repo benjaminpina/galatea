@@ -638,18 +638,20 @@ class _ReproductionEditorState extends ConsumerState<_ReproductionEditor> {
 class _BehaviorCostsEditor extends ConsumerWidget {
   const _BehaviorCostsEditor();
 
-  static const _behaviors = [
-    'move_active',
-    'move_rest',
-    'feed',
-    'fight_display',
-    'fight_escalate',
-    'fight_retreat',
-    'court_display',
-    'court_escalate',
-    'court_accept',
-    'court_reject',
-    'oviposit',
+  // Canonical behavior names shared with the Go engine
+  // (see world.BuildBehaviorNames). The stored value is the canonical name;
+  // the label is shown to the user. "Feed" is generic per-nutrient.
+  static const _behaviors = <({String name, String label})>[
+    (name: 'Move', label: 'Move'),
+    (name: 'Rest', label: 'Rest'),
+    (name: 'Feed', label: 'Feed'),
+    (name: 'Fight_Attack', label: 'Fight — Attack'),
+    (name: 'Fight_Defend', label: 'Fight — Defend'),
+    (name: 'Fight_Retreat', label: 'Fight — Retreat'),
+    (name: 'Court_Display', label: 'Court — Display'),
+    (name: 'Court_Accept', label: 'Court — Accept'),
+    (name: 'Court_Reject', label: 'Court — Reject'),
+    (name: 'Oviposit', label: 'Oviposit'),
   ];
 
   @override
@@ -682,14 +684,14 @@ class _BehaviorCostsEditor extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    behavior,
+                    behavior.label,
                     style: const TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                   ...nutrients.map((n) {
-                    final key = '$behavior.${n.id}';
+                    final key = '${behavior.name}.${n.id}';
                     final value = existing[key] ?? '1';
                     return Padding(
                       padding: const EdgeInsets.symmetric(vertical: 2),
@@ -705,10 +707,10 @@ class _BehaviorCostsEditor extends ConsumerWidget {
                           Expanded(
                             child: FormulaField(
                               label: n.name,
-                              title: '$behavior — ${n.name} cost',
+                              title: '${behavior.label} — ${n.name} cost',
                               value: value,
                               onChanged: (v) =>
-                                  _saveCost(db, behavior, n.id, v),
+                                  _saveCost(db, behavior.name, n.id, v),
                             ),
                           ),
                         ],

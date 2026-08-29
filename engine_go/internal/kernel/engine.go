@@ -43,11 +43,13 @@ type Engine struct {
 
 	// Precomputed perception config from the DB (attractiveness tables).
 	// Layouts:
-	//   agentAttrArr:    [observedIdx * NumPrototypes + perceiverIdx]
-	//   resourceAttrArr: [resourceType * NumPrototypes + perceiverIdx]
-	// Both default to 0 (no attraction) when not configured.
-	agentAttrArr    []int32
-	resourceAttrArr []int32
+	//   agentAttrArr/agentRadiiArr:       [observedIdx * NumPrototypes + perceiverIdx]
+	//   resourceAttrArr/resourceRadiiArr: [resourceType * NumPrototypes + perceiverIdx]
+	// Attraction defaults to 0 (no attraction); radii default to cellSize.
+	agentAttrArr     []int32
+	resourceAttrArr  []int32
+	agentRadiiArr    []float64
+	resourceRadiiArr []float64
 
 	// Write buffer for simulation results.
 	WriteBuffer *storage.WriteBuffer
@@ -206,15 +208,20 @@ func Build(db *storage.DB, cfg EngineConfig) (*Engine, error) {
 		}
 	}
 
-	// Compile prototype formulas (longevity, refractories).
+	// Compile prototype formulas (longevity, refractories, offspring sex ratio).
+	// reference.go looks these up under the agent's PrototypeID, which the world
+	// loader sets to (DB id - 1). So we compile under that same index.
 	protoFormulaRows, err := db.Conn.Query(
-		"SELECT id, longevity_formula, refractory_combat_formula, refractory_courtship_formula FROM prototypes ORDER BY id")
+		`SELECT id, longevity_formula, refractory_combat_formula,
+		        refractory_courtship_formula, sex_ratio_males_formula,
+		        sex_ratio_females_formula
+		 FROM prototypes ORDER BY id`)
 	if err == nil {
 		defer protoFormulaRows.Close()
 		for protoFormulaRows.Next() {
 			var protoID int64
-			var longF, refCombatF, refCourtF string
-			if err := protoFormulaRows.Scan(&protoID, &longF, &refCombatF, &refCourtF); err != nil {
+			var longF, refCombatF, refCourtF, ratioMF, ratioFF string
+			if err := protoFormulaRows.Scan(&protoID, &longF, &refCombatF, &refCourtF, &ratioMF, &ratioFF); err != nil {
 				continue
 			}
 			// protoID is 1-based in DB, but engine uses 0-based index.
@@ -222,6 +229,8 @@ func Build(db *storage.DB, cfg EngineConfig) (*Engine, error) {
 			registry.Compile(fmt.Sprintf("prototype.%d.longevity", pIdx), longF)
 			registry.Compile(fmt.Sprintf("prototype.%d.refractory_combat", pIdx), refCombatF)
 			registry.Compile(fmt.Sprintf("prototype.%d.refractory_courtship", pIdx), refCourtF)
+			registry.Compile(fmt.Sprintf("prototype.%d.sex_ratio_males", pIdx), ratioMF)
+			registry.Compile(fmt.Sprintf("prototype.%d.sex_ratio_females", pIdx), ratioFF)
 		}
 	}
 
@@ -341,11 +350,12 @@ func Build(db *storage.DB, cfg EngineConfig) (*Engine, error) {
 	// turnSlotToEngine maps the DB turnIndex to the engine tendency slot.
 	compileTendencies(db, registry, w.Config)
 
-	// Precompute attractiveness arrays from the DB (default 0 = no attraction).
-	// This ensures agents/resources only attract when the user configures it,
-	// instead of a hardcoded constant.
-	agentAttrArr := buildAgentAttractiveness(db, w.Config, eval, envBuilder)
-	resourceAttrArr := buildResourceAttractiveness(db, w.Config, eval, envBuilder)
+	// Precompute attractiveness + radius arrays from the DB. Attraction
+	// defaults to 0 (no attraction); radii default to cellSize. This ensures
+	// agents/resources only attract when the user configures it, instead of a
+	// hardcoded constant, while still perceiving at cellSize by default.
+	agentAttrArr, agentRadiiArr := buildAgentAttractiveness(db, w.Config, eval, cellSize)
+	resourceAttrArr, resourceRadiiArr := buildResourceAttractiveness(db, w.Config, eval, cellSize)
 
 	// Build write buffer.
 	wb := storage.NewWriteBuffer(db, runID, cfg.WriteBufferCfg)
@@ -386,8 +396,10 @@ func Build(db *storage.DB, cfg EngineConfig) (*Engine, error) {
 		Paternity:          reproVals.paternity,
 		ConsumptionRate:    reproVals.consumption,
 		SpermDegradation:   reproVals.spermDeg,
-		MaleRatio:          50, // From prototype sex_ratio_*, not the reproduction table.
-		FemaleRatio:        50,
+		// Fallback sex ratio; overridden per-female in ResolveCourtshipDynamics
+		// using the mother's prototype sex_ratio_males/females formulas.
+		MaleRatio:   50,
+		FemaleRatio: 50,
 	}
 
 	// Ontogeny config: load real stages from the DB (falls back to sensible
@@ -417,27 +429,29 @@ func Build(db *storage.DB, cfg EngineConfig) (*Engine, error) {
 	permutation := make([]int, w.Agents.Cap)
 
 	e := &Engine{
-		World:           w,
-		DB:              db,
-		RunID:           runID,
-		AgentGrid:       agentGrid,
-		ResourceGrid:    resourceGrid,
-		Registry:        registry,
-		Eval:            eval,
-		EnvBuilder:      envBuilder,
-		OntogenyCfg:     ontCfg,
-		GeneticsCfg:     genCfg,
-		ReproCfg:        reproCfg,
-		BehaviorCosts:   behaviorCosts,
-		OptimalLevels:   optimalLevels,
-		Longevity:       cfg.Longevity,
-		CombatTimeout:   cfg.CombatTimeout,
-		CourtTimeout:    cfg.CourtTimeout,
-		WriteBuffer:     wb,
-		permutation:     permutation,
-		agentRef:        systems.NewAgentRef(numNut, numBeh),
-		agentAttrArr:    agentAttrArr,
-		resourceAttrArr: resourceAttrArr,
+		World:            w,
+		DB:               db,
+		RunID:            runID,
+		AgentGrid:        agentGrid,
+		ResourceGrid:     resourceGrid,
+		Registry:         registry,
+		Eval:             eval,
+		EnvBuilder:       envBuilder,
+		OntogenyCfg:      ontCfg,
+		GeneticsCfg:      genCfg,
+		ReproCfg:         reproCfg,
+		BehaviorCosts:    behaviorCosts,
+		OptimalLevels:    optimalLevels,
+		Longevity:        cfg.Longevity,
+		CombatTimeout:    cfg.CombatTimeout,
+		CourtTimeout:     cfg.CourtTimeout,
+		WriteBuffer:      wb,
+		permutation:      permutation,
+		agentRef:         systems.NewAgentRef(numNut, numBeh),
+		agentAttrArr:     agentAttrArr,
+		resourceAttrArr:  resourceAttrArr,
+		agentRadiiArr:    agentRadiiArr,
+		resourceRadiiArr: resourceRadiiArr,
 	}
 
 	return e, nil
@@ -526,7 +540,9 @@ func (e *Engine) Tick() {
 
 	// 11. Resolve combat/courtship dynamics.
 	systems.ResolveCombatDynamics(w, e.CombatTimeout)
-	systems.ResolveCourtshipDynamics(w, e.CourtTimeout, e.ReproCfg, e.GeneticsCfg)
+	systems.ResolveCourtshipDynamics(
+		w, e.CourtTimeout, e.ReproCfg, e.GeneticsCfg,
+		e.Registry, e.Eval, e.EnvBuilder, e.agentRef)
 
 	// 12. Ontogeny: evaluate eggs and stage transitions.
 	systems.EvaluateEggs(w, e.OntogenyCfg, e.GeneticsCfg)
@@ -609,30 +625,19 @@ func (e *Engine) Finish(status string) error {
 // --- Internal helpers ---
 
 func (e *Engine) resourceRadii() []float64 {
-	numProtos := e.World.Config.NumPrototypes
-	numResTypes := e.World.Config.NumResourceTypes
-	n := numResTypes * numProtos
-	radii := make([]float64, n)
-	for i := range radii {
-		radii[i] = e.AgentGrid.CellSize
-	}
-	return radii
+	// Precomputed from attractiveness_sources.radius_formula (default cellSize).
+	return e.resourceRadiiArr
 }
 
 func (e *Engine) resourceAttr() []int32 {
 	// Precomputed from the attractiveness_sources table (default 0 = no
-	// attraction). See buildPerceptionAttractiveness.
+	// attraction). See buildResourceAttractiveness.
 	return e.resourceAttrArr
 }
 
 func (e *Engine) agentRadii() []float64 {
-	numProtos := e.World.Config.NumPrototypes
-	n := numProtos * numProtos
-	radii := make([]float64, n)
-	for i := range radii {
-		radii[i] = e.AgentGrid.CellSize
-	}
-	return radii
+	// Precomputed from attractiveness_agents.radius_formula (default cellSize).
+	return e.agentRadiiArr
 }
 
 // shuffleAgents generates a Fisher-Yates permutation of indices [0, count).
@@ -936,30 +941,36 @@ func evalConstFloatFormula(eval *formulas.Evaluator, formula string, defaultVal 
 	return v
 }
 
-// buildAgentAttractiveness precomputes the agent-to-agent attractiveness array
-// from the attractiveness_agents table. Layout: [observedIdx * NumPrototypes +
-// perceiverIdx]. Defaults to 0 (no attraction) for unconfigured pairs.
+// buildAgentAttractiveness precomputes the agent-to-agent attractiveness and
+// perception-radius arrays from the attractiveness_agents table.
+// Layout: [observedIdx * NumPrototypes + perceiverIdx].
+// Attraction defaults to 0 (no attraction); radius defaults to defaultRadius.
 func buildAgentAttractiveness(
 	db *storage.DB, cfg world.Config,
-	eval *formulas.Evaluator, envBuilder *formulas.EnvBuilder,
-) []int32 {
+	eval *formulas.Evaluator, defaultRadius float64,
+) (attr []int32, radii []float64) {
 	n := cfg.NumPrototypes * cfg.NumPrototypes
-	attr := make([]int32, n) // all zeros by default
+	attr = make([]int32, n) // all zeros (no attraction) by default
+	radii = make([]float64, n)
+	for i := range radii {
+		radii[i] = defaultRadius
+	}
 	protoMap := buildProtoPerceiverMap(db, cfg)
 
 	rows, err := db.Conn.Query(
 		`SELECT observed_stage_id, observed_prototype_id,
-		        perceiver_stage_id, perceiver_prototype_id, attractiveness_formula
+		        perceiver_stage_id, perceiver_prototype_id,
+		        attractiveness_formula, radius_formula
 		 FROM attractiveness_agents`)
 	if err != nil {
-		return attr
+		return attr, radii
 	}
 	defer rows.Close()
 
 	for rows.Next() {
 		var obsStage, obsProto, perStage, perProto *int64
-		var formula string
-		if err := rows.Scan(&obsStage, &obsProto, &perStage, &perProto, &formula); err != nil {
+		var formula, radiusFormula string
+		if err := rows.Scan(&obsStage, &obsProto, &perStage, &perProto, &formula, &radiusFormula); err != nil {
 			continue
 		}
 		observedIdx := resolvePerceiverIdx(obsStage, obsProto, protoMap)
@@ -972,35 +983,41 @@ func buildAgentAttractiveness(
 			continue
 		}
 		attr[key] = evalConstFormula(eval, formula, 0)
+		radii[key] = float64(evalConstFormula(eval, radiusFormula, int32(defaultRadius)))
 	}
-	return attr
+	return attr, radii
 }
 
-// buildResourceAttractiveness precomputes the resource attractiveness array
-// from the attractiveness_sources table. Layout: [resourceType * NumPrototypes +
-// perceiverIdx]. Defaults to 0 (no attraction) for unconfigured pairs.
+// buildResourceAttractiveness precomputes the resource attractiveness and
+// perception-radius arrays from the attractiveness_sources table.
+// Layout: [resourceType * NumPrototypes + perceiverIdx].
+// Attraction defaults to 0 (no attraction); radius defaults to defaultRadius.
 func buildResourceAttractiveness(
 	db *storage.DB, cfg world.Config,
-	eval *formulas.Evaluator, envBuilder *formulas.EnvBuilder,
-) []int32 {
+	eval *formulas.Evaluator, defaultRadius float64,
+) (attr []int32, radii []float64) {
 	n := cfg.NumResourceTypes * cfg.NumPrototypes
-	attr := make([]int32, n) // all zeros by default
+	attr = make([]int32, n) // all zeros (no attraction) by default
+	radii = make([]float64, n)
+	for i := range radii {
+		radii[i] = defaultRadius
+	}
 	protoMap := buildProtoPerceiverMap(db, cfg)
 
 	rows, err := db.Conn.Query(
 		`SELECT nutrient_id, perceiver_stage_id, perceiver_prototype_id,
-		        attractiveness_formula
+		        attractiveness_formula, radius_formula
 		 FROM attractiveness_sources`)
 	if err != nil {
-		return attr
+		return attr, radii
 	}
 	defer rows.Close()
 
 	for rows.Next() {
 		var nutrientID int64
 		var perStage, perProto *int64
-		var formula string
-		if err := rows.Scan(&nutrientID, &perStage, &perProto, &formula); err != nil {
+		var formula, radiusFormula string
+		if err := rows.Scan(&nutrientID, &perStage, &perProto, &formula, &radiusFormula); err != nil {
 			continue
 		}
 		resourceType := int(nutrientID - 1) // 1-based nutrient id -> 0-based type.
@@ -1013,18 +1030,20 @@ func buildResourceAttractiveness(
 			continue
 		}
 		attr[key] = evalConstFormula(eval, formula, 0)
+		radii[key] = float64(evalConstFormula(eval, radiusFormula, int32(defaultRadius)))
 	}
-	return attr
+	return attr, radii
 }
 
-// behaviorNameToIndex maps an editor behavior-cost name to the engine's numeric
-// behavior index, for a given nutrient index. Returns -1 if the name is unknown.
+// behaviorNameToIndex maps a canonical behavior name (shared with the editor;
+// see world.BuildBehaviorNames) to the engine's numeric behavior index, for a
+// given nutrient index. Returns -1 if the name is unknown.
 //
-// Engine behavior layout (see world.BuildBehaviorNames):
+// Engine behavior layout:
 //
 //	0            Move
 //	1            Rest
-//	2..2+N-1     Feed_<nutrient n>
+//	2..2+N-1     Feed_<nutrient n>   (the generic "Feed" maps to Feed_<nIdx>)
 //	2+N          Fight_Attack
 //	2+N+1        Fight_Defend
 //	2+N+2        Fight_Retreat
@@ -1032,40 +1051,33 @@ func buildResourceAttractiveness(
 //	2+N+4        Court_Accept
 //	2+N+5        Court_Reject
 //	2+N+6        Oviposit
-//
-// The editor's "feed" is generic per-nutrient, so it maps to Feed_<nIdx>.
 func behaviorNameToIndex(name string, nIdx int, cfg world.Config) int {
 	feedBase := 2
 	fightBase := feedBase + cfg.NumResourceTypes
 	switch name {
-	case "move_active":
+	case "Move":
 		return 0
-	case "move_rest":
+	case "Rest":
 		return 1
-	case "feed":
+	case "Feed":
 		if nIdx < 0 || nIdx >= cfg.NumResourceTypes {
 			return -1
 		}
 		return feedBase + nIdx
-	case "fight_display":
-		return fightBase + 0 // Fight_Attack
-	case "fight_escalate":
-		return fightBase + 1 // Fight_Defend
-	case "fight_retreat":
+	case "Fight_Attack":
+		return fightBase + 0
+	case "Fight_Defend":
+		return fightBase + 1
+	case "Fight_Retreat":
 		return fightBase + 2
-	case "court_display":
-		return fightBase + 3 // Court_Display
-	case "court_accept":
-		return fightBase + 4 // Court_Accept
-	case "court_reject":
-		return fightBase + 5 // Court_Reject
-	case "oviposit":
+	case "Court_Display":
+		return fightBase + 3
+	case "Court_Accept":
+		return fightBase + 4
+	case "Court_Reject":
+		return fightBase + 5
+	case "Oviposit":
 		return fightBase + 6
-	case "court_escalate":
-		// The editor exposes a "court_escalate" behavior that the engine's
-		// behavior model does not have (engine courtship is Display/Accept/
-		// Reject). Ignore it rather than collide with court_accept.
-		return -1
 	default:
 		return -1
 	}

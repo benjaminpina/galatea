@@ -20,6 +20,10 @@ type AgentRef struct {
 	MaxGametes          int32
 	GameteCosts         []int32 // per nutrient
 	BehaviorCosts       []int32 // flat: [behavior * numNutrients + nutrient]
+	// Offspring sex ratio, taken from the prototype (females carry the
+	// meaningful ratio; the legacy reads it from the mother's prototype).
+	SexRatioMales   int32
+	SexRatioFemales int32
 }
 
 // NewAgentRef creates an AgentRef with pre-allocated slices.
@@ -29,6 +33,8 @@ func NewAgentRef(numNutrients, numBehaviors int) *AgentRef {
 		RefractoryCombat:    10,
 		RefractoryCourtship: 10,
 		Speed:               1,
+		SexRatioMales:       50,
+		SexRatioFemales:     50,
 		MaxReserves:         make([]int32, numNutrients),
 		OptimalReserves:     make([]int32, numNutrients),
 		CriticalReserves:    make([]int32, numNutrients),
@@ -45,7 +51,8 @@ func NewAgentRef(numNutrients, numBehaviors int) *AgentRef {
 //
 // Formula key patterns:
 //   - "metabolism.<nutrientIdx>.min", ".critical", ".optimal", ".max"
-//   - "prototype.<protoIdx>.longevity", ".refractory_combat", ".refractory_courtship"
+//   - "prototype.<protoIdx>.longevity", ".refractory_combat", ".refractory_courtship",
+//     ".sex_ratio_males", ".sex_ratio_females"
 //   - "behavior_cost.<behaviorIdx>.<nutrientIdx>"
 //   - "gamete_cost.<M|F>.<nutrientIdx>"
 //   - "reproduction.max_gametes"
@@ -72,6 +79,8 @@ func EvalRefValues(
 		ref.Longevity = evalIntFormula(reg, eval, protoKey+"longevity", int(ref.Longevity))
 		ref.RefractoryCombat = evalIntFormula(reg, eval, protoKey+"refractory_combat", int(ref.RefractoryCombat))
 		ref.RefractoryCourtship = evalIntFormula(reg, eval, protoKey+"refractory_courtship", int(ref.RefractoryCourtship))
+		ref.SexRatioMales = evalIntFormula(reg, eval, protoKey+"sex_ratio_males", int(ref.SexRatioMales))
+		ref.SexRatioFemales = evalIntFormula(reg, eval, protoKey+"sex_ratio_females", int(ref.SexRatioFemales))
 	}
 
 	// Metabolism per nutrient.

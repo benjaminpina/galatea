@@ -387,7 +387,12 @@ func ResolveCombatDynamics(w *world.World, maxTicks int32) {
 
 // ResolveCourtshipDynamics checks courtship interactions and resolves mutual acceptance
 // into copulation, or timeouts into rejection.
-func ResolveCourtshipDynamics(w *world.World, maxTicks int32, reproCfg ReproductionConfig, genCfg GeneticsConfig) int {
+func ResolveCourtshipDynamics(
+	w *world.World, maxTicks int32, reproCfg ReproductionConfig,
+	genCfg GeneticsConfig,
+	reg *formulas.Registry, eval *formulas.Evaluator,
+	envBuilder *formulas.EnvBuilder, ref *AgentRef,
+) int {
 	a := w.Agents
 	copulations := 0
 
@@ -409,7 +414,16 @@ func ResolveCourtshipDynamics(w *world.World, maxTicks int32, reproCfg Reproduct
 			if a.Sex[i] == world.SexFemale {
 				maleIdx, femaleIdx = int(interactant), i
 			}
-			Copulate(w, maleIdx, femaleIdx, reproCfg, genCfg)
+			// Offspring sex ratio comes from the FEMALE's prototype. Evaluate
+			// it per-copulation so each mother uses her own configured ratio
+			// instead of a hardcoded 50/50.
+			cfgForPair := reproCfg
+			if reg != nil && eval != nil && ref != nil {
+				EvalRefValues(w, femaleIdx, reg, eval, envBuilder, ref)
+				cfgForPair.MaleRatio = int(ref.SexRatioMales)
+				cfgForPair.FemaleRatio = int(ref.SexRatioFemales)
+			}
+			Copulate(w, maleIdx, femaleIdx, cfgForPair, genCfg)
 			copulations++
 			continue
 		}
