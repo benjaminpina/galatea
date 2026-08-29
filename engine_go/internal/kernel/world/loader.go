@@ -228,32 +228,19 @@ func validateSubstrateMap(w *World) error {
 	return nil
 }
 
-// loadResources reads environment_sources and populates ResourceArrays.
+// loadResources reads environment_sources and environment_oviposition_sites
+// and populates ResourceArrays. Nutrient sources use their 0-based nutrient
+// index as TypeID; oviposition sites use the ResourceTypeOvipositionSite
+// sentinel, with Level=0 (eggs deposited so far) and MaxLevel=capacity.
 func loadResources(db *storage.DB, w *World, environmentID int64) error {
 	envRepo := storage.NewEnvironmentRepo(db)
+
 	sources, err := envRepo.ListSources(environmentID)
 	if err != nil {
 		return err
 	}
-
 	for _, s := range sources {
-		idx := w.Resources.Count
-		if idx >= w.Resources.Cap {
-			// Grow resource arrays.
-			newCap := w.Resources.Cap * 2
-			if newCap == 0 {
-				newCap = 64
-			}
-			w.Resources.PosX = growF64(w.Resources.PosX, newCap)
-			w.Resources.PosY = growF64(w.Resources.PosY, newCap)
-			w.Resources.TypeID = growI32(w.Resources.TypeID, newCap)
-			w.Resources.Level = growI32(w.Resources.Level, newCap)
-			w.Resources.MaxLevel = growI32(w.Resources.MaxLevel, newCap)
-			w.Resources.Quality = growI32(w.Resources.Quality, newCap)
-			w.Resources.RegenRate = growF64(w.Resources.RegenRate, newCap)
-			w.Resources.Cap = newCap
-		}
-
+		idx := reserveResourceSlot(w)
 		w.Resources.PosX[idx] = float64(s.PosX)
 		w.Resources.PosY[idx] = float64(s.PosY)
 		w.Resources.TypeID[idx] = int32(s.NutrientID - 1) // 1-based nutrient ID to 0-based index.
@@ -264,7 +251,45 @@ func loadResources(db *storage.DB, w *World, environmentID int64) error {
 		w.Resources.Count++
 	}
 
+	sites, err := envRepo.ListOvipositionSites(environmentID)
+	if err != nil {
+		return err
+	}
+	for _, o := range sites {
+		idx := reserveResourceSlot(w)
+		w.Resources.PosX[idx] = float64(o.PosX)
+		w.Resources.PosY[idx] = float64(o.PosY)
+		w.Resources.TypeID[idx] = ResourceTypeOvipositionSite
+		w.Resources.Level[idx] = 0                    // Eggs deposited so far.
+		w.Resources.MaxLevel[idx] = int32(o.Capacity) // Site capacity.
+		w.Resources.Quality[idx] = int32(o.Quality)
+		w.Resources.RegenRate[idx] = 1.0 // Egg count does not "regenerate".
+		w.Resources.Count++
+	}
+
 	return nil
+}
+
+// reserveResourceSlot returns the index of the next free resource slot, growing
+// the ResourceArrays if needed. It does NOT increment Count (the caller does,
+// after filling the slot).
+func reserveResourceSlot(w *World) int {
+	idx := w.Resources.Count
+	if idx >= w.Resources.Cap {
+		newCap := w.Resources.Cap * 2
+		if newCap == 0 {
+			newCap = 64
+		}
+		w.Resources.PosX = growF64(w.Resources.PosX, newCap)
+		w.Resources.PosY = growF64(w.Resources.PosY, newCap)
+		w.Resources.TypeID = growI32(w.Resources.TypeID, newCap)
+		w.Resources.Level = growI32(w.Resources.Level, newCap)
+		w.Resources.MaxLevel = growI32(w.Resources.MaxLevel, newCap)
+		w.Resources.Quality = growI32(w.Resources.Quality, newCap)
+		w.Resources.RegenRate = growF64(w.Resources.RegenRate, newCap)
+		w.Resources.Cap = newCap
+	}
+	return idx
 }
 
 // loadAgents reads environment_agents and populates AgentArrays.

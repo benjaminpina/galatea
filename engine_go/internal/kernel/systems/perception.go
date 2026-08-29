@@ -367,9 +367,13 @@ func applyFilters(ctx *PerceptionContext, idx int) {
 		a.VDecision[vdBase+courtEscalateIdx] = 0
 	}
 
-	// --- Disable oviposition for males, or if no fertilized eggs ---
-	if a.Sex[idx] == world.SexMale || a.FertilizedCount(idx) == 0 {
-		if ovipositIdx < cfg.NumBehaviors {
+	// --- Disable oviposition for males, if no fertilized eggs, or if there is
+	// no contiguous oviposition site with free capacity (mirrors the legacy
+	// VDecision[11]:=0 when not HayDinamicos[5]). ---
+	if ovipositIdx < cfg.NumBehaviors {
+		noSite := ctx.ResourceGrid == nil ||
+			findContiguousOvipositionSite(w, a.PosX[idx], a.PosY[idx], ctx.ResourceGrid) < 0
+		if a.Sex[idx] == world.SexMale || a.FertilizedCount(idx) == 0 || noSite {
 			a.VDecision[vdBase+ovipositIdx] = 0
 		}
 	}

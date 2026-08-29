@@ -73,6 +73,15 @@ func NewEggArrays(cap int, cfg Config) *EggArrays {
 	return e
 }
 
+// ResourceTypeOvipositionSite is a sentinel TypeID marking a resource entry as
+// an oviposition site rather than a nutrient source. Oviposition sites are the
+// legacy TSitioOviposicion (a TDinamico of type edStOvpscn): they carry no
+// nutrient, their Level counts deposited eggs and their MaxLevel is the site
+// capacity. Using a negative sentinel keeps them out of nutrient-indexed logic
+// (feeding, attractiveness-by-type) while still living in the resource grid so
+// females can find a contiguous site to lay in.
+const ResourceTypeOvipositionSite int32 = -2
+
 // ResourceArrays holds mutable state for placed resource instances in SoA layout.
 type ResourceArrays struct {
 	Count int
@@ -81,10 +90,10 @@ type ResourceArrays struct {
 	PosX []float64
 	PosY []float64
 
-	TypeID   []int32   // Index into the resource type definitions.
-	Level    []int32   // Current resource level.
-	MaxLevel []int32   // Maximum capacity.
-	Quality  []int32   // Quality metric.
+	TypeID    []int32   // Index into the resource type definitions.
+	Level     []int32   // Current resource level.
+	MaxLevel  []int32   // Maximum capacity.
+	Quality   []int32   // Quality metric.
 	RegenRate []float64 // Multiplicative regeneration rate per tick.
 }
 

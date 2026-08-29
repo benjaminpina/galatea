@@ -293,6 +293,17 @@ func TestOviposit(t *testing.T) {
 	w.Agents.Reserves[female*cfg.NumNutrients+0] = 100
 	w.Agents.Reserves[female*cfg.NumNutrients+1] = 100
 
+	// Place a contiguous oviposition site (the carrier) with ample capacity,
+	// and make it the female's interactant.
+	site := w.Resources.Count
+	w.Resources.PosX[site] = 30
+	w.Resources.PosY[site] = 40
+	w.Resources.TypeID[site] = world.ResourceTypeOvipositionSite
+	w.Resources.Level[site] = 0
+	w.Resources.MaxLevel[site] = 10
+	w.Resources.Count++
+	w.Agents.InteractantIdx[female] = int32(site)
+
 	// Seed 5 retained fertilized eggs, each carrying a distinct genotype and a
 	// known donor, so we can verify the deposited egg keeps its genotype.
 	genoSize := cfg.NumLoci * 2
@@ -343,11 +354,21 @@ func TestOviposit(t *testing.T) {
 	if w.Eggs.ParentMale[0] != "M7" {
 		t.Fatalf("egg 0 sire not recorded: expected M7, got %q", w.Eggs.ParentMale[0])
 	}
-	if w.Agents.CarriedEggs[female] != 3 {
-		t.Fatalf("expected 3 carried eggs, got %d", w.Agents.CarriedEggs[female])
+	// The oviposition site must hold the 3 deposited eggs.
+	if w.Resources.Level[site] != 3 {
+		t.Fatalf("expected site egg count 3, got %d", w.Resources.Level[site])
+	}
+	// Each egg must reference the site as its carrier (not the mother).
+	for i := 0; i < 3; i++ {
+		if w.Eggs.CarrierResourceIdx[i] != int32(site) {
+			t.Fatalf("egg %d carrier: expected site %d, got %d", i, site, w.Eggs.CarrierResourceIdx[i])
+		}
+		if w.Eggs.CarrierAgentIdx[i] != -1 {
+			t.Fatalf("egg %d should not be carried by the mother, got agent %d", i, w.Eggs.CarrierAgentIdx[i])
+		}
 	}
 
-	// Check egg position.
+	// Check egg position matches the site.
 	if w.Eggs.PosX[0] != 30 || w.Eggs.PosY[0] != 40 {
 		t.Fatalf("egg 0 position: expected (30,40), got (%f,%f)", w.Eggs.PosX[0], w.Eggs.PosY[0])
 	}
@@ -375,6 +396,14 @@ func TestOvipositTriggeredByDecision(t *testing.T) {
 	for n := 0; n < cfg.NumNutrients; n++ {
 		w.Agents.Reserves[female*cfg.NumNutrients+n] = 100
 	}
+	// Contiguous oviposition site as the female's interactant.
+	site := w.Resources.Count
+	w.Resources.PosX[site] = 10
+	w.Resources.PosY[site] = 10
+	w.Resources.TypeID[site] = world.ResourceTypeOvipositionSite
+	w.Resources.MaxLevel[site] = 10
+	w.Resources.Count++
+	w.Agents.InteractantIdx[female] = int32(site)
 	// Retain 3 fertilized eggs.
 	for e := 0; e < 3; e++ {
 		w.Agents.AddFertilizedEgg(female, world.FertilizedEgg{
@@ -418,6 +447,92 @@ func TestOvipositTriggeredByDecision(t *testing.T) {
 	}
 }
 
+// TestOvipositBoundedBySiteCapacity verifies eggs laid are capped by the
+// oviposition site's free capacity, and the female keeps the eggs it couldn't
+// deposit (mirrors the legacy Maximo-Nivel bound).
+func TestOvipositBoundedBySiteCapacity(t *testing.T) {
+	cfg := testCfg()
+	w := world.New(cfg)
+	genoSize := cfg.NumLoci * 2
+
+	female := w.AddAgent()
+	w.Agents.Sex[female] = world.SexFemale
+	w.Agents.PosX[female] = 5
+	w.Agents.PosY[female] = 5
+
+	// Site with only 1 free slot (capacity 2, already 1 egg deposited).
+	site := w.Resources.Count
+	w.Resources.PosX[site] = 5
+	w.Resources.PosY[site] = 5
+	w.Resources.TypeID[site] = world.ResourceTypeOvipositionSite
+	w.Resources.Level[site] = 1
+	w.Resources.MaxLevel[site] = 2
+	w.Resources.Count++
+	w.Agents.InteractantIdx[female] = int32(site)
+
+	// Female wants to lay 3, but only 1 slot is free.
+	for e := 0; e < 3; e++ {
+		w.Agents.AddFertilizedEgg(female, world.FertilizedEgg{
+			GenotypeCont:  make([]float64, genoSize),
+			GenotypeDisc:  make([]int32, genoSize),
+			DominanceCont: make([]uint8, genoSize),
+			DominanceDisc: make([]uint8, genoSize),
+			Sex:           world.SexFemale,
+			Donor:         "M1",
+		})
+	}
+
+	reproCfg := ReproductionConfig{EggsPerCycle: 3, EggFraction: 0.1, MaleRatio: 50, FemaleRatio: 50}
+	genCfg := GeneticsConfig{NumLoci: cfg.NumLoci, LociCont: make([]LocusConfig, cfg.NumLoci), LociDisc: make([]LocusConfig, cfg.NumLoci)}
+
+	laid := Oviposit(w, female, reproCfg, genCfg)
+	if laid != 1 {
+		t.Fatalf("expected 1 egg laid (capacity-bound), got %d", laid)
+	}
+	if w.Resources.Level[site] != 2 {
+		t.Fatalf("expected site full (level 2), got %d", w.Resources.Level[site])
+	}
+	// 3 retained - 1 laid = 2 kept by the female.
+	if w.Agents.FertilizedCount(female) != 2 {
+		t.Fatalf("expected 2 eggs retained, got %d", w.Agents.FertilizedCount(female))
+	}
+}
+
+// TestOvipositWithoutSiteLaysNothing verifies that without a valid oviposition
+// site as interactant, no eggs are deposited (mirrors the legacy VDecision[11]
+// veto when no contiguous site exists).
+func TestOvipositWithoutSiteLaysNothing(t *testing.T) {
+	cfg := testCfg()
+	w := world.New(cfg)
+	genoSize := cfg.NumLoci * 2
+
+	female := w.AddAgent()
+	w.Agents.Sex[female] = world.SexFemale
+	w.Agents.InteractantIdx[female] = -1 // No site.
+	w.Agents.AddFertilizedEgg(female, world.FertilizedEgg{
+		GenotypeCont:  make([]float64, genoSize),
+		GenotypeDisc:  make([]int32, genoSize),
+		DominanceCont: make([]uint8, genoSize),
+		DominanceDisc: make([]uint8, genoSize),
+		Sex:           world.SexFemale,
+	})
+
+	reproCfg := ReproductionConfig{EggsPerCycle: 3, EggFraction: 0.1, MaleRatio: 50, FemaleRatio: 50}
+	genCfg := GeneticsConfig{NumLoci: cfg.NumLoci, LociCont: make([]LocusConfig, cfg.NumLoci), LociDisc: make([]LocusConfig, cfg.NumLoci)}
+
+	laid := Oviposit(w, female, reproCfg, genCfg)
+	if laid != 0 {
+		t.Fatalf("expected 0 eggs laid without a site, got %d", laid)
+	}
+	if w.Eggs.Count != 0 {
+		t.Fatalf("expected no eggs in world, got %d", w.Eggs.Count)
+	}
+	// The female keeps its fertilized egg.
+	if w.Agents.FertilizedCount(female) != 1 {
+		t.Fatalf("expected the egg retained, got %d", w.Agents.FertilizedCount(female))
+	}
+}
+
 // TestPaternalInheritance is the end-to-end guarantee for point 2: after a real
 // copulation + oviposition, offspring genotypes must carry alleles from the
 // FATHER, not just the mother. We give the male a distinctive allele value the
@@ -454,6 +569,14 @@ func TestPaternalInheritance(t *testing.T) {
 		w.Agents.Reserves[female*cfg.NumNutrients+n] = 100
 	}
 
+	// Oviposition site colocated with the female, used at laying time.
+	site := w.Resources.Count
+	w.Resources.PosX[site] = w.Agents.PosX[female]
+	w.Resources.PosY[site] = w.Agents.PosY[female]
+	w.Resources.TypeID[site] = world.ResourceTypeOvipositionSite
+	w.Resources.MaxLevel[site] = 20
+	w.Resources.Count++
+
 	reproCfg := ReproductionConfig{
 		PacksTransferred:   6,
 		MaxStoredPacks:     10,
@@ -476,6 +599,9 @@ func TestPaternalInheritance(t *testing.T) {
 		t.Fatal("expected the female to have fertilized eggs after copulation")
 	}
 
+	// EstablishInteraction would set the oviposition site as interactant when
+	// the female decides to lay; set it directly here for the unit test.
+	w.Agents.InteractantIdx[female] = int32(site)
 	laid := Oviposit(w, female, reproCfg, genCfg)
 	if laid == 0 {
 		t.Fatal("expected at least one egg laid")

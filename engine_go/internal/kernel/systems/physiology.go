@@ -70,6 +70,11 @@ func UpdateAgent(w *world.World, idx int, longevity int32) {
 func RegenerateResources(w *world.World) {
 	r := w.Resources
 	for i := 0; i < r.Count; i++ {
+		// Oviposition sites are not nutrient sources: their Level counts
+		// deposited eggs and must not regenerate.
+		if r.TypeID[i] == world.ResourceTypeOvipositionSite {
+			continue
+		}
 		newLevel := int32(float64(r.Level[i]) * r.RegenRate[i])
 		if newLevel > r.MaxLevel[i] {
 			newLevel = r.MaxLevel[i]

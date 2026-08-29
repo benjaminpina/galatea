@@ -137,8 +137,18 @@ func ecloseEgg(w *world.World, eggIdx int, ontCfg OntogenyConfig, genCfg Genetic
 }
 
 // removeEgg removes an egg by swapping with the last and decrementing Count.
+// If the egg was held in an oviposition site, that site's egg count (Level) is
+// decremented first so the freed capacity becomes available again.
 func removeEgg(w *world.World, idx int) {
 	eggs := w.Eggs
+
+	// Free the slot the egg occupied in its oviposition site, if any.
+	if siteIdx := eggs.CarrierResourceIdx[idx]; siteIdx >= 0 && int(siteIdx) < w.Resources.Count {
+		if w.Resources.TypeID[siteIdx] == world.ResourceTypeOvipositionSite && w.Resources.Level[siteIdx] > 0 {
+			w.Resources.Level[siteIdx]--
+		}
+	}
+
 	last := eggs.Count - 1
 	if idx != last {
 		swapEggs(eggs, idx, last, w.Config)

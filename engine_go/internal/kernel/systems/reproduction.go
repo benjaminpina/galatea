@@ -224,21 +224,39 @@ func FertilizeGametes(w *world.World, femaleIdx int, count int32, cfg Reproducti
 	return fertilized
 }
 
-// Oviposit deposits the female's retained fertilized eggs into the world's
-// EggArrays. Each deposited egg keeps the genotype produced at fertilization
-// (mother × sperm pack), so paternal inheritance flows through to offspring —
-// no crossover is redone here (mirrors the legacy Oviposita, which just moves
-// eggs from Fertilizados into the environment). Returns the number laid.
+// Oviposit deposits the female's retained fertilized eggs into a contiguous
+// oviposition site (the female's current interactant, set by
+// EstablishInteraction). Each deposited egg keeps the genotype produced at
+// fertilization (mother × sperm pack), so paternal inheritance flows through —
+// no crossover is redone here (mirrors the legacy Oviposita, which moves eggs
+// from Fertilizados into the site).
+//
+// The number laid is bounded by EggsPerCycle, the female's retained eggs, and
+// the site's free capacity (MaxLevel - Level). Deposited eggs are positioned at
+// the site and reference it as their carrier; the site's Level (egg count) is
+// incremented. Returns the number laid. If the female has no valid oviposition
+// site as interactant, nothing is laid.
 func Oviposit(w *world.World, femaleIdx int, cfg ReproductionConfig, genCfg GeneticsConfig) int {
 	a := w.Agents
+	r := w.Resources
 	wcfg := w.Config
 	numLoci := wcfg.NumLoci
 	numNut := wcfg.NumNutrients
 
+	// Require a valid, contiguous oviposition site as the interactant.
+	siteIdx := a.InteractantIdx[femaleIdx]
+	if siteIdx < 0 || int(siteIdx) >= r.Count ||
+		r.TypeID[siteIdx] != world.ResourceTypeOvipositionSite {
+		return 0
+	}
+
 	eggsToLay := cfg.EggsPerCycle
-	available := a.FertilizedCount(femaleIdx)
-	if eggsToLay > available {
+	if available := a.FertilizedCount(femaleIdx); eggsToLay > available {
 		eggsToLay = available
+	}
+	// Bound by the site's free capacity.
+	if freeCap := r.MaxLevel[siteIdx] - r.Level[siteIdx]; eggsToLay > freeCap {
+		eggsToLay = freeCap
 	}
 	if eggsToLay <= 0 {
 		return 0
@@ -261,9 +279,9 @@ func Oviposit(w *world.World, femaleIdx int, cfg ReproductionConfig, genCfg Gene
 
 		eggs := w.Eggs
 
-		// Position at mother's location.
-		eggs.PosX[eggIdx] = a.PosX[femaleIdx]
-		eggs.PosY[eggIdx] = a.PosY[femaleIdx]
+		// Position at the oviposition site (the egg's carrier).
+		eggs.PosX[eggIdx] = r.PosX[siteIdx]
+		eggs.PosY[eggIdx] = r.PosY[siteIdx]
 		eggs.Age[eggIdx] = 0
 
 		// Sex and genotype come from the retained fertilized egg.
@@ -284,16 +302,17 @@ func Oviposit(w *world.World, femaleIdx int, cfg ReproductionConfig, genCfg Gene
 			eggs.Reserves[eggResBase+n] = eggReserve
 		}
 
-		// Set carrier to mother agent index; record parentage.
-		eggs.CarrierAgentIdx[eggIdx] = int32(femaleIdx)
-		eggs.CarrierResourceIdx[eggIdx] = -1
+		// Carrier is the oviposition site (not the mother); record parentage.
+		eggs.CarrierAgentIdx[eggIdx] = -1
+		eggs.CarrierResourceIdx[eggIdx] = siteIdx
 		eggs.ParentMale[eggIdx] = fEgg.Donor
 		eggs.ParentFemale[eggIdx] = "F" + itoa(femaleIdx)
 
+		// Increment the site's egg count.
+		r.Level[siteIdx]++
+
 		laid++
 	}
-
-	a.CarriedEggs[femaleIdx] += int32(laid)
 
 	return laid
 }

@@ -201,8 +201,43 @@ func EstablishInteraction(w *world.World, idx int, agentGrid, resourceGrid *spat
 		return
 	}
 
-	// Oviposition or other: clear interaction.
+	// Oviposition: find a contiguous oviposition site with free capacity to
+	// carry the eggs (mirrors the legacy, where eggs are deposited into a
+	// contiguous TSitioOviposicion). If none is available, clear the
+	// interaction so no eggs are laid this tick.
+	if decision == ovipositBehaviorIdx(cfg) {
+		a.InteractantIdx[idx] = findContiguousOvipositionSite(w, ax, ay, resourceGrid)
+		return
+	}
+
+	// Other: clear interaction.
 	a.InteractantIdx[idx] = -1
+}
+
+// findContiguousOvipositionSite returns the index of the nearest contiguous
+// oviposition site that still has free capacity (Level < MaxLevel), or -1 if
+// none is available.
+func findContiguousOvipositionSite(w *world.World, ax, ay float64, grid *spatial.Grid) int32 {
+	r := w.Resources
+	candidates := grid.QueryRadiusExact(ax, ay, contiguousDistance, r.PosX, r.PosY)
+
+	bestIdx := int32(-1)
+	bestDist := math.MaxFloat64
+
+	for _, rIdx := range candidates {
+		if r.TypeID[rIdx] != world.ResourceTypeOvipositionSite {
+			continue
+		}
+		if r.Level[rIdx] >= r.MaxLevel[rIdx] {
+			continue // Site is full.
+		}
+		dist := distance(ax, ay, r.PosX[rIdx], r.PosY[rIdx])
+		if dist < bestDist {
+			bestDist = dist
+			bestIdx = rIdx
+		}
+	}
+	return bestIdx
 }
 
 // findContiguousResource returns the index of the nearest resource of the given type

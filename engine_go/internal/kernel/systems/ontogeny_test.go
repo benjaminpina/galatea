@@ -86,6 +86,45 @@ func TestEvaluateEggs_Eclosion(t *testing.T) {
 	}
 }
 
+// TestEclosionFreesOvipositionSiteCapacity verifies that when an egg held in an
+// oviposition site ecloses, the site's egg count (Level) is decremented so the
+// freed capacity becomes available again.
+func TestEclosionFreesOvipositionSiteCapacity(t *testing.T) {
+	cfg := testCfg()
+	w := world.New(cfg)
+	ontCfg := testOntogenyCfg()
+	genCfg := GeneticsConfig{NumLoci: cfg.NumLoci}
+
+	// Oviposition site currently holding 2 eggs.
+	site := w.Resources.Count
+	w.Resources.PosX[site] = 15
+	w.Resources.PosY[site] = 20
+	w.Resources.TypeID[site] = world.ResourceTypeOvipositionSite
+	w.Resources.Level[site] = 2
+	w.Resources.MaxLevel[site] = 5
+	w.Resources.Count++
+
+	// One egg (of those 2) is ready to eclose and references the site.
+	eggs := w.Eggs
+	eggs.Count = 1
+	eggs.PosX[0] = 15
+	eggs.PosY[0] = 20
+	eggs.Age[0] = 15
+	eggs.Sex[0] = world.SexMale
+	eggs.CarrierResourceIdx[0] = int32(site)
+	eggs.CarrierAgentIdx[0] = -1
+	eggs.Reserves[0*cfg.NumNutrients+0] = 10
+	eggs.Reserves[0*cfg.NumNutrients+1] = 10
+
+	if EvaluateEggs(w, ontCfg, genCfg) != 1 {
+		t.Fatal("expected 1 eclosion")
+	}
+	// Site egg count must drop from 2 to 1.
+	if w.Resources.Level[site] != 1 {
+		t.Fatalf("expected site level 1 after eclosion, got %d", w.Resources.Level[site])
+	}
+}
+
 func TestEvaluateEggs_NotReady(t *testing.T) {
 	cfg := testCfg()
 	w := world.New(cfg)
