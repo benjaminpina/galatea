@@ -82,8 +82,13 @@ type AgentArrays struct {
 	// Reproduction
 	GametesCount    []int32 // Number of gametes in gonad.
 	FertilizedCount []int32 // Number of fertilized eggs carried.
-	SpermPacksCount []int32 // Number of sperm packs stored (females).
 	CarriedEggs     []int32 // Number of eggs being carried.
+
+	// SpermPacks holds, per female agent, the list of stored spermatophores.
+	// Each pack carries the donor male's genotype so paternal inheritance is
+	// possible (mirrors the legacy TEspermateca). SpermPacks[i] is the list
+	// for agent i; nil/empty for males and virgin females.
+	SpermPacks [][]SpermPack
 
 	// Time counters
 	TimeInStage       []int32 // Ticks spent in current stage.
@@ -145,8 +150,8 @@ func NewAgentArrays(cap int, cfg Config) *AgentArrays {
 
 		GametesCount:    make([]int32, cap),
 		FertilizedCount: make([]int32, cap),
-		SpermPacksCount: make([]int32, cap),
 		CarriedEggs:     make([]int32, cap),
+		SpermPacks:      make([][]SpermPack, cap),
 
 		TimeInStage:       make([]int32, cap),
 		TimeOnSubstrate:   make([]int32, cap),
@@ -180,4 +185,32 @@ func NewAgentArrays(cap int, cfg Config) *AgentArrays {
 	}
 
 	return a
+}
+
+// SpermPackCount returns the number of sperm packs stored by the agent at idx.
+func (a *AgentArrays) SpermPackCount(idx int) int32 {
+	return int32(len(a.SpermPacks[idx]))
+}
+
+// AddSpermPack appends a sperm pack to the female agent's spermatheca.
+func (a *AgentArrays) AddSpermPack(idx int, pack SpermPack) {
+	a.SpermPacks[idx] = append(a.SpermPacks[idx], pack)
+}
+
+// RemoveSpermPack removes the sperm pack at position p from the agent's list
+// using swap-and-pop (order within the spermatheca is not significant).
+func (a *AgentArrays) RemoveSpermPack(idx, p int) {
+	packs := a.SpermPacks[idx]
+	if p < 0 || p >= len(packs) {
+		return
+	}
+	last := len(packs) - 1
+	packs[p] = packs[last]
+	packs[last] = SpermPack{} // Release references for GC.
+	a.SpermPacks[idx] = packs[:last]
+}
+
+// ClearSpermPacks empties the agent's spermatheca (e.g. on death/removal).
+func (a *AgentArrays) ClearSpermPacks(idx int) {
+	a.SpermPacks[idx] = nil
 }

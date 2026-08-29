@@ -80,9 +80,9 @@ func (b *EnvBuilder) SetAgentVars(w *world.World, idx int) {
 	// --- Reproduction ---
 	b.eval.SetInt("QuantityGametes", int(a.GametesCount[idx]))
 	b.eval.SetInt("QuantityFertilizedEggs", int(a.FertilizedCount[idx]))
-	b.eval.SetInt("QuantitySpermPacksStored", int(a.SpermPacksCount[idx]))
+	b.eval.SetInt("QuantitySpermPacksStored", int(a.SpermPackCount(idx)))
 	b.eval.SetInt("QuantityCarriedEggs", int(a.CarriedEggs[idx]))
-	b.eval.Set("Virginity", a.SpermPacksCount[idx] == 0 && a.Sex[idx] == world.SexFemale)
+	b.eval.Set("Virginity", a.SpermPackCount(idx) == 0 && a.Sex[idx] == world.SexFemale)
 
 	// --- Memory: perception/interaction (named by element) ---
 	// Element order: substrates, then nutrients (=resource types), then prototypes.

@@ -1,26 +1,24 @@
 package systems
 
 import (
-	"math/rand/v2"
-
 	"galatea/engine/internal/kernel/world"
 )
 
 // ReproductionConfig holds the parameters for reproduction mechanics.
 type ReproductionConfig struct {
-	MaxGametes          int32   // Maximum gametes an agent can produce.
-	GameteCosts         []int32 // Cost per gamete per nutrient: [nutrient] = cost.
-	PacksTransferred    int32   // Sperm packs transferred per copulation.
-	MaxStoredPacks      int32   // Max sperm packs a female can store.
-	FractionFertilized  float64 // Fraction of eggs fertilized after copulation.
-	PackFraction        float64 // Fraction of gamete reserves in each sperm pack.
-	EggFraction         float64 // Fraction of gamete reserves allocated to egg.
-	EggsPerCycle        int32   // Eggs oviposited per cycle.
-	Paternity           int32   // Initial paternity weight for sperm packs.
-	ConsumptionRate     float64 // Rate at which females consume stored sperm packs.
-	SpermDegradation    float64 // Rate of paternity degradation per tick.
-	MaleRatio           int     // Proportion for sex determination.
-	FemaleRatio         int     // Proportion for sex determination.
+	MaxGametes         int32   // Maximum gametes an agent can produce.
+	GameteCosts        []int32 // Cost per gamete per nutrient: [nutrient] = cost.
+	PacksTransferred   int32   // Sperm packs transferred per copulation.
+	MaxStoredPacks     int32   // Max sperm packs a female can store.
+	FractionFertilized float64 // Fraction of eggs fertilized after copulation.
+	PackFraction       float64 // Fraction of gamete reserves in each sperm pack.
+	EggFraction        float64 // Fraction of gamete reserves allocated to egg.
+	EggsPerCycle       int32   // Eggs oviposited per cycle.
+	Paternity          int32   // Initial paternity weight for sperm packs.
+	ConsumptionRate    float64 // Rate at which females consume stored sperm packs.
+	SpermDegradation   float64 // Rate of paternity degradation per tick.
+	MaleRatio          int     // Proportion for sex determination.
+	FemaleRatio        int     // Proportion for sex determination.
 }
 
 // Gametogenesis produces gametes when the agent has optimal reserves.
@@ -71,8 +69,16 @@ func Gametogenesis(w *world.World, idx int, cfg ReproductionConfig) {
 
 // Copulate transfers sperm packs from male to female and triggers fertilization.
 // maleIdx and femaleIdx must be valid agents in courtship that have both accepted.
+//
+// Each transferred pack carries a deep copy of the male's genotype plus a
+// paternity weight, so the stored spermatheca preserves the paternal lineage
+// (mirrors the legacy TPaqEspermatico). This enables real sexual inheritance
+// at fertilization/oviposition time.
 func Copulate(w *world.World, maleIdx, femaleIdx int, cfg ReproductionConfig, genCfg GeneticsConfig) {
 	a := w.Agents
+	wcfg := w.Config
+	numLoci := wcfg.NumLoci
+	numNut := wcfg.NumNutrients
 
 	// Determine number of packs to transfer.
 	available := a.GametesCount[maleIdx]
@@ -82,7 +88,7 @@ func Copulate(w *world.World, maleIdx, femaleIdx int, cfg ReproductionConfig, ge
 	}
 
 	// Cap by female storage capacity.
-	freeSlots := cfg.MaxStoredPacks - a.SpermPacksCount[femaleIdx]
+	freeSlots := cfg.MaxStoredPacks - a.SpermPackCount(femaleIdx)
 	if transfer > freeSlots {
 		transfer = freeSlots
 	}
@@ -91,9 +97,26 @@ func Copulate(w *world.World, maleIdx, femaleIdx int, cfg ReproductionConfig, ge
 		return
 	}
 
-	// Transfer packs: deduct from male gametes, add to female sperm packs.
+	// Package reserves per pack: a fraction of the male's current reserves.
+	// The engine models the gonad as a count (GametesCount) rather than
+	// per-gamete reserves, so we approximate the packaged reserves as a
+	// fraction of the donor's reserves (legacy scales gonad reserves by
+	// FraccPaquete). This keeps a meaningful nutrient payload on each pack.
+	packReserves := make([]int32, numNut)
+	maleResBase := maleIdx * numNut
+	for n := 0; n < numNut; n++ {
+		packReserves[n] = int32(float64(a.Reserves[maleResBase+n]) * cfg.PackFraction)
+	}
+
+	donor := donorID(maleIdx)
+
+	// Transfer packs: deduct from male gametes, add genotype-carrying packs to
+	// the female's spermatheca.
 	a.GametesCount[maleIdx] -= transfer
-	a.SpermPacksCount[femaleIdx] += transfer
+	for t := int32(0); t < transfer; t++ {
+		pack := world.NewSpermPackFromAgent(a, maleIdx, numLoci, numNut, packReserves, cfg.Paternity, donor)
+		a.AddSpermPack(femaleIdx, pack)
+	}
 
 	// Fertilize a fraction of the female's unfertilized gametes.
 	fertilizeCount := int32(float64(a.GametesCount[femaleIdx]) * cfg.FractionFertilized)
@@ -111,6 +134,13 @@ func Copulate(w *world.World, maleIdx, femaleIdx int, cfg ReproductionConfig, ge
 	a.InteractantIdx[femaleIdx] = -1
 	a.TimeInInteraction[maleIdx] = 0
 	a.TimeInInteraction[femaleIdx] = 0
+}
+
+// donorID builds a stable identifier for a donor male from its agent index.
+// The engine identifies agents by index rather than name, so this provides
+// lineage traceability on stored packs (mirrors the legacy Donador string).
+func donorID(maleIdx int) string {
+	return "M" + itoa(maleIdx)
 }
 
 // Oviposit deposits fertilized eggs into the world's EggArrays.
@@ -201,28 +231,71 @@ func Oviposit(w *world.World, femaleIdx int, cfg ReproductionConfig, genCfg Gene
 	return laid
 }
 
-// SpermConsumption degrades stored sperm packs in a female agent.
-// Reduces pack count based on consumption rate (simplified model).
+// SpermConsumption metabolizes the stored sperm packs of a female agent each
+// tick, mirroring the legacy ConsumoPaquetesEspermaticos: it draws a fraction
+// (ConsumptionRate) of each pack's nutrient reserves into the female's own
+// reserves, degrades each pack's paternity weight by SpermDegradation, and
+// removes packs that are exhausted (no paternity and no reserves left).
 func SpermConsumption(w *world.World, femaleIdx int, cfg ReproductionConfig) {
 	a := w.Agents
+	wcfg := w.Config
 	if a.Sex[femaleIdx] != world.SexFemale {
 		return
 	}
-	if a.SpermPacksCount[femaleIdx] <= 0 {
+	packs := a.SpermPacks[femaleIdx]
+	if len(packs) == 0 {
 		return
 	}
 
-	// Probabilistic consumption: each pack has a chance of being consumed this tick.
-	consumed := int32(0)
-	for p := int32(0); p < a.SpermPacksCount[femaleIdx]; p++ {
-		if rand.Float64() < cfg.ConsumptionRate {
-			consumed++
+	numNut := wcfg.NumNutrients
+	femResBase := femaleIdx * numNut
+
+	// Iterate in reverse so swap-and-pop removals are safe.
+	for p := len(packs) - 1; p >= 0; p-- {
+		pack := &packs[p]
+
+		// Metabolize a fraction of the pack's reserves into the female.
+		if cfg.ConsumptionRate > 0 {
+			for n := 0; n < numNut && n < len(pack.Reserves); n++ {
+				take := int32(float64(pack.Reserves[n]) * cfg.ConsumptionRate)
+				if take <= 0 && pack.Reserves[n] > 0 {
+					take = 1 // Ensure progress so packs eventually deplete.
+				}
+				if take > pack.Reserves[n] {
+					take = pack.Reserves[n]
+				}
+				pack.Reserves[n] -= take
+				a.Reserves[femResBase+n] += take
+			}
+		}
+
+		// Degrade paternity weight.
+		if cfg.SpermDegradation > 0 && pack.Paternity > 0 {
+			deg := int32(float64(pack.Paternity) * cfg.SpermDegradation)
+			if deg <= 0 {
+				deg = 1 // Ensure eventual degradation.
+			}
+			pack.Paternity -= deg
+			if pack.Paternity < 0 {
+				pack.Paternity = 0
+			}
+		}
+
+		// Remove packs that are fully exhausted.
+		if pack.Paternity <= 0 && packReservesEmpty(pack) {
+			a.RemoveSpermPack(femaleIdx, p)
 		}
 	}
-	a.SpermPacksCount[femaleIdx] -= consumed
-	if a.SpermPacksCount[femaleIdx] < 0 {
-		a.SpermPacksCount[femaleIdx] = 0
+}
+
+// packReservesEmpty reports whether a sperm pack has no remaining reserves.
+func packReservesEmpty(pack *world.SpermPack) bool {
+	for _, r := range pack.Reserves {
+		if r > 0 {
+			return false
+		}
 	}
+	return true
 }
 
 // IsOptimalForReproduction returns true if all reserves are at or above optimal level.

@@ -230,7 +230,6 @@ func TestCopulate(t *testing.T) {
 	female := w.AddAgent()
 	w.Agents.Sex[female] = world.SexFemale
 	w.Agents.GametesCount[female] = 8
-	w.Agents.SpermPacksCount[female] = 0
 	w.Agents.Situation[female] = world.SituationCourtship
 	w.Agents.InteractantIdx[male] = int32(female)
 	w.Agents.InteractantIdx[female] = int32(male)
@@ -249,8 +248,17 @@ func TestCopulate(t *testing.T) {
 		t.Fatalf("male gametes: expected 2, got %d", w.Agents.GametesCount[male])
 	}
 	// Female: received 3 sperm packs.
-	if w.Agents.SpermPacksCount[female] != 3 {
-		t.Fatalf("female sperm packs: expected 3, got %d", w.Agents.SpermPacksCount[female])
+	if w.Agents.SpermPackCount(female) != 3 {
+		t.Fatalf("female sperm packs: expected 3, got %d", w.Agents.SpermPackCount(female))
+	}
+	// Each stored pack must carry the donor male's genotype and identity.
+	for i, pack := range w.Agents.SpermPacks[female] {
+		if len(pack.GenotypeCont) != cfg.NumLoci*2 {
+			t.Fatalf("pack %d: expected genotype len %d, got %d", i, cfg.NumLoci*2, len(pack.GenotypeCont))
+		}
+		if pack.Donor == "" {
+			t.Fatalf("pack %d: expected a donor identifier", i)
+		}
 	}
 	// Female: 8 gametes * 0.5 = 4 fertilized.
 	if w.Agents.FertilizedCount[female] != 4 {
@@ -331,21 +339,58 @@ func TestOviposit(t *testing.T) {
 func TestSpermConsumption(t *testing.T) {
 	cfg := testCfg()
 	w := world.New(cfg)
+	numNut := cfg.NumNutrients
 
 	female := w.AddAgent()
 	w.Agents.Sex[female] = world.SexFemale
-	w.Agents.SpermPacksCount[female] = 100
+
+	// Give the female two packs: one with reserves + paternity, one exhausted.
+	fullPack := world.SpermPack{
+		GenotypeCont:  make([]float64, cfg.NumLoci*2),
+		GenotypeDisc:  make([]int32, cfg.NumLoci*2),
+		DominanceCont: make([]uint8, cfg.NumLoci*2),
+		DominanceDisc: make([]uint8, cfg.NumLoci*2),
+		Reserves:      make([]int32, numNut),
+		Paternity:     100,
+		Donor:         "M0",
+	}
+	for n := 0; n < numNut; n++ {
+		fullPack.Reserves[n] = 100
+	}
+	emptyPack := world.SpermPack{
+		Reserves:  make([]int32, numNut), // all zero
+		Paternity: 0,
+	}
+	w.Agents.AddSpermPack(female, fullPack)
+	w.Agents.AddSpermPack(female, emptyPack)
+
+	femResBefore := make([]int32, numNut)
+	copy(femResBefore, w.Agents.Reserves[female*numNut:female*numNut+numNut])
 
 	reproCfg := ReproductionConfig{
-		ConsumptionRate: 0.5, // 50% chance per pack per tick.
+		ConsumptionRate:  0.5,
+		SpermDegradation: 0.5,
 	}
 
 	SpermConsumption(w, female, reproCfg)
 
-	// With 100 packs and 50% rate, expect ~50 consumed (±15 tolerance).
-	remaining := w.Agents.SpermPacksCount[female]
-	if remaining < 30 || remaining > 70 {
-		t.Fatalf("expected ~50 remaining packs, got %d", remaining)
+	// The exhausted pack (paternity 0, no reserves) must be removed.
+	if w.Agents.SpermPackCount(female) != 1 {
+		t.Fatalf("expected 1 pack remaining (exhausted removed), got %d", w.Agents.SpermPackCount(female))
+	}
+
+	// The full pack must have degraded paternity (100 * 0.5 = 50).
+	remaining := w.Agents.SpermPacks[female][0]
+	if remaining.Paternity != 50 {
+		t.Fatalf("expected paternity 50 after degradation, got %d", remaining.Paternity)
+	}
+
+	// The female must have gained reserves from the metabolized pack.
+	for n := 0; n < numNut; n++ {
+		gained := w.Agents.Reserves[female*numNut+n] - femResBefore[n]
+		if gained <= 0 {
+			t.Fatalf("nutrient %d: expected female to gain reserves, gained %d", n, gained)
+		}
 	}
 }
 
