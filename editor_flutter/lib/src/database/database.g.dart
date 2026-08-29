@@ -3566,12 +3566,12 @@ class $StageTendenciesTable extends StageTendencies
       'REFERENCES stages (id)',
     ),
   );
-  static const VerificationMeta _directionMeta = const VerificationMeta(
-    'direction',
+  static const VerificationMeta _turnIndexMeta = const VerificationMeta(
+    'turnIndex',
   );
   @override
-  late final GeneratedColumn<int> direction = GeneratedColumn<int>(
-    'direction',
+  late final GeneratedColumn<int> turnIndex = GeneratedColumn<int>(
+    'turn_index',
     aliasedName,
     false,
     type: DriftSqlType.int,
@@ -3590,7 +3590,7 @@ class $StageTendenciesTable extends StageTendencies
     defaultValue: const Constant('1'),
   );
   @override
-  List<GeneratedColumn> get $columns => [id, stageId, direction, formula];
+  List<GeneratedColumn> get $columns => [id, stageId, turnIndex, formula];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -3614,13 +3614,13 @@ class $StageTendenciesTable extends StageTendencies
     } else if (isInserting) {
       context.missing(_stageIdMeta);
     }
-    if (data.containsKey('direction')) {
+    if (data.containsKey('turn_index')) {
       context.handle(
-        _directionMeta,
-        direction.isAcceptableOrUnknown(data['direction']!, _directionMeta),
+        _turnIndexMeta,
+        turnIndex.isAcceptableOrUnknown(data['turn_index']!, _turnIndexMeta),
       );
     } else if (isInserting) {
-      context.missing(_directionMeta);
+      context.missing(_turnIndexMeta);
     }
     if (data.containsKey('formula')) {
       context.handle(
@@ -3635,7 +3635,7 @@ class $StageTendenciesTable extends StageTendencies
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
   List<Set<GeneratedColumn>> get uniqueKeys => [
-    {stageId, direction},
+    {stageId, turnIndex},
   ];
   @override
   StageTendency map(Map<String, dynamic> data, {String? tablePrefix}) {
@@ -3649,9 +3649,9 @@ class $StageTendenciesTable extends StageTendencies
         DriftSqlType.int,
         data['${effectivePrefix}stage_id'],
       )!,
-      direction: attachedDatabase.typeMapping.read(
+      turnIndex: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
-        data['${effectivePrefix}direction'],
+        data['${effectivePrefix}turn_index'],
       )!,
       formula: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
@@ -3669,12 +3669,12 @@ class $StageTendenciesTable extends StageTendencies
 class StageTendency extends DataClass implements Insertable<StageTendency> {
   final int id;
   final int stageId;
-  final int direction;
+  final int turnIndex;
   final String formula;
   const StageTendency({
     required this.id,
     required this.stageId,
-    required this.direction,
+    required this.turnIndex,
     required this.formula,
   });
   @override
@@ -3682,7 +3682,7 @@ class StageTendency extends DataClass implements Insertable<StageTendency> {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
     map['stage_id'] = Variable<int>(stageId);
-    map['direction'] = Variable<int>(direction);
+    map['turn_index'] = Variable<int>(turnIndex);
     map['formula'] = Variable<String>(formula);
     return map;
   }
@@ -3691,7 +3691,7 @@ class StageTendency extends DataClass implements Insertable<StageTendency> {
     return StageTendenciesCompanion(
       id: Value(id),
       stageId: Value(stageId),
-      direction: Value(direction),
+      turnIndex: Value(turnIndex),
       formula: Value(formula),
     );
   }
@@ -3704,7 +3704,7 @@ class StageTendency extends DataClass implements Insertable<StageTendency> {
     return StageTendency(
       id: serializer.fromJson<int>(json['id']),
       stageId: serializer.fromJson<int>(json['stageId']),
-      direction: serializer.fromJson<int>(json['direction']),
+      turnIndex: serializer.fromJson<int>(json['turnIndex']),
       formula: serializer.fromJson<String>(json['formula']),
     );
   }
@@ -3714,7 +3714,7 @@ class StageTendency extends DataClass implements Insertable<StageTendency> {
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
       'stageId': serializer.toJson<int>(stageId),
-      'direction': serializer.toJson<int>(direction),
+      'turnIndex': serializer.toJson<int>(turnIndex),
       'formula': serializer.toJson<String>(formula),
     };
   }
@@ -3722,19 +3722,19 @@ class StageTendency extends DataClass implements Insertable<StageTendency> {
   StageTendency copyWith({
     int? id,
     int? stageId,
-    int? direction,
+    int? turnIndex,
     String? formula,
   }) => StageTendency(
     id: id ?? this.id,
     stageId: stageId ?? this.stageId,
-    direction: direction ?? this.direction,
+    turnIndex: turnIndex ?? this.turnIndex,
     formula: formula ?? this.formula,
   );
   StageTendency copyWithCompanion(StageTendenciesCompanion data) {
     return StageTendency(
       id: data.id.present ? data.id.value : this.id,
       stageId: data.stageId.present ? data.stageId.value : this.stageId,
-      direction: data.direction.present ? data.direction.value : this.direction,
+      turnIndex: data.turnIndex.present ? data.turnIndex.value : this.turnIndex,
       formula: data.formula.present ? data.formula.value : this.formula,
     );
   }
@@ -3744,52 +3744,52 @@ class StageTendency extends DataClass implements Insertable<StageTendency> {
     return (StringBuffer('StageTendency(')
           ..write('id: $id, ')
           ..write('stageId: $stageId, ')
-          ..write('direction: $direction, ')
+          ..write('turnIndex: $turnIndex, ')
           ..write('formula: $formula')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, stageId, direction, formula);
+  int get hashCode => Object.hash(id, stageId, turnIndex, formula);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is StageTendency &&
           other.id == this.id &&
           other.stageId == this.stageId &&
-          other.direction == this.direction &&
+          other.turnIndex == this.turnIndex &&
           other.formula == this.formula);
 }
 
 class StageTendenciesCompanion extends UpdateCompanion<StageTendency> {
   final Value<int> id;
   final Value<int> stageId;
-  final Value<int> direction;
+  final Value<int> turnIndex;
   final Value<String> formula;
   const StageTendenciesCompanion({
     this.id = const Value.absent(),
     this.stageId = const Value.absent(),
-    this.direction = const Value.absent(),
+    this.turnIndex = const Value.absent(),
     this.formula = const Value.absent(),
   });
   StageTendenciesCompanion.insert({
     this.id = const Value.absent(),
     required int stageId,
-    required int direction,
+    required int turnIndex,
     this.formula = const Value.absent(),
   }) : stageId = Value(stageId),
-       direction = Value(direction);
+       turnIndex = Value(turnIndex);
   static Insertable<StageTendency> custom({
     Expression<int>? id,
     Expression<int>? stageId,
-    Expression<int>? direction,
+    Expression<int>? turnIndex,
     Expression<String>? formula,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (stageId != null) 'stage_id': stageId,
-      if (direction != null) 'direction': direction,
+      if (turnIndex != null) 'turn_index': turnIndex,
       if (formula != null) 'formula': formula,
     });
   }
@@ -3797,13 +3797,13 @@ class StageTendenciesCompanion extends UpdateCompanion<StageTendency> {
   StageTendenciesCompanion copyWith({
     Value<int>? id,
     Value<int>? stageId,
-    Value<int>? direction,
+    Value<int>? turnIndex,
     Value<String>? formula,
   }) {
     return StageTendenciesCompanion(
       id: id ?? this.id,
       stageId: stageId ?? this.stageId,
-      direction: direction ?? this.direction,
+      turnIndex: turnIndex ?? this.turnIndex,
       formula: formula ?? this.formula,
     );
   }
@@ -3817,8 +3817,8 @@ class StageTendenciesCompanion extends UpdateCompanion<StageTendency> {
     if (stageId.present) {
       map['stage_id'] = Variable<int>(stageId.value);
     }
-    if (direction.present) {
-      map['direction'] = Variable<int>(direction.value);
+    if (turnIndex.present) {
+      map['turn_index'] = Variable<int>(turnIndex.value);
     }
     if (formula.present) {
       map['formula'] = Variable<String>(formula.value);
@@ -3831,7 +3831,7 @@ class StageTendenciesCompanion extends UpdateCompanion<StageTendency> {
     return (StringBuffer('StageTendenciesCompanion(')
           ..write('id: $id, ')
           ..write('stageId: $stageId, ')
-          ..write('direction: $direction, ')
+          ..write('turnIndex: $turnIndex, ')
           ..write('formula: $formula')
           ..write(')'))
         .toString();
@@ -4905,12 +4905,12 @@ class $PrototypeTendenciesTable extends PrototypeTendencies
       'REFERENCES prototypes (id)',
     ),
   );
-  static const VerificationMeta _directionMeta = const VerificationMeta(
-    'direction',
+  static const VerificationMeta _turnIndexMeta = const VerificationMeta(
+    'turnIndex',
   );
   @override
-  late final GeneratedColumn<int> direction = GeneratedColumn<int>(
-    'direction',
+  late final GeneratedColumn<int> turnIndex = GeneratedColumn<int>(
+    'turn_index',
     aliasedName,
     false,
     type: DriftSqlType.int,
@@ -4929,7 +4929,7 @@ class $PrototypeTendenciesTable extends PrototypeTendencies
     defaultValue: const Constant('1'),
   );
   @override
-  List<GeneratedColumn> get $columns => [id, prototypeId, direction, formula];
+  List<GeneratedColumn> get $columns => [id, prototypeId, turnIndex, formula];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -4956,13 +4956,13 @@ class $PrototypeTendenciesTable extends PrototypeTendencies
     } else if (isInserting) {
       context.missing(_prototypeIdMeta);
     }
-    if (data.containsKey('direction')) {
+    if (data.containsKey('turn_index')) {
       context.handle(
-        _directionMeta,
-        direction.isAcceptableOrUnknown(data['direction']!, _directionMeta),
+        _turnIndexMeta,
+        turnIndex.isAcceptableOrUnknown(data['turn_index']!, _turnIndexMeta),
       );
     } else if (isInserting) {
-      context.missing(_directionMeta);
+      context.missing(_turnIndexMeta);
     }
     if (data.containsKey('formula')) {
       context.handle(
@@ -4977,7 +4977,7 @@ class $PrototypeTendenciesTable extends PrototypeTendencies
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
   List<Set<GeneratedColumn>> get uniqueKeys => [
-    {prototypeId, direction},
+    {prototypeId, turnIndex},
   ];
   @override
   PrototypeTendency map(Map<String, dynamic> data, {String? tablePrefix}) {
@@ -4991,9 +4991,9 @@ class $PrototypeTendenciesTable extends PrototypeTendencies
         DriftSqlType.int,
         data['${effectivePrefix}prototype_id'],
       )!,
-      direction: attachedDatabase.typeMapping.read(
+      turnIndex: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
-        data['${effectivePrefix}direction'],
+        data['${effectivePrefix}turn_index'],
       )!,
       formula: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
@@ -5012,12 +5012,12 @@ class PrototypeTendency extends DataClass
     implements Insertable<PrototypeTendency> {
   final int id;
   final int prototypeId;
-  final int direction;
+  final int turnIndex;
   final String formula;
   const PrototypeTendency({
     required this.id,
     required this.prototypeId,
-    required this.direction,
+    required this.turnIndex,
     required this.formula,
   });
   @override
@@ -5025,7 +5025,7 @@ class PrototypeTendency extends DataClass
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
     map['prototype_id'] = Variable<int>(prototypeId);
-    map['direction'] = Variable<int>(direction);
+    map['turn_index'] = Variable<int>(turnIndex);
     map['formula'] = Variable<String>(formula);
     return map;
   }
@@ -5034,7 +5034,7 @@ class PrototypeTendency extends DataClass
     return PrototypeTendenciesCompanion(
       id: Value(id),
       prototypeId: Value(prototypeId),
-      direction: Value(direction),
+      turnIndex: Value(turnIndex),
       formula: Value(formula),
     );
   }
@@ -5047,7 +5047,7 @@ class PrototypeTendency extends DataClass
     return PrototypeTendency(
       id: serializer.fromJson<int>(json['id']),
       prototypeId: serializer.fromJson<int>(json['prototypeId']),
-      direction: serializer.fromJson<int>(json['direction']),
+      turnIndex: serializer.fromJson<int>(json['turnIndex']),
       formula: serializer.fromJson<String>(json['formula']),
     );
   }
@@ -5057,7 +5057,7 @@ class PrototypeTendency extends DataClass
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
       'prototypeId': serializer.toJson<int>(prototypeId),
-      'direction': serializer.toJson<int>(direction),
+      'turnIndex': serializer.toJson<int>(turnIndex),
       'formula': serializer.toJson<String>(formula),
     };
   }
@@ -5065,12 +5065,12 @@ class PrototypeTendency extends DataClass
   PrototypeTendency copyWith({
     int? id,
     int? prototypeId,
-    int? direction,
+    int? turnIndex,
     String? formula,
   }) => PrototypeTendency(
     id: id ?? this.id,
     prototypeId: prototypeId ?? this.prototypeId,
-    direction: direction ?? this.direction,
+    turnIndex: turnIndex ?? this.turnIndex,
     formula: formula ?? this.formula,
   );
   PrototypeTendency copyWithCompanion(PrototypeTendenciesCompanion data) {
@@ -5079,7 +5079,7 @@ class PrototypeTendency extends DataClass
       prototypeId: data.prototypeId.present
           ? data.prototypeId.value
           : this.prototypeId,
-      direction: data.direction.present ? data.direction.value : this.direction,
+      turnIndex: data.turnIndex.present ? data.turnIndex.value : this.turnIndex,
       formula: data.formula.present ? data.formula.value : this.formula,
     );
   }
@@ -5089,52 +5089,52 @@ class PrototypeTendency extends DataClass
     return (StringBuffer('PrototypeTendency(')
           ..write('id: $id, ')
           ..write('prototypeId: $prototypeId, ')
-          ..write('direction: $direction, ')
+          ..write('turnIndex: $turnIndex, ')
           ..write('formula: $formula')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, prototypeId, direction, formula);
+  int get hashCode => Object.hash(id, prototypeId, turnIndex, formula);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is PrototypeTendency &&
           other.id == this.id &&
           other.prototypeId == this.prototypeId &&
-          other.direction == this.direction &&
+          other.turnIndex == this.turnIndex &&
           other.formula == this.formula);
 }
 
 class PrototypeTendenciesCompanion extends UpdateCompanion<PrototypeTendency> {
   final Value<int> id;
   final Value<int> prototypeId;
-  final Value<int> direction;
+  final Value<int> turnIndex;
   final Value<String> formula;
   const PrototypeTendenciesCompanion({
     this.id = const Value.absent(),
     this.prototypeId = const Value.absent(),
-    this.direction = const Value.absent(),
+    this.turnIndex = const Value.absent(),
     this.formula = const Value.absent(),
   });
   PrototypeTendenciesCompanion.insert({
     this.id = const Value.absent(),
     required int prototypeId,
-    required int direction,
+    required int turnIndex,
     this.formula = const Value.absent(),
   }) : prototypeId = Value(prototypeId),
-       direction = Value(direction);
+       turnIndex = Value(turnIndex);
   static Insertable<PrototypeTendency> custom({
     Expression<int>? id,
     Expression<int>? prototypeId,
-    Expression<int>? direction,
+    Expression<int>? turnIndex,
     Expression<String>? formula,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (prototypeId != null) 'prototype_id': prototypeId,
-      if (direction != null) 'direction': direction,
+      if (turnIndex != null) 'turn_index': turnIndex,
       if (formula != null) 'formula': formula,
     });
   }
@@ -5142,13 +5142,13 @@ class PrototypeTendenciesCompanion extends UpdateCompanion<PrototypeTendency> {
   PrototypeTendenciesCompanion copyWith({
     Value<int>? id,
     Value<int>? prototypeId,
-    Value<int>? direction,
+    Value<int>? turnIndex,
     Value<String>? formula,
   }) {
     return PrototypeTendenciesCompanion(
       id: id ?? this.id,
       prototypeId: prototypeId ?? this.prototypeId,
-      direction: direction ?? this.direction,
+      turnIndex: turnIndex ?? this.turnIndex,
       formula: formula ?? this.formula,
     );
   }
@@ -5162,8 +5162,8 @@ class PrototypeTendenciesCompanion extends UpdateCompanion<PrototypeTendency> {
     if (prototypeId.present) {
       map['prototype_id'] = Variable<int>(prototypeId.value);
     }
-    if (direction.present) {
-      map['direction'] = Variable<int>(direction.value);
+    if (turnIndex.present) {
+      map['turn_index'] = Variable<int>(turnIndex.value);
     }
     if (formula.present) {
       map['formula'] = Variable<String>(formula.value);
@@ -5176,7 +5176,7 @@ class PrototypeTendenciesCompanion extends UpdateCompanion<PrototypeTendency> {
     return (StringBuffer('PrototypeTendenciesCompanion(')
           ..write('id: $id, ')
           ..write('prototypeId: $prototypeId, ')
-          ..write('direction: $direction, ')
+          ..write('turnIndex: $turnIndex, ')
           ..write('formula: $formula')
           ..write(')'))
         .toString();
@@ -21130,14 +21130,14 @@ typedef $$StageTendenciesTableCreateCompanionBuilder =
     StageTendenciesCompanion Function({
       Value<int> id,
       required int stageId,
-      required int direction,
+      required int turnIndex,
       Value<String> formula,
     });
 typedef $$StageTendenciesTableUpdateCompanionBuilder =
     StageTendenciesCompanion Function({
       Value<int> id,
       Value<int> stageId,
-      Value<int> direction,
+      Value<int> turnIndex,
       Value<String> formula,
     });
 
@@ -21182,8 +21182,8 @@ class $$StageTendenciesTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<int> get direction => $composableBuilder(
-    column: $table.direction,
+  ColumnFilters<int> get turnIndex => $composableBuilder(
+    column: $table.turnIndex,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -21230,8 +21230,8 @@ class $$StageTendenciesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<int> get direction => $composableBuilder(
-    column: $table.direction,
+  ColumnOrderings<int> get turnIndex => $composableBuilder(
+    column: $table.turnIndex,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -21276,8 +21276,8 @@ class $$StageTendenciesTableAnnotationComposer
   GeneratedColumn<int> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
 
-  GeneratedColumn<int> get direction =>
-      $composableBuilder(column: $table.direction, builder: (column) => column);
+  GeneratedColumn<int> get turnIndex =>
+      $composableBuilder(column: $table.turnIndex, builder: (column) => column);
 
   GeneratedColumn<String> get formula =>
       $composableBuilder(column: $table.formula, builder: (column) => column);
@@ -21338,24 +21338,24 @@ class $$StageTendenciesTableTableManager
               ({
                 Value<int> id = const Value.absent(),
                 Value<int> stageId = const Value.absent(),
-                Value<int> direction = const Value.absent(),
+                Value<int> turnIndex = const Value.absent(),
                 Value<String> formula = const Value.absent(),
               }) => StageTendenciesCompanion(
                 id: id,
                 stageId: stageId,
-                direction: direction,
+                turnIndex: turnIndex,
                 formula: formula,
               ),
           createCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
                 required int stageId,
-                required int direction,
+                required int turnIndex,
                 Value<String> formula = const Value.absent(),
               }) => StageTendenciesCompanion.insert(
                 id: id,
                 stageId: stageId,
-                direction: direction,
+                turnIndex: turnIndex,
                 formula: formula,
               ),
           withReferenceMapper: (p0) => p0
@@ -23705,14 +23705,14 @@ typedef $$PrototypeTendenciesTableCreateCompanionBuilder =
     PrototypeTendenciesCompanion Function({
       Value<int> id,
       required int prototypeId,
-      required int direction,
+      required int turnIndex,
       Value<String> formula,
     });
 typedef $$PrototypeTendenciesTableUpdateCompanionBuilder =
     PrototypeTendenciesCompanion Function({
       Value<int> id,
       Value<int> prototypeId,
-      Value<int> direction,
+      Value<int> turnIndex,
       Value<String> formula,
     });
 
@@ -23761,8 +23761,8 @@ class $$PrototypeTendenciesTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<int> get direction => $composableBuilder(
-    column: $table.direction,
+  ColumnFilters<int> get turnIndex => $composableBuilder(
+    column: $table.turnIndex,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -23809,8 +23809,8 @@ class $$PrototypeTendenciesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<int> get direction => $composableBuilder(
-    column: $table.direction,
+  ColumnOrderings<int> get turnIndex => $composableBuilder(
+    column: $table.turnIndex,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -23855,8 +23855,8 @@ class $$PrototypeTendenciesTableAnnotationComposer
   GeneratedColumn<int> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
 
-  GeneratedColumn<int> get direction =>
-      $composableBuilder(column: $table.direction, builder: (column) => column);
+  GeneratedColumn<int> get turnIndex =>
+      $composableBuilder(column: $table.turnIndex, builder: (column) => column);
 
   GeneratedColumn<String> get formula =>
       $composableBuilder(column: $table.formula, builder: (column) => column);
@@ -23923,24 +23923,24 @@ class $$PrototypeTendenciesTableTableManager
               ({
                 Value<int> id = const Value.absent(),
                 Value<int> prototypeId = const Value.absent(),
-                Value<int> direction = const Value.absent(),
+                Value<int> turnIndex = const Value.absent(),
                 Value<String> formula = const Value.absent(),
               }) => PrototypeTendenciesCompanion(
                 id: id,
                 prototypeId: prototypeId,
-                direction: direction,
+                turnIndex: turnIndex,
                 formula: formula,
               ),
           createCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
                 required int prototypeId,
-                required int direction,
+                required int turnIndex,
                 Value<String> formula = const Value.absent(),
               }) => PrototypeTendenciesCompanion.insert(
                 id: id,
                 prototypeId: prototypeId,
-                direction: direction,
+                turnIndex: turnIndex,
                 formula: formula,
               ),
           withReferenceMapper: (p0) => p0

@@ -267,16 +267,19 @@ class StageNutrientRequirements extends Table {
   ];
 }
 
-/// Movement tendencies per stage (8 directions).
+/// Movement tendencies per stage, RELATIVE to the agent's heading.
+/// turnIndex (0..7) encodes a relative turn, NOT an absolute direction:
+///   0 = 180° (reverse), 1 = 135° left, 2 = 90° left, 3 = 45° left,
+///   4 = 0° (straight ahead), 5 = 45° right, 6 = 90° right, 7 = 135° right.
 class StageTendencies extends Table {
   IntColumn get id => integer().autoIncrement()();
   IntColumn get stageId => integer().references(Stages, #id)();
-  IntColumn get direction => integer()(); // 1..8
+  IntColumn get turnIndex => integer()(); // 0..7 (see class doc)
   TextColumn get formula => text().withDefault(const Constant('1'))();
 
   @override
   List<Set<Column>> get uniqueKeys => [
-    {stageId, direction},
+    {stageId, turnIndex},
   ];
 }
 
@@ -300,16 +303,19 @@ class PrototypeMorphology extends Table {
   ];
 }
 
-/// Movement tendencies per prototype (8 directions).
+/// Movement tendencies per prototype, RELATIVE to the agent's heading.
+/// turnIndex (0..7) encodes a relative turn, NOT an absolute direction:
+///   0 = 180° (reverse), 1 = 135° left, 2 = 90° left, 3 = 45° left,
+///   4 = 0° (straight ahead), 5 = 45° right, 6 = 90° right, 7 = 135° right.
 class PrototypeTendencies extends Table {
   IntColumn get id => integer().autoIncrement()();
   IntColumn get prototypeId => integer().references(Prototypes, #id)();
-  IntColumn get direction => integer()(); // 1..8
+  IntColumn get turnIndex => integer()(); // 0..7 (see class doc)
   TextColumn get formula => text().withDefault(const Constant('1'))();
 
   @override
   List<Set<Column>> get uniqueKeys => [
-    {prototypeId, direction},
+    {prototypeId, turnIndex},
   ];
 }
 

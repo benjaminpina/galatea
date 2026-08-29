@@ -337,3 +337,45 @@ func TestEnginePerformance(t *testing.T) {
 		t.Logf("WARNING: TPS %.0f is below expected minimum of 1000", tps)
 	}
 }
+
+// TestTurnSlotToEngineMapping verifies the relative-turn index (editor order,
+// ordered by turn angle) maps to the correct engine tendency slot.
+func TestTurnSlotToEngineMapping(t *testing.T) {
+	// Engine slots: DirNW=0, DirN=1, DirNE=2, DirW=3, DirE=4, DirSW=5, DirS=6, DirSE=7.
+	cases := []struct {
+		turnIndex int
+		name      string
+		wantSlot  int
+	}{
+		{0, "Reverse (180)", 6},     // DirS
+		{1, "Back-left (135)", 5},   // DirSW
+		{2, "Hard-left (90)", 3},    // DirW
+		{3, "Slight-left (45)", 0},  // DirNW
+		{4, "Straight (0)", 1},      // DirN
+		{5, "Slight-right (45)", 2}, // DirNE
+		{6, "Hard-right (90)", 4},   // DirE
+		{7, "Back-right (135)", 7},  // DirSE
+	}
+	for _, c := range cases {
+		got := turnSlotToEngine[c.turnIndex]
+		if got != c.wantSlot {
+			t.Errorf("turnIndex %d (%s): got engine slot %d, want %d",
+				c.turnIndex, c.name, got, c.wantSlot)
+		}
+	}
+
+	// Sanity: the mapping must be a bijection over 0..7.
+	seen := make(map[int]bool)
+	for _, slot := range turnSlotToEngine {
+		if slot < 0 || slot > 7 {
+			t.Fatalf("engine slot out of range: %d", slot)
+		}
+		if seen[slot] {
+			t.Fatalf("duplicate engine slot in mapping: %d", slot)
+		}
+		seen[slot] = true
+	}
+	if len(seen) != 8 {
+		t.Fatalf("mapping does not cover all 8 slots, got %d", len(seen))
+	}
+}

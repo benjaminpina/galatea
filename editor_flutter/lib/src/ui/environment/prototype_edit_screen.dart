@@ -6,6 +6,7 @@ import '../../database/database.dart';
 import '../../providers/database_provider.dart';
 import '../formula/formula_field.dart';
 import '../substrates/substrate_list_screen.dart';
+import 'movement_tendencies.dart';
 
 /// Dedicated edit screen for a single prototype.
 /// Tabs: General, Morphology, Fighting, Courtship, Movement.
@@ -33,21 +34,8 @@ class _PrototypeEditScreenState extends ConsumerState<PrototypeEditScreen>
   int _color = 0;
 
   // Movement tendencies cache: direction → formula.
-  final Map<int, String> _tendencyValues = {};
+  final Map<int, String> _tendencyValues = {}; // turnIndex → formula
   bool _tendenciesLoaded = false;
-
-  // Legacy default weights (relative movement), order = direction 1..8:
-  // [Fwd-L, Forward, Fwd-R, Left, Right, Back-L, Back, Back-R].
-  static const _tendencyDefaults = [
-    '25',
-    '50',
-    '25',
-    '10',
-    '10',
-    '1',
-    '1',
-    '1',
-  ];
 
   @override
   void initState() {
@@ -90,22 +78,21 @@ class _PrototypeEditScreenState extends ConsumerState<PrototypeEditScreen>
       db.prototypeTendencies,
     )..where((t) => t.prototypeId.equals(widget.prototypeId))).get();
     for (final t in tendencies) {
-      _tendencyValues[t.direction] = t.formula;
+      _tendencyValues[t.turnIndex] = t.formula;
     }
-    // Seed legacy defaults for missing directions (relative movement weights).
-    for (var i = 0; i < 8; i++) {
-      final dir = i + 1;
-      if (!_tendencyValues.containsKey(dir)) {
+    // Seed legacy defaults for missing turn slots (relative movement weights).
+    for (final slot in turnSlots) {
+      if (!_tendencyValues.containsKey(slot.turnIndex)) {
         await db
             .into(db.prototypeTendencies)
             .insert(
               PrototypeTendenciesCompanion.insert(
                 prototypeId: widget.prototypeId,
-                direction: dir,
-                formula: Value(_tendencyDefaults[i]),
+                turnIndex: slot.turnIndex,
+                formula: Value(slot.defaultWeight),
               ),
             );
-        _tendencyValues[dir] = _tendencyDefaults[i];
+        _tendencyValues[slot.turnIndex] = slot.defaultWeight;
       }
     }
     if (mounted) setState(() => _tendenciesLoaded = true);
@@ -536,19 +523,6 @@ class _PrototypeEditScreenState extends ConsumerState<PrototypeEditScreen>
       return const Center(child: CircularProgressIndicator());
     }
 
-    // Directions RELATIVE to the agent's heading, in engine order
-    // (index d = direction-1): [NW, N, NE, W, E, SW, S, SE].
-    final directions = [
-      '↖ Fwd-L',
-      '↑ Forward',
-      '↗ Fwd-R',
-      '← Left',
-      '→ Right',
-      '↙ Back-L',
-      '↓ Back',
-      '↘ Back-R',
-    ];
-
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
@@ -558,30 +532,28 @@ class _PrototypeEditScreenState extends ConsumerState<PrototypeEditScreen>
         ),
         const SizedBox(height: 8),
         Text(
-          'Relative probability weights per direction, relative to where the '
-          'agent is facing. Higher = more likely to move that way.',
+          'Relative turn weights, relative to where the agent is facing. '
+          '"Straight" means keep the current heading; higher weight = more '
+          'likely. Rarely reverse, like real animals.',
           style: Theme.of(context).textTheme.bodySmall,
         ),
         const SizedBox(height: 16),
-        ...List.generate(8, (i) {
-          final dir = i + 1;
+        ...turnSlots.map((slot) {
           return Padding(
             padding: const EdgeInsets.symmetric(vertical: 4),
             child: Row(
               children: [
                 SizedBox(
-                  width: 30,
-                  child: Text(
-                    directions[i],
-                    style: const TextStyle(fontWeight: FontWeight.w600),
-                  ),
+                  width: 24,
+                  child: Text(slot.arrow, style: const TextStyle(fontSize: 16)),
                 ),
                 Expanded(
                   child: FormulaField(
-                    label: directions[i],
-                    title: '${_nameCtrl.text} — Tendency ${directions[i]}',
-                    value: _tendencyValues[dir] ?? _tendencyDefaults[i],
-                    onChanged: (v) => _saveTendency(db, dir, v),
+                    label: slot.label,
+                    title: '${_nameCtrl.text} — ${slot.label}',
+                    value:
+                        _tendencyValues[slot.turnIndex] ?? slot.defaultWeight,
+                    onChanged: (v) => _saveTendency(db, slot.turnIndex, v),
                   ),
                 ),
               ],
@@ -594,14 +566,14 @@ class _PrototypeEditScreenState extends ConsumerState<PrototypeEditScreen>
 
   Future<void> _saveTendency(
     AppDatabase db,
-    int direction,
+    int turnIndex,
     String formula,
   ) async {
     final existing =
         await (db.select(db.prototypeTendencies)..where(
               (t) =>
                   t.prototypeId.equals(widget.prototypeId) &
-                  t.direction.equals(direction),
+                  t.turnIndex.equals(turnIndex),
             ))
             .getSingleOrNull();
     if (existing == null) {
@@ -610,7 +582,7 @@ class _PrototypeEditScreenState extends ConsumerState<PrototypeEditScreen>
           .insert(
             PrototypeTendenciesCompanion.insert(
               prototypeId: widget.prototypeId,
-              direction: direction,
+              turnIndex: turnIndex,
               formula: Value(formula),
             ),
           );
@@ -619,7 +591,7 @@ class _PrototypeEditScreenState extends ConsumerState<PrototypeEditScreen>
             ..where((t) => t.id.equals(existing.id)))
           .write(PrototypeTendenciesCompanion(formula: Value(formula)));
     }
-    setState(() => _tendencyValues[direction] = formula);
+    setState(() => _tendencyValues[turnIndex] = formula);
   }
 }
 

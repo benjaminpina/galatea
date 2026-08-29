@@ -250,8 +250,10 @@ func applyBaseTendencies(ctx *PerceptionContext, idx int) {
 	perceiverIdx := getPerceiverIndex(a, idx, cfg)
 	prefix := "tendency." + util.Itoa(perceiverIdx) + "."
 
+	// Tendency keys use the 0-based engine slot (DirNW=0..DirSE=7), matching
+	// how compileTendencies registers them.
 	for d := 0; d < 8; d++ {
-		p := ctx.Formulas.Get(prefix + util.Itoa(d+1))
+		p := ctx.Formulas.Get(prefix + util.Itoa(d))
 		if p != nil {
 			val, err := ctx.Eval.RunProgramInt(p)
 			if err == nil {

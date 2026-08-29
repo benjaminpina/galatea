@@ -296,6 +296,12 @@ func Build(db *storage.DB, cfg EngineConfig) (*Engine, error) {
 		}
 	}
 
+	// Compile movement tendency formulas (relative-turn weights).
+	// The editor stores a turnIndex (0..7) ordered by turn angle; the engine's
+	// tendency array uses relative-direction slots (DirNW=0..DirSE=7).
+	// turnSlotToEngine maps the DB turnIndex to the engine tendency slot.
+	compileTendencies(db, registry, w.Config)
+
 	// Build write buffer.
 	wb := storage.NewWriteBuffer(db, runID, cfg.WriteBufferCfg)
 
@@ -717,4 +723,105 @@ func splitCSV(s string) []string {
 		}
 	}
 	return result
+}
+
+// turnSlotToEngine maps the editor's turnIndex (0..7, ordered by turn angle)
+// to the engine's relative-direction tendency slot (DirNW=0..DirSE=7).
+//
+// Editor turnIndex:  0=Reverse(180), 1=BackL(135), 2=HardL(90), 3=SlightL(45),
+//
+//	4=Straight(0),  5=SlightR(45), 6=HardR(90), 7=BackR(135)
+//
+// Engine slots:      DirNW=0(-45), DirN=1(0), DirNE=2(+45), DirW=3(-90),
+//
+//	DirE=4(+90),  DirSW=5(-135), DirS=6(180), DirSE=7(+135)
+var turnSlotToEngine = [8]int{
+	6, // 0 Reverse   -> DirS
+	5, // 1 Back-left -> DirSW
+	3, // 2 Hard-left -> DirW
+	0, // 3 Slight-left -> DirNW
+	1, // 4 Straight  -> DirN
+	2, // 5 Slight-right -> DirNE
+	4, // 6 Hard-right -> DirE
+	7, // 7 Back-right -> DirSE
+}
+
+// compileTendencies loads movement tendency formulas from the DB and compiles
+// them under keys "tendency.<perceiverIdx>.<engineSlot>" so the perception
+// system can evaluate base tendencies per agent.
+//
+// The perceiver index is the unified prototype listing used by the perception
+// system: stages [0..NumStages), then males, then females.
+func compileTendencies(db *storage.DB, registry *formulas.Registry, cfg world.Config) {
+	// --- Stage tendencies ---
+	// Stage perceiverIdx = stageID - 1 (1-based DB id to 0-based index).
+	stageRows, err := db.Conn.Query(
+		"SELECT stage_id, turn_index, formula FROM stage_tendencies")
+	if err == nil {
+		defer stageRows.Close()
+		for stageRows.Next() {
+			var stageID int64
+			var turnIndex int
+			var formula string
+			if err := stageRows.Scan(&stageID, &turnIndex, &formula); err != nil {
+				continue
+			}
+			if turnIndex < 0 || turnIndex > 7 {
+				continue
+			}
+			perceiverIdx := int(stageID - 1)
+			slot := turnSlotToEngine[turnIndex]
+			registry.Compile(
+				fmt.Sprintf("tendency.%d.%d", perceiverIdx, slot), formula)
+		}
+	}
+
+	// --- Prototype tendencies ---
+	// Build prototype_id -> perceiverIdx map, matching the loader's ordering:
+	// males first (by sort_order), then females (by sort_order), offset by
+	// NumStages.
+	protoPerceiver := make(map[int64]int)
+	assignPerceiver := func(sex string, base int) {
+		rows, qErr := db.Conn.Query(
+			"SELECT id FROM prototypes WHERE sex = ? ORDER BY sort_order", sex)
+		if qErr != nil {
+			return
+		}
+		defer rows.Close()
+		i := 0
+		for rows.Next() {
+			var id int64
+			if err := rows.Scan(&id); err != nil {
+				continue
+			}
+			protoPerceiver[id] = base + i
+			i++
+		}
+	}
+	assignPerceiver("M", cfg.NumStages)
+	assignPerceiver("F", cfg.NumStages+cfg.NumPrototypesM)
+
+	protoRows, err := db.Conn.Query(
+		"SELECT prototype_id, turn_index, formula FROM prototype_tendencies")
+	if err == nil {
+		defer protoRows.Close()
+		for protoRows.Next() {
+			var protoID int64
+			var turnIndex int
+			var formula string
+			if err := protoRows.Scan(&protoID, &turnIndex, &formula); err != nil {
+				continue
+			}
+			if turnIndex < 0 || turnIndex > 7 {
+				continue
+			}
+			perceiverIdx, ok := protoPerceiver[protoID]
+			if !ok {
+				continue
+			}
+			slot := turnSlotToEngine[turnIndex]
+			registry.Compile(
+				fmt.Sprintf("tendency.%d.%d", perceiverIdx, slot), formula)
+		}
+	}
 }

@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../database/database.dart';
 import '../../providers/database_provider.dart';
 import '../formula/formula_field.dart';
+import 'movement_tendencies.dart';
 
 /// Dedicated edit screen for a single life stage.
 /// Sections: General (cycles, conditions, logic, color, linked prototype),
@@ -616,23 +617,7 @@ class _TendenciesSectionState extends ConsumerState<_TendenciesSection> {
   // Directions are RELATIVE to the agent's heading, in the engine's order
   // (index d = direction-1): [NW, N, NE, W, E, SW, S, SE].
   // Labels describe the relative turn: forward, diagonals, sides, back.
-  static const _dirs = [
-    '↖ Fwd-L',
-    '↑ Forward',
-    '↗ Fwd-R',
-    '← Left',
-    '→ Right',
-    '↙ Back-L',
-    '↓ Back',
-    '↘ Back-R',
-  ];
-
-  // Legacy default weights (relative movement): strong forward bias,
-  // occasional gentle turns, rare 90° turns, almost never backward.
-  // Order matches _dirs: [NW, N, NE, W, E, SW, S, SE].
-  static const _defaults = ['25', '50', '25', '10', '10', '1', '1', '1'];
-
-  final Map<int, String> _values = {}; // direction → formula
+  final Map<int, String> _values = {}; // turnIndex → formula
   bool _loaded = false;
 
   @override
@@ -647,28 +632,25 @@ class _TendenciesSectionState extends ConsumerState<_TendenciesSection> {
       setState(() => _loaded = true);
       return;
     }
-    final rows =
-        await (db.select(db.stageTendencies)
-              ..where((t) => t.stageId.equals(widget.stageId))
-              ..orderBy([(t) => OrderingTerm.asc(t.direction)]))
-            .get();
+    final rows = await (db.select(
+      db.stageTendencies,
+    )..where((t) => t.stageId.equals(widget.stageId))).get();
     for (final t in rows) {
-      _values[t.direction] = t.formula;
+      _values[t.turnIndex] = t.formula;
     }
-    // Seed defaults for any missing directions so they persist to the DB.
-    for (var i = 0; i < 8; i++) {
-      final dir = i + 1;
-      if (!_values.containsKey(dir)) {
+    // Seed legacy defaults for any missing turn slots so they persist.
+    for (final slot in turnSlots) {
+      if (!_values.containsKey(slot.turnIndex)) {
         await db
             .into(db.stageTendencies)
             .insert(
               StageTendenciesCompanion.insert(
                 stageId: widget.stageId,
-                direction: dir,
-                formula: Value(_defaults[i]),
+                turnIndex: slot.turnIndex,
+                formula: Value(slot.defaultWeight),
               ),
             );
-        _values[dir] = _defaults[i];
+        _values[slot.turnIndex] = slot.defaultWeight;
       }
     }
     if (mounted) setState(() => _loaded = true);
@@ -681,43 +663,36 @@ class _TendenciesSectionState extends ConsumerState<_TendenciesSection> {
     if (!_loaded) return const LinearProgressIndicator();
 
     return Column(
-      children: List.generate(8, (i) {
-        final dir = i + 1;
+      children: turnSlots.map((slot) {
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 3),
           child: Row(
             children: [
               SizedBox(
-                width: 30,
-                child: Text(
-                  _dirs[i],
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 12,
-                  ),
-                ),
+                width: 24,
+                child: Text(slot.arrow, style: const TextStyle(fontSize: 14)),
               ),
               Expanded(
                 child: FormulaField(
-                  label: _dirs[i],
-                  title: 'Tendency ${_dirs[i]}',
-                  value: _values[dir] ?? _defaults[i],
-                  onChanged: (v) => _save(db, dir, v),
+                  label: slot.label,
+                  title: 'Movement tendency — ${slot.label}',
+                  value: _values[slot.turnIndex] ?? slot.defaultWeight,
+                  onChanged: (v) => _save(db, slot.turnIndex, v),
                 ),
               ),
             ],
           ),
         );
-      }),
+      }).toList(),
     );
   }
 
-  Future<void> _save(AppDatabase db, int direction, String formula) async {
+  Future<void> _save(AppDatabase db, int turnIndex, String formula) async {
     final existing =
         await (db.select(db.stageTendencies)..where(
               (t) =>
                   t.stageId.equals(widget.stageId) &
-                  t.direction.equals(direction),
+                  t.turnIndex.equals(turnIndex),
             ))
             .getSingleOrNull();
     if (existing == null) {
@@ -726,7 +701,7 @@ class _TendenciesSectionState extends ConsumerState<_TendenciesSection> {
           .insert(
             StageTendenciesCompanion.insert(
               stageId: widget.stageId,
-              direction: direction,
+              turnIndex: turnIndex,
               formula: Value(formula),
             ),
           );
@@ -735,7 +710,7 @@ class _TendenciesSectionState extends ConsumerState<_TendenciesSection> {
             ..where((t) => t.id.equals(existing.id)))
           .write(StageTendenciesCompanion(formula: Value(formula)));
     }
-    setState(() => _values[direction] = formula);
+    setState(() => _values[turnIndex] = formula);
   }
 }
 

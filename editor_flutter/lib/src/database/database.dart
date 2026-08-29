@@ -66,42 +66,20 @@ class AppDatabase extends _$AppDatabase {
   // For testing with in-memory database.
   AppDatabase.memory() : super(NativeDatabase.memory());
 
+  // DEVELOPMENT POLICY: the schema is NOT versioned during development.
+  // It stays at version 1 and every structural change is treated as a brand
+  // new initial schema. There are no migrations. When the schema changes,
+  // simply delete the old project files and create new ones. Proper version
+  // control and migrations will be added once the schema stabilizes for release.
   @override
-  int get schemaVersion => 5;
+  int get schemaVersion => 1;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
     onCreate: (Migrator m) async {
       await m.createAll();
     },
-    onUpgrade: (Migrator m, int from, int to) async {
-      if (from < 5) {
-        // v4 → v5: Add new columns to environment_agents + new tables.
-        await customStatement(
-          'ALTER TABLE environment_agents ADD COLUMN orientation INTEGER NOT NULL DEFAULT 1',
-        );
-        await customStatement(
-          'ALTER TABLE environment_agents ADD COLUMN cycles_in_stage INTEGER NOT NULL DEFAULT 0',
-        );
-        await customStatement(
-          'ALTER TABLE environment_agents ADD COLUMN gametes INTEGER NOT NULL DEFAULT 0',
-        );
-        await customStatement(
-          'ALTER TABLE environment_agents ADD COLUMN fertilized_eggs INTEGER NOT NULL DEFAULT 0',
-        );
-        await customStatement(
-          'ALTER TABLE environment_agents ADD COLUMN stored_sperm_packs INTEGER NOT NULL DEFAULT 0',
-        );
-        await customStatement(
-          'ALTER TABLE environment_agents ADD COLUMN virgin INTEGER NOT NULL DEFAULT 1',
-        );
-        // Create new tables.
-        await m.createTable(environmentAgentReserves);
-        await m.createTable(environmentAgentMemory);
-      }
-    },
     beforeOpen: (details) async {
-      // Enable foreign keys and WAL mode.
       await customStatement('PRAGMA foreign_keys = ON');
       await customStatement('PRAGMA journal_mode = WAL');
       await customStatement('PRAGMA synchronous = NORMAL');
