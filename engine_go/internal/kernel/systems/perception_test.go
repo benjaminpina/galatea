@@ -114,6 +114,38 @@ func TestPerceiveResourceAccumulatesTendency(t *testing.T) {
 	}
 }
 
+// TestDetectionBoostRequiresBaseWeight verifies the fix for "the game of the
+// enchanted": detecting a contiguous contender adds fight weight ONLY when the
+// agent already has a positive configured fight weight. With no configured
+// combat tendency (the default), detection adds nothing, so agents never enter
+// spontaneous combat on contact.
+func TestDetectionBoostRequiresBaseWeight(t *testing.T) {
+	cfg := testCfg()
+	w := world.New(cfg)
+	idx := w.AddAgent()
+	w.Agents.Sex[idx] = world.SexMale
+	vdBase := idx * cfg.NumBehaviors
+	fightDisplayIdx := 2 + cfg.NumResourceTypes
+
+	// Case 1: no base fight weight -> detection adds nothing.
+	for b := 0; b < cfg.NumBehaviors; b++ {
+		w.Agents.VDecision[vdBase+b] = 0
+	}
+	applyAgentDetectionBoosts(w.Agents, idx, cfg, true /*hasContender*/, false)
+	if w.Agents.VDecision[vdBase+fightDisplayIdx] != 0 {
+		t.Fatalf("expected no fight weight without base config, got %d",
+			w.Agents.VDecision[vdBase+fightDisplayIdx])
+	}
+
+	// Case 2: a positive base fight weight -> detection reinforces it.
+	w.Agents.VDecision[vdBase+fightDisplayIdx] = 2
+	applyAgentDetectionBoosts(w.Agents, idx, cfg, true /*hasContender*/, false)
+	if w.Agents.VDecision[vdBase+fightDisplayIdx] <= 2 {
+		t.Fatalf("expected fight weight reinforced above base, got %d",
+			w.Agents.VDecision[vdBase+fightDisplayIdx])
+	}
+}
+
 func TestPerceiveAgentDetectsContender(t *testing.T) {
 	cfg := testCfg()
 	w := world.New(cfg)
@@ -147,11 +179,12 @@ func TestPerceiveAgentDetectsContender(t *testing.T) {
 	ctx := setupPerceptionContext(w)
 	Perceive(ctx, idx0)
 
-	// Fight behaviors should have weight (contender detected).
+	// With no configured combat tendency, detecting a contender must NOT
+	// inject fight weight (fix for the "enchanted" bug).
 	vdBase := idx0 * cfg.NumBehaviors
 	fightDisplayIdx := 2 + cfg.NumResourceTypes // = 4
-	if w.Agents.VDecision[vdBase+fightDisplayIdx] <= 0 {
-		t.Fatalf("expected positive fight_display weight, got %d", w.Agents.VDecision[vdBase+fightDisplayIdx])
+	if w.Agents.VDecision[vdBase+fightDisplayIdx] != 0 {
+		t.Fatalf("expected zero fight_display weight without config, got %d", w.Agents.VDecision[vdBase+fightDisplayIdx])
 	}
 }
 
@@ -188,11 +221,12 @@ func TestPerceiveAgentDetectsMate(t *testing.T) {
 	ctx := setupPerceptionContext(w)
 	Perceive(ctx, idx0)
 
-	// Courtship behaviors should have weight.
+	// With no configured courtship tendency, detecting a mate must NOT inject
+	// courtship weight (fix for the "enchanted" bug — applies to courtship too).
 	vdBase := idx0 * cfg.NumBehaviors
 	courtDisplayIdx := 2 + cfg.NumResourceTypes + 2 // = 6
-	if w.Agents.VDecision[vdBase+courtDisplayIdx] <= 0 {
-		t.Fatalf("expected positive court_display weight, got %d", w.Agents.VDecision[vdBase+courtDisplayIdx])
+	if w.Agents.VDecision[vdBase+courtDisplayIdx] != 0 {
+		t.Fatalf("expected zero court_display weight without config, got %d", w.Agents.VDecision[vdBase+courtDisplayIdx])
 	}
 }
 

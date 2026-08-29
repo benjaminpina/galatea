@@ -52,7 +52,6 @@ class _EnvironmentEditorScreenState
   int _selectedSubstrateId = 1;
   int _selectedNutrientId = 0;
   int? _selectedPrototypeId;
-  String _selectedSex = 'M';
 
   // --- Brush state ---
   BrushShape _brushShape = BrushShape.square;
@@ -510,6 +509,14 @@ class _EnvironmentEditorScreenState
     }
     final envDao = ref.read(environmentDaoProvider);
     if (envDao == null) return;
+    // The agent's sex is DERIVED from its prototype (the single source of
+    // truth). Every prototype has a fixed sex; there is no separate sex choice.
+    final prototypes = ref.read(prototypesProvider).valueOrNull ?? [];
+    final proto = prototypes
+        .where((p) => p.id == _selectedPrototypeId)
+        .firstOrNull;
+    if (proto == null) return;
+    final sex = proto.sex;
     final name = 'Agent${_agents.length + 1}';
     final randomOrientation = Random().nextInt(8) + 1; // 1..8
     final id = await envDao.placeAgent(
@@ -518,7 +525,7 @@ class _EnvironmentEditorScreenState
         name: name,
         posX: x,
         posY: y,
-        sex: _selectedSex,
+        sex: sex,
         prototypeId: _selectedPrototypeId!,
         orientation: Value(randomOrientation),
       ),
@@ -530,7 +537,7 @@ class _EnvironmentEditorScreenState
           posX: x,
           posY: y,
           name: name,
-          sex: _selectedSex,
+          sex: sex,
           prototypeId: _selectedPrototypeId!,
           stageId: null,
           age: 0,
@@ -1033,7 +1040,6 @@ class _EnvironmentEditorScreenState
                     selectedSubstrateId: _selectedSubstrateId,
                     selectedNutrientId: _selectedNutrientId,
                     selectedPrototypeId: _selectedPrototypeId,
-                    selectedSex: _selectedSex,
                     selectedElement: _selectedElement,
                     onSubstrateChanged: (id) =>
                         setState(() => _selectedSubstrateId = id),
@@ -1041,7 +1047,6 @@ class _EnvironmentEditorScreenState
                         setState(() => _selectedNutrientId = id),
                     onPrototypeChanged: (id) =>
                         setState(() => _selectedPrototypeId = id),
-                    onSexChanged: (sex) => setState(() => _selectedSex = sex),
                     onDeleteElement: _deleteSelectedElement,
                     cellSize: _cellSize,
                     onZoomIn: () => setState(

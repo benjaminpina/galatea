@@ -227,10 +227,15 @@ func findContiguousResource(w *world.World, ax, ay float64, resourceType int32, 
 	return bestIdx
 }
 
-// findContiguousAgent returns the index of the nearest contiguous agent suitable
-// for interaction. If oppositeSex is true, looks for opposite sex; otherwise same sex.
-// The target must be in Regular situation and Undecided state.
-func findContiguousAgent(w *world.World, selfIdx int, ax, ay float64, grid *spatial.Grid, oppositeSex bool) int32 {
+// findContiguousAgent returns the index of the nearest contiguous adult agent
+// suitable for interaction. The target must be a Regular adult.
+//
+// Sex rules mirror the legacy engine:
+//   - Combat (requireOppositeSex=false): ANY adult, regardless of sex. Agents
+//     can fight both same-sex and opposite-sex neighbors (AgenteAdultoContiguo).
+//   - Courtship (requireOppositeSex=true): ONLY opposite-sex adults
+//     (AgenteAdultoSexoOpuestoContiguo).
+func findContiguousAgent(w *world.World, selfIdx int, ax, ay float64, grid *spatial.Grid, requireOppositeSex bool) int32 {
 	a := w.Agents
 	candidates := grid.QueryRadiusExact(ax, ay, contiguousDistance, a.PosX, a.PosY)
 	selfSex := a.Sex[selfIdx]
@@ -245,16 +250,14 @@ func findContiguousAgent(w *world.World, selfIdx int, ax, ay float64, grid *spat
 		if a.Situation[cIdx] != world.SituationRegular {
 			continue
 		}
+		// Only adults can fight or court (they must have a prototype/sex).
+		if a.StageID[cIdx] != -1 {
+			continue
+		}
 
-		otherSex := a.Sex[cIdx]
-		if oppositeSex {
-			if !isOppositeSex(selfSex, otherSex) {
-				continue
-			}
-		} else {
-			if isOppositeSex(selfSex, otherSex) {
-				continue
-			}
+		// Courtship requires opposite sex; combat accepts any sex.
+		if requireOppositeSex && !isOppositeSex(selfSex, a.Sex[cIdx]) {
+			continue
 		}
 
 		dist := distance(ax, ay, a.PosX[cIdx], a.PosY[cIdx])

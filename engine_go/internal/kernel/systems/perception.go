@@ -91,8 +91,14 @@ func Perceive(ctx *PerceptionContext, idx int) {
 	ctx.EnvBuilder.SetAgentVars(w, idx)
 
 	perceiveResources(ctx, idx)
-	perceiveAgents(ctx, idx)
+	hasContender, hasMate := perceiveAgents(ctx, idx)
 	applyBaseTendencies(ctx, idx)
+	// Detection boosts are applied AFTER base tendencies and only reinforce
+	// combat/courtship weights the agent already has configured (> 0). This
+	// mirrors the legacy default where an unconfigured prototype never fights
+	// or courts, so agents just wander past each other instead of getting
+	// locked into combat on contact.
+	applyAgentDetectionBoosts(a, idx, cfg, hasContender, hasMate)
 	applyFilters(ctx, idx)
 	applyBoundaryAvoidance(ctx, idx)
 	ensureNonZeroDecision(ctx, idx)
@@ -155,8 +161,11 @@ func perceiveResources(ctx *PerceptionContext, idx int) {
 	}
 }
 
-// perceiveAgents queries the agent grid and accumulates tendencies + VDecision.
-func perceiveAgents(ctx *PerceptionContext, idx int) {
+// perceiveAgents queries the agent grid and accumulates attractiveness-driven
+// tendencies. It returns whether a contiguous contender/mate was detected, so
+// the caller can conditionally reinforce combat/courtship weights AFTER base
+// tendencies are applied. It does NOT itself inject any behavior weight.
+func perceiveAgents(ctx *PerceptionContext, idx int) (hasContender, hasMate bool) {
 	w := ctx.World
 	a := w.Agents
 	cfg := w.Config
@@ -168,14 +177,11 @@ func perceiveAgents(ctx *PerceptionContext, idx int) {
 
 	maxRadius := maxFloat64(ctx.AgentRadii)
 	if maxRadius <= 0 {
-		return
+		return false, false
 	}
 
 	candidates := ctx.AgentGrid.QueryRadiusExact(ax, ay, maxRadius, a.PosX, a.PosY)
 	tendBase := idx * 8
-
-	hasContender := false
-	hasMate := false
 
 	for _, cIdx := range candidates {
 		if cIdx == int32(idx) || int(cIdx) >= a.Count {
@@ -202,21 +208,40 @@ func perceiveAgents(ctx *PerceptionContext, idx int) {
 		}
 	}
 
-	applyAgentDetectionBoosts(a, idx, cfg, hasContender, hasMate)
+	return hasContender, hasMate
 }
 
-// classifyNeighbor determines if a contiguous agent is a contender, a mate, or neither.
+// classifyNeighbor determines if a contiguous neighbor is a contender, a mate,
+// or neither, following the legacy sex rules:
+//   - A contender (for combat) is ANY adult, regardless of sex.
+//   - A mate (for courtship) is an OPPOSITE-SEX adult only.
+//
+// Only adults (SituationRegular, with a defined sex) qualify; immature agents
+// and eggs never trigger combat or courtship.
 func classifyNeighbor(agentSex, otherSex, otherSituation uint8) (contender, mate bool) {
-	if otherSituation != world.SituationRegular && otherSituation != world.SituationImmature {
+	if otherSituation != world.SituationRegular {
 		return false, false
 	}
-	contender = agentSex == otherSex || agentSex == world.SexUndefined || otherSex == world.SexUndefined
+	// The perceiver itself must be a sexed adult to fight or court.
+	if agentSex != world.SexMale && agentSex != world.SexFemale {
+		return false, false
+	}
+	if otherSex != world.SexMale && otherSex != world.SexFemale {
+		return false, false
+	}
+	contender = true // Any adult neighbor is a potential combat opponent.
 	mate = (agentSex == world.SexMale && otherSex == world.SexFemale) ||
 		(agentSex == world.SexFemale && otherSex == world.SexMale)
 	return contender, mate
 }
 
-// applyAgentDetectionBoosts adds fight/court weights when contenders/mates are found.
+// applyAgentDetectionBoosts reinforces fight/court weights when a contender or
+// mate is contiguous — but ONLY for behaviors the agent already has a positive
+// configured weight for. If a prototype has no combat/courtship tendency
+// (the default), detecting a neighbor adds nothing, so agents wander past each
+// other instead of getting locked into spontaneous combat ("the game of the
+// enchanted"). This must run AFTER applyBaseTendencies so the base weights
+// (from the user's VDecision formulas) are already present.
 func applyAgentDetectionBoosts(a *world.AgentArrays, idx int, cfg world.Config, hasContender, hasMate bool) {
 	vdBase := idx * cfg.NumBehaviors
 	fightDisplayIdx := behaviorOffsetFeed + cfg.NumResourceTypes
@@ -224,21 +249,21 @@ func applyAgentDetectionBoosts(a *world.AgentArrays, idx int, cfg world.Config, 
 	courtDisplayIdx := fightDisplayIdx + 2
 	courtEscalateIdx := fightDisplayIdx + 3
 
-	if hasContender {
-		if fightDisplayIdx < cfg.NumBehaviors {
-			a.VDecision[vdBase+fightDisplayIdx] += fightBoostDisplay
-		}
-		if fightEscalateIdx < cfg.NumBehaviors {
-			a.VDecision[vdBase+fightEscalateIdx] += fightBoostEscalate
+	// boostIfConfigured adds `boost` to slot only if the slot already has a
+	// positive base weight (i.e. the user enabled that behavior).
+	boostIfConfigured := func(slot int, boost int32) {
+		if slot < cfg.NumBehaviors && a.VDecision[vdBase+slot] > 0 {
+			a.VDecision[vdBase+slot] += boost
 		}
 	}
+
+	if hasContender {
+		boostIfConfigured(fightDisplayIdx, fightBoostDisplay)
+		boostIfConfigured(fightEscalateIdx, fightBoostEscalate)
+	}
 	if hasMate {
-		if courtDisplayIdx < cfg.NumBehaviors {
-			a.VDecision[vdBase+courtDisplayIdx] += courtBoostDisplay
-		}
-		if courtEscalateIdx < cfg.NumBehaviors {
-			a.VDecision[vdBase+courtEscalateIdx] += courtBoostEscalate
-		}
+		boostIfConfigured(courtDisplayIdx, courtBoostDisplay)
+		boostIfConfigured(courtEscalateIdx, courtBoostEscalate)
 	}
 }
 

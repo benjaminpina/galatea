@@ -18,12 +18,10 @@ class LeftSidebar extends StatelessWidget {
     required this.selectedSubstrateId,
     required this.selectedNutrientId,
     required this.selectedPrototypeId,
-    required this.selectedSex,
     required this.selectedElement,
     required this.onSubstrateChanged,
     required this.onNutrientChanged,
     required this.onPrototypeChanged,
-    required this.onSexChanged,
     required this.onDeleteElement,
     required this.cellSize,
     required this.onZoomIn,
@@ -46,12 +44,10 @@ class LeftSidebar extends StatelessWidget {
   final int selectedSubstrateId;
   final int selectedNutrientId;
   final int? selectedPrototypeId;
-  final String selectedSex;
   final PlacedElement? selectedElement;
   final ValueChanged<int> onSubstrateChanged;
   final ValueChanged<int> onNutrientChanged;
   final ValueChanged<int?> onPrototypeChanged;
-  final ValueChanged<String> onSexChanged;
   final VoidCallback onDeleteElement;
   final double cellSize;
   final VoidCallback onZoomIn;
@@ -440,8 +436,6 @@ class LeftSidebar extends StatelessWidget {
   }
 
   Widget _buildAgentConfig(BuildContext context) {
-    final filtered = prototypes.where((p) => p.sex == selectedSex).toList();
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -454,16 +448,10 @@ class LeftSidebar extends StatelessWidget {
         ),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12),
-          child: SegmentedButton<String>(
-            segments: const [
-              ButtonSegment(value: 'M', label: Text('M')),
-              ButtonSegment(value: 'F', label: Text('F')),
-            ],
-            selected: {selectedSex},
-            onSelectionChanged: (s) => onSexChanged(s.first),
-            style: const ButtonStyle(
-              visualDensity: VisualDensity.compact,
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          child: Text(
+            'Pick a prototype. The agent\'s sex is set by its prototype.',
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: Theme.of(context).colorScheme.outline,
             ),
           ),
         ),
@@ -472,20 +460,20 @@ class LeftSidebar extends StatelessWidget {
           child: ListView(
             padding: const EdgeInsets.symmetric(horizontal: 8),
             children: [
-              if (filtered.isEmpty)
+              if (prototypes.isEmpty)
                 Padding(
                   padding: const EdgeInsets.all(8),
                   child: Text(
-                    'No ${selectedSex == 'M' ? 'male' : 'female'} prototypes.\nUse the Prototypes button to create some.',
+                    'No prototypes.\nUse the Prototypes button to create some.',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: Theme.of(context).colorScheme.outline,
                     ),
                   ),
                 )
               else
-                ...filtered.map(
+                ...prototypes.map(
                   (proto) => _PaletteItem(
-                    name: proto.name,
+                    name: '${proto.name} (${proto.sex})',
                     color: Color(proto.color),
                     selected: selectedPrototypeId == proto.id,
                     onTap: () => onPrototypeChanged(proto.id),

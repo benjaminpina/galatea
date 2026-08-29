@@ -275,6 +275,12 @@ func loadAgents(db *storage.DB, w *World, environmentID int64) error {
 		return err
 	}
 
+	// Map prototype DB id -> sex. An adult's sex is DEFINED BY ITS PROTOTYPE,
+	// not by any per-agent field: every prototype has a fixed sex (M/F), and
+	// only eggs/immature stages (no prototype) are sexless. We derive the sex
+	// from the prototype to avoid inconsistent/undefined sexes on adults.
+	protoSex := loadPrototypeSexMap(db)
+
 	for _, a := range agents {
 		idx := w.AddAgent()
 
@@ -282,28 +288,51 @@ func loadAgents(db *storage.DB, w *World, environmentID int64) error {
 		w.Agents.PosY[idx] = float64(a.PosY)
 		w.Agents.Age[idx] = int32(a.Age)
 
-		switch a.Sex {
-		case "M":
-			w.Agents.Sex[idx] = SexMale
-		case "F":
-			w.Agents.Sex[idx] = SexFemale
-		default:
-			w.Agents.Sex[idx] = SexUndefined
-		}
-
 		if a.StageID != nil {
 			w.Agents.StageID[idx] = int32(*a.StageID - 1) // 1-based to 0-based.
 			w.Agents.Situation[idx] = SituationImmature
 		}
+
 		if a.PrototypeID != nil {
 			w.Agents.PrototypeID[idx] = int32(*a.PrototypeID - 1)
 			w.Agents.Situation[idx] = SituationRegular
+			// Sex is derived from the prototype (the single source of truth).
+			w.Agents.Sex[idx] = protoSex[*a.PrototypeID]
+		} else {
+			// No prototype -> egg/immature stage -> sexless until it matures.
+			w.Agents.Sex[idx] = SexUndefined
 		}
 
 		// Initialize reserves to 0 (will be set by formula evaluation in the engine setup).
 	}
 
 	return nil
+}
+
+// loadPrototypeSexMap returns a map from prototype DB id to its Sex constant.
+func loadPrototypeSexMap(db *storage.DB) map[int64]uint8 {
+	m := make(map[int64]uint8)
+	rows, err := db.Conn.Query("SELECT id, sex FROM prototypes")
+	if err != nil {
+		return m
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var id int64
+		var sex string
+		if err := rows.Scan(&id, &sex); err != nil {
+			continue
+		}
+		switch sex {
+		case "M":
+			m[id] = SexMale
+		case "F":
+			m[id] = SexFemale
+		default:
+			m[id] = SexUndefined
+		}
+	}
+	return m
 }
 
 // loadCharacterNames reads morphological character names from the DB.

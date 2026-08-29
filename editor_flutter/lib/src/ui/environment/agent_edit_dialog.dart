@@ -174,6 +174,15 @@ class _AgentEditDialogState extends ConsumerState<AgentEditDialog> {
     final prototypes = ref.watch(prototypesProvider).valueOrNull ?? [];
     final stages = ref.watch(stagesProvider).valueOrNull ?? [];
 
+    // Keep sex in sync with the (source-of-truth) prototype. This corrects any
+    // stale/divergent sex value the agent might carry from older data.
+    final currentProto = prototypes
+        .where((p) => p.id == _prototypeId)
+        .firstOrNull;
+    if (currentProto != null && _sex != currentProto.sex) {
+      _sex = currentProto.sex;
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Edit Agent: ${widget.agent.name}'),
@@ -203,13 +212,20 @@ class _AgentEditDialogState extends ConsumerState<AgentEditDialog> {
                   children: [
                     const Text('Sex:'),
                     const SizedBox(width: 12),
-                    SegmentedButton<String>(
-                      segments: const [
-                        ButtonSegment(value: 'M', label: Text('Male')),
-                        ButtonSegment(value: 'F', label: Text('Female')),
-                      ],
-                      selected: {_sex},
-                      onSelectionChanged: (s) => setState(() => _sex = s.first),
+                    Text(
+                      _sex == 'M'
+                          ? 'Male'
+                          : _sex == 'F'
+                          ? 'Female'
+                          : '—',
+                      style: const TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      '(from prototype)',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Theme.of(context).colorScheme.outline,
+                      ),
                     ),
                   ],
                 ),
@@ -234,7 +250,16 @@ class _AgentEditDialogState extends ConsumerState<AgentEditDialog> {
                           ),
                         ],
                         onChanged: (v) {
-                          if (v != null) setState(() => _prototypeId = v);
+                          if (v != null) {
+                            setState(() {
+                              _prototypeId = v;
+                              // Sex is derived from the selected prototype.
+                              final p = prototypes
+                                  .where((p) => p.id == v)
+                                  .firstOrNull;
+                              if (p != null) _sex = p.sex;
+                            });
+                          }
                         },
                       ),
                     ),

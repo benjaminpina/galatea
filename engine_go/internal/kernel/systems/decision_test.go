@@ -259,6 +259,88 @@ func TestEstablishInteractionCombat(t *testing.T) {
 	}
 }
 
+// TestEstablishInteractionCombatOppositeSex verifies the legacy rule that an
+// agent can fight ANY adult, including one of the opposite sex (unlike
+// courtship, which requires opposite sex). A male initiating combat against a
+// contiguous female must lock both into combat.
+func TestEstablishInteractionCombatOppositeSex(t *testing.T) {
+	cfg := testCfg()
+	w := world.New(cfg)
+
+	idx0 := w.AddAgent()
+	w.Agents.PosX[idx0] = 10
+	w.Agents.PosY[idx0] = 10
+	w.Agents.Sex[idx0] = world.SexMale
+	w.Agents.Situation[idx0] = world.SituationRegular
+	fightDisplayIdx := behaviorOffsetFeed + cfg.NumResourceTypes
+	w.Agents.Decision[idx0] = uint8(fightDisplayIdx)
+	w.Agents.StageID[idx0] = -1
+	w.Agents.PrototypeID[idx0] = 0
+
+	// Target: opposite sex (female), contiguous.
+	idx1 := w.AddAgent()
+	w.Agents.PosX[idx1] = 10.5
+	w.Agents.PosY[idx1] = 10
+	w.Agents.Sex[idx1] = world.SexFemale
+	w.Agents.Situation[idx1] = world.SituationRegular
+	w.Agents.StageID[idx1] = -1
+	w.Agents.PrototypeID[idx1] = 0
+
+	agentGrid := spatial.NewGrid(5.0, 64)
+	agentGrid.Insert(int32(idx0), w.Agents.PosX[idx0], w.Agents.PosY[idx0])
+	agentGrid.Insert(int32(idx1), w.Agents.PosX[idx1], w.Agents.PosY[idx1])
+	resourceGrid := spatial.NewGrid(5.0, 64)
+
+	EstablishInteraction(w, idx0, agentGrid, resourceGrid)
+
+	if w.Agents.Situation[idx0] != world.SituationCombat {
+		t.Fatalf("expected initiator in combat with opposite sex, got %d", w.Agents.Situation[idx0])
+	}
+	if w.Agents.Situation[idx1] != world.SituationCombat {
+		t.Fatalf("expected opposite-sex target in combat, got %d", w.Agents.Situation[idx1])
+	}
+}
+
+// TestEstablishInteractionCourtshipRejectsSameSex verifies courtship requires
+// opposite sex: a male trying to court another male finds no target.
+func TestEstablishInteractionCourtshipRejectsSameSex(t *testing.T) {
+	cfg := testCfg()
+	w := world.New(cfg)
+
+	idx0 := w.AddAgent()
+	w.Agents.PosX[idx0] = 10
+	w.Agents.PosY[idx0] = 10
+	w.Agents.Sex[idx0] = world.SexMale
+	w.Agents.Situation[idx0] = world.SituationRegular
+	courtDisplayIdx := behaviorOffsetFeed + cfg.NumResourceTypes + 2
+	w.Agents.Decision[idx0] = uint8(courtDisplayIdx)
+	w.Agents.StageID[idx0] = -1
+	w.Agents.PrototypeID[idx0] = 0
+
+	// Same-sex neighbor: not a valid courtship target.
+	idx1 := w.AddAgent()
+	w.Agents.PosX[idx1] = 10.5
+	w.Agents.PosY[idx1] = 10
+	w.Agents.Sex[idx1] = world.SexMale
+	w.Agents.Situation[idx1] = world.SituationRegular
+	w.Agents.StageID[idx1] = -1
+	w.Agents.PrototypeID[idx1] = 0
+
+	agentGrid := spatial.NewGrid(5.0, 64)
+	agentGrid.Insert(int32(idx0), w.Agents.PosX[idx0], w.Agents.PosY[idx0])
+	agentGrid.Insert(int32(idx1), w.Agents.PosX[idx1], w.Agents.PosY[idx1])
+	resourceGrid := spatial.NewGrid(5.0, 64)
+
+	EstablishInteraction(w, idx0, agentGrid, resourceGrid)
+
+	if w.Agents.Situation[idx0] == world.SituationCourtship {
+		t.Fatal("expected NO courtship with same-sex neighbor")
+	}
+	if w.Agents.InteractantIdx[idx0] != -1 {
+		t.Fatalf("expected no interactant for same-sex courtship, got %d", w.Agents.InteractantIdx[idx0])
+	}
+}
+
 func TestEstablishInteractionCourtship(t *testing.T) {
 	cfg := testCfg()
 	w := world.New(cfg)
