@@ -6,6 +6,7 @@ import '../../database/database.dart';
 import '../../providers/database_provider.dart';
 import '../formula/formula_field.dart';
 import 'movement_tendencies.dart';
+import 'movement_tendency_grid.dart';
 
 /// Dedicated edit screen for a single life stage.
 /// Sections: General (cycles, conditions, logic, color, linked prototype),
@@ -662,28 +663,10 @@ class _TendenciesSectionState extends ConsumerState<_TendenciesSection> {
     if (db == null) return const SizedBox.shrink();
     if (!_loaded) return const LinearProgressIndicator();
 
-    return Column(
-      children: turnSlots.map((slot) {
-        return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 3),
-          child: Row(
-            children: [
-              SizedBox(
-                width: 24,
-                child: Text(slot.arrow, style: const TextStyle(fontSize: 14)),
-              ),
-              Expanded(
-                child: FormulaField(
-                  label: slot.label,
-                  title: 'Movement tendency — ${slot.label}',
-                  value: _values[slot.turnIndex] ?? slot.defaultWeight,
-                  onChanged: (v) => _save(db, slot.turnIndex, v),
-                ),
-              ),
-            ],
-          ),
-        );
-      }).toList(),
+    return MovementTendencyGrid(
+      values: _values,
+      titlePrefix: 'Movement tendency',
+      onChanged: (turnIndex, formula) => _save(db, turnIndex, formula),
     );
   }
 

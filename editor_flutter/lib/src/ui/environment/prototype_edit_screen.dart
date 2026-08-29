@@ -7,6 +7,7 @@ import '../../providers/database_provider.dart';
 import '../formula/formula_field.dart';
 import '../substrates/substrate_list_screen.dart';
 import 'movement_tendencies.dart';
+import 'movement_tendency_grid.dart';
 
 /// Dedicated edit screen for a single prototype.
 /// Tabs: General, Morphology, Fighting, Courtship, Movement.
@@ -532,34 +533,18 @@ class _PrototypeEditScreenState extends ConsumerState<PrototypeEditScreen>
         ),
         const SizedBox(height: 8),
         Text(
-          'Relative turn weights, relative to where the agent is facing. '
-          '"Straight" means keep the current heading; higher weight = more '
-          'likely. Rarely reverse, like real animals.',
+          'Relative turn weights, relative to where the agent is facing '
+          '(shown pointing up). "Straight" means keep the current heading; '
+          'higher weight = more likely. Rarely reverse, like real animals.',
           style: Theme.of(context).textTheme.bodySmall,
         ),
         const SizedBox(height: 16),
-        ...turnSlots.map((slot) {
-          return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 4),
-            child: Row(
-              children: [
-                SizedBox(
-                  width: 24,
-                  child: Text(slot.arrow, style: const TextStyle(fontSize: 16)),
-                ),
-                Expanded(
-                  child: FormulaField(
-                    label: slot.label,
-                    title: '${_nameCtrl.text} — ${slot.label}',
-                    value:
-                        _tendencyValues[slot.turnIndex] ?? slot.defaultWeight,
-                    onChanged: (v) => _saveTendency(db, slot.turnIndex, v),
-                  ),
-                ),
-              ],
-            ),
-          );
-        }),
+        MovementTendencyGrid(
+          values: _tendencyValues,
+          titlePrefix: _nameCtrl.text,
+          onChanged: (turnIndex, formula) =>
+              _saveTendency(db, turnIndex, formula),
+        ),
       ],
     );
   }
