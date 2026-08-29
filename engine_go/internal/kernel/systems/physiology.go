@@ -53,8 +53,13 @@ func UpdateAgent(w *world.World, idx int, longevity int32) {
 		return
 	}
 
-	// Check old age (only adults).
-	if a.StageID[idx] == -1 && longevity > 0 && a.Age[idx] > longevity {
+	// Check old age (only adults). Longevity is the maximum age; an agent dies
+	// once its age exceeds it. There is NO special "immortal" sentinel value:
+	// a longevity of 0 or negative simply means the agent dies as soon as it
+	// becomes adult. To make an agent immortal, set longevity to a formula that
+	// always exceeds the current age (e.g. "Age + 1"), which is explicit and
+	// mathematically self-evident rather than a memorized convention.
+	if a.StageID[idx] == -1 && a.Age[idx] > longevity {
 		markDead(a, idx)
 	}
 }

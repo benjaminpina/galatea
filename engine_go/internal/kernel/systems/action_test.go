@@ -64,7 +64,7 @@ func TestActFeedTransfersResources(t *testing.T) {
 	w.Agents.PosY[idx] = 10
 	w.Agents.Speed[idx] = 5
 	w.Agents.Decision[idx] = uint8(behaviorOffsetFeed) // Feed from resource type 0.
-	w.Agents.Reserves[idx*cfg.NumNutrients+0] = 20    // Current water reserve.
+	w.Agents.Reserves[idx*cfg.NumNutrients+0] = 20     // Current water reserve.
 
 	// Place resource of type 0 with level 50.
 	w.Resources.PosX[0] = 10
@@ -425,5 +425,54 @@ func TestBehaviorMemoryUpdate(t *testing.T) {
 	// Other behaviors should have been incremented.
 	if w.Agents.MemoryLastBehavior[memBase+1] != 4 {
 		t.Fatalf("expected MemoryLastBehavior[rest]=4, got %d", w.Agents.MemoryLastBehavior[memBase+1])
+	}
+}
+
+// TestUpdateAgentZeroLongevityDiesImmediately verifies the design decision that
+// there is NO special immortal sentinel: a longevity of 0 (or negative) means
+// the adult dies as soon as its age exceeds it, i.e. right away.
+func TestUpdateAgentZeroLongevityDiesImmediately(t *testing.T) {
+	cfg := testCfg()
+	w := world.New(cfg)
+
+	idx := w.AddAgent()
+	w.Agents.StageID[idx] = -1 // Adult.
+	w.Agents.Age[idx] = 0
+	w.Agents.Reserves[idx*cfg.NumNutrients+0] = 50
+	w.Agents.Reserves[idx*cfg.NumNutrients+1] = 50
+
+	UpdateAgent(w, idx, 0) // Longevity = 0 -> dies immediately.
+
+	if w.Agents.Situation[idx] != world.SituationDead {
+		t.Fatalf("expected immediate death with longevity 0, got %d",
+			w.Agents.Situation[idx])
+	}
+}
+
+// TestUpdateAgentAgePlusOneIsImmortal verifies the explicit, math-based way to
+// make an agent immortal: a longevity that always equals its current age + 1,
+// so the "age > longevity" check can never be true.
+func TestUpdateAgentAgePlusOneIsImmortal(t *testing.T) {
+	cfg := testCfg()
+	w := world.New(cfg)
+
+	idx := w.AddAgent()
+	w.Agents.StageID[idx] = -1 // Adult.
+	w.Agents.Reserves[idx*cfg.NumNutrients+0] = 50
+	w.Agents.Reserves[idx*cfg.NumNutrients+1] = 50
+
+	// Simulate several ticks where longevity = age + 1 (evaluated per tick,
+	// mirroring EvalRefValues). The agent must never die of old age.
+	for tick := 0; tick < 100; tick++ {
+		// Longevity is computed BEFORE UpdateAgent increments age, matching the
+		// engine's EvalRefValues -> UpdateAgent ordering.
+		longevity := w.Agents.Age[idx] + 1
+		// Keep reserves topped up so it never starves.
+		w.Agents.Reserves[idx*cfg.NumNutrients+0] = 50
+		w.Agents.Reserves[idx*cfg.NumNutrients+1] = 50
+		UpdateAgent(w, idx, longevity)
+		if w.Agents.Situation[idx] == world.SituationDead {
+			t.Fatalf("agent died of old age at tick %d with longevity=age+1", tick)
+		}
 	}
 }
