@@ -168,10 +168,12 @@ func actCourtshipSignal(w *world.World, idx int) {
 	}
 }
 
-// actOviposit placeholder — actual oviposition logic is in reproduction system.
+// actOviposit records the oviposition decision; the actual egg deposit is
+// performed by the engine's dedicated oviposition phase (which has access to
+// the reproduction/genetics config), mirroring the legacy where Oviposita runs
+// in the iteration loop rather than inside the agent's Actua. Behavior memory
+// is updated by the caller (Act), so nothing else is needed here.
 func actOviposit(w *world.World, idx int) {
-	// Oviposition is handled in the reproduction system (Task 8).
-	// Here we just mark the behavior as executed.
 	_ = w
 	_ = idx
 }
@@ -225,6 +227,12 @@ func isCourtshipBehavior(decision int, cfg world.Config) bool {
 
 func ovipositBehaviorIdx(cfg world.Config) int {
 	return behaviorOffsetFeed + cfg.NumResourceTypes + 4
+}
+
+// IsOvipositDecision reports whether the agent at idx decided to oviposit this
+// tick. Used by the engine's oviposition phase to trigger egg-laying.
+func IsOvipositDecision(w *world.World, idx int) bool {
+	return int(w.Agents.Decision[idx]) == ovipositBehaviorIdx(w.Config)
 }
 
 // MovementDirection selects a movement direction for the given agent via

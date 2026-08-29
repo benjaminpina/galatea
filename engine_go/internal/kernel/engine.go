@@ -507,6 +507,19 @@ func (e *Engine) Tick() {
 		systems.Act(w, idx)
 	}
 
+	// 6b. Oviposition: females that decided to oviposit deposit their retained
+	// fertilized eggs into the world (mirrors the legacy Oviposita call in the
+	// action phase). Runs right after Act so egg-laying costs are charged in
+	// the same nutrient phase below.
+	for _, idx := range perm {
+		if systems.IsOvipositDecision(w, idx) {
+			systems.EvalRefValues(w, idx, e.Registry, e.Eval, e.EnvBuilder, e.agentRef)
+			e.ReproCfg.MaxGametes = e.agentRef.MaxGametes
+			e.ReproCfg.GameteCosts = e.agentRef.GameteCosts
+			systems.Oviposit(w, idx, e.ReproCfg, e.GeneticsCfg)
+		}
+	}
+
 	// 7. Charge nutrient costs (using per-agent evaluated costs).
 	for i := 0; i < a.Count; i++ {
 		systems.EvalRefValues(w, i, e.Registry, e.Eval, e.EnvBuilder, e.agentRef)

@@ -359,6 +359,65 @@ func TestOviposit(t *testing.T) {
 	}
 }
 
+// TestOvipositTriggeredByDecision is the point-3 guarantee: the engine's
+// oviposition phase must fire only when the agent decided to oviposit, and it
+// must actually deposit the retained fertilized eggs into the world.
+func TestOvipositTriggeredByDecision(t *testing.T) {
+	cfg := testCfg()
+	w := world.New(cfg)
+	genoSize := cfg.NumLoci * 2
+	ovipositIdx := behaviorOffsetFeed + cfg.NumResourceTypes + 4 // = 8 here
+
+	female := w.AddAgent()
+	w.Agents.Sex[female] = world.SexFemale
+	w.Agents.PosX[female] = 10
+	w.Agents.PosY[female] = 10
+	for n := 0; n < cfg.NumNutrients; n++ {
+		w.Agents.Reserves[female*cfg.NumNutrients+n] = 100
+	}
+	// Retain 3 fertilized eggs.
+	for e := 0; e < 3; e++ {
+		w.Agents.AddFertilizedEgg(female, world.FertilizedEgg{
+			GenotypeCont:  make([]float64, genoSize),
+			GenotypeDisc:  make([]int32, genoSize),
+			DominanceCont: make([]uint8, genoSize),
+			DominanceDisc: make([]uint8, genoSize),
+			Sex:           world.SexFemale,
+			Donor:         "M3",
+		})
+	}
+
+	reproCfg := ReproductionConfig{EggsPerCycle: 2, EggFraction: 0.1, MaleRatio: 50, FemaleRatio: 50}
+	genCfg := GeneticsConfig{
+		NumLoci:  cfg.NumLoci,
+		LociCont: make([]LocusConfig, cfg.NumLoci),
+		LociDisc: make([]LocusConfig, cfg.NumLoci),
+	}
+
+	// Not deciding to oviposit: the phase must NOT fire.
+	w.Agents.Decision[female] = uint8(behaviorRest)
+	if IsOvipositDecision(w, female) {
+		t.Fatal("rest decision should not be an oviposit decision")
+	}
+
+	// Deciding to oviposit: the phase fires and lays EggsPerCycle eggs.
+	w.Agents.Decision[female] = uint8(ovipositIdx)
+	if !IsOvipositDecision(w, female) {
+		t.Fatal("oviposit decision not recognized")
+	}
+	laid := Oviposit(w, female, reproCfg, genCfg)
+	if laid != 2 {
+		t.Fatalf("expected 2 eggs laid, got %d", laid)
+	}
+	if w.Eggs.Count != 2 {
+		t.Fatalf("expected 2 eggs deposited in world, got %d", w.Eggs.Count)
+	}
+	// 3 retained - 2 laid = 1 remaining.
+	if w.Agents.FertilizedCount(female) != 1 {
+		t.Fatalf("expected 1 fertilized egg remaining, got %d", w.Agents.FertilizedCount(female))
+	}
+}
+
 // TestPaternalInheritance is the end-to-end guarantee for point 2: after a real
 // copulation + oviposition, offspring genotypes must carry alleles from the
 // FATHER, not just the mother. We give the male a distinctive allele value the
