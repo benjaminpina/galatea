@@ -91,13 +91,24 @@ func ecloseEgg(w *world.World, eggIdx int, ontCfg OntogenyConfig, genCfg Genetic
 	numLoci := cfg.NumLoci
 	numNut := cfg.NumNutrients
 
+	// Resolve the eclosion position from the CURRENT carrier position: a
+	// carrier agent may have moved since the egg was laid (the legacy reads
+	// Huevo.Portador.X/Y at eclosion). Fall back to the egg's stored position
+	// if the carrier is gone.
+	hatchX, hatchY := eggs.PosX[eggIdx], eggs.PosY[eggIdx]
+	if carrierIdx := eggs.CarrierAgentIdx[eggIdx]; carrierIdx >= 0 && int(carrierIdx) < w.Agents.Count {
+		hatchX, hatchY = w.Agents.PosX[carrierIdx], w.Agents.PosY[carrierIdx]
+	} else if siteIdx := eggs.CarrierResourceIdx[eggIdx]; siteIdx >= 0 && int(siteIdx) < w.Resources.Count {
+		hatchX, hatchY = w.Resources.PosX[siteIdx], w.Resources.PosY[siteIdx]
+	}
+
 	// Create new agent.
 	agentIdx := w.AddAgent()
 	a := w.Agents
 
-	// Transfer position.
-	a.PosX[agentIdx] = eggs.PosX[eggIdx]
-	a.PosY[agentIdx] = eggs.PosY[eggIdx]
+	// Transfer position (from the carrier at eclosion time).
+	a.PosX[agentIdx] = hatchX
+	a.PosY[agentIdx] = hatchY
 
 	// Set identity: immature, first stage after egg.
 	startStage := int32(0)
@@ -137,15 +148,21 @@ func ecloseEgg(w *world.World, eggIdx int, ontCfg OntogenyConfig, genCfg Genetic
 }
 
 // removeEgg removes an egg by swapping with the last and decrementing Count.
-// If the egg was held in an oviposition site, that site's egg count (Level) is
-// decremented first so the freed capacity becomes available again.
+// It first releases the egg's slot on its carrier: an oviposition site's egg
+// count (Level) or a carrier agent's CarriedEggs count is decremented, so the
+// carrier's bookkeeping stays correct after the egg ecloses or dies (mirrors
+// the legacy THuevo.Destroy, which decrements Acarreados/Nivel on the carrier).
 func removeEgg(w *world.World, idx int) {
 	eggs := w.Eggs
 
-	// Free the slot the egg occupied in its oviposition site, if any.
+	// Free the slot the egg occupied on its carrier.
 	if siteIdx := eggs.CarrierResourceIdx[idx]; siteIdx >= 0 && int(siteIdx) < w.Resources.Count {
 		if w.Resources.TypeID[siteIdx] == world.ResourceTypeOvipositionSite && w.Resources.Level[siteIdx] > 0 {
 			w.Resources.Level[siteIdx]--
+		}
+	} else if carrierIdx := eggs.CarrierAgentIdx[idx]; carrierIdx >= 0 && int(carrierIdx) < w.Agents.Count {
+		if w.Agents.CarriedEggs[carrierIdx] > 0 {
+			w.Agents.CarriedEggs[carrierIdx]--
 		}
 	}
 

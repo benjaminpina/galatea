@@ -533,6 +533,155 @@ func TestOvipositWithoutSiteLaysNothing(t *testing.T) {
 	}
 }
 
+// TestOvipositOntoAgentCarrier verifies eggs can be deposited onto a carrier
+// AGENT (carried eggs / Acarreados) when the interactant is an agent, wiring
+// the egg to that carrier and incrementing its CarriedEggs count.
+func TestOvipositOntoAgentCarrier(t *testing.T) {
+	cfg := testCfg()
+	w := world.New(cfg)
+	genoSize := cfg.NumLoci * 2
+
+	female := w.AddAgent()
+	w.Agents.Sex[female] = world.SexFemale
+	w.Agents.PosX[female] = 7
+	w.Agents.PosY[female] = 7
+
+	// The carrier is another adult agent.
+	carrier := w.AddAgent()
+	w.Agents.PosX[carrier] = 8
+	w.Agents.PosY[carrier] = 7
+	w.Agents.StageID[carrier] = -1
+	w.Agents.Situation[carrier] = world.SituationRegular
+
+	// Interactant is the carrier agent (set by EstablishInteraction).
+	w.Agents.InteractantIdx[female] = int32(carrier)
+	w.Agents.OvipositCarrierIsAgent[female] = true
+
+	for e := 0; e < 3; e++ {
+		w.Agents.AddFertilizedEgg(female, world.FertilizedEgg{
+			GenotypeCont:  make([]float64, genoSize),
+			GenotypeDisc:  make([]int32, genoSize),
+			DominanceCont: make([]uint8, genoSize),
+			DominanceDisc: make([]uint8, genoSize),
+			Sex:           world.SexFemale,
+			Donor:         "M2",
+		})
+	}
+
+	reproCfg := ReproductionConfig{EggsPerCycle: 2, EggFraction: 0.1, MaleRatio: 50, FemaleRatio: 50}
+	genCfg := GeneticsConfig{NumLoci: cfg.NumLoci, LociCont: make([]LocusConfig, cfg.NumLoci), LociDisc: make([]LocusConfig, cfg.NumLoci)}
+
+	laid := Oviposit(w, female, reproCfg, genCfg)
+	if laid != 2 {
+		t.Fatalf("expected 2 eggs laid onto carrier, got %d", laid)
+	}
+	if w.Agents.CarriedEggs[carrier] != 2 {
+		t.Fatalf("expected carrier to carry 2 eggs, got %d", w.Agents.CarriedEggs[carrier])
+	}
+	for i := 0; i < 2; i++ {
+		if w.Eggs.CarrierAgentIdx[i] != int32(carrier) {
+			t.Fatalf("egg %d carrier: expected agent %d, got %d", i, carrier, w.Eggs.CarrierAgentIdx[i])
+		}
+		if w.Eggs.CarrierResourceIdx[i] != -1 {
+			t.Fatalf("egg %d should not reference a site, got %d", i, w.Eggs.CarrierResourceIdx[i])
+		}
+		// Egg positioned at the carrier.
+		if w.Eggs.PosX[i] != 8 || w.Eggs.PosY[i] != 7 {
+			t.Fatalf("egg %d position: expected (8,7), got (%f,%f)", i, w.Eggs.PosX[i], w.Eggs.PosY[i])
+		}
+	}
+}
+
+// TestCarriedEggEclosesAtCarrierPosition verifies a carried egg ecloses at the
+// carrier's CURRENT position (the carrier moved after laying), and that the
+// carrier's CarriedEggs count is released on eclosion.
+func TestCarriedEggEclosesAtCarrierPosition(t *testing.T) {
+	cfg := testCfg()
+	w := world.New(cfg)
+	ontCfg := testOntogenyCfg()
+	genCfg := GeneticsConfig{NumLoci: cfg.NumLoci}
+
+	carrier := w.AddAgent()
+	w.Agents.PosX[carrier] = 3
+	w.Agents.PosY[carrier] = 3
+	w.Agents.StageID[carrier] = -1
+	w.Agents.Situation[carrier] = world.SituationRegular
+	w.Agents.CarriedEggs[carrier] = 1
+
+	// Egg laid when carrier was at (3,3), referencing the carrier.
+	eggs := w.Eggs
+	eggs.Count = 1
+	eggs.PosX[0] = 3
+	eggs.PosY[0] = 3
+	eggs.Age[0] = 15
+	eggs.Sex[0] = world.SexMale
+	eggs.CarrierAgentIdx[0] = int32(carrier)
+	eggs.CarrierResourceIdx[0] = -1
+	eggs.Reserves[0*cfg.NumNutrients+0] = 10
+	eggs.Reserves[0*cfg.NumNutrients+1] = 10
+
+	// Carrier moves before the egg ecloses.
+	w.Agents.PosX[carrier] = 20
+	w.Agents.PosY[carrier] = 25
+
+	if EvaluateEggs(w, ontCfg, genCfg) != 1 {
+		t.Fatal("expected 1 eclosion")
+	}
+	// The new agent is the last one; it must be at the carrier's CURRENT pos.
+	newIdx := w.Agents.Count - 1
+	if w.Agents.PosX[newIdx] != 20 || w.Agents.PosY[newIdx] != 25 {
+		t.Fatalf("hatchling position: expected (20,25), got (%f,%f)", w.Agents.PosX[newIdx], w.Agents.PosY[newIdx])
+	}
+	// Carrier released the egg.
+	if w.Agents.CarriedEggs[carrier] != 0 {
+		t.Fatalf("expected carrier CarriedEggs 0 after eclosion, got %d", w.Agents.CarriedEggs[carrier])
+	}
+}
+
+// TestCarrierDeathKillsCarriedEggs verifies that when a carrier agent dies, the
+// eggs it carried are removed (orphaned eggs die, per the legacy), and that
+// egg→carrier links for surviving agents remain correct after swap-and-pop.
+func TestCarrierDeathKillsCarriedEggs(t *testing.T) {
+	cfg := testCfg()
+	w := world.New(cfg)
+
+	// Agent 0 carries an egg and will die.
+	carrier := w.AddAgent()
+	w.Agents.StageID[carrier] = -1
+	w.Agents.Situation[carrier] = world.SituationDead
+	w.Agents.CarriedEggs[carrier] = 1
+
+	// Agent 1 survives and also carries an egg; it will be swapped into slot 0.
+	survivor := w.AddAgent()
+	w.Agents.StageID[survivor] = -1
+	w.Agents.Situation[survivor] = world.SituationRegular
+	w.Agents.CarriedEggs[survivor] = 1
+
+	eggs := w.Eggs
+	eggs.Count = 2
+	// Egg 0 carried by the dying agent.
+	eggs.CarrierAgentIdx[0] = int32(carrier)
+	eggs.CarrierResourceIdx[0] = -1
+	// Egg 1 carried by the survivor.
+	eggs.CarrierAgentIdx[1] = int32(survivor)
+	eggs.CarrierResourceIdx[1] = -1
+
+	RemoveDeadAgents(w)
+
+	// Only the survivor remains.
+	if w.Agents.Count != 1 {
+		t.Fatalf("expected 1 agent remaining, got %d", w.Agents.Count)
+	}
+	// The dead carrier's egg was removed; the survivor's egg remains.
+	if w.Eggs.Count != 1 {
+		t.Fatalf("expected 1 egg remaining, got %d", w.Eggs.Count)
+	}
+	// The surviving egg must still reference the survivor (now at index 0).
+	if w.Eggs.CarrierAgentIdx[0] != 0 {
+		t.Fatalf("surviving egg carrier: expected 0 (remapped), got %d", w.Eggs.CarrierAgentIdx[0])
+	}
+}
+
 // TestPaternalInheritance is the end-to-end guarantee for point 2: after a real
 // copulation + oviposition, offspring genotypes must carry alleles from the
 // FATHER, not just the mother. We give the male a distinctive allele value the

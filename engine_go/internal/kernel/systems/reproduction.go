@@ -224,18 +224,19 @@ func FertilizeGametes(w *world.World, femaleIdx int, count int32, cfg Reproducti
 	return fertilized
 }
 
-// Oviposit deposits the female's retained fertilized eggs into a contiguous
-// oviposition site (the female's current interactant, set by
-// EstablishInteraction). Each deposited egg keeps the genotype produced at
-// fertilization (mother × sperm pack), so paternal inheritance flows through —
-// no crossover is redone here (mirrors the legacy Oviposita, which moves eggs
-// from Fertilizados into the site).
+// Oviposit deposits the female's retained fertilized eggs onto her current
+// oviposition target (the interactant set by EstablishInteraction), which is
+// either an oviposition-site RESOURCE or a carrier AGENT (carried eggs), as
+// indicated by OvipositCarrierIsAgent. Each deposited egg keeps the genotype
+// produced at fertilization (mother × sperm pack), so paternal inheritance
+// flows through — no crossover is redone here (mirrors the legacy Oviposita).
 //
-// The number laid is bounded by EggsPerCycle, the female's retained eggs, and
-// the site's free capacity (MaxLevel - Level). Deposited eggs are positioned at
-// the site and reference it as their carrier; the site's Level (egg count) is
-// incremented. Returns the number laid. If the female has no valid oviposition
-// site as interactant, nothing is laid.
+// The number laid is bounded by EggsPerCycle and the female's retained eggs;
+// for a site it is further bounded by the site's free capacity (MaxLevel -
+// Level). Site-borne eggs increment the site's Level; agent-borne eggs
+// increment the carrier's CarriedEggs. Eggs are positioned at their carrier and
+// reference it (CarrierResourceIdx or CarrierAgentIdx). Returns the number laid.
+// If the female has no valid carrier, nothing is laid.
 func Oviposit(w *world.World, femaleIdx int, cfg ReproductionConfig, genCfg GeneticsConfig) int {
 	a := w.Agents
 	r := w.Resources
@@ -243,20 +244,36 @@ func Oviposit(w *world.World, femaleIdx int, cfg ReproductionConfig, genCfg Gene
 	numLoci := wcfg.NumLoci
 	numNut := wcfg.NumNutrients
 
-	// Require a valid, contiguous oviposition site as the interactant.
-	siteIdx := a.InteractantIdx[femaleIdx]
-	if siteIdx < 0 || int(siteIdx) >= r.Count ||
-		r.TypeID[siteIdx] != world.ResourceTypeOvipositionSite {
+	target := a.InteractantIdx[femaleIdx]
+	if target < 0 {
 		return 0
+	}
+	carrierIsAgent := a.OvipositCarrierIsAgent[femaleIdx]
+
+	// Resolve the carrier and its position; validate it.
+	var carrierX, carrierY float64
+	if carrierIsAgent {
+		if int(target) >= a.Count || a.Situation[target] == world.SituationDead {
+			return 0
+		}
+		carrierX, carrierY = a.PosX[target], a.PosY[target]
+	} else {
+		if int(target) >= r.Count || r.TypeID[target] != world.ResourceTypeOvipositionSite {
+			return 0
+		}
+		carrierX, carrierY = r.PosX[target], r.PosY[target]
 	}
 
 	eggsToLay := cfg.EggsPerCycle
 	if available := a.FertilizedCount(femaleIdx); eggsToLay > available {
 		eggsToLay = available
 	}
-	// Bound by the site's free capacity.
-	if freeCap := r.MaxLevel[siteIdx] - r.Level[siteIdx]; eggsToLay > freeCap {
-		eggsToLay = freeCap
+	// A site bounds the batch by its free capacity; a carrier agent has no cap
+	// (the legacy Acarreados is unbounded).
+	if !carrierIsAgent {
+		if freeCap := r.MaxLevel[target] - r.Level[target]; eggsToLay > freeCap {
+			eggsToLay = freeCap
+		}
 	}
 	if eggsToLay <= 0 {
 		return 0
@@ -279,9 +296,9 @@ func Oviposit(w *world.World, femaleIdx int, cfg ReproductionConfig, genCfg Gene
 
 		eggs := w.Eggs
 
-		// Position at the oviposition site (the egg's carrier).
-		eggs.PosX[eggIdx] = r.PosX[siteIdx]
-		eggs.PosY[eggIdx] = r.PosY[siteIdx]
+		// Position at the carrier.
+		eggs.PosX[eggIdx] = carrierX
+		eggs.PosY[eggIdx] = carrierY
 		eggs.Age[eggIdx] = 0
 
 		// Sex and genotype come from the retained fertilized egg.
@@ -302,14 +319,19 @@ func Oviposit(w *world.World, femaleIdx int, cfg ReproductionConfig, genCfg Gene
 			eggs.Reserves[eggResBase+n] = eggReserve
 		}
 
-		// Carrier is the oviposition site (not the mother); record parentage.
-		eggs.CarrierAgentIdx[eggIdx] = -1
-		eggs.CarrierResourceIdx[eggIdx] = siteIdx
+		// Record parentage and wire the egg to its carrier, updating the
+		// carrier's egg count (site Level or agent CarriedEggs).
 		eggs.ParentMale[eggIdx] = fEgg.Donor
 		eggs.ParentFemale[eggIdx] = "F" + itoa(femaleIdx)
-
-		// Increment the site's egg count.
-		r.Level[siteIdx]++
+		if carrierIsAgent {
+			eggs.CarrierAgentIdx[eggIdx] = target
+			eggs.CarrierResourceIdx[eggIdx] = -1
+			a.CarriedEggs[target]++
+		} else {
+			eggs.CarrierAgentIdx[eggIdx] = -1
+			eggs.CarrierResourceIdx[eggIdx] = target
+			r.Level[target]++
+		}
 
 		laid++
 	}

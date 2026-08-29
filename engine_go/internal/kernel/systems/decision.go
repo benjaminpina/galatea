@@ -201,12 +201,21 @@ func EstablishInteraction(w *world.World, idx int, agentGrid, resourceGrid *spat
 		return
 	}
 
-	// Oviposition: find a contiguous oviposition site with free capacity to
-	// carry the eggs (mirrors the legacy, where eggs are deposited into a
-	// contiguous TSitioOviposicion). If none is available, clear the
-	// interaction so no eggs are laid this tick.
+	// Oviposition: mirror the legacy target selection. Prefer a contiguous
+	// oviposition site with free capacity; if none exists, deposit the eggs
+	// onto a contiguous adult agent (carried eggs / Acarreados). If neither is
+	// available, clear the interaction so no eggs are laid this tick.
 	if decision == ovipositBehaviorIdx(cfg) {
-		a.InteractantIdx[idx] = findContiguousOvipositionSite(w, ax, ay, resourceGrid)
+		if site := findContiguousOvipositionSite(w, ax, ay, resourceGrid); site >= 0 {
+			a.InteractantIdx[idx] = site
+			a.OvipositCarrierIsAgent[idx] = false
+			return
+		}
+		// No site: try a contiguous adult agent as carrier. The legacy uses
+		// AgenteAdultoContiguo (any adult, either sex).
+		carrier := findContiguousAgent(w, idx, ax, ay, agentGrid, false)
+		a.InteractantIdx[idx] = carrier
+		a.OvipositCarrierIsAgent[idx] = carrier >= 0
 		return
 	}
 

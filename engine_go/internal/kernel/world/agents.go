@@ -96,6 +96,14 @@ type AgentArrays struct {
 	// FertilizedCount(idx) for the count.
 	FertilizedEggs [][]FertilizedEgg
 
+	// OvipositCarrierIsAgent marks, for an agent whose Decision is oviposit,
+	// whether its InteractantIdx refers to another AGENT (true, carried eggs)
+	// or an oviposition-site RESOURCE (false). This disambiguates the shared
+	// InteractantIdx, since agent and resource indices overlap. It mirrors the
+	// legacy where eggs go to a contiguous site if present, else onto a
+	// contiguous adult agent (Acarreados).
+	OvipositCarrierIsAgent []bool
+
 	// Time counters
 	TimeInStage       []int32 // Ticks spent in current stage.
 	TimeOnSubstrate   []int32 // Ticks on current substrate.
@@ -154,10 +162,11 @@ func NewAgentArrays(cap int, cfg Config) *AgentArrays {
 		Tendencies: make([]int32, cap*8),
 		VDecision:  make([]int32, cap*numBehaviors),
 
-		GametesCount:   make([]int32, cap),
-		CarriedEggs:    make([]int32, cap),
-		SpermPacks:     make([][]SpermPack, cap),
-		FertilizedEggs: make([][]FertilizedEgg, cap),
+		GametesCount:           make([]int32, cap),
+		CarriedEggs:            make([]int32, cap),
+		SpermPacks:             make([][]SpermPack, cap),
+		FertilizedEggs:         make([][]FertilizedEgg, cap),
+		OvipositCarrierIsAgent: make([]bool, cap),
 
 		TimeInStage:       make([]int32, cap),
 		TimeOnSubstrate:   make([]int32, cap),

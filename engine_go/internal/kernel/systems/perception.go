@@ -368,12 +368,19 @@ func applyFilters(ctx *PerceptionContext, idx int) {
 	}
 
 	// --- Disable oviposition for males, if no fertilized eggs, or if there is
-	// no contiguous oviposition site with free capacity (mirrors the legacy
-	// VDecision[11]:=0 when not HayDinamicos[5]). ---
+	// nowhere to deposit them. The legacy allows laying into a contiguous
+	// oviposition site OR onto a contiguous adult agent (carried eggs), so
+	// oviposition is only vetoed when NEITHER carrier is available. ---
 	if ovipositIdx < cfg.NumBehaviors {
-		noSite := ctx.ResourceGrid == nil ||
-			findContiguousOvipositionSite(w, a.PosX[idx], a.PosY[idx], ctx.ResourceGrid) < 0
-		if a.Sex[idx] == world.SexMale || a.FertilizedCount(idx) == 0 || noSite {
+		hasCarrier := false
+		if ctx.ResourceGrid != nil &&
+			findContiguousOvipositionSite(w, a.PosX[idx], a.PosY[idx], ctx.ResourceGrid) >= 0 {
+			hasCarrier = true
+		} else if ctx.AgentGrid != nil &&
+			findContiguousAgent(w, idx, a.PosX[idx], a.PosY[idx], ctx.AgentGrid, false) >= 0 {
+			hasCarrier = true
+		}
+		if a.Sex[idx] == world.SexMale || a.FertilizedCount(idx) == 0 || !hasCarrier {
 			a.VDecision[vdBase+ovipositIdx] = 0
 		}
 	}

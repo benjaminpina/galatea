@@ -100,6 +100,12 @@ func ResetAgentStates(w *world.World) {
 
 // RemoveDeadAgents removes all agents marked as dead using swap-and-pop.
 // Returns the number of agents removed.
+//
+// Because agents can carry eggs (CarrierAgentIdx), removal must keep those
+// egg→carrier links consistent: a dying carrier's eggs are orphaned and killed
+// (mirrors the legacy, where a dead carrier forces its eggs to die), and the
+// swap-and-pop's index remapping is propagated to any eggs that referenced the
+// moved (last) agent.
 func RemoveDeadAgents(w *world.World) int {
 	a := w.Agents
 	removed := 0
@@ -108,7 +114,16 @@ func RemoveDeadAgents(w *world.World) int {
 		if a.Situation[i] == world.SituationDead {
 			// Notify interactant (if in combat/courtship, partner wins/is rejected).
 			notifyInteractantOfDeath(a, i)
+			// Kill any eggs this agent was carrying (orphaned on death).
+			removeEggsCarriedBy(w, int32(i))
+
+			last := int32(a.Count - 1)
 			w.RemoveAgent(i)
+			// RemoveAgent swapped `last` into slot i (unless i == last). Any
+			// eggs that referenced `last` as carrier must now point to i.
+			if last != int32(i) {
+				remapEggCarrier(w, last, int32(i))
+			}
 			removed++
 			// Don't increment i — the swapped-in agent needs to be checked too.
 		} else {
@@ -116,6 +131,31 @@ func RemoveDeadAgents(w *world.World) int {
 		}
 	}
 	return removed
+}
+
+// removeEggsCarriedBy removes every egg carried by the given agent (used when
+// that agent dies). Iterates in reverse so swap-and-pop removals are safe.
+func removeEggsCarriedBy(w *world.World, carrierIdx int32) {
+	eggs := w.Eggs
+	for e := eggs.Count - 1; e >= 0; e-- {
+		if eggs.CarrierAgentIdx[e] == carrierIdx {
+			// Detach first so removeEgg doesn't decrement a soon-to-be-removed
+			// carrier's CarriedEggs (the carrier is being removed anyway).
+			eggs.CarrierAgentIdx[e] = -1
+			removeEgg(w, e)
+		}
+	}
+}
+
+// remapEggCarrier repoints eggs whose carrier agent was moved from oldIdx to
+// newIdx (after a swap-and-pop agent removal).
+func remapEggCarrier(w *world.World, oldIdx, newIdx int32) {
+	eggs := w.Eggs
+	for e := 0; e < eggs.Count; e++ {
+		if eggs.CarrierAgentIdx[e] == oldIdx {
+			eggs.CarrierAgentIdx[e] = newIdx
+		}
+	}
 }
 
 // --- Internal helpers ---
