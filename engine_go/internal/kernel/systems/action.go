@@ -229,6 +229,18 @@ func ovipositBehaviorIdx(cfg world.Config) int {
 	return behaviorOffsetFeed + cfg.NumResourceTypes + 4
 }
 
+// EggSurviveBehaviorIdx / EggDieBehaviorIdx return the behavior-axis indices of
+// the two egg-viability columns, which sit right after Oviposit. An egg reads
+// these two columns from its carrier's interaction matrix to decide, each tick,
+// whether it stays viable (survive) or dies.
+func EggSurviveBehaviorIdx(cfg world.Config) int {
+	return behaviorOffsetFeed + cfg.NumResourceTypes + 5
+}
+
+func EggDieBehaviorIdx(cfg world.Config) int {
+	return behaviorOffsetFeed + cfg.NumResourceTypes + 6
+}
+
 // IsOvipositDecision reports whether the agent at idx decided to oviposit this
 // tick. Used by the engine's oviposition phase to trigger egg-laying.
 func IsOvipositDecision(w *world.World, idx int) bool {

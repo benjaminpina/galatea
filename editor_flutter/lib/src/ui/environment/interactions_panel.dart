@@ -60,20 +60,39 @@ class InteractionsPanel extends ConsumerWidget {
 // =============================================================================
 
 /// Human-readable behavior labels indexed by behaviorIndex.
-const _behaviorLabels = [
-  'Ignore', // 0
-  'Approach', // 1
-  'Avoid', // 2
-  'Attack', // 3
-  'Court', // 4
-  'Feed', // 5
-];
+/// A canonical behavior column of an interaction matrix: its engine index and
+/// a human-readable label. This mirrors the Go engine's world.BuildBehaviorNames
+/// layout exactly, so the behaviorIndex stored here is the same index the engine
+/// reads: Move=0, Rest=1, then a Feed behavior per nutrient, then
+/// Fight/Court/Oviposit after the feed block. Feeding is one behavior PER
+/// nutrient (nutrients are dynamic in the new design; in the legacy they were a
+/// fixed set).
+typedef _BehaviorColumn = ({int index, String label});
 
-String _behaviorLabel(int index) {
-  if (index >= 0 && index < _behaviorLabels.length) {
-    return _behaviorLabels[index];
+/// Builds the canonical behavior columns for the given nutrients, matching the
+/// engine's behavior index layout. One Feed behavior per nutrient.
+List<_BehaviorColumn> _behaviorColumns(List<Nutrient> nutrients) {
+  final cols = <_BehaviorColumn>[];
+  cols.add((index: 0, label: 'Move'));
+  cols.add((index: 1, label: 'Rest'));
+  for (var n = 0; n < nutrients.length; n++) {
+    cols.add((index: 2 + n, label: 'Feed — ${nutrients[n].name}'));
   }
-  return 'Behavior $index';
+  final fightBase = 2 + nutrients.length;
+  cols.add((index: fightBase + 0, label: 'Fight — Attack'));
+  cols.add((index: fightBase + 1, label: 'Fight — Defend'));
+  cols.add((index: fightBase + 2, label: 'Fight — Retreat'));
+  cols.add((index: fightBase + 3, label: 'Court — Display'));
+  cols.add((index: fightBase + 4, label: 'Court — Accept'));
+  cols.add((index: fightBase + 5, label: 'Court — Reject'));
+  cols.add((index: fightBase + 6, label: 'Oviposit'));
+  // Egg viability columns: weights an egg reads from its carrier's matrix to
+  // decide survive vs die each tick. Mainly meaningful in the Agent matrix
+  // (the carrier is an agent). Kept on the shared behavior axis for parity
+  // with the engine's world.BuildBehaviorNames layout.
+  cols.add((index: fightBase + 7, label: 'Egg — Survive'));
+  cols.add((index: fightBase + 8, label: 'Egg — Die'));
+  return cols;
 }
 
 /// Builds a perceiver label from nullable stage/prototype IDs.
@@ -216,6 +235,9 @@ class _InteractionSubstratesEditorState
           _InteractionSubstrateGrid(
             db: db,
             substrates: substrates,
+            behaviors: _behaviorColumns(
+              ref.watch(nutrientsProvider).valueOrNull ?? [],
+            ),
             perceiverStageId: _filterStageId,
             perceiverPrototypeId: _filterPrototypeId,
           ),
@@ -229,12 +251,14 @@ class _InteractionSubstrateGrid extends StatefulWidget {
   const _InteractionSubstrateGrid({
     required this.db,
     required this.substrates,
+    required this.behaviors,
     required this.perceiverStageId,
     required this.perceiverPrototypeId,
   });
 
   final AppDatabase db;
   final List<Substrate> substrates;
+  final List<_BehaviorColumn> behaviors;
   final int? perceiverStageId;
   final int? perceiverPrototypeId;
 
@@ -341,7 +365,7 @@ class _InteractionSubstrateGridState extends State<_InteractionSubstrateGrid> {
     if (_loading) return const LinearProgressIndicator();
 
     return Table(
-      columnWidths: const {0: FixedColumnWidth(70)},
+      columnWidths: const {0: FixedColumnWidth(90)},
       defaultColumnWidth: const FlexColumnWidth(),
       border: TableBorder.all(
         color: Theme.of(context).colorScheme.outlineVariant,
@@ -352,8 +376,7 @@ class _InteractionSubstrateGridState extends State<_InteractionSubstrateGrid> {
         TableRow(
           children: [
             _headerCell('Substrate'),
-            for (var b = 0; b < _behaviorLabels.length; b++)
-              _headerCell(_behaviorLabel(b)),
+            for (final col in widget.behaviors) _headerCell(col.label),
           ],
         ),
         // Data rows
@@ -361,11 +384,11 @@ class _InteractionSubstrateGridState extends State<_InteractionSubstrateGrid> {
           return TableRow(
             children: [
               _labelCell(sub.name),
-              for (var b = 0; b < _behaviorLabels.length; b++)
+              for (final col in widget.behaviors)
                 _formulaCell(
-                  _values['${sub.id}.$b'] ?? '0',
-                  (v) => _save(sub.id, b, v),
-                  '${sub.name} — ${_behaviorLabel(b)}',
+                  _values['${sub.id}.${col.index}'] ?? '0',
+                  (v) => _save(sub.id, col.index, v),
+                  '${sub.name} — ${col.label}',
                 ),
             ],
           );
@@ -669,6 +692,7 @@ class _InteractionSourcesEditorState
           _InteractionSourceGrid(
             db: db,
             nutrients: nutrients,
+            behaviors: _behaviorColumns(nutrients),
             perceiverStageId: _filterStageId,
             perceiverPrototypeId: _filterPrototypeId,
           ),
@@ -682,12 +706,14 @@ class _InteractionSourceGrid extends StatefulWidget {
   const _InteractionSourceGrid({
     required this.db,
     required this.nutrients,
+    required this.behaviors,
     required this.perceiverStageId,
     required this.perceiverPrototypeId,
   });
 
   final AppDatabase db;
   final List<Nutrient> nutrients;
+  final List<_BehaviorColumn> behaviors;
   final int? perceiverStageId;
   final int? perceiverPrototypeId;
 
@@ -792,7 +818,7 @@ class _InteractionSourceGridState extends State<_InteractionSourceGrid> {
     if (_loading) return const LinearProgressIndicator();
 
     return Table(
-      columnWidths: const {0: FixedColumnWidth(70)},
+      columnWidths: const {0: FixedColumnWidth(90)},
       defaultColumnWidth: const FlexColumnWidth(),
       border: TableBorder.all(
         color: Theme.of(context).colorScheme.outlineVariant,
@@ -802,19 +828,18 @@ class _InteractionSourceGridState extends State<_InteractionSourceGrid> {
         TableRow(
           children: [
             _headerCell('Source'),
-            for (var b = 0; b < _behaviorLabels.length; b++)
-              _headerCell(_behaviorLabel(b)),
+            for (final col in widget.behaviors) _headerCell(col.label),
           ],
         ),
         ...widget.nutrients.map((nut) {
           return TableRow(
             children: [
               _labelCell(nut.name),
-              for (var b = 0; b < _behaviorLabels.length; b++)
+              for (final col in widget.behaviors)
                 _formulaCell(
-                  _values['${nut.id}.$b'] ?? '0',
-                  (v) => _save(nut.id, b, v),
-                  '${nut.name} — ${_behaviorLabel(b)}',
+                  _values['${nut.id}.${col.index}'] ?? '0',
+                  (v) => _save(nut.id, col.index, v),
+                  '${nut.name} — ${col.label}',
                 ),
             ],
           );
@@ -1132,6 +1157,9 @@ class _InteractionAgentsEditorState
           const SizedBox(height: 8),
           _InteractionAgentGrid(
             db: db,
+            behaviors: _behaviorColumns(
+              ref.watch(nutrientsProvider).valueOrNull ?? [],
+            ),
             perceiverStageId: _perceiverStageId,
             perceiverPrototypeId: _perceiverPrototypeId,
             observedStageId: _observedStageId,
@@ -1146,6 +1174,7 @@ class _InteractionAgentsEditorState
 class _InteractionAgentGrid extends StatefulWidget {
   const _InteractionAgentGrid({
     required this.db,
+    required this.behaviors,
     required this.perceiverStageId,
     required this.perceiverPrototypeId,
     required this.observedStageId,
@@ -1153,6 +1182,7 @@ class _InteractionAgentGrid extends StatefulWidget {
   });
 
   final AppDatabase db;
+  final List<_BehaviorColumn> behaviors;
   final int? perceiverStageId;
   final int? perceiverPrototypeId;
   final int? observedStageId;
@@ -1284,24 +1314,21 @@ class _InteractionAgentGridState extends State<_InteractionAgentGrid> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        for (var b = 0; b < _behaviorLabels.length; b++)
+        for (final col in widget.behaviors)
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 3),
             child: Row(
               children: [
                 SizedBox(
-                  width: 60,
-                  child: Text(
-                    _behaviorLabel(b),
-                    style: const TextStyle(fontSize: 10),
-                  ),
+                  width: 110,
+                  child: Text(col.label, style: const TextStyle(fontSize: 10)),
                 ),
                 Expanded(
                   child: FormulaField(
-                    label: _behaviorLabel(b),
-                    title: 'Agent interaction — ${_behaviorLabel(b)}',
-                    value: _values[b] ?? '0',
-                    onChanged: (v) => _save(b, v),
+                    label: col.label,
+                    title: 'Agent interaction — ${col.label}',
+                    value: _values[col.index] ?? '0',
+                    onChanged: (v) => _save(col.index, v),
                   ),
                 ),
               ],

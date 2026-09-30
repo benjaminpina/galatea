@@ -46,6 +46,12 @@ type Names struct {
 // Fight_Attack, Fight_Defend, Fight_Retreat,
 // Court_Display, Court_Accept, Court_Reject,
 // Oviposit.
+// The final two behaviors, Egg_Survive and Egg_Die, are not agent actions:
+// they are the columns an egg reads from its carrier's interaction matrix to
+// decide, each tick, whether it stays viable or dies (mirrors the legacy egg
+// viability that read the carrier's interaction matrix). They live at the end
+// of the behavior axis so the agent-action indices (Fight/Court/Oviposit) are
+// unaffected.
 func BuildBehaviorNames(nutrientNames []string) []string {
 	names := []string{"Move", "Rest"}
 	for _, n := range nutrientNames {
@@ -54,5 +60,6 @@ func BuildBehaviorNames(nutrientNames []string) []string {
 	names = append(names, "Fight_Attack", "Fight_Defend", "Fight_Retreat")
 	names = append(names, "Court_Display", "Court_Accept", "Court_Reject")
 	names = append(names, "Oviposit")
+	names = append(names, "Egg_Survive", "Egg_Die")
 	return names
 }

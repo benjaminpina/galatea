@@ -97,6 +97,18 @@ func TestPerceiveResourceAccumulatesTendency(t *testing.T) {
 	w.Agents.Reserves[idx*cfg.NumNutrients+1] = 50
 
 	ctx := setupPerceptionContext(w)
+
+	// Configure the source-interaction matrix so that perceiving this resource
+	// (type 0) contributes weight to the Feed_0 behavior (index 2) for the
+	// perceiver (stage index 0). This is the legacy model: the behavior weight
+	// comes from the interaction matrix, not from attractiveness (which only
+	// drives directional tendency).
+	feedBehavior := behaviorOffsetFeed + 0 // Feed for resource type 0.
+	if err := ctx.Formulas.Compile(
+		InteractionKeySource(0, 0, feedBehavior), "7"); err != nil {
+		t.Fatalf("compile source interaction: %v", err)
+	}
+
 	Perceive(ctx, idx)
 
 	// The resource is directly north, so the forward (N) tendency should be highest.
@@ -106,11 +118,14 @@ func TestPerceiveResourceAccumulatesTendency(t *testing.T) {
 		t.Fatalf("expected positive forward tendency towards resource, got %d", forwardTendency)
 	}
 
-	// VDecision for feed behavior (index 2 + resourceType 0 = 2) should be positive.
+	// VDecision for the feed behavior reflects the interaction-matrix formula,
+	// AVERAGED over all perceived elements (legacy PromediaProbaDecision): the
+	// current substrate contributes 0 (no configured cell) and the source
+	// contributes 7, so the average is (0 + 7) / 2 = 3.
 	vdBase := idx * cfg.NumBehaviors
-	feedWeight := w.Agents.VDecision[vdBase+2]
-	if feedWeight <= 0 {
-		t.Fatalf("expected positive feed VDecision, got %d", feedWeight)
+	feedWeight := w.Agents.VDecision[vdBase+feedBehavior]
+	if feedWeight != 3 {
+		t.Fatalf("expected feed VDecision = 3 (avg of substrate 0 and source 7), got %d", feedWeight)
 	}
 }
 
@@ -446,5 +461,88 @@ func TestFullPerceiveNoResources(t *testing.T) {
 	vdBase := idx * cfg.NumBehaviors
 	if w.Agents.VDecision[vdBase+0] != 1 {
 		t.Fatalf("expected move forced to 1, got %d", w.Agents.VDecision[vdBase+0])
+	}
+}
+
+// TestInteractionAgentMatrixModulatesVDecision verifies that perceiving another
+// agent contributes to VDecision through the agent-interaction matrix (legacy
+// MatrizAgentes → PromediaProbaDecision), for the specific behavior configured.
+func TestInteractionAgentMatrixModulatesVDecision(t *testing.T) {
+	cfg := testCfg()
+	w := world.New(cfg)
+
+	// Perceiver at (25,25), adult stage index 0.
+	self := w.AddAgent()
+	w.Agents.PosX[self] = 25
+	w.Agents.PosY[self] = 25
+	w.Agents.Direction[self] = 2
+	w.Agents.StageID[self] = 0
+	w.Agents.Reserves[self*cfg.NumNutrients+0] = 50
+	w.Agents.Reserves[self*cfg.NumNutrients+1] = 50
+
+	// Observed agent nearby, also stage index 0.
+	other := w.AddAgent()
+	w.Agents.PosX[other] = 26
+	w.Agents.PosY[other] = 25
+	w.Agents.StageID[other] = 0
+
+	ctx := setupPerceptionContext(w)
+
+	// Configure the agent-interaction matrix: observed 0, perceiver 0, behavior
+	// Fight_Attack contributes 10. fightAttack index = 2 + NumResourceTypes.
+	fightAttack := behaviorOffsetFeed + cfg.NumResourceTypes
+	if err := ctx.Formulas.Compile(
+		InteractionKeyAgent(0, 0, fightAttack), "10"); err != nil {
+		t.Fatalf("compile agent interaction: %v", err)
+	}
+
+	Perceive(ctx, self)
+
+	// The perceiver perceives: its substrate (contributes 0 to fightAttack) and
+	// one agent (contributes 10). Average = (0 + 10) / 2 = 5.
+	vdBase := self * cfg.NumBehaviors
+	got := w.Agents.VDecision[vdBase+fightAttack]
+	if got != 5 {
+		t.Fatalf("expected Fight_Attack VDecision = 5 (avg of substrate 0 and agent 10), got %d", got)
+	}
+}
+
+// TestInteractionMatrixUsesContenderVars verifies interaction formulas can read
+// the observed agent's variables (Contender*), so behavior can depend on who is
+// perceived — a core capability of the legacy matrices.
+func TestInteractionMatrixUsesContenderVars(t *testing.T) {
+	cfg := testCfg()
+	w := world.New(cfg)
+
+	self := w.AddAgent()
+	w.Agents.PosX[self] = 25
+	w.Agents.PosY[self] = 25
+	w.Agents.StageID[self] = 0
+	w.Agents.Reserves[self*cfg.NumNutrients+0] = 50
+	w.Agents.Reserves[self*cfg.NumNutrients+1] = 50
+
+	// Observed male agent → ContenderIsMale should be true in the formula.
+	other := w.AddAgent()
+	w.Agents.PosX[other] = 26
+	w.Agents.PosY[other] = 25
+	w.Agents.StageID[other] = 0
+	w.Agents.Sex[other] = world.SexMale
+
+	ctx := setupPerceptionContext(w)
+
+	// Formula: attack weight 20 if the observed agent is male, else 0.
+	fightAttack := behaviorOffsetFeed + cfg.NumResourceTypes
+	if err := ctx.Formulas.Compile(
+		InteractionKeyAgent(0, 0, fightAttack), "If(ContenderIsMale, 20, 0)"); err != nil {
+		t.Fatalf("compile: %v", err)
+	}
+
+	Perceive(ctx, self)
+
+	// (substrate 0 + agent 20) / 2 = 10.
+	vdBase := self * cfg.NumBehaviors
+	got := w.Agents.VDecision[vdBase+fightAttack]
+	if got != 10 {
+		t.Fatalf("expected Fight_Attack = 10 (contender-dependent), got %d", got)
 	}
 }

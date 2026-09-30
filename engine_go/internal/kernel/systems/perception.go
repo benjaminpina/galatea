@@ -4,6 +4,7 @@
 package systems
 
 import (
+	"fmt"
 	"math"
 
 	"galatea/engine/internal/kernel/formulas"
@@ -35,6 +36,29 @@ const (
 	behaviorOffsetFeed   = 2   // First feed behavior index (0=move, 1=rest, 2+=feed).
 	contiguousBoost      = 1   // Extra VDecision weight for contiguous resources.
 )
+
+// --- Interaction-matrix registry keys ---
+//
+// These build the formula-registry keys for the behavior-probability
+// interaction matrices. They are defined here (in systems) because both the
+// Cold Path (which compiles the formulas) and the Hot Path (which evaluates
+// them) must agree on the key format. observedIdx/perceiverIdx are the unified
+// prototype index (stages, then males, then females).
+
+// InteractionKeyAgent builds the registry key for an agent-interaction cell.
+func InteractionKeyAgent(observedIdx, perceiverIdx, behaviorIdx int) string {
+	return fmt.Sprintf("interaction.agent.%d.%d.%d", observedIdx, perceiverIdx, behaviorIdx)
+}
+
+// InteractionKeySource builds the registry key for a source-interaction cell.
+func InteractionKeySource(resourceType, perceiverIdx, behaviorIdx int) string {
+	return fmt.Sprintf("interaction.source.%d.%d.%d", resourceType, perceiverIdx, behaviorIdx)
+}
+
+// InteractionKeySubstrate builds the registry key for a substrate-interaction cell.
+func InteractionKeySubstrate(substrateIdx, perceiverIdx, behaviorIdx int) string {
+	return fmt.Sprintf("interaction.substrate.%d.%d.%d", substrateIdx, perceiverIdx, behaviorIdx)
+}
 
 // Lookup tables for direction conversions (replace switch statements).
 // dirAngleTable maps direction code (1-8) to clockwise angular index (0-7 from N).
@@ -74,6 +98,14 @@ type PerceptionContext struct {
 
 	// Per-agent reference values (set before each agent's perception).
 	Ref *AgentRef
+
+	// Interaction-matrix accumulators (reused across agents, reset per agent).
+	// The legacy averages each behavior's weight over all perceived elements
+	// (PromediaProbaDecision): interSum holds the running sum of formula
+	// results per behavior, interCount the number of contributing elements.
+	// VDecision[b] is later set to interSum[b] / interCount[b].
+	interSum   []int32
+	interCount []int32
 }
 
 // Perceive runs the full perception pipeline for agent at idx.
@@ -86,12 +118,19 @@ func Perceive(ctx *PerceptionContext, idx int) {
 	cfg := w.Config
 
 	resetVectors(a, idx, cfg.NumBehaviors)
+	resetInteractionAccumulators(ctx, cfg.NumBehaviors)
 
 	ctx.EnvBuilder.SetWorldVars(w)
 	ctx.EnvBuilder.SetAgentVars(w, idx)
 
+	perceiveSubstrate(ctx, idx)
 	perceiveResources(ctx, idx)
 	hasContender, hasMate := perceiveAgents(ctx, idx)
+
+	// Convert the accumulated interaction weights into VDecision using the
+	// legacy averaging model (sum / count per behavior).
+	applyInteractionAverages(ctx, idx)
+
 	applyBaseTendencies(ctx, idx)
 	// Detection boosts are applied AFTER base tendencies and only reinforce
 	// combat/courtship weights the agent already has configured (> 0). This
@@ -114,6 +153,80 @@ func resetVectors(a *world.AgentArrays, idx int, numBehaviors int) {
 	for b := 0; b < numBehaviors; b++ {
 		a.VDecision[vdBase+b] = 0
 	}
+}
+
+// resetInteractionAccumulators (re)allocates and zeroes the per-behavior
+// interaction sum/count buffers for the current agent.
+func resetInteractionAccumulators(ctx *PerceptionContext, numBehaviors int) {
+	if len(ctx.interSum) < numBehaviors {
+		ctx.interSum = make([]int32, numBehaviors)
+		ctx.interCount = make([]int32, numBehaviors)
+	}
+	for b := 0; b < numBehaviors; b++ {
+		ctx.interSum[b] = 0
+		ctx.interCount[b] = 0
+	}
+}
+
+// accumulateInteraction evaluates the interaction-matrix formula for every
+// behavior of a single perceived element and adds each result to the running
+// per-behavior average (one contribution per element, per the legacy
+// PromediaProbaDecision). keyFn builds the registry key for a given behavior.
+// The evaluator environment must already be set for the perceiver and, when
+// relevant, the observed element/contender.
+func accumulateInteraction(ctx *PerceptionContext, keyFn func(behaviorIdx int) string, numBehaviors int) {
+	for b := 0; b < numBehaviors; b++ {
+		p := ctx.Formulas.Get(keyFn(b))
+		if p == nil {
+			// No configured cell for this behavior: it still counts as a
+			// contribution of 0, matching the legacy which averages over all
+			// perceived elements regardless of whether the cell is non-zero.
+			ctx.interCount[b]++
+			continue
+		}
+		val, err := ctx.Eval.RunProgramInt(p)
+		if err == nil {
+			ctx.interSum[b] += int32(val)
+		}
+		ctx.interCount[b]++
+	}
+}
+
+// applyInteractionAverages writes the averaged interaction weights into the
+// agent's VDecision (VDecision[b] = round(sum/count)). Behaviors with no
+// contributing element are left at 0.
+func applyInteractionAverages(ctx *PerceptionContext, idx int) {
+	cfg := ctx.World.Config
+	vdBase := idx * cfg.NumBehaviors
+	a := ctx.World.Agents
+	for b := 0; b < cfg.NumBehaviors; b++ {
+		if ctx.interCount[b] > 0 {
+			a.VDecision[vdBase+b] += ctx.interSum[b] / ctx.interCount[b]
+		}
+	}
+}
+
+// perceiveSubstrate accumulates interaction weights from the substrate the
+// agent currently stands on. The legacy also perceives nearby substrates within
+// a radius; here we contribute the current cell's substrate (the dominant
+// signal) so substrate interaction formulas take effect. Tendency/attraction of
+// substrates is handled separately by the attractiveness matrices.
+func perceiveSubstrate(ctx *PerceptionContext, idx int) {
+	w := ctx.World
+	a := w.Agents
+	cfg := w.Config
+
+	sx := int(a.PosX[idx])
+	sy := int(a.PosY[idx])
+	if sx < 0 || sx >= cfg.GridWidth || sy < 0 || sy >= cfg.GridHeight {
+		return
+	}
+	substrateIdx := int(w.Substrates.Get(sx, sy))
+	perceiverIdx := getPerceiverIndex(a, idx, cfg)
+
+	accumulateInteraction(ctx, func(b int) string {
+		return InteractionKeySubstrate(substrateIdx, perceiverIdx, b)
+	}, cfg.NumBehaviors)
 }
 
 // perceiveResources queries the resource grid and accumulates tendencies + VDecision.
@@ -151,14 +264,17 @@ func perceiveResources(ctx *PerceptionContext, idx int) {
 		attractiveness := getResourceAttractiveness(ctx, radiusKey, dist)
 		accumulateTendency(a, tendBase, aDir, ax, ay, rx, ry, attractiveness)
 
-		feedBehavior := behaviorOffsetFeed + resourceType
-		if feedBehavior < cfg.NumBehaviors {
-			a.VDecision[vdBase+feedBehavior] += clampPositive(attractiveness)
-			if dist <= contiguousDistance {
-				a.VDecision[vdBase+feedBehavior] += contiguousBoost
-			}
+		// Accumulate this source's interaction-matrix contribution to every
+		// behavior (legacy PromediaProbaDecision). Expose the element's
+		// variables so formulas can reference DynamicElementLevel/Quality.
+		if resourceType >= 0 {
+			ctx.EnvBuilder.SetResourceVars(w, int(rIdx))
+			accumulateInteraction(ctx, func(b int) string {
+				return InteractionKeySource(resourceType, perceiverIdx, b)
+			}, cfg.NumBehaviors)
 		}
 	}
+	_ = vdBase
 }
 
 // perceiveAgents queries the agent grid and accumulates attractiveness-driven
@@ -200,6 +316,14 @@ func perceiveAgents(ctx *PerceptionContext, idx int) (hasContender, hasMate bool
 
 		attractiveness := getAgentAttractiveness(ctx, radiusKey, dist)
 		accumulateTendency(a, tendBase, aDir, ax, ay, cx, cy, attractiveness)
+
+		// Accumulate this observed agent's interaction-matrix contribution to
+		// every behavior (legacy PromediaProbaDecision). Expose the observed
+		// agent as the "contender" so formulas can reference Contender* vars.
+		ctx.EnvBuilder.SetContenderVars(w, int(cIdx))
+		accumulateInteraction(ctx, func(b int) string {
+			return InteractionKeyAgent(observedIdx, perceiverIdx, b)
+		}, cfg.NumBehaviors)
 
 		if dist <= contiguousDistance {
 			c, m := classifyNeighbor(a.Sex[idx], a.Sex[cIdx], a.Situation[cIdx])

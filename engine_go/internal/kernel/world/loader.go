@@ -133,12 +133,12 @@ func loadConfig(db *storage.DB, environmentID int64) (Config, error) {
 	cfg.GridWidth = env.Width
 	cfg.GridHeight = env.Height
 
-	// Behaviors: move + rest + feed×NumResourceTypes + fight×2 + court×2 + oviposit + die
-	cfg.NumBehaviors = 2 + cfg.NumResourceTypes + 2 + 2 + 1 + 1
-	// Minimum of 12 for compatibility with the base behavioral model.
-	if cfg.NumBehaviors < 12 {
-		cfg.NumBehaviors = 12
-	}
+	// Behaviors (see world.BuildBehaviorNames):
+	//   Move, Rest, Feed×NumResourceTypes,
+	//   Fight_Attack/Defend/Retreat, Court_Display/Accept/Reject, Oviposit,
+	//   Egg_Survive, Egg_Die.
+	// = 2 + N + 3 + 3 + 1 + 2. (Names are populated below; count uses N here.)
+	cfg.NumBehaviors = 2 + cfg.NumResourceTypes + 3 + 3 + 1 + 2
 
 	// --- Populate user-defined names ---
 	cfg.Names.NutrientNames = make([]string, len(nutrients))

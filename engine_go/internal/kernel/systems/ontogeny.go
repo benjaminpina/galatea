@@ -38,6 +38,102 @@ type OntogenyConfig struct {
 }
 
 // EvaluateEggs checks each egg for eclosion conditions and converts them to agents.
+// EvaluateEggViability runs the per-tick survive/die decision for every egg,
+// mirroring the legacy: an egg reads two columns from its CARRIER's interaction
+// matrix — Egg_Survive and Egg_Die — and picks one by weighted roulette. If it
+// picks "die", the egg is removed. If the carrier has vanished (a dead carrier
+// agent), the egg is forced to die (orphaned). When neither weight is
+// configured (both zero), the egg survives by default.
+//
+// Carrier resolution:
+//   - Carrier AGENT: weights come from interaction.agent.<carrierProto>.<carrierProto>.<Egg_*>.
+//   - Carrier SITE: oviposition sites are not part of the source-interaction
+//     matrix (that matrix is per-nutrient), so a site-borne egg currently
+//     always survives unless its site is gone. Configurable site viability is a
+//     known follow-up.
+//
+// Must run before EvaluateEggs (eclosion) each tick.
+func EvaluateEggViability(
+	w *world.World,
+	reg *formulas.Registry, eval *formulas.Evaluator, envBuilder *formulas.EnvBuilder,
+) int {
+	eggs := w.Eggs
+	a := w.Agents
+	cfg := w.Config
+	surviveIdx := EggSurviveBehaviorIdx(cfg)
+	dieIdx := EggDieBehaviorIdx(cfg)
+
+	died := 0
+	envBuilder.SetWorldVars(w)
+
+	// Reverse iteration so swap-and-pop removals are safe.
+	for i := eggs.Count - 1; i >= 0; i-- {
+		carrierAgent := eggs.CarrierAgentIdx[i]
+		carrierSite := eggs.CarrierResourceIdx[i]
+
+		var survive, die int32
+
+		switch {
+		case carrierAgent >= 0:
+			if int(carrierAgent) >= a.Count || a.Situation[carrierAgent] == world.SituationDead {
+				// Orphaned: carrier gone → forced death.
+				removeEgg(w, i)
+				died++
+				continue
+			}
+			// Evaluate the carrier's egg-viability columns. Expose the carrier's
+			// own variables so the formula can depend on the carrier's state.
+			envBuilder.SetAgentVars(w, int(carrierAgent))
+			proto := getPerceiverIndex(a, int(carrierAgent), cfg)
+			survive = evalInteractionInt(reg, eval, InteractionKeyAgent(proto, proto, surviveIdx))
+			die = evalInteractionInt(reg, eval, InteractionKeyAgent(proto, proto, dieIdx))
+
+		case carrierSite >= 0:
+			if int(carrierSite) >= w.Resources.Count ||
+				w.Resources.TypeID[carrierSite] != world.ResourceTypeOvipositionSite {
+				// Site gone → forced death.
+				removeEgg(w, i)
+				died++
+				continue
+			}
+			// Site viability is not configurable via the current matrices;
+			// default to survival (survive=1, die=0).
+			survive, die = 1, 0
+
+		default:
+			// No carrier at all → forced death.
+			removeEgg(w, i)
+			died++
+			continue
+		}
+
+		// Roulette between survive and die. If both are zero, survive.
+		if survive == 0 && die == 0 {
+			continue
+		}
+		weights := []int32{survive, die}
+		if Roulette(weights) == 1 { // index 1 = die
+			removeEgg(w, i)
+			died++
+		}
+	}
+	return died
+}
+
+// evalInteractionInt evaluates a compiled interaction formula by key, returning
+// 0 when the key is absent or evaluation fails.
+func evalInteractionInt(reg *formulas.Registry, eval *formulas.Evaluator, key string) int32 {
+	p := reg.Get(key)
+	if p == nil {
+		return 0
+	}
+	v, err := eval.RunProgramInt(p)
+	if err != nil {
+		return 0
+	}
+	return int32(v)
+}
+
 // Returns the number of eggs that eclosed.
 func EvaluateEggs(w *world.World, ontCfg OntogenyConfig, genCfg GeneticsConfig) int {
 	eggs := w.Eggs

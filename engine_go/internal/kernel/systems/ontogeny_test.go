@@ -419,3 +419,120 @@ func TestCombineLogic(t *testing.T) {
 		t.Error("(F AND F) OR T should be true")
 	}
 }
+
+// eggViabilityCtx builds the registry/eval/envBuilder trio for egg-viability tests.
+func eggViabilityCtx(w *world.World) (*formulas.Registry, *formulas.Evaluator, *formulas.EnvBuilder) {
+	reg := formulas.NewRegistry()
+	eval := formulas.NewEvaluator(128)
+	envBuilder := formulas.NewEnvBuilder(eval, w.Config)
+	return reg, eval, envBuilder
+}
+
+// TestEggViabilityAgentCarrierDies verifies an egg carried by an agent dies when
+// the carrier's interaction matrix gives all weight to Egg_Die.
+func TestEggViabilityAgentCarrierDies(t *testing.T) {
+	cfg := testCfg()
+	w := world.New(cfg)
+
+	carrier := w.AddAgent()
+	w.Agents.StageID[carrier] = 0 // perceiver index 0
+	w.Agents.Situation[carrier] = world.SituationRegular
+
+	eggs := w.Eggs
+	eggs.Count = 1
+	eggs.CarrierAgentIdx[0] = int32(carrier)
+	eggs.CarrierResourceIdx[0] = -1
+
+	reg, eval, envBuilder := eggViabilityCtx(w)
+	// Carrier proto index 0: survive=0, die=1 → certain death.
+	_ = reg.Compile(InteractionKeyAgent(0, 0, EggSurviveBehaviorIdx(cfg)), "0")
+	_ = reg.Compile(InteractionKeyAgent(0, 0, EggDieBehaviorIdx(cfg)), "1")
+
+	died := EvaluateEggViability(w, reg, eval, envBuilder)
+	if died != 1 {
+		t.Fatalf("expected 1 egg to die, got %d", died)
+	}
+	if w.Eggs.Count != 0 {
+		t.Fatalf("expected 0 eggs remaining, got %d", w.Eggs.Count)
+	}
+}
+
+// TestEggViabilityAgentCarrierSurvives verifies an egg survives when the
+// carrier's matrix gives all weight to Egg_Survive.
+func TestEggViabilityAgentCarrierSurvives(t *testing.T) {
+	cfg := testCfg()
+	w := world.New(cfg)
+
+	carrier := w.AddAgent()
+	w.Agents.StageID[carrier] = 0
+	w.Agents.Situation[carrier] = world.SituationRegular
+
+	eggs := w.Eggs
+	eggs.Count = 1
+	eggs.CarrierAgentIdx[0] = int32(carrier)
+	eggs.CarrierResourceIdx[0] = -1
+
+	reg, eval, envBuilder := eggViabilityCtx(w)
+	_ = reg.Compile(InteractionKeyAgent(0, 0, EggSurviveBehaviorIdx(cfg)), "1")
+	_ = reg.Compile(InteractionKeyAgent(0, 0, EggDieBehaviorIdx(cfg)), "0")
+
+	died := EvaluateEggViability(w, reg, eval, envBuilder)
+	if died != 0 {
+		t.Fatalf("expected no egg to die, got %d", died)
+	}
+	if w.Eggs.Count != 1 {
+		t.Fatalf("expected 1 egg remaining, got %d", w.Eggs.Count)
+	}
+}
+
+// TestEggViabilityOrphanDies verifies an egg whose carrier agent is dead is
+// forced to die (orphaned), regardless of any matrix.
+func TestEggViabilityOrphanDies(t *testing.T) {
+	cfg := testCfg()
+	w := world.New(cfg)
+
+	carrier := w.AddAgent()
+	w.Agents.StageID[carrier] = 0
+	w.Agents.Situation[carrier] = world.SituationDead // carrier is gone
+
+	eggs := w.Eggs
+	eggs.Count = 1
+	eggs.CarrierAgentIdx[0] = int32(carrier)
+	eggs.CarrierResourceIdx[0] = -1
+
+	reg, eval, envBuilder := eggViabilityCtx(w)
+	// Even with survive=1, the orphan must die.
+	_ = reg.Compile(InteractionKeyAgent(0, 0, EggSurviveBehaviorIdx(cfg)), "1")
+
+	died := EvaluateEggViability(w, reg, eval, envBuilder)
+	if died != 1 {
+		t.Fatalf("expected orphan egg to die, got %d", died)
+	}
+}
+
+// TestEggViabilitySiteSurvivesByDefault verifies an egg in an oviposition site
+// survives by default (site viability is not matrix-configured yet).
+func TestEggViabilitySiteSurvivesByDefault(t *testing.T) {
+	cfg := testCfg()
+	w := world.New(cfg)
+
+	site := w.Resources.Count
+	w.Resources.TypeID[site] = world.ResourceTypeOvipositionSite
+	w.Resources.MaxLevel[site] = 5
+	w.Resources.Level[site] = 1
+	w.Resources.Count++
+
+	eggs := w.Eggs
+	eggs.Count = 1
+	eggs.CarrierAgentIdx[0] = -1
+	eggs.CarrierResourceIdx[0] = int32(site)
+
+	reg, eval, envBuilder := eggViabilityCtx(w)
+	died := EvaluateEggViability(w, reg, eval, envBuilder)
+	if died != 0 {
+		t.Fatalf("expected site egg to survive, got %d died", died)
+	}
+	if w.Eggs.Count != 1 {
+		t.Fatalf("expected 1 egg remaining, got %d", w.Eggs.Count)
+	}
+}

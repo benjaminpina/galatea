@@ -350,6 +350,14 @@ func Build(db *storage.DB, cfg EngineConfig) (*Engine, error) {
 	// turnSlotToEngine maps the DB turnIndex to the engine tendency slot.
 	compileTendencies(db, registry, w.Config)
 
+	// Compile the behavior-probability interaction matrices (agents, sources,
+	// substrates). These modulate VDecision per perceived element in the hot
+	// perception loop (see systems.Perceive), mirroring the legacy
+	// PromediaProbaDecision accumulation.
+	compileInteractionAgents(db, registry, w.Config)
+	compileInteractionSources(db, registry, w.Config)
+	compileInteractionSubstrates(db, registry, w.Config)
+
 	// Precompute attractiveness + radius arrays from the DB. Attraction
 	// defaults to 0 (no attraction); radii default to cellSize. This ensures
 	// agents/resources only attract when the user configures it, instead of a
@@ -557,7 +565,10 @@ func (e *Engine) Tick() {
 		w, e.CourtTimeout, e.ReproCfg, e.GeneticsCfg,
 		e.Registry, e.Eval, e.EnvBuilder, e.agentRef)
 
-	// 12. Ontogeny: evaluate eggs and stage transitions.
+	// 12. Ontogeny: egg viability (survive/die per carrier), then eclosion and
+	// stage transitions. Viability runs first so non-viable eggs die before
+	// they can eclose (mirrors the legacy egg decision preceding EvaluaHuevo).
+	systems.EvaluateEggViability(w, e.Registry, e.Eval, e.EnvBuilder)
 	systems.EvaluateEggs(w, e.OntogenyCfg, e.GeneticsCfg)
 	for i := 0; i < a.Count; i++ {
 		if a.StageID[i] >= 0 {
@@ -1091,6 +1102,10 @@ func behaviorNameToIndex(name string, nIdx int, cfg world.Config) int {
 		return fightBase + 5
 	case "Oviposit":
 		return fightBase + 6
+	case "Egg_Survive":
+		return fightBase + 7
+	case "Egg_Die":
+		return fightBase + 8
 	default:
 		return -1
 	}
@@ -1177,4 +1192,152 @@ func buildStagesFromDB(
 // convention (true = AND).
 func logicIsAnd(s string) bool {
 	return s != "OR"
+}
+
+// --- Interaction matrices (behavior-probability) ------------------------------
+//
+// These mirror the legacy MatrizAgentes / MatrizDinamicos / MatrizSustratos:
+// for each element perceived within radius, every behavior column contributes a
+// weight to the perceiver's VDecision. Each cell is a formula (evaluated hot in
+// the perception loop because it can depend on agent/contender/element state),
+// so here we only COMPILE the formulas into the registry under keys the
+// perception system looks up.
+//
+// Key patterns (perceiverIdx/observedIdx are the unified prototype index used
+// by the perception system: stages [0..NumStages), then males, then females):
+//
+//	interaction.agent.<observedIdx>.<perceiverIdx>.<behaviorIdx>
+//	interaction.source.<resourceType>.<perceiverIdx>.<behaviorIdx>
+//	interaction.substrate.<substrateIdx>.<perceiverIdx>.<behaviorIdx>
+//
+// A NULL perceiver or observed in the DB means "Any": the formula is compiled
+// for every concrete index (expanded at load time), so a specific row always
+// wins over an Any row only if it is registered later — callers should register
+// Any first. We register Any rows first, then specific rows, so specific
+// overrides Any.
+
+// allPerceiverIndices returns every concrete unified perceiver index
+// (stages, then males, then females).
+func allPerceiverIndices(cfg world.Config) []int {
+	out := make([]int, 0, cfg.NumPrototypes)
+	for i := 0; i < cfg.NumPrototypes; i++ {
+		out = append(out, i)
+	}
+	return out
+}
+
+// compileInteractionAgents loads interaction_agents and compiles each cell's
+// formula. observed/perceiver NULL = Any (expanded to all concrete indices,
+// registered first so specific rows override).
+func compileInteractionAgents(db *storage.DB, registry *formulas.Registry, cfg world.Config) {
+	protoMap := buildProtoPerceiverMap(db, cfg)
+	rows, err := db.Conn.Query(
+		`SELECT observed_stage_id, observed_prototype_id,
+		        perceiver_stage_id, perceiver_prototype_id,
+		        behavior_index, formula
+		 FROM interaction_agents
+		 ORDER BY (perceiver_stage_id IS NULL AND perceiver_prototype_id IS NULL) DESC,
+		          (observed_stage_id IS NULL AND observed_prototype_id IS NULL) DESC`)
+	if err != nil {
+		return
+	}
+	defer rows.Close()
+
+	all := allPerceiverIndices(cfg)
+	for rows.Next() {
+		var obsStage, obsProto, perStage, perProto *int64
+		var behaviorIdx int
+		var formula string
+		if err := rows.Scan(&obsStage, &obsProto, &perStage, &perProto, &behaviorIdx, &formula); err != nil {
+			continue
+		}
+		if behaviorIdx < 0 || behaviorIdx >= cfg.NumBehaviors {
+			continue
+		}
+
+		observedIdxs := resolveIdxOrAll(obsStage, obsProto, protoMap, all)
+		perceiverIdxs := resolveIdxOrAll(perStage, perProto, protoMap, all)
+		for _, o := range observedIdxs {
+			for _, p := range perceiverIdxs {
+				_ = registry.Compile(systems.InteractionKeyAgent(o, p, behaviorIdx), formula)
+			}
+		}
+	}
+}
+
+// compileInteractionSources loads interaction_sources and compiles each cell.
+func compileInteractionSources(db *storage.DB, registry *formulas.Registry, cfg world.Config) {
+	protoMap := buildProtoPerceiverMap(db, cfg)
+	rows, err := db.Conn.Query(
+		`SELECT nutrient_id, perceiver_stage_id, perceiver_prototype_id,
+		        behavior_index, formula
+		 FROM interaction_sources
+		 ORDER BY (perceiver_stage_id IS NULL AND perceiver_prototype_id IS NULL) DESC`)
+	if err != nil {
+		return
+	}
+	defer rows.Close()
+
+	all := allPerceiverIndices(cfg)
+	for rows.Next() {
+		var nutrientID int64
+		var perStage, perProto *int64
+		var behaviorIdx int
+		var formula string
+		if err := rows.Scan(&nutrientID, &perStage, &perProto, &behaviorIdx, &formula); err != nil {
+			continue
+		}
+		resourceType := int(nutrientID - 1)
+		if resourceType < 0 || behaviorIdx < 0 || behaviorIdx >= cfg.NumBehaviors {
+			continue
+		}
+		for _, p := range resolveIdxOrAll(perStage, perProto, protoMap, all) {
+			_ = registry.Compile(systems.InteractionKeySource(resourceType, p, behaviorIdx), formula)
+		}
+	}
+}
+
+// compileInteractionSubstrates loads interaction_substrates and compiles each cell.
+func compileInteractionSubstrates(db *storage.DB, registry *formulas.Registry, cfg world.Config) {
+	protoMap := buildProtoPerceiverMap(db, cfg)
+	rows, err := db.Conn.Query(
+		`SELECT substrate_id, perceiver_stage_id, perceiver_prototype_id,
+		        behavior_index, formula
+		 FROM interaction_substrates
+		 ORDER BY (perceiver_stage_id IS NULL AND perceiver_prototype_id IS NULL) DESC`)
+	if err != nil {
+		return
+	}
+	defer rows.Close()
+
+	all := allPerceiverIndices(cfg)
+	for rows.Next() {
+		var substrateID int64
+		var perStage, perProto *int64
+		var behaviorIdx int
+		var formula string
+		if err := rows.Scan(&substrateID, &perStage, &perProto, &behaviorIdx, &formula); err != nil {
+			continue
+		}
+		substrateIdx := int(substrateID - 1)
+		if substrateIdx < 0 || behaviorIdx < 0 || behaviorIdx >= cfg.NumBehaviors {
+			continue
+		}
+		for _, p := range resolveIdxOrAll(perStage, perProto, protoMap, all) {
+			_ = registry.Compile(systems.InteractionKeySubstrate(substrateIdx, p, behaviorIdx), formula)
+		}
+	}
+}
+
+// resolveIdxOrAll resolves a (stageID, protoID) pair to a single unified index,
+// or returns all concrete indices when both are NULL ("Any").
+func resolveIdxOrAll(stageID, protoID *int64, protoMap map[int64]int, all []int) []int {
+	if stageID == nil && protoID == nil {
+		return all
+	}
+	idx := resolvePerceiverIdx(stageID, protoID, protoMap)
+	if idx < 0 {
+		return nil
+	}
+	return []int{idx}
 }
