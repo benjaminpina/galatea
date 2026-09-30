@@ -4,6 +4,7 @@ package kernel
 import (
 	"context"
 	"fmt"
+	"math"
 	"math/rand/v2"
 	"sort"
 	"strings"
@@ -51,6 +52,10 @@ type Engine struct {
 	resourceAttrArr  []int32
 	agentRadiiArr    []float64
 	resourceRadiiArr []float64
+
+	// substrateField holds the precomputed constant-case substrate perception
+	// (enfoque B). Nil when no constant substrate attractiveness is configured.
+	substrateField *systems.SubstrateField
 
 	// Write buffer for simulation results.
 	WriteBuffer *storage.WriteBuffer
@@ -392,6 +397,13 @@ func Build(db *storage.DB, cfg EngineConfig) (*Engine, error) {
 	agentAttrArr, agentRadiiArr := buildAgentAttractiveness(db, w.Config, eval, cellSize)
 	resourceAttrArr, resourceRadiiArr := buildResourceAttractiveness(db, w.Config, eval, cellSize)
 
+	// Precompute the CONSTANT-case substrate perception field (enfoque B): for
+	// substrates whose attractiveness/radius formulas do not depend on state,
+	// the per-agent radius sweep is computed once here per (perceiver, cell),
+	// eliminating the legacy O(agents × radius² × ticks) hot-spot. Dynamic
+	// substrate formulas are skipped for now (handled by a later hot-path branch).
+	substrateField := buildSubstrateAttractiveness(db, w, registry, eval, cellSize)
+
 	// Build write buffer.
 	wb := storage.NewWriteBuffer(db, runID, cfg.WriteBufferCfg)
 
@@ -490,6 +502,7 @@ func Build(db *storage.DB, cfg EngineConfig) (*Engine, error) {
 		resourceAttrArr:  resourceAttrArr,
 		agentRadiiArr:    agentRadiiArr,
 		resourceRadiiArr: resourceRadiiArr,
+		substrateField:   substrateField,
 	}
 
 	return e, nil
@@ -503,16 +516,17 @@ func (e *Engine) Tick() {
 
 	// 1. Build perception context for this tick.
 	ctx := &systems.PerceptionContext{
-		World:         w,
-		AgentGrid:     e.AgentGrid,
-		ResourceGrid:  e.ResourceGrid,
-		Formulas:      e.Registry,
-		Eval:          e.Eval,
-		EnvBuilder:    e.EnvBuilder,
-		ResourceRadii: e.resourceRadii(),
-		ResourceAttr:  e.resourceAttr(),
-		AgentRadii:    e.agentRadii(),
-		AgentAttr:     e.agentAttrArr,
+		World:          w,
+		AgentGrid:      e.AgentGrid,
+		ResourceGrid:   e.ResourceGrid,
+		Formulas:       e.Registry,
+		Eval:           e.Eval,
+		EnvBuilder:     e.EnvBuilder,
+		ResourceRadii:  e.resourceRadii(),
+		ResourceAttr:   e.resourceAttr(),
+		AgentRadii:     e.agentRadii(),
+		AgentAttr:      e.agentAttrArr,
+		SubstrateField: e.substrateField,
 	}
 
 	// 2. Generate random permutation for agent processing order.
@@ -1098,6 +1112,142 @@ func buildResourceAttractiveness(
 		radii[key] = float64(evalConstFormula(eval, radiusFormula, int32(defaultRadius)))
 	}
 	return attr, radii
+}
+
+// substrateAttrRow is one classified attractiveness_substrates row: the
+// resolved (substrate, perceiver) pair with its constant attractiveness value
+// and radius. Only rows whose attractiveness AND radius formulas are constant
+// (enfoque B constant case) are collected here.
+type substrateAttrRow struct {
+	substrateIdx int
+	perceiverIdx int
+	attr         int32
+	radius       float64
+}
+
+// buildSubstrateAttractiveness precomputes the CONSTANT-case substrate
+// perception field (enfoque B). For every (substrate, perceiver) pair whose
+// attractiveness/radius formulas do not depend on agent/world state and are not
+// stochastic, it sweeps the substrate map ONCE and records, per (perceiver,
+// cell), the heading-independent attractiveness→tendency contribution and the
+// set of substrates in range. The hot path then reads this back in O(8) instead
+// of re-sweeping O(radius²) per agent per tick.
+//
+// Rows with dynamic formulas are ignored here; they will be handled by a later
+// per-agent hot-path branch. Returns nil when no constant row is configured, so
+// perceiveSubstrate falls back to its current-cell behavior.
+func buildSubstrateAttractiveness(
+	db *storage.DB, w *world.World, registry *formulas.Registry,
+	eval *formulas.Evaluator, defaultRadius float64,
+) *systems.SubstrateField {
+	cfg := w.Config
+	rows := loadConstantSubstrateAttr(db, cfg, registry, eval, defaultRadius)
+	if len(rows) == 0 {
+		return nil
+	}
+
+	field := systems.NewSubstrateField(
+		cfg.NumPrototypes, cfg.NumBehaviors, cfg.GridWidth, cfg.GridHeight, cfg.NumSubstrates)
+
+	// For each constant (substrate, perceiver) row, sweep every cell of the map
+	// that holds that substrate and radiate its attractiveness into the cells
+	// within radius, exactly as the legacy per-agent sweep would have, but from
+	// the substrate's point of view (equivalent, and computed once).
+	for _, row := range rows {
+		radius := row.radius
+		if radius <= 0 || row.attr == 0 {
+			continue
+		}
+		r := int(math.Ceil(radius))
+		for cy := 0; cy < cfg.GridHeight; cy++ {
+			for cx := 0; cx < cfg.GridWidth; cx++ {
+				if int(w.Substrates.Get(cx, cy)) != row.substrateIdx {
+					continue
+				}
+				accumulateSubstrateCell(field, row, cx, cy, r, radius)
+			}
+		}
+	}
+	return field
+}
+
+// accumulateSubstrateCell radiates the attractiveness of the substrate cell at
+// (cx, cy) into every agent-standpoint cell within radius, for one perceiver.
+// The tendency points from the standpoint cell TOWARD the substrate cell, with
+// weight attr/dist (legacy Atractividad/Dist), stored in absolute angle buckets.
+func accumulateSubstrateCell(
+	field *systems.SubstrateField, row substrateAttrRow, cx, cy, r int, radius float64,
+) {
+	for sy := cy - r; sy <= cy+r; sy++ {
+		for sx := cx - r; sx <= cx+r; sx++ {
+			dist := systems.SubstrateEuclid(sx, sy, cx, cy)
+			if dist > radius {
+				continue
+			}
+			// From the agent standpoint (sx,sy), this substrate is perceived.
+			field.MarkPerceivedSubstrate(row.perceiverIdx, sx, sy, row.substrateIdx)
+			if dist == 0 {
+				continue // Own cell contributes no directional tendency.
+			}
+			absAngle := systems.AbsoluteAngleOf(float64(sx), float64(sy), float64(cx), float64(cy))
+			if absAngle < 0 {
+				continue
+			}
+			w := row.attr / int32(math.Max(1, dist))
+			field.AddTendency(row.perceiverIdx, sx, sy, absAngle, w)
+		}
+	}
+}
+
+// loadConstantSubstrateAttr reads attractiveness_substrates and returns the
+// rows whose attractiveness AND radius formulas are constant, with those
+// formulas already evaluated to scalars.
+func loadConstantSubstrateAttr(
+	db *storage.DB, cfg world.Config, registry *formulas.Registry,
+	eval *formulas.Evaluator, defaultRadius float64,
+) []substrateAttrRow {
+	protoMap := buildProtoPerceiverMap(db, cfg)
+	all := allPerceiverIndices(cfg)
+
+	dbRows, err := db.Conn.Query(
+		`SELECT substrate_id, perceiver_stage_id, perceiver_prototype_id,
+		        attractiveness_formula, radius_formula
+		 FROM attractiveness_substrates`)
+	if err != nil {
+		return nil
+	}
+	defer dbRows.Close()
+
+	var out []substrateAttrRow
+	for dbRows.Next() {
+		var substrateID int64
+		var perStage, perProto *int64
+		var formula, radiusFormula string
+		if err := dbRows.Scan(&substrateID, &perStage, &perProto, &formula, &radiusFormula); err != nil {
+			continue
+		}
+		substrateIdx := int(substrateID - 1)
+		if substrateIdx < 0 || substrateIdx >= cfg.NumSubstrates {
+			continue
+		}
+		// Enfoque B: only the constant case is precomputed here. A formula that
+		// references variables or calls a stochastic function is dynamic and is
+		// left to the later per-agent branch.
+		if !registry.IsConstantFormula(formula) || !registry.IsConstantFormula(radiusFormula) {
+			continue
+		}
+		attr := evalConstFormula(eval, formula, 0)
+		radius := float64(evalConstFormula(eval, radiusFormula, int32(defaultRadius)))
+		for _, p := range resolveIdxOrAll(perStage, perProto, protoMap, all) {
+			out = append(out, substrateAttrRow{
+				substrateIdx: substrateIdx,
+				perceiverIdx: p,
+				attr:         attr,
+				radius:       radius,
+			})
+		}
+	}
+	return out
 }
 
 // behaviorNameToIndex maps a canonical behavior name (shared with the editor;

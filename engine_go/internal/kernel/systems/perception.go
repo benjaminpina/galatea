@@ -120,6 +120,11 @@ type PerceptionContext struct {
 	// Defaults to 0 (no attraction) when not configured in the DB.
 	AgentAttr []int32
 
+	// SubstrateField holds the precomputed constant-case substrate perception
+	// (tendencies + interaction) per (perceiver, cell). Nil when no constant
+	// substrate attractiveness is configured. See enfoque B / SubstrateField.
+	SubstrateField *SubstrateField
+
 	// Per-agent reference values (set before each agent's perception).
 	Ref *AgentRef
 
@@ -327,6 +332,16 @@ func perceiveSubstrate(ctx *PerceptionContext, idx int) {
 	// The agent stands on this substrate → it perceives it (memory tracks the
 	// substrate cell, mixed or simple, by its own index).
 	markPerceived(ctx, cfg.MemSlotSubstrate(substrateIdx))
+
+	// Enfoque B, constant case: when a precomputed substrate field exists, fold
+	// in the radius-swept attractiveness→tendency contribution (rotated by the
+	// agent's heading) and mark perception memory for the substrates in range.
+	// This replaces the legacy per-agent O(radius²) tendency sweep with an O(8)
+	// lookup. The interaction contribution below still runs for the agent's own
+	// cell (surrounding-cell interaction is a later entry).
+	if ctx.SubstrateField.HasSubstrateField() {
+		ctx.SubstrateField.applyTo(ctx, idx, perceiverIdx, sx, sy)
+	}
 
 	if !cfg.IsMixedSubstrate(substrateIdx) {
 		// Simple substrate: one interaction contribution.
