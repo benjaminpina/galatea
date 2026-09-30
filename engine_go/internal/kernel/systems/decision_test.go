@@ -4,6 +4,7 @@ import (
 	"math"
 	"testing"
 
+	"galatea/engine/internal/kernel/formulas"
 	"galatea/engine/internal/kernel/spatial"
 	"galatea/engine/internal/kernel/world"
 )
@@ -83,7 +84,7 @@ func TestDecideRegular(t *testing.T) {
 	vdBase := idx * cfg.NumBehaviors
 	w.Agents.VDecision[vdBase+1] = 100
 
-	Decide(w, idx)
+	Decide(w, idx, nil)
 
 	if w.Agents.State[idx] != world.StateDecided {
 		t.Fatal("expected state = Decided")
@@ -101,7 +102,7 @@ func TestDecideAlreadyDecided(t *testing.T) {
 	w.Agents.State[idx] = world.StateDecided
 	w.Agents.Decision[idx] = 5
 
-	Decide(w, idx)
+	Decide(w, idx, nil)
 
 	// Should not change.
 	if w.Agents.Decision[idx] != 5 {
@@ -122,7 +123,7 @@ func TestDecideCombat(t *testing.T) {
 	fightDisplayIdx := behaviorOffsetFeed + cfg.NumResourceTypes
 	w.Agents.VDecision[vdBase+fightDisplayIdx] = 100
 
-	Decide(w, idx)
+	Decide(w, idx, nil)
 
 	if w.Agents.State[idx] != world.StateDecided {
 		t.Fatal("expected state = Decided")
@@ -147,7 +148,7 @@ func TestDecideCourtship(t *testing.T) {
 	courtDisplayIdx := behaviorOffsetFeed + cfg.NumResourceTypes + 2
 	w.Agents.VDecision[vdBase+courtDisplayIdx] = 100
 
-	Decide(w, idx)
+	Decide(w, idx, nil)
 
 	if w.Agents.State[idx] != world.StateDecided {
 		t.Fatal("expected state = Decided")
@@ -395,5 +396,116 @@ func TestIsOppositeSex(t *testing.T) {
 	}
 	if isOppositeSex(world.SexUndefined, world.SexMale) {
 		t.Error("U/M should not be opposite")
+	}
+}
+
+// decisionCtx builds a DecisionContext for strategy-matrix tests.
+func decisionCtx(w *world.World) *DecisionContext {
+	eval := formulas.NewEvaluator(128)
+	return &DecisionContext{
+		Registry:   formulas.NewRegistry(),
+		Eval:       eval,
+		EnvBuilder: formulas.NewEnvBuilder(eval, w.Config),
+	}
+}
+
+// TestDecideCombatUsesStrategyMatrix verifies the combat decision reads the
+// prototype's strategy matrix indexed by the opponent's last action: the same
+// agent decides differently depending on what the rival just did.
+func TestDecideCombatUsesStrategyMatrix(t *testing.T) {
+	cfg := testCfg()
+	w := world.New(cfg)
+
+	idx := w.AddAgent()
+	w.Agents.StageID[idx] = -1
+	w.Agents.PrototypeID[idx] = 0 // combat.0.*
+	w.Agents.Situation[idx] = world.SituationCombat
+
+	// A valid interactant so contender vars can be set.
+	other := w.AddAgent()
+	w.Agents.StageID[other] = -1
+	w.Agents.PrototypeID[other] = 0
+	w.Agents.Situation[other] = world.SituationCombat
+	w.Agents.InteractantIdx[idx] = int32(other)
+
+	dctx := decisionCtx(w)
+	fightDisplayIdx := behaviorOffsetFeed + cfg.NumResourceTypes
+	fightEscalateIdx := fightDisplayIdx + 1
+	retreatIdx := fightDisplayIdx + 4
+
+	// Matrix for prototype 0:
+	//   opponent Displayed (col 1) → I escalate for sure (row 2 = 1, others 0)
+	//   opponent Escalated (col 2) → I retreat for sure (row 3 = 1, others 0)
+	_ = dctx.Registry.Compile(CombatStrategyKey(0, 1, 1), "0") // display | opp display
+	_ = dctx.Registry.Compile(CombatStrategyKey(0, 2, 1), "1") // escalate | opp display
+	_ = dctx.Registry.Compile(CombatStrategyKey(0, 3, 1), "0") // retreat | opp display
+	_ = dctx.Registry.Compile(CombatStrategyKey(0, 1, 2), "0") // display | opp escalate
+	_ = dctx.Registry.Compile(CombatStrategyKey(0, 2, 2), "0") // escalate | opp escalate
+	_ = dctx.Registry.Compile(CombatStrategyKey(0, 3, 2), "1") // retreat | opp escalate
+
+	// Case 1: opponent last displayed → agent must escalate.
+	w.Agents.LastOpponentAction[idx] = 1
+	w.Agents.State[idx] = world.StateUndecided
+	Decide(w, idx, dctx)
+	if int(w.Agents.Decision[idx]) != fightEscalateIdx {
+		t.Fatalf("opp displayed: expected escalate (%d), got %d", fightEscalateIdx, w.Agents.Decision[idx])
+	}
+
+	// Case 2: opponent last escalated → agent must retreat.
+	w.Agents.LastOpponentAction[idx] = 2
+	w.Agents.State[idx] = world.StateUndecided
+	Decide(w, idx, dctx)
+	if int(w.Agents.Decision[idx]) != retreatIdx {
+		t.Fatalf("opp escalated: expected retreat (%d), got %d", retreatIdx, w.Agents.Decision[idx])
+	}
+}
+
+// TestDecideCourtshipUsesStrategyMatrix verifies the courtship decision reads
+// the prototype's strategy matrix indexed by the mate's last action.
+func TestDecideCourtshipUsesStrategyMatrix(t *testing.T) {
+	cfg := testCfg()
+	w := world.New(cfg)
+
+	idx := w.AddAgent()
+	w.Agents.StageID[idx] = -1
+	w.Agents.PrototypeID[idx] = 0
+	w.Agents.Situation[idx] = world.SituationCourtship
+
+	other := w.AddAgent()
+	w.Agents.StageID[other] = -1
+	w.Agents.PrototypeID[other] = 0
+	w.Agents.Situation[other] = world.SituationCourtship
+	w.Agents.InteractantIdx[idx] = int32(other)
+
+	dctx := decisionCtx(w)
+	courtDisplayIdx := behaviorOffsetFeed + cfg.NumResourceTypes + 2
+	acceptIdx := courtDisplayIdx + courtshipAccept
+	rejectIdx := courtDisplayIdx + courtshipReject
+
+	// When the mate accepted (col 3) → I accept for sure (row 3 = 1).
+	_ = dctx.Registry.Compile(CourtshipStrategyKey(0, 1, 3), "0") // display
+	_ = dctx.Registry.Compile(CourtshipStrategyKey(0, 2, 3), "0") // escalate
+	_ = dctx.Registry.Compile(CourtshipStrategyKey(0, 3, 3), "1") // accept
+	_ = dctx.Registry.Compile(CourtshipStrategyKey(0, 4, 3), "0") // reject
+	// When the mate displayed (col 1) → I reject for sure (row 4 = 1).
+	_ = dctx.Registry.Compile(CourtshipStrategyKey(0, 1, 1), "0")
+	_ = dctx.Registry.Compile(CourtshipStrategyKey(0, 2, 1), "0")
+	_ = dctx.Registry.Compile(CourtshipStrategyKey(0, 3, 1), "0")
+	_ = dctx.Registry.Compile(CourtshipStrategyKey(0, 4, 1), "1")
+
+	// Mate accepted → agent accepts.
+	w.Agents.LastOpponentAction[idx] = 3
+	w.Agents.State[idx] = world.StateUndecided
+	Decide(w, idx, dctx)
+	if int(w.Agents.Decision[idx]) != acceptIdx {
+		t.Fatalf("mate accepted: expected accept (%d), got %d", acceptIdx, w.Agents.Decision[idx])
+	}
+
+	// Mate displayed → agent rejects.
+	w.Agents.LastOpponentAction[idx] = 1
+	w.Agents.State[idx] = world.StateUndecided
+	Decide(w, idx, dctx)
+	if int(w.Agents.Decision[idx]) != rejectIdx {
+		t.Fatalf("mate displayed: expected reject (%d), got %d", rejectIdx, w.Agents.Decision[idx])
 	}
 }

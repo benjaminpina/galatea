@@ -358,6 +358,12 @@ func Build(db *storage.DB, cfg EngineConfig) (*Engine, error) {
 	compileInteractionSources(db, registry, w.Config)
 	compileInteractionSubstrates(db, registry, w.Config)
 
+	// Compile the per-prototype combat/courtship strategy matrices. These make
+	// combat/courtship decisions respond to the opponent's last action
+	// (legacy Combate[i,j] / Cortejo[i,j]).
+	compileCombatMatrices(db, registry)
+	compileCourtshipMatrices(db, registry)
+
 	// Precompute attractiveness + radius arrays from the DB. Attraction
 	// defaults to 0 (no attraction); radii default to cellSize. This ensures
 	// agents/resources only attract when the user configures it, instead of a
@@ -500,9 +506,15 @@ func (e *Engine) Tick() {
 		systems.Perceive(ctx, idx)
 	}
 
-	// 4. Decide (all agents).
+	// 4. Decide (all agents). Combat/courtship read the prototype strategy
+	// matrices via the decision context.
+	dctx := &systems.DecisionContext{
+		Registry:   e.Registry,
+		Eval:       e.Eval,
+		EnvBuilder: e.EnvBuilder,
+	}
 	for _, idx := range perm {
-		systems.Decide(w, idx)
+		systems.Decide(w, idx, dctx)
 	}
 
 	// 5. Establish interactions.
@@ -1340,4 +1352,58 @@ func resolveIdxOrAll(stageID, protoID *int64, protoMap map[int64]int, all []int)
 		return nil
 	}
 	return []int{idx}
+}
+
+// --- Combat/Courtship strategy matrices ---------------------------------------
+//
+// These compile the per-prototype strategy matrices (PrototypeCombat /
+// PrototypeCourtship) into the registry. Each cell is a formula giving the
+// probability weight of one of my actions given the opponent's last action, so
+// combat/courtship decisions respond to what the rival just did (legacy
+// Combate[i,j] / Cortejo[i,j]). Keys use the agent's 0-based PrototypeID.
+
+// compileCombatMatrices loads prototype_combat and compiles each cell.
+func compileCombatMatrices(db *storage.DB, registry *formulas.Registry) {
+	rows, err := db.Conn.Query(
+		`SELECT prototype_id, action, opponent_action, formula FROM prototype_combat`)
+	if err != nil {
+		return
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var protoID int64
+		var action, oppAction int
+		var formula string
+		if err := rows.Scan(&protoID, &action, &oppAction, &formula); err != nil {
+			continue
+		}
+		pIdx := int(protoID - 1) // 1-based DB id -> 0-based prototype index.
+		if pIdx < 0 {
+			continue
+		}
+		_ = registry.Compile(systems.CombatStrategyKey(pIdx, action, oppAction), formula)
+	}
+}
+
+// compileCourtshipMatrices loads prototype_courtship and compiles each cell.
+func compileCourtshipMatrices(db *storage.DB, registry *formulas.Registry) {
+	rows, err := db.Conn.Query(
+		`SELECT prototype_id, action, opponent_action, formula FROM prototype_courtship`)
+	if err != nil {
+		return
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var protoID int64
+		var action, oppAction int
+		var formula string
+		if err := rows.Scan(&protoID, &action, &oppAction, &formula); err != nil {
+			continue
+		}
+		pIdx := int(protoID - 1)
+		if pIdx < 0 {
+			continue
+		}
+		_ = registry.Compile(systems.CourtshipStrategyKey(pIdx, action, oppAction), formula)
+	}
 }

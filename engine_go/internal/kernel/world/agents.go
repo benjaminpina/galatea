@@ -104,6 +104,13 @@ type AgentArrays struct {
 	// contiguous adult agent (Acarreados).
 	OvipositCarrierIsAgent []bool
 
+	// LastCopulation counts ticks since the agent last copulated (-1 = never).
+	// It drives the courtship refractory period: after copulating, an agent
+	// cannot start courting again for RefractoryCourtship ticks. This is the
+	// corrected legacy behavior — the refractory is triggered by copulation,
+	// not by a rejection (the legacy read the wrong memory slot).
+	LastCopulation []int32
+
 	// Time counters
 	TimeInStage       []int32 // Ticks spent in current stage.
 	TimeOnSubstrate   []int32 // Ticks on current substrate.
@@ -167,6 +174,7 @@ func NewAgentArrays(cap int, cfg Config) *AgentArrays {
 		SpermPacks:             make([][]SpermPack, cap),
 		FertilizedEggs:         make([][]FertilizedEgg, cap),
 		OvipositCarrierIsAgent: make([]bool, cap),
+		LastCopulation:         make([]int32, cap),
 
 		TimeInStage:       make([]int32, cap),
 		TimeOnSubstrate:   make([]int32, cap),
@@ -187,6 +195,10 @@ func NewAgentArrays(cap int, cfg Config) *AgentArrays {
 	}
 	for i := range a.PrototypeID {
 		a.PrototypeID[i] = -1
+	}
+	// Initialize last-copulation to -1 (never copulated).
+	for i := range a.LastCopulation {
+		a.LastCopulation[i] = -1
 	}
 	// Initialize memory "last" values to -1 (never perceived/interacted).
 	for i := range a.MemoryLastPerceived {

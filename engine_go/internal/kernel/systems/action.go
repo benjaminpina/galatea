@@ -209,6 +209,11 @@ func updateBehaviorMemory(a *world.AgentArrays, idx, behavior, numBehaviors int)
 			a.MemoryLastBehavior[memBase+b]++
 		}
 	}
+
+	// Age the copulation refractory counter (once per agent per tick).
+	if a.LastCopulation[idx] >= 0 {
+		a.LastCopulation[idx]++
+	}
 }
 
 // --- Behavior index helpers ---

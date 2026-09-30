@@ -4,6 +4,7 @@ import (
 	"math"
 	"math/rand/v2"
 
+	"galatea/engine/internal/kernel/formulas"
 	"galatea/engine/internal/kernel/spatial"
 	"galatea/engine/internal/kernel/world"
 )
@@ -63,9 +64,14 @@ func Roulette(weights []int32) int {
 }
 
 // Decide selects a behavior for the agent based on its current situation.
-// It reads VDecision (for regular), VPeleas-equivalent (for combat),
-// or VCortejos-equivalent (for courtship) and sets the Decision field.
-func Decide(w *world.World, idx int) {
+// It reads VDecision (for regular), or the prototype's combat/courtship
+// strategy matrix (indexed by the opponent's last action) for combat/courtship,
+// and sets the Decision field.
+//
+// dctx provides the formula registry/evaluator needed to read the strategy
+// matrices; it may be nil, in which case combat/courtship fall back to the base
+// VDecision weights (used by unit tests that don't configure matrices).
+func Decide(w *world.World, idx int, dctx *DecisionContext) {
 	a := w.Agents
 	if a.State[idx] == world.StateDecided {
 		return // Already decided this tick.
@@ -78,12 +84,37 @@ func Decide(w *world.World, idx int) {
 	case world.SituationImmature, world.SituationRegular:
 		decideRegular(a, idx, cfg, vdBase)
 	case world.SituationCombat:
-		decideCombat(a, idx, cfg, vdBase)
+		decideCombat(w, idx, cfg, vdBase, dctx)
 	case world.SituationCourtship:
-		decideCourtship(a, idx, cfg, vdBase)
+		decideCourtship(w, idx, cfg, vdBase, dctx)
 	}
 
 	a.State[idx] = world.StateDecided
+}
+
+// DecisionContext carries the formula machinery needed to evaluate the
+// combat/courtship strategy matrices during the decision phase.
+type DecisionContext struct {
+	Registry   *formulas.Registry
+	Eval       *formulas.Evaluator
+	EnvBuilder *formulas.EnvBuilder
+}
+
+// strategyWeight evaluates a strategy-matrix cell formula, returning fallback
+// when the context is nil, the key is absent, or evaluation fails.
+func strategyWeight(dctx *DecisionContext, key string, fallback int32) int32 {
+	if dctx == nil || dctx.Registry == nil || dctx.Eval == nil {
+		return fallback
+	}
+	p := dctx.Registry.Get(key)
+	if p == nil {
+		return fallback
+	}
+	v, err := dctx.Eval.RunProgramInt(p)
+	if err != nil {
+		return fallback
+	}
+	return int32(v)
 }
 
 // decideRegular uses the full VDecision vector for behavior selection.
@@ -93,54 +124,98 @@ func decideRegular(a *world.AgentArrays, idx int, cfg world.Config, vdBase int) 
 	a.Decision[idx] = uint8(chosen)
 }
 
-// decideCombat selects among combat-specific behaviors: display, escalate, retreat.
-func decideCombat(a *world.AgentArrays, idx int, cfg world.Config, vdBase int) {
+// decideCombat selects among combat behaviors (display, escalate, retreat)
+// using the prototype's combat strategy matrix, indexed by the opponent's last
+// action (LastOpponentAction). This mirrors the legacy DinamicaCombate, where
+// VPeleas[i] = Combate[i, UltAccionContendiente]. When no strategy context is
+// available, it falls back to the base VDecision weights.
+func decideCombat(w *world.World, idx int, cfg world.Config, vdBase int, dctx *DecisionContext) {
+	a := w.Agents
 	fightDisplayIdx := behaviorOffsetFeed + cfg.NumResourceTypes
 	fightEscalateIdx := fightDisplayIdx + 1
+	retreatIdx := fightDisplayIdx + 4
 
-	// Build a 3-element weight vector: [display, escalate, retreat].
-	var combatWeights [3]int32
-	if fightDisplayIdx < cfg.NumBehaviors {
-		combatWeights[combatDisplay] = clampPositive(a.VDecision[vdBase+fightDisplayIdx])
+	// Opponent's last action → matrix column j (1=display, 2=escalate). The
+	// legacy sets this to 1..2 at combat start (Reto: Decision-6); default to 1.
+	oppAction := int(a.LastOpponentAction[idx])
+	if oppAction < 1 || oppAction > 2 {
+		oppAction = 1
 	}
-	if fightEscalateIdx < cfg.NumBehaviors {
-		combatWeights[combatEscalate] = clampPositive(a.VDecision[vdBase+fightEscalateIdx])
+
+	protoIdx := int(a.PrototypeID[idx])
+
+	// Expose this agent (and its opponent as contender) so strategy formulas
+	// can reference agent/contender state.
+	if dctx != nil && dctx.EnvBuilder != nil {
+		dctx.EnvBuilder.SetWorldVars(w)
+		dctx.EnvBuilder.SetAgentVars(w, idx)
+		if inter := a.InteractantIdx[idx]; inter >= 0 && int(inter) < a.Count {
+			dctx.EnvBuilder.SetContenderVars(w, int(inter))
+		}
 	}
-	combatWeights[combatRetreat] = 1 // Always at least some chance to retreat.
+
+	// Fallbacks (used when no matrix is configured): the base VDecision weights,
+	// with a guaranteed chance to retreat as in the previous behavior.
+	fbDisplay := clampPositive(a.VDecision[vdBase+fightDisplayIdx])
+	fbEscalate := clampPositive(a.VDecision[vdBase+fightEscalateIdx])
+
+	var combatWeights [3]int32 // [display, escalate, retreat]
+	combatWeights[combatDisplay] = clampPositive(strategyWeight(dctx, CombatStrategyKey(protoIdx, 1, oppAction), fbDisplay))
+	combatWeights[combatEscalate] = clampPositive(strategyWeight(dctx, CombatStrategyKey(protoIdx, 2, oppAction), fbEscalate))
+	combatWeights[combatRetreat] = clampPositive(strategyWeight(dctx, CombatStrategyKey(protoIdx, 3, oppAction), 1))
 
 	chosen := Roulette(combatWeights[:])
-
-	// Map combat choice back to the global behavior index.
 	switch chosen {
 	case combatDisplay:
 		a.Decision[idx] = uint8(fightDisplayIdx)
 	case combatEscalate:
 		a.Decision[idx] = uint8(fightEscalateIdx)
 	case combatRetreat:
-		a.Decision[idx] = uint8(fightDisplayIdx + 4) // retreat uses a distinct slot
+		a.Decision[idx] = uint8(retreatIdx)
 	}
 }
 
-// decideCourtship selects among courtship-specific behaviors.
-func decideCourtship(a *world.AgentArrays, idx int, cfg world.Config, vdBase int) {
+// decideCourtship selects among courtship behaviors (display, escalate, accept,
+// reject) using the prototype's courtship strategy matrix, indexed by the
+// mate's last action (LastOpponentAction: 1=display, 2=escalate, 3=accept).
+// Mirrors the legacy DinamicaCortejo, where VCortejos[i] = Cortejo[i,
+// UltAccionContendiente]. Falls back to base VDecision weights when no strategy
+// context is available.
+func decideCourtship(w *world.World, idx int, cfg world.Config, vdBase int, dctx *DecisionContext) {
+	a := w.Agents
 	courtDisplayIdx := behaviorOffsetFeed + cfg.NumResourceTypes + 2
 	courtEscalateIdx := courtDisplayIdx + 1
 
-	// Build a 4-element weight vector: [display, escalate, accept, reject].
+	// Mate's last action → matrix column j (1=display, 2=escalate, 3=accept).
+	// The legacy sets this to 1..2 at courtship start (Pretencion: Decision-8);
+	// default to 1.
+	oppAction := int(a.LastOpponentAction[idx])
+	if oppAction < 1 || oppAction > 3 {
+		oppAction = 1
+	}
+
+	protoIdx := int(a.PrototypeID[idx])
+
+	if dctx != nil && dctx.EnvBuilder != nil {
+		dctx.EnvBuilder.SetWorldVars(w)
+		dctx.EnvBuilder.SetAgentVars(w, idx)
+		if inter := a.InteractantIdx[idx]; inter >= 0 && int(inter) < a.Count {
+			dctx.EnvBuilder.SetContenderVars(w, int(inter))
+		}
+	}
+
+	fbDisplay := clampPositive(a.VDecision[vdBase+courtDisplayIdx])
+	fbEscalate := clampPositive(a.VDecision[vdBase+courtEscalateIdx])
+
+	// [display, escalate, accept, reject]. Accept/reject default to 1 (as
+	// before) when the matrix is absent, so courtship can still resolve.
 	var courtWeights [4]int32
-	if courtDisplayIdx < cfg.NumBehaviors {
-		courtWeights[courtshipDisplay] = clampPositive(a.VDecision[vdBase+courtDisplayIdx])
-	}
-	if courtEscalateIdx < cfg.NumBehaviors {
-		courtWeights[courtshipEscalate] = clampPositive(a.VDecision[vdBase+courtEscalateIdx])
-	}
-	courtWeights[courtshipAccept] = 1
-	courtWeights[courtshipReject] = 1
+	courtWeights[courtshipDisplay] = clampPositive(strategyWeight(dctx, CourtshipStrategyKey(protoIdx, 1, oppAction), fbDisplay))
+	courtWeights[courtshipEscalate] = clampPositive(strategyWeight(dctx, CourtshipStrategyKey(protoIdx, 2, oppAction), fbEscalate))
+	courtWeights[courtshipAccept] = clampPositive(strategyWeight(dctx, CourtshipStrategyKey(protoIdx, 3, oppAction), 1))
+	courtWeights[courtshipReject] = clampPositive(strategyWeight(dctx, CourtshipStrategyKey(protoIdx, 4, oppAction), 1))
 
 	chosen := Roulette(courtWeights[:])
-
-	// Map courtship choice to decision code.
-	// Use indices relative to courtDisplay for compact representation.
 	a.Decision[idx] = uint8(courtDisplayIdx + chosen)
 }
 

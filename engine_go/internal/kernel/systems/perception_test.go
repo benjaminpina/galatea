@@ -546,3 +546,60 @@ func TestInteractionMatrixUsesContenderVars(t *testing.T) {
 		t.Fatalf("expected Fight_Attack = 10 (contender-dependent), got %d", got)
 	}
 }
+
+// TestCourtshipRefractoryTriggeredByCopulation verifies the corrected legacy
+// behavior: the courtship refractory is driven by an actual copulation
+// (LastCopulation), disabling courtship for RefractoryCourtship ticks — and a
+// non-copulating agent (LastCopulation == -1) is never blocked.
+func TestCourtshipRefractoryTriggeredByCopulation(t *testing.T) {
+	cfg := testCfg()
+	w := world.New(cfg)
+
+	idx := w.AddAgent()
+	w.Agents.PosX[idx] = 25
+	w.Agents.PosY[idx] = 25
+	w.Agents.StageID[idx] = -1
+	w.Agents.PrototypeID[idx] = 0
+	w.Agents.Sex[idx] = world.SexMale
+	w.Agents.Situation[idx] = world.SituationRegular
+	w.Agents.Reserves[idx*cfg.NumNutrients+0] = 50
+	w.Agents.Reserves[idx*cfg.NumNutrients+1] = 50
+
+	courtDisplayIdx := behaviorOffsetFeed + cfg.NumResourceTypes + 2
+
+	ctx := setupPerceptionContext(w)
+	ref := NewAgentRef(cfg.NumNutrients, cfg.NumBehaviors)
+	ref.RefractoryCourtship = 10
+	// Keep reserves above critical so the critical-reserve filter doesn't also
+	// zero courtship (isolate the refractory effect).
+	for n := range ref.CriticalReserves {
+		ref.CriticalReserves[n] = 0
+	}
+	ctx.Ref = ref
+
+	// Helper: run applyFilters with a fresh court display weight and report it.
+	courtWeightAfterFilter := func() int32 {
+		vdBase := idx * cfg.NumBehaviors
+		w.Agents.VDecision[vdBase+courtDisplayIdx] = 100
+		applyFilters(ctx, idx)
+		return w.Agents.VDecision[vdBase+courtDisplayIdx]
+	}
+
+	// Never copulated → not blocked.
+	w.Agents.LastCopulation[idx] = -1
+	if got := courtWeightAfterFilter(); got == 0 {
+		t.Fatal("agent that never copulated should not be in courtship refractory")
+	}
+
+	// Just copulated (0 < 10) → blocked.
+	w.Agents.LastCopulation[idx] = 0
+	if got := courtWeightAfterFilter(); got != 0 {
+		t.Fatalf("just-copulated agent should be blocked, got weight %d", got)
+	}
+
+	// Copulated long ago (>= refractory) → not blocked.
+	w.Agents.LastCopulation[idx] = 10
+	if got := courtWeightAfterFilter(); got == 0 {
+		t.Fatal("agent past the refractory period should court again")
+	}
+}

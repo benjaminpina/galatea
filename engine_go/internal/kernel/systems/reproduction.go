@@ -133,6 +133,10 @@ func Copulate(w *world.World, maleIdx, femaleIdx int, cfg ReproductionConfig, ge
 	a.InteractantIdx[femaleIdx] = -1
 	a.TimeInInteraction[maleIdx] = 0
 	a.TimeInInteraction[femaleIdx] = 0
+
+	// Mark the copulation for the courtship refractory period (both partners).
+	a.LastCopulation[maleIdx] = 0
+	a.LastCopulation[femaleIdx] = 0
 }
 
 // donorID builds a stable identifier for a donor male from its agent index.

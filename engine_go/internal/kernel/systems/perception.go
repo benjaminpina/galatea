@@ -60,6 +60,30 @@ func InteractionKeySubstrate(substrateIdx, perceiverIdx, behaviorIdx int) string
 	return fmt.Sprintf("interaction.substrate.%d.%d.%d", substrateIdx, perceiverIdx, behaviorIdx)
 }
 
+// --- Combat/Courtship strategy-matrix registry keys ---
+//
+// These index a prototype's strategy matrix by (my action, opponent's last
+// action), mirroring the legacy TPrototipo.Combate[i,j] / Cortejo[i,j]. Both
+// action indices are 1-based, exactly as stored by the editor and the legacy:
+//
+//	Combat action    (1..3): 1=Display, 2=Escalate, 3=Retreat
+//	Combat oppAction (1..2): 1=Opp.Display, 2=Opp.Escalate
+//	Court action     (1..4): 1=Display, 2=Escalate, 3=Accept, 4=Reject
+//	Court oppAction  (1..3): 1=Opp.Display, 2=Opp.Escalate, 3=Opp.Accept
+//
+// protoIdx is the agent's 0-based PrototypeID (DB id - 1), matching how
+// reference.go keys the other per-prototype formulas.
+
+// CombatStrategyKey builds the registry key for a combat strategy cell.
+func CombatStrategyKey(protoIdx, action, oppAction int) string {
+	return fmt.Sprintf("combat.%d.%d.%d", protoIdx, action, oppAction)
+}
+
+// CourtshipStrategyKey builds the registry key for a courtship strategy cell.
+func CourtshipStrategyKey(protoIdx, action, oppAction int) string {
+	return fmt.Sprintf("courtship.%d.%d.%d", protoIdx, action, oppAction)
+}
+
 // Lookup tables for direction conversions (replace switch statements).
 // dirAngleTable maps direction code (1-8) to clockwise angular index (0-7 from N).
 var dirAngleTable = [9]int{0, 7, 0, 1, 6, 2, 5, 4, 3} // index 0 unused
@@ -470,16 +494,14 @@ func applyFilters(ctx *PerceptionContext, idx int) {
 	}
 
 	// --- Disable courtship if in refractory period ---
+	// Triggered by an actual COPULATION (LastCopulation), not by a rejection.
+	// This corrects the legacy bug where the courtship refractory read the
+	// "reject" memory slot instead of the copulation one.
 	if ref != nil && ref.RefractoryCourtship > 0 {
-		memBase := idx * cfg.NumBehaviors
-		// Check last copulation (accept behavior = courtDisplayIdx + 2).
-		acceptBehavior := courtDisplayIdx + 2
-		if acceptBehavior < cfg.NumBehaviors {
-			lastCopulate := a.MemoryLastBehavior[memBase+acceptBehavior]
-			if lastCopulate >= 0 && lastCopulate < int32(ref.RefractoryCourtship) {
-				zeroIfValid(a.VDecision, vdBase+courtDisplayIdx, cfg.NumBehaviors)
-				zeroIfValid(a.VDecision, vdBase+courtEscalateIdx, cfg.NumBehaviors)
-			}
+		lastCopulate := a.LastCopulation[idx]
+		if lastCopulate >= 0 && lastCopulate < int32(ref.RefractoryCourtship) {
+			zeroIfValid(a.VDecision, vdBase+courtDisplayIdx, cfg.NumBehaviors)
+			zeroIfValid(a.VDecision, vdBase+courtEscalateIdx, cfg.NumBehaviors)
 		}
 	}
 

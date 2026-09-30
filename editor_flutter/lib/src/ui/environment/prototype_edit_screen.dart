@@ -473,7 +473,7 @@ class _PrototypeEditScreenState extends ConsumerState<PrototypeEditScreen>
           const SizedBox(height: 8),
           Text(
             'Defines how this prototype responds in combat.\n'
-            'Rows = this agent\'s action, Columns = opponent\'s action.\n'
+            'Rows = this agent\'s action, Columns = opponent\'s last action.\n'
             'Each cell is a formula (probability weight).',
             style: Theme.of(context).textTheme.bodySmall,
           ),
@@ -481,8 +481,10 @@ class _PrototypeEditScreenState extends ConsumerState<PrototypeEditScreen>
           _StrategyMatrixEditor(
             prototypeId: widget.prototypeId,
             tableName: 'combat',
-            rowLabels: const ['Attack', 'Defend', 'Retreat'],
-            colLabels: const ['Attack', 'Defend'],
+            // Rows = my combat action (Display, Escalate, Retreat).
+            // Columns = opponent's last action (Display, Escalate).
+            rowLabels: const ['Display', 'Escalate', 'Retreat'],
+            colLabels: const ['Opp. Display', 'Opp. Escalate'],
           ),
         ],
       ),
@@ -502,15 +504,17 @@ class _PrototypeEditScreenState extends ConsumerState<PrototypeEditScreen>
           const SizedBox(height: 8),
           Text(
             'Defines courtship interaction strategy.\n'
-            'Rows = this agent\'s action, Columns = mate\'s action.',
+            'Rows = this agent\'s action, Columns = mate\'s last action.',
             style: Theme.of(context).textTheme.bodySmall,
           ),
           const SizedBox(height: 16),
           _StrategyMatrixEditor(
             prototypeId: widget.prototypeId,
             tableName: 'courtship',
-            rowLabels: const ['Court', 'Accept', 'Reject', 'Ignore'],
-            colLabels: const ['Court', 'Accept', 'Reject'],
+            // Rows = my courtship action (Display, Escalate, Accept, Reject).
+            // Columns = mate's last action (Display, Escalate, Accept).
+            rowLabels: const ['Display', 'Escalate', 'Accept', 'Reject'],
+            colLabels: const ['Opp. Display', 'Opp. Escalate', 'Opp. Accept'],
           ),
         ],
       ),

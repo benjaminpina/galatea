@@ -24,6 +24,7 @@ func (w *World) AddAgent() int {
 	a.FertilizedEggs[idx] = nil // Clear any retained eggs from a previous occupant.
 	a.OvipositCarrierIsAgent[idx] = false
 	a.CarriedEggs[idx] = 0
+	a.LastCopulation[idx] = -1
 
 	return idx
 }
@@ -73,6 +74,7 @@ func (w *World) swapAgents(i, j int) {
 	a.SpermPacks[i], a.SpermPacks[j] = a.SpermPacks[j], a.SpermPacks[i]
 	a.FertilizedEggs[i], a.FertilizedEggs[j] = a.FertilizedEggs[j], a.FertilizedEggs[i]
 	a.OvipositCarrierIsAgent[i], a.OvipositCarrierIsAgent[j] = a.OvipositCarrierIsAgent[j], a.OvipositCarrierIsAgent[i]
+	a.LastCopulation[i], a.LastCopulation[j] = a.LastCopulation[j], a.LastCopulation[i]
 	a.CarriedEggs[i], a.CarriedEggs[j] = a.CarriedEggs[j], a.CarriedEggs[i]
 	a.TimeInStage[i], a.TimeInStage[j] = a.TimeInStage[j], a.TimeInStage[i]
 	a.TimeOnSubstrate[i], a.TimeOnSubstrate[j] = a.TimeOnSubstrate[j], a.TimeOnSubstrate[i]
@@ -155,6 +157,7 @@ func (w *World) growAgents() {
 	a.SpermPacks = growSpermPacks(a.SpermPacks, newCap)
 	a.FertilizedEggs = growFertilizedEggs(a.FertilizedEggs, newCap)
 	a.OvipositCarrierIsAgent = growBool(a.OvipositCarrierIsAgent, newCap)
+	a.LastCopulation = growI32(a.LastCopulation, newCap)
 	a.CarriedEggs = growI32(a.CarriedEggs, newCap)
 	a.TimeInStage = growI32(a.TimeInStage, newCap)
 	a.TimeOnSubstrate = growI32(a.TimeOnSubstrate, newCap)
@@ -168,6 +171,7 @@ func (w *World) growAgents() {
 		a.InteractantIdx[i] = -1
 		a.StageID[i] = -1
 		a.PrototypeID[i] = -1
+		a.LastCopulation[i] = -1
 	}
 	for i := a.Cap * memPerceptionSlots; i < newCap*memPerceptionSlots; i++ {
 		a.MemoryLastPerceived[i] = -1
