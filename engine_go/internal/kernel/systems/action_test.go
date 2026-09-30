@@ -21,7 +21,7 @@ func TestActMoveChangesPosition(t *testing.T) {
 	tendBase := idx * 8
 	w.Agents.Tendencies[tendBase+DirN] = 100
 
-	Act(w, idx)
+	Act(w, idx, nil)
 
 	// Agent should have moved north (Y decreases).
 	if w.Agents.PosY[idx] >= 25 {
@@ -47,12 +47,21 @@ func TestActMoveClampsToBounds(t *testing.T) {
 	tendBase := idx * 8
 	w.Agents.Tendencies[tendBase+DirN] = 100
 
-	Act(w, idx)
+	Act(w, idx, nil)
 
 	// Should be clamped to 0.
 	if w.Agents.PosX[idx] < 0 || w.Agents.PosY[idx] < 0 {
 		t.Fatalf("position went negative: (%f, %f)", w.Agents.PosX[idx], w.Agents.PosY[idx])
 	}
+}
+
+// feedRef builds an AgentRef with the given feeding gain and reserve max for
+// nutrient 0 (the others default), for feeding tests.
+func feedRef(cfg world.Config, gain0, max0 int32) *AgentRef {
+	ref := NewAgentRef(cfg.NumNutrients, cfg.NumBehaviors)
+	ref.FeedingGains[0] = gain0
+	ref.MaxReserves[0] = max0
+	return ref
 }
 
 func TestActFeedTransfersResources(t *testing.T) {
@@ -62,7 +71,6 @@ func TestActFeedTransfersResources(t *testing.T) {
 	idx := w.AddAgent()
 	w.Agents.PosX[idx] = 10
 	w.Agents.PosY[idx] = 10
-	w.Agents.Speed[idx] = 5
 	w.Agents.Decision[idx] = uint8(behaviorOffsetFeed) // Feed from resource type 0.
 	w.Agents.Reserves[idx*cfg.NumNutrients+0] = 20     // Current water reserve.
 
@@ -75,14 +83,13 @@ func TestActFeedTransfersResources(t *testing.T) {
 
 	w.Agents.InteractantIdx[idx] = 0
 
-	Act(w, idx)
+	// Feeding gain 5, max reserve 100 (plenty of room).
+	Act(w, idx, feedRef(cfg, 5, 100))
 
-	// Agent should have gained resources (speed=5 units transferred).
-	expectedReserve := int32(20 + 5)
-	if w.Agents.Reserves[idx*cfg.NumNutrients+0] != expectedReserve {
-		t.Fatalf("expected reserve=%d, got %d", expectedReserve, w.Agents.Reserves[idx*cfg.NumNutrients+0])
+	// Agent gains exactly the feeding gain (5 units).
+	if got := w.Agents.Reserves[idx*cfg.NumNutrients+0]; got != 25 {
+		t.Fatalf("expected reserve=25, got %d", got)
 	}
-	// Resource should have been depleted.
 	if w.Resources.Level[0] != 45 {
 		t.Fatalf("expected resource level=45, got %d", w.Resources.Level[0])
 	}
@@ -93,7 +100,6 @@ func TestActFeedLimitedByResourceLevel(t *testing.T) {
 	w := world.New(cfg)
 
 	idx := w.AddAgent()
-	w.Agents.Speed[idx] = 10
 	w.Agents.Decision[idx] = uint8(behaviorOffsetFeed)
 	w.Agents.Reserves[idx*cfg.NumNutrients+0] = 0
 
@@ -106,7 +112,8 @@ func TestActFeedLimitedByResourceLevel(t *testing.T) {
 
 	w.Agents.InteractantIdx[idx] = 0
 
-	Act(w, idx)
+	// Gain 10 but only 3 units available in the source.
+	Act(w, idx, feedRef(cfg, 10, 100))
 
 	// Should only take 3 (limited by resource level).
 	if w.Agents.Reserves[idx*cfg.NumNutrients+0] != 3 {
@@ -114,6 +121,35 @@ func TestActFeedLimitedByResourceLevel(t *testing.T) {
 	}
 	if w.Resources.Level[0] != 0 {
 		t.Fatalf("expected resource level=0, got %d", w.Resources.Level[0])
+	}
+}
+
+// TestActFeedCappedByReserveMax verifies feeding is capped by the room left
+// below the reserve's maximum (legacy: CantTomada <= Maximos - Reserva).
+func TestActFeedCappedByReserveMax(t *testing.T) {
+	cfg := testCfg()
+	w := world.New(cfg)
+
+	idx := w.AddAgent()
+	w.Agents.Decision[idx] = uint8(behaviorOffsetFeed)
+	w.Agents.Reserves[idx*cfg.NumNutrients+0] = 95 // Near the cap.
+
+	w.Resources.PosX[0] = 0
+	w.Resources.PosY[0] = 0
+	w.Resources.TypeID[0] = 0
+	w.Resources.Level[0] = 50
+	w.Resources.Count = 1
+	w.Agents.InteractantIdx[idx] = 0
+
+	// Gain 20, but max reserve is 100 and current is 95 → only 5 fits.
+	Act(w, idx, feedRef(cfg, 20, 100))
+
+	if got := w.Agents.Reserves[idx*cfg.NumNutrients+0]; got != 100 {
+		t.Fatalf("expected reserve capped at 100, got %d", got)
+	}
+	// Only 5 units were drawn from the source.
+	if w.Resources.Level[0] != 45 {
+		t.Fatalf("expected source level 45 (only 5 taken), got %d", w.Resources.Level[0])
 	}
 }
 
@@ -133,7 +169,7 @@ func TestActCombatRetreat(t *testing.T) {
 	w.Agents.InteractantIdx[idx0] = int32(idx1)
 	w.Agents.InteractantIdx[idx1] = int32(idx0)
 
-	Act(w, idx0)
+	Act(w, idx0, nil)
 
 	// Retreater returns to regular.
 	if w.Agents.Situation[idx0] != world.SituationRegular {
@@ -159,7 +195,7 @@ func TestActCourtshipReject(t *testing.T) {
 	w.Agents.InteractantIdx[idx0] = int32(idx1)
 	w.Agents.InteractantIdx[idx1] = int32(idx0)
 
-	Act(w, idx0)
+	Act(w, idx0, nil)
 
 	if w.Agents.Situation[idx0] != world.SituationRegular {
 		t.Fatalf("rejecter should be regular, got %d", w.Agents.Situation[idx0])
@@ -178,7 +214,7 @@ func TestActRest(t *testing.T) {
 	w.Agents.PosY[idx] = 25
 	w.Agents.Decision[idx] = behaviorRest
 
-	Act(w, idx)
+	Act(w, idx, nil)
 
 	// Position unchanged.
 	if w.Agents.PosX[idx] != 25 || w.Agents.PosY[idx] != 25 {
@@ -413,7 +449,7 @@ func TestBehaviorMemoryUpdate(t *testing.T) {
 
 	w.Agents.Decision[idx] = behaviorMove
 
-	Act(w, idx)
+	Act(w, idx, nil)
 
 	// Move (0) should be reset to 0 and count incremented.
 	if w.Agents.MemoryLastBehavior[memBase+0] != 0 {

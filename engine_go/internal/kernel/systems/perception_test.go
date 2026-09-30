@@ -672,7 +672,7 @@ func TestInteractionMemoryRecorded(t *testing.T) {
 	w.Agents.Decision[idx] = uint8(behaviorOffsetFeed + 1) // Feed from type 1.
 	w.Agents.InteractantIdx[idx] = 0
 
-	Act(w, idx)
+	Act(w, idx, nil)
 
 	slot := cfg.MemSlotSource(1)
 	slots := cfg.MemPerceptionSlots()

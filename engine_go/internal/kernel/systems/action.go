@@ -8,7 +8,11 @@ import (
 
 // Act executes the decided behavior for the agent at idx.
 // It modifies world state according to the behavior type.
-func Act(w *world.World, idx int) {
+//
+// ref provides the per-agent feeding gains and reserve caps for actFeed; it may
+// be nil, in which case feeding falls back to a minimal default (used by unit
+// tests that don't set up reference values).
+func Act(w *world.World, idx int, ref *AgentRef) {
 	a := w.Agents
 	a.State[idx] = world.StateActing
 	decision := int(a.Decision[idx])
@@ -19,7 +23,7 @@ func Act(w *world.World, idx int) {
 	case decision == behaviorRest:
 		// Rest: do nothing (agent stays in place).
 	case decision >= behaviorOffsetFeed && decision < behaviorOffsetFeed+w.Config.NumResourceTypes:
-		actFeed(w, idx)
+		actFeed(w, idx, ref)
 	case isCombatBehavior(decision, w.Config):
 		actCombatSignal(w, idx)
 	case isCourtshipBehavior(decision, w.Config):
@@ -75,8 +79,11 @@ func actMove(w *world.World, idx int) {
 	a.PosY[idx] = newY
 }
 
-// actFeed transfers resources from the interactant resource to the agent's reserves.
-func actFeed(w *world.World, idx int) {
+// actFeed transfers nutrient from the interactant source to the agent's
+// reserves, mirroring the legacy TAgente.Comer: the amount taken is the
+// configured feeding gain for that nutrient, capped by (a) the room left below
+// the reserve's max and (b) the source's available level.
+func actFeed(w *world.World, idx int, ref *AgentRef) {
 	a := w.Agents
 	r := w.Resources
 	cfg := w.Config
@@ -91,21 +98,36 @@ func actFeed(w *world.World, idx int) {
 		return // Resource type doesn't map to a nutrient.
 	}
 
-	// Transfer: take up to speed units from resource, cap at available level.
-	amount := a.Speed[idx] // Use speed as a proxy for feeding rate.
-	if amount <= 0 {
-		amount = 1
+	// Amount taken = the configured feeding gain for this nutrient. Falls back
+	// to a small default when no reference values are available.
+	amount := int32(1)
+	if ref != nil && resourceType < len(ref.FeedingGains) {
+		amount = ref.FeedingGains[resourceType]
 	}
-	available := r.Level[interactant]
-	if amount > available {
+	if amount < 0 {
+		amount = 0
+	}
+
+	reserveIdx := idx*cfg.NumNutrients + resourceType
+
+	// Cap by the room left below the reserve's maximum (legacy caps CantTomada
+	// at Maximos[tipo] - Reserva).
+	if ref != nil && resourceType < len(ref.MaxReserves) {
+		room := ref.MaxReserves[resourceType] - a.Reserves[reserveIdx]
+		if room < 0 {
+			room = 0
+		}
+		if amount > room {
+			amount = room
+		}
+	}
+
+	// Cap by the source's available level.
+	if available := r.Level[interactant]; amount > available {
 		amount = available
 	}
 
-	// Add to reserves (simple: resource type index = nutrient index).
-	reserveIdx := idx*cfg.NumNutrients + resourceType
 	a.Reserves[reserveIdx] += amount
-
-	// Deplete resource.
 	r.Level[interactant] -= amount
 
 	// Record the interaction with this source type in the agent's memory.

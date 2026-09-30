@@ -262,6 +262,26 @@ func Build(db *storage.DB, cfg EngineConfig) (*Engine, error) {
 		}
 	}
 
+	// Compile feeding-gain formulas (how much nutrient is taken per feeding).
+	// Key: "feeding_gain.<nutrientIdx>". Mirrors the legacy Alimentacion.Ganancias.
+	feedRows, err := db.Conn.Query(
+		"SELECT nutrient_id, gain_formula FROM feeding_gains")
+	if err == nil {
+		defer feedRows.Close()
+		for feedRows.Next() {
+			var nutID int64
+			var gainF string
+			if err := feedRows.Scan(&nutID, &gainF); err != nil {
+				continue
+			}
+			nIdx := int(nutID - 1)
+			if nIdx < 0 {
+				continue
+			}
+			registry.Compile(fmt.Sprintf("feeding_gain.%d", nIdx), gainF)
+		}
+	}
+
 	// Compile substrate velocity formulas.
 	velRows, err := db.Conn.Query(
 		"SELECT substrate_id, velocity_formula FROM substrate_velocities")
@@ -529,9 +549,11 @@ func (e *Engine) Tick() {
 		systems.EstablishInteraction(w, idx, e.AgentGrid, e.ResourceGrid)
 	}
 
-	// 6. Act (all agents).
+	// 6. Act (all agents). Feeding needs per-agent reference values (feeding
+	// gains + reserve caps), so evaluate them just before acting.
 	for _, idx := range perm {
-		systems.Act(w, idx)
+		systems.EvalRefValues(w, idx, e.Registry, e.Eval, e.EnvBuilder, e.agentRef)
+		systems.Act(w, idx, e.agentRef)
 	}
 
 	// 6b. Oviposition: females that decided to oviposit deposit their retained

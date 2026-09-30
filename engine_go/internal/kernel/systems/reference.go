@@ -20,6 +20,7 @@ type AgentRef struct {
 	MaxGametes          int32
 	GameteCosts         []int32 // per nutrient
 	BehaviorCosts       []int32 // flat: [behavior * numNutrients + nutrient]
+	FeedingGains        []int32 // per nutrient: units taken when feeding from that source
 	// Offspring sex ratio, taken from the prototype (females carry the
 	// meaningful ratio; the legacy reads it from the mother's prototype).
 	SexRatioMales   int32
@@ -42,6 +43,7 @@ func NewAgentRef(numNutrients, numBehaviors int) *AgentRef {
 		MaxGametes:          10,
 		GameteCosts:         make([]int32, numNutrients),
 		BehaviorCosts:       make([]int32, numBehaviors*numNutrients),
+		FeedingGains:        make([]int32, numNutrients),
 	}
 }
 
@@ -90,6 +92,12 @@ func EvalRefValues(
 		ref.CriticalReserves[n] = evalIntFormula(reg, eval, metaKey+"critical", 10)
 		ref.OptimalReserves[n] = evalIntFormula(reg, eval, metaKey+"optimal", 50)
 		ref.MaxReserves[n] = evalIntFormula(reg, eval, metaKey+"max", 100)
+	}
+
+	// Feeding gains per nutrient: how many units are taken when feeding from
+	// that nutrient's source (legacy Ganancia<Nutriente>). Default 10.
+	for n := 0; n < cfg.NumNutrients; n++ {
+		ref.FeedingGains[n] = evalIntFormula(reg, eval, "feeding_gain."+itoa(n), 10)
 	}
 
 	// Gamete costs per nutrient, keyed by the agent's sex ("M"/"F"). This
