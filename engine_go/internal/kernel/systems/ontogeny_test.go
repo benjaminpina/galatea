@@ -694,3 +694,130 @@ func TestAssignPrototypeUsesCriteria(t *testing.T) {
 		t.Fatalf("Age=150: expected prototype 0, got %d", got)
 	}
 }
+
+// linkedStagesCfg builds an OntogenyConfig with prototype-linked stage branches
+// for a male with two prototypes. Stage layout (NumStages=3):
+//
+//	stage 0: unlinked (the starting immature stage)
+//	stage 1: linked to male prototype 0  (unified index NumStages+0 = 3)
+//	stage 2: linked to male prototype 1  (unified index NumStages+1 = 4)
+//
+// The agent's assigned prototype (chosen by the criteria) selects which branch
+// it takes out of stage 0.
+func linkedStagesCfg(cfg world.Config, reg *formulas.Registry, eval *formulas.Evaluator, env *formulas.EnvBuilder) OntogenyConfig {
+	numStages := 3
+	return OntogenyConfig{
+		NumStages:      numStages,
+		NumPrototypesM: 2,
+		NumPrototypesF: 1,
+		Stages: []StageConfig{
+			{CyclesRequired: 1, NutrientReqs: []int32{0, 0}, NutrientCosts: []int32{0, 0}, LogicCyclesReqs: true, LogicReqsConds: false, LinkedPrototype: -1},
+			{CyclesRequired: 1, NutrientReqs: []int32{0, 0}, NutrientCosts: []int32{0, 0}, LogicCyclesReqs: true, LogicReqsConds: false, LinkedPrototype: numStages + 0},
+			{CyclesRequired: 1, NutrientReqs: []int32{0, 0}, NutrientCosts: []int32{0, 0}, LogicCyclesReqs: true, LogicReqsConds: false, LinkedPrototype: numStages + 1},
+		},
+		AssignmentPriorityM: []int{0, 1},
+		AssignmentCriteriaM: []AssignmentCriterion{
+			{Key: "assign.M.0", Op: ">", Threshold: 100}, // proto 0 if Age > 100
+			{Key: "assign.M.1", Op: ">", Threshold: 0},   // else proto 1 (Age > 0)
+		},
+		AssignmentPriorityF: []int{0},
+		Registry:            reg,
+		Eval:                eval,
+		EnvBuilder:          env,
+	}
+}
+
+// TestNextStageLinkedBranchSelected verifies an agent takes the stage branch
+// linked to its assigned prototype.
+func TestNextStageLinkedBranchSelected(t *testing.T) {
+	cfg := testCfg()
+	w := world.New(cfg)
+	reg := formulas.NewRegistry()
+	eval := formulas.NewEvaluator(32)
+	env := formulas.NewEnvBuilder(eval, cfg)
+	_ = reg.Compile("assign.M.0", "Age")
+	_ = reg.Compile("assign.M.1", "Age")
+	ontCfg := linkedStagesCfg(cfg, reg, eval, env)
+
+	idx := w.AddAgent()
+	a := w.Agents
+	a.Sex[idx] = world.SexMale
+	a.StageID[idx] = 0
+	a.TimeInStage[idx] = 5 // meets stage 0's cycle requirement
+
+	// Age 50: proto 0 (Age>100) fails, proto 1 (Age>0) passes → assigned proto 1
+	// → its linked branch is stage 2.
+	a.Age[idx] = 50
+	if !EvaluateStageTransition(w, idx, ontCfg) {
+		t.Fatal("expected a transition")
+	}
+	if a.StageID[idx] != 2 {
+		t.Fatalf("expected branch to stage 2 (proto 1), got stage %d", a.StageID[idx])
+	}
+}
+
+// TestNextStageLinkedBranchOther verifies the other prototype selects the other
+// branch (first-match selection).
+func TestNextStageLinkedBranchOther(t *testing.T) {
+	cfg := testCfg()
+	w := world.New(cfg)
+	reg := formulas.NewRegistry()
+	eval := formulas.NewEvaluator(32)
+	env := formulas.NewEnvBuilder(eval, cfg)
+	_ = reg.Compile("assign.M.0", "Age")
+	_ = reg.Compile("assign.M.1", "Age")
+	ontCfg := linkedStagesCfg(cfg, reg, eval, env)
+
+	idx := w.AddAgent()
+	a := w.Agents
+	a.Sex[idx] = world.SexMale
+	a.StageID[idx] = 0
+	a.TimeInStage[idx] = 5
+
+	// Age 150: proto 0 (Age>100) passes → assigned proto 0 → branch is stage 1.
+	a.Age[idx] = 150
+	if !EvaluateStageTransition(w, idx, ontCfg) {
+		t.Fatal("expected a transition")
+	}
+	if a.StageID[idx] != 1 {
+		t.Fatalf("expected branch to stage 1 (proto 0), got stage %d", a.StageID[idx])
+	}
+}
+
+// TestNextStageUnlinkedLinearAdvance verifies that when the next stage is not
+// prototype-linked, the agent advances linearly regardless of prototype.
+func TestNextStageUnlinkedLinearAdvance(t *testing.T) {
+	cfg := testCfg()
+	w := world.New(cfg)
+	reg := formulas.NewRegistry()
+	eval := formulas.NewEvaluator(32)
+	env := formulas.NewEnvBuilder(eval, cfg)
+	ontCfg := OntogenyConfig{
+		NumStages:      3,
+		NumPrototypesM: 1,
+		NumPrototypesF: 1,
+		Stages: []StageConfig{
+			{CyclesRequired: 1, NutrientReqs: []int32{0, 0}, NutrientCosts: []int32{0, 0}, LogicCyclesReqs: true, LinkedPrototype: -1},
+			{CyclesRequired: 1, NutrientReqs: []int32{0, 0}, NutrientCosts: []int32{0, 0}, LogicCyclesReqs: true, LinkedPrototype: -1},
+			{CyclesRequired: 1, NutrientReqs: []int32{0, 0}, NutrientCosts: []int32{0, 0}, LogicCyclesReqs: true, LinkedPrototype: -1},
+		},
+		AssignmentPriorityM: []int{0},
+		AssignmentPriorityF: []int{0},
+		Registry:            reg,
+		Eval:                eval,
+		EnvBuilder:          env,
+	}
+
+	idx := w.AddAgent()
+	a := w.Agents
+	a.Sex[idx] = world.SexMale
+	a.StageID[idx] = 0
+	a.TimeInStage[idx] = 5
+
+	if !EvaluateStageTransition(w, idx, ontCfg) {
+		t.Fatal("expected a transition")
+	}
+	if a.StageID[idx] != 1 {
+		t.Fatalf("expected linear advance to stage 1, got %d", a.StageID[idx])
+	}
+}

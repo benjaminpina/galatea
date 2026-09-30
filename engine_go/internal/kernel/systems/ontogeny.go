@@ -370,8 +370,9 @@ func EvaluateStageTransition(w *world.World, idx int, ontCfg OntogenyConfig) boo
 		}
 	}
 
-	// Advance to next stage or become adult.
-	nextStage := currentStage + 1
+	// Advance to the next stage (which may be a prototype-linked branch) or
+	// become adult.
+	nextStage := nextStageFor(w, idx, currentStage, ontCfg)
 	if nextStage >= ontCfg.NumStages {
 		// Become adult.
 		becomeAdult(w, idx, ontCfg)
@@ -381,6 +382,68 @@ func EvaluateStageTransition(w *world.World, idx int, ontCfg OntogenyConfig) boo
 	}
 
 	return true
+}
+
+// nextStageFor determines the stage an immature agent advances to from
+// currentStage, mirroring the legacy SiguienteEstadio with prototype-linked
+// branching:
+//
+//   - If the immediately following stage is NOT linked to a prototype
+//     (LinkedPrototype < 0), advance linearly to currentStage+1.
+//   - If it IS linked, the agent takes the branch matching its (tentatively)
+//     assigned prototype: among the remaining stages, pick the FIRST whose
+//     LinkedPrototype matches the assigned prototype's unified index, or is
+//     unlinked. (The legacy takes the last match; per project decision we take
+//     the first.)
+//
+// Returns a stage index; a value >= NumStages means "become adult".
+func nextStageFor(w *world.World, idx, currentStage int, ontCfg OntogenyConfig) int {
+	next := currentStage + 1
+	if next >= ontCfg.NumStages {
+		return next // Becomes adult.
+	}
+
+	// If the next stage is unlinked, simple linear advance. A stage is
+	// "linked" only when it points at an actual adult prototype, whose unified
+	// index is >= NumStages; any value below that (including the -1 sentinel
+	// and the Go zero value) means unlinked. This mirrors the legacy where
+	// Prototipo=0 means "not linked".
+	if next >= len(ontCfg.Stages) || !isLinkedPrototype(ontCfg.Stages[next].LinkedPrototype, ontCfg.NumStages) {
+		return next
+	}
+
+	// The next stage is prototype-linked: resolve the agent's tentative
+	// prototype and pick the first matching (or unlinked) branch.
+	assignedUnified := assignedPrototypeUnifiedIdx(w, idx, ontCfg)
+	for s := next; s < ontCfg.NumStages && s < len(ontCfg.Stages); s++ {
+		linked := ontCfg.Stages[s].LinkedPrototype
+		if !isLinkedPrototype(linked, ontCfg.NumStages) || linked == assignedUnified {
+			return s
+		}
+	}
+	// No matching branch: proceed to adulthood.
+	return ontCfg.NumStages
+}
+
+// isLinkedPrototype reports whether a stage's LinkedPrototype value refers to an
+// actual adult prototype (unified index >= numStages). Values below that —
+// including -1 and the zero default — mean the stage is not prototype-linked.
+func isLinkedPrototype(linked, numStages int) bool {
+	return linked >= numStages
+}
+
+// assignedPrototypeUnifiedIdx returns the unified prototype index (stages, then
+// males, then females — the same space LinkedPrototype uses) of the prototype
+// the agent would be assigned, so it can be compared against a stage's
+// LinkedPrototype.
+func assignedPrototypeUnifiedIdx(w *world.World, idx int, ontCfg OntogenyConfig) int {
+	a := w.Agents
+	protoWithinSex := AssignPrototype(w, idx, ontCfg)
+	base := ontCfg.NumStages
+	if a.Sex[idx] == world.SexFemale {
+		base += ontCfg.NumPrototypesM
+	}
+	return base + protoWithinSex
 }
 
 // becomeAdult transitions an agent from immature to adult status.
