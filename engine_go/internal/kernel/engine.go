@@ -57,6 +57,10 @@ type Engine struct {
 	// (enfoque B). Nil when no constant substrate attractiveness is configured.
 	substrateField *systems.SubstrateField
 
+	// dynamicSubstrates flags substrates whose formulas are dynamic and must be
+	// swept per-agent (enfoque B dynamic case).
+	dynamicSubstrates systems.DynamicSubstrateSpec
+
 	// Write buffer for simulation results.
 	WriteBuffer *storage.WriteBuffer
 
@@ -402,7 +406,7 @@ func Build(db *storage.DB, cfg EngineConfig) (*Engine, error) {
 	// the per-agent radius sweep is computed once here per (perceiver, cell),
 	// eliminating the legacy O(agents × radius² × ticks) hot-spot. Dynamic
 	// substrate formulas are skipped for now (handled by a later hot-path branch).
-	substrateField := buildSubstrateAttractiveness(db, w, registry, eval, cellSize)
+	substrateField, dynamicSubstrates := buildSubstrateAttractiveness(db, w, registry, eval, cellSize)
 
 	// Build write buffer.
 	wb := storage.NewWriteBuffer(db, runID, cfg.WriteBufferCfg)
@@ -479,30 +483,31 @@ func Build(db *storage.DB, cfg EngineConfig) (*Engine, error) {
 	permutation := make([]int, w.Agents.Cap)
 
 	e := &Engine{
-		World:            w,
-		DB:               db,
-		RunID:            runID,
-		AgentGrid:        agentGrid,
-		ResourceGrid:     resourceGrid,
-		Registry:         registry,
-		Eval:             eval,
-		EnvBuilder:       envBuilder,
-		OntogenyCfg:      ontCfg,
-		GeneticsCfg:      genCfg,
-		ReproCfg:         reproCfg,
-		BehaviorCosts:    behaviorCosts,
-		OptimalLevels:    optimalLevels,
-		Longevity:        cfg.Longevity,
-		CombatTimeout:    cfg.CombatTimeout,
-		CourtTimeout:     cfg.CourtTimeout,
-		WriteBuffer:      wb,
-		permutation:      permutation,
-		agentRef:         systems.NewAgentRef(numNut, numBeh),
-		agentAttrArr:     agentAttrArr,
-		resourceAttrArr:  resourceAttrArr,
-		agentRadiiArr:    agentRadiiArr,
-		resourceRadiiArr: resourceRadiiArr,
-		substrateField:   substrateField,
+		World:             w,
+		DB:                db,
+		RunID:             runID,
+		AgentGrid:         agentGrid,
+		ResourceGrid:      resourceGrid,
+		Registry:          registry,
+		Eval:              eval,
+		EnvBuilder:        envBuilder,
+		OntogenyCfg:       ontCfg,
+		GeneticsCfg:       genCfg,
+		ReproCfg:          reproCfg,
+		BehaviorCosts:     behaviorCosts,
+		OptimalLevels:     optimalLevels,
+		Longevity:         cfg.Longevity,
+		CombatTimeout:     cfg.CombatTimeout,
+		CourtTimeout:      cfg.CourtTimeout,
+		WriteBuffer:       wb,
+		permutation:       permutation,
+		agentRef:          systems.NewAgentRef(numNut, numBeh),
+		agentAttrArr:      agentAttrArr,
+		resourceAttrArr:   resourceAttrArr,
+		agentRadiiArr:     agentRadiiArr,
+		resourceRadiiArr:  resourceRadiiArr,
+		substrateField:    substrateField,
+		dynamicSubstrates: dynamicSubstrates,
 	}
 
 	return e, nil
@@ -516,17 +521,18 @@ func (e *Engine) Tick() {
 
 	// 1. Build perception context for this tick.
 	ctx := &systems.PerceptionContext{
-		World:          w,
-		AgentGrid:      e.AgentGrid,
-		ResourceGrid:   e.ResourceGrid,
-		Formulas:       e.Registry,
-		Eval:           e.Eval,
-		EnvBuilder:     e.EnvBuilder,
-		ResourceRadii:  e.resourceRadii(),
-		ResourceAttr:   e.resourceAttr(),
-		AgentRadii:     e.agentRadii(),
-		AgentAttr:      e.agentAttrArr,
-		SubstrateField: e.substrateField,
+		World:             w,
+		AgentGrid:         e.AgentGrid,
+		ResourceGrid:      e.ResourceGrid,
+		Formulas:          e.Registry,
+		Eval:              e.Eval,
+		EnvBuilder:        e.EnvBuilder,
+		ResourceRadii:     e.resourceRadii(),
+		ResourceAttr:      e.resourceAttr(),
+		AgentRadii:        e.agentRadii(),
+		AgentAttr:         e.agentAttrArr,
+		SubstrateField:    e.substrateField,
+		DynamicSubstrates: e.dynamicSubstrates,
 	}
 
 	// 2. Generate random permutation for agent processing order.
@@ -1123,6 +1129,20 @@ type substrateAttrRow struct {
 	perceiverIdx int
 	attr         int32
 	radius       float64
+	// interVec is the per-behavior constant interaction contribution of this
+	// substrate (legacy Influencias[substrate-1, l]) when all its interaction
+	// formulas are constant; nil otherwise. When nil, the substrate's
+	// interaction is dynamic and handled by the per-agent branch even though its
+	// tendency is precomputed here.
+	interVec []int32
+}
+
+// substrateInterInfo is the precomputed per-behavior interaction vector for one
+// (substrate, perceiver) pair plus whether every one of its behavior formulas
+// is constant.
+type substrateInterInfo struct {
+	vec      []int32
+	allConst bool
 }
 
 // buildSubstrateAttractiveness precomputes the CONSTANT-case substrate
@@ -1139,11 +1159,11 @@ type substrateAttrRow struct {
 func buildSubstrateAttractiveness(
 	db *storage.DB, w *world.World, registry *formulas.Registry,
 	eval *formulas.Evaluator, defaultRadius float64,
-) *systems.SubstrateField {
+) (*systems.SubstrateField, systems.DynamicSubstrateSpec) {
 	cfg := w.Config
-	rows := loadConstantSubstrateAttr(db, cfg, registry, eval, defaultRadius)
+	rows, spec := loadSubstrateAttr(db, cfg, registry, eval, defaultRadius)
 	if len(rows) == 0 {
-		return nil
+		return nil, spec
 	}
 
 	field := systems.NewSubstrateField(
@@ -1155,7 +1175,10 @@ func buildSubstrateAttractiveness(
 	// the substrate's point of view (equivalent, and computed once).
 	for _, row := range rows {
 		radius := row.radius
-		if radius <= 0 || row.attr == 0 {
+		// A row must have a positive radius to perceive anything, and must
+		// contribute EITHER attractiveness (tendency) OR a constant interaction
+		// vector; otherwise it adds nothing and the sweep is pure cost.
+		if radius <= 0 || (row.attr == 0 && row.interVec == nil) {
 			continue
 		}
 		r := int(math.Ceil(radius))
@@ -1168,7 +1191,7 @@ func buildSubstrateAttractiveness(
 			}
 		}
 	}
-	return field
+	return field, spec
 }
 
 // accumulateSubstrateCell radiates the attractiveness of the substrate cell at
@@ -1186,8 +1209,17 @@ func accumulateSubstrateCell(
 			}
 			// From the agent standpoint (sx,sy), this substrate is perceived.
 			field.MarkPerceivedSubstrate(row.perceiverIdx, sx, sy, row.substrateIdx)
-			if dist == 0 {
-				continue // Own cell contributes no directional tendency.
+
+			// Interaction: one PromediaProbaDecision contribution per perceived
+			// substrate cell (legacy adds it for every cell in radius, including
+			// the agent's own cell at dist 0), but only when this substrate's
+			// interaction is fully constant.
+			if row.interVec != nil {
+				field.AddInteraction(row.perceiverIdx, sx, sy, row.interVec)
+			}
+
+			if dist == 0 || row.attr == 0 {
+				continue // Own cell / no attraction: no directional tendency.
 			}
 			absAngle := systems.AbsoluteAngleOf(float64(sx), float64(sy), float64(cx), float64(cy))
 			if absAngle < 0 {
@@ -1199,22 +1231,35 @@ func accumulateSubstrateCell(
 	}
 }
 
-// loadConstantSubstrateAttr reads attractiveness_substrates and returns the
-// rows whose attractiveness AND radius formulas are constant, with those
-// formulas already evaluated to scalars.
-func loadConstantSubstrateAttr(
+// loadSubstrateAttr reads attractiveness_substrates and classifies every
+// (substrate, perceiver) pair into the enfoque B constant/dynamic split:
+//   - Constant tendency/interaction is returned as substrateAttrRow (folded into
+//     the SubstrateField by the caller).
+//   - Dynamic attractiveness/radius/interaction is recorded in the returned
+//     DynamicSubstrateSpec, and the dynamic formulas are compiled into the
+//     registry for per-agent evaluation.
+//
+// A pair may be split: e.g. constant tendency but dynamic interaction produces
+// both a row (tendency only, interVec nil) and a spec entry (InterDynamic).
+func loadSubstrateAttr(
 	db *storage.DB, cfg world.Config, registry *formulas.Registry,
 	eval *formulas.Evaluator, defaultRadius float64,
-) []substrateAttrRow {
+) ([]substrateAttrRow, systems.DynamicSubstrateSpec) {
 	protoMap := buildProtoPerceiverMap(db, cfg)
 	all := allPerceiverIndices(cfg)
+	interMap := buildConstantSubstrateInteraction(db, cfg, registry, eval)
+
+	spec := make(systems.DynamicSubstrateSpec, cfg.NumPrototypes)
+	for p := range spec {
+		spec[p] = make([]*systems.DynamicSubstrate, cfg.NumSubstrates)
+	}
 
 	dbRows, err := db.Conn.Query(
 		`SELECT substrate_id, perceiver_stage_id, perceiver_prototype_id,
 		        attractiveness_formula, radius_formula
 		 FROM attractiveness_substrates`)
 	if err != nil {
-		return nil
+		return nil, spec
 	}
 	defer dbRows.Close()
 
@@ -1230,24 +1275,195 @@ func loadConstantSubstrateAttr(
 		if substrateIdx < 0 || substrateIdx >= cfg.NumSubstrates {
 			continue
 		}
-		// Enfoque B: only the constant case is precomputed here. A formula that
-		// references variables or calls a stochastic function is dynamic and is
-		// left to the later per-agent branch.
-		if !registry.IsConstantFormula(formula) || !registry.IsConstantFormula(radiusFormula) {
-			continue
+
+		radiusConst := registry.IsConstantFormula(radiusFormula)
+		attrConst := registry.IsConstantFormula(formula)
+		var radius float64
+		if radiusConst {
+			radius = float64(evalConstFormula(eval, radiusFormula, int32(defaultRadius)))
 		}
-		attr := evalConstFormula(eval, formula, 0)
-		radius := float64(evalConstFormula(eval, radiusFormula, int32(defaultRadius)))
+		var attr int32
+		if attrConst {
+			attr = evalConstFormula(eval, formula, 0)
+		}
+
 		for _, p := range resolveIdxOrAll(perStage, perProto, protoMap, all) {
-			out = append(out, substrateAttrRow{
-				substrateIdx: substrateIdx,
-				perceiverIdx: p,
-				attr:         attr,
-				radius:       radius,
-			})
+			// A pair with no interaction rows is treated as constant-zero
+			// interaction (legacy averages in 0 for unconfigured cells), so it
+			// stays on the fast constant path instead of forcing a per-agent
+			// sweep for nothing.
+			interConst := true
+			if info, ok := interMap[substrateInterKey{substrateIdx, p}]; ok {
+				interConst = info.allConst
+			}
+
+			// The radius being dynamic forces the whole pair to the per-agent
+			// branch, because we cannot know at load time which cells fall in
+			// range. Otherwise fold the constant parts into the field and flag
+			// only the dynamic parts.
+			fullyConstant := radiusConst && attrConst && interConst
+
+			// constVec returns this pair's constant interaction vector: the
+			// configured one when present, else a zero vector so each perceived
+			// cell still contributes one (zero-weight) PromediaProbaDecision
+			// count, matching the legacy denominator.
+			constVec := func() []int32 {
+				if info, ok := interMap[substrateInterKey{substrateIdx, p}]; ok {
+					return info.vec
+				}
+				return make([]int32, cfg.NumBehaviors)
+			}
+
+			if fullyConstant {
+				out = append(out, substrateAttrRow{
+					substrateIdx: substrateIdx, perceiverIdx: p,
+					attr: attr, radius: radius, interVec: constVec(),
+				})
+				continue
+			}
+
+			// Split path: precompute whatever is constant when the radius is
+			// constant, and flag the dynamic remainder. When interaction is
+			// constant it goes on the field (with count); when dynamic it is
+			// left for the per-agent sweep (which supplies the count).
+			if radiusConst && (attrConst || interConst) {
+				row := substrateAttrRow{substrateIdx: substrateIdx, perceiverIdx: p, radius: radius}
+				if attrConst {
+					row.attr = attr
+				}
+				if interConst {
+					row.interVec = constVec()
+				}
+				out = append(out, row)
+			}
+
+			// Register dynamic formulas and flag the pair for the per-agent
+			// sweep. Radius dynamic → evaluate per-agent; else reuse constant.
+			ds := &systems.DynamicSubstrate{
+				AttrDynamic:   !attrConst,
+				InterDynamic:  !interConst,
+				RadiusDynamic: !radiusConst,
+				Radius:        radius,
+			}
+			if !attrConst {
+				_ = registry.Compile(systems.SubstrateAttractKey(substrateIdx, p), formula)
+			}
+			if !radiusConst {
+				_ = registry.Compile(systems.SubstrateRadiusKey(substrateIdx, p), radiusFormula)
+			}
+			spec[p][substrateIdx] = ds
 		}
 	}
+	return out, spec
+}
+
+// substrateInterKey keys the constant-interaction map by (substrate, perceiver).
+type substrateInterKey struct {
+	substrateIdx int
+	perceiverIdx int
+}
+
+// buildConstantSubstrateInteraction reads interaction_substrates and returns,
+// per (substrate, perceiver), the per-behavior interaction vector and whether
+// EVERY one of its behavior formulas is constant. Only fully-constant pairs are
+// safe to fold into the precomputed field; a pair with any dynamic behavior
+// formula is marked allConst=false and left to the per-agent branch.
+//
+// Mixed substrates do NOT use their own rows: following the legacy
+// GetInteraccionSustratos (X>7), a mixed substrate's interaction is the
+// fraction-weighted combination of its simple components' formulas. So the
+// mixed vector is composed from the simple entries here, and it is constant
+// only if every contributing component is constant. This is the single,
+// unified criterion shared by the field and the per-agent branch.
+//
+// NULL perceiver = Any, expanded to all concrete perceiver indices (matching
+// compileInteractionSubstrates). A behavior with no row keeps weight 0, which
+// still counts as a contribution (legacy averages over all perceived cells).
+func buildConstantSubstrateInteraction(
+	db *storage.DB, cfg world.Config, registry *formulas.Registry, eval *formulas.Evaluator,
+) map[substrateInterKey]*substrateInterInfo {
+	protoMap := buildProtoPerceiverMap(db, cfg)
+	all := allPerceiverIndices(cfg)
+	out := make(map[substrateInterKey]*substrateInterInfo)
+
+	rows, err := db.Conn.Query(
+		`SELECT substrate_id, perceiver_stage_id, perceiver_prototype_id,
+		        behavior_index, formula
+		 FROM interaction_substrates`)
+	if err != nil {
+		return out
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var substrateID int64
+		var perStage, perProto *int64
+		var behaviorIdx int
+		var formula string
+		if err := rows.Scan(&substrateID, &perStage, &perProto, &behaviorIdx, &formula); err != nil {
+			continue
+		}
+		substrateIdx := int(substrateID - 1)
+		if substrateIdx < 0 || behaviorIdx < 0 || behaviorIdx >= cfg.NumBehaviors {
+			continue
+		}
+		isConst := registry.IsConstantFormula(formula)
+		var val int32
+		if isConst {
+			val = evalConstFormula(eval, formula, 0)
+		}
+		for _, p := range resolveIdxOrAll(perStage, perProto, protoMap, all) {
+			key := substrateInterKey{substrateIdx, p}
+			info := out[key]
+			if info == nil {
+				info = &substrateInterInfo{vec: make([]int32, cfg.NumBehaviors), allConst: true}
+				out[key] = info
+			}
+			if isConst {
+				info.vec[behaviorIdx] = val
+			} else {
+				info.allConst = false
+			}
+		}
+	}
+
+	composeMixedSubstrateInteraction(cfg, out)
 	return out
+}
+
+// composeMixedSubstrateInteraction overrides every mixed substrate's
+// interaction entry with the fraction-weighted combination of its simple
+// components (legacy GetInteraccionSustratos for X>7). The composed entry is
+// constant only if every contributing component's entry is constant; otherwise
+// it is marked dynamic so the whole mixed substrate is swept per-agent.
+func composeMixedSubstrateInteraction(cfg world.Config, out map[substrateInterKey]*substrateInterInfo) {
+	for s := 0; s < cfg.NumSubstrates; s++ {
+		if !cfg.IsMixedSubstrate(s) {
+			continue
+		}
+		comps := cfg.SubstrateComposition[s]
+		for _, p := range allPerceiverIndices(cfg) {
+			combined := make([]int32, cfg.NumBehaviors)
+			allConst := true
+			acc := make([]float64, cfg.NumBehaviors)
+			for _, comp := range comps {
+				ci := out[substrateInterKey{comp.SimpleIdx, p}]
+				if ci == nil {
+					continue // no rows for this component → contributes 0
+				}
+				if !ci.allConst {
+					allConst = false
+				}
+				for b := 0; b < cfg.NumBehaviors; b++ {
+					acc[b] += float64(ci.vec[b]) * comp.Fraction
+				}
+			}
+			for b := 0; b < cfg.NumBehaviors; b++ {
+				combined[b] = int32(acc[b] + 0.5) // round, matching hot-path fallback
+			}
+			out[substrateInterKey{s, p}] = &substrateInterInfo{vec: combined, allConst: allConst}
+		}
+	}
 }
 
 // behaviorNameToIndex maps a canonical behavior name (shared with the editor;

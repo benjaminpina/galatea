@@ -196,6 +196,106 @@ func TestGametogenesis(t *testing.T) {
 	if w.Agents.Reserves[idx*cfg.NumNutrients+0] != 50 {
 		t.Fatalf("expected reserve0=50, got %d", w.Agents.Reserves[idx*cfg.NumNutrients+0])
 	}
+	// Each gamete must record its per-gamete endowment (= its production cost),
+	// mirroring the legacy Gonada.Agrega(CostosGameto).
+	for n := 0; n < cfg.NumNutrients; n++ {
+		if got := w.Agents.GameteReserve[idx*cfg.NumNutrients+n]; got != 5 {
+			t.Fatalf("expected gamete endowment[%d]=5, got %d", n, got)
+		}
+	}
+}
+
+// TestGameteReserveConservation pins the per-gamete reserve chain end to end and
+// verifies energy conservation: the egg's reserve comes from the ovum endowment
+// scaled by (1 − EggFraction), and oviposition does NOT debit the mother again
+// (the old path leaked energy by reading her reserves without deducting them).
+func TestGameteReserveConservation(t *testing.T) {
+	cfg := testCfg()
+	w := world.New(cfg)
+	numNut := cfg.NumNutrients
+
+	female := w.AddAgent()
+	w.Agents.Sex[female] = world.SexFemale
+	for n := 0; n < numNut; n++ {
+		w.Agents.Reserves[female*numNut+n] = 100
+	}
+
+	// Produce gametes: cost 5 each → endowment 5 per gamete.
+	reproCfg := ReproductionConfig{
+		MaxGametes:         10,
+		GameteCosts:        []int32{5, 5},
+		FractionFertilized: 1.0,
+		EggFraction:        0.2, // mother keeps 20%; egg gets 80% of the ovum.
+		EggsPerCycle:       10,
+		MaleRatio:          50,
+		FemaleRatio:        50,
+	}
+	genCfg := GeneticsConfig{
+		NumLoci:  cfg.NumLoci,
+		LociCont: make([]LocusConfig, cfg.NumLoci),
+		LociDisc: make([]LocusConfig, cfg.NumLoci),
+	}
+	Gametogenesis(w, female, reproCfg)
+
+	// Give the female a sperm pack so fertilization can proceed.
+	pack := world.SpermPack{
+		GenotypeCont:  make([]float64, cfg.NumLoci*2),
+		GenotypeDisc:  make([]int32, cfg.NumLoci*2),
+		DominanceCont: make([]uint8, cfg.NumLoci*2),
+		DominanceDisc: make([]uint8, cfg.NumLoci*2),
+		Reserves:      make([]int32, numNut),
+		Paternity:     100,
+		Donor:         "M0",
+	}
+	w.Agents.AddSpermPack(female, pack)
+
+	// Snapshot the mother's reserves right before fertilization/oviposition.
+	motherBefore := make([]int32, numNut)
+	copy(motherBefore, w.Agents.Reserves[female*numNut:female*numNut+numNut])
+
+	FertilizeGametes(w, female, 1, reproCfg, genCfg)
+	if w.Agents.FertilizedCount(female) != 1 {
+		t.Fatalf("expected 1 fertilized egg, got %d", w.Agents.FertilizedCount(female))
+	}
+
+	// The retained egg's reserve must be ovum(5) × (1 − 0.2) = 4 per nutrient.
+	fEgg := w.Agents.FertilizedEggs[female][0]
+	for n := 0; n < numNut; n++ {
+		if fEgg.Reserves[n] != 4 {
+			t.Fatalf("egg reserve[%d]: expected 4 (5 × 0.8), got %d", n, fEgg.Reserves[n])
+		}
+	}
+
+	// Lay it onto a colocated oviposition site.
+	site := w.Resources.Count
+	w.Resources.PosX[site] = w.Agents.PosX[female]
+	w.Resources.PosY[site] = w.Agents.PosY[female]
+	w.Resources.TypeID[site] = world.ResourceTypeOvipositionSite
+	w.Resources.MaxLevel[site] = 20
+	w.Resources.Count++
+	w.Agents.InteractantIdx[female] = int32(site)
+
+	laid := Oviposit(w, female, reproCfg, genCfg)
+	if laid != 1 {
+		t.Fatalf("expected 1 egg laid, got %d", laid)
+	}
+
+	// The laid egg keeps exactly the carried reserve (no re-synthesis).
+	for n := 0; n < numNut; n++ {
+		if w.Eggs.Reserves[n] != 4 {
+			t.Fatalf("laid egg reserve[%d]: expected 4, got %d", n, w.Eggs.Reserves[n])
+		}
+	}
+
+	// Energy conservation: fertilization + oviposition must NOT change the
+	// mother's own reserves (all reproductive energy was already paid at
+	// gametogenesis). The old code leaked by reading her reserves at laying.
+	for n := 0; n < numNut; n++ {
+		if got := w.Agents.Reserves[female*numNut+n]; got != motherBefore[n] {
+			t.Fatalf("mother reserve[%d] changed during fertilize/oviposit: before %d, after %d",
+				n, motherBefore[n], got)
+		}
+	}
 }
 
 func TestGametogenesis_LimitedByReserves(t *testing.T) {

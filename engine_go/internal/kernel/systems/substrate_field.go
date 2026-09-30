@@ -27,10 +27,12 @@ import (
 // slot (DirNW..DirSE), exactly as accumulateTendency would have via
 // relativeDirection.
 //
-// This first entry precomputes only the attractiveness→tendency contribution
-// (the dominant per-agent cost). The surrounding-cell interaction contribution
-// stays on the per-cell path for now; it is handled in a later entry together
-// with the dynamic-formula branch.
+// The field carries the CONSTANT-case tendency (attractiveness→direction) and,
+// when the substrate's interaction formulas are also constant, the interaction
+// contribution to the behavior-probability average (legacy PromediaProbaDecision:
+// one contribution per substrate cell in range). Substrates whose attractiveness,
+// radius, or interaction formulas are DYNAMIC are excluded from the field and
+// handled by the per-agent branch in perceiveSubstrate.
 type SubstrateField struct {
 	numPerceivers int
 	numBehaviors  int
@@ -40,6 +42,16 @@ type SubstrateField struct {
 	// tendAbs holds, per (perceiver, cell), the 8 absolute-angle tendency
 	// buckets. Layout: [(perceiver*cells + cellY*width + cellX)*8 + absAngle].
 	tendAbs []int32
+
+	// interSum holds, per (perceiver, cell), the summed interaction weight per
+	// behavior over all constant substrate cells in range. Layout:
+	// [(perceiver*cells + cell)*numBehaviors + behavior].
+	interSum []int32
+
+	// interCount holds, per (perceiver, cell), how many constant substrate cells
+	// in range contributed an interaction (the PromediaProbaDecision denominator
+	// for the field's share). Layout: [perceiver*cells + cell].
+	interCount []int32
 
 	// perceivedMask holds, per (perceiver, cell), a bitmask of substrate indices
 	// perceived within range from that cell (bit i set → substrate index i was
@@ -67,9 +79,27 @@ func NewSubstrateField(numPerceivers, numBehaviors, width, height, numSubstrates
 		width:         width,
 		height:        height,
 		tendAbs:       make([]int32, numPerceivers*cells*8),
+		interSum:      make([]int32, numPerceivers*cells*numBehaviors),
+		interCount:    make([]int32, numPerceivers*cells),
 		perceivedMask: make([]uint64, numPerceivers*cells*maskWords),
 		maskWords:     maskWords,
 	}
+}
+
+// AddInteraction adds one substrate cell's per-behavior interaction contribution
+// at the standpoint (perceiver, x, y) and bumps the contributing-cell count once
+// (one PromediaProbaDecision contribution per perceived substrate cell). Values
+// beyond numBehaviors are ignored.
+func (f *SubstrateField) AddInteraction(perceiver, x, y int, perBehavior []int32) {
+	base := f.cellBase(perceiver, x, y)
+	if base < 0 {
+		return
+	}
+	off := base * f.numBehaviors
+	for b := 0; b < f.numBehaviors && b < len(perBehavior); b++ {
+		f.interSum[off+b] += perBehavior[b]
+	}
+	f.interCount[base]++
 }
 
 // MarkPerceivedSubstrate records that, from (perceiver, x, y), substrate index
@@ -107,9 +137,9 @@ func (f *SubstrateField) AddTendency(perceiver, x, y, absAngle int, weight int32
 }
 
 // applyTo folds the precomputed field for the agent standing at (x, y) into the
-// perception accumulators: heading-rotated tendencies and substrate perception
-// memory. It mirrors the tendency half of a per-agent substrate sweep at O(8)
-// cost plus the perceived-substrate marking.
+// perception accumulators: heading-rotated tendencies, constant interaction
+// contributions, and substrate perception memory. It mirrors a per-agent
+// substrate sweep (for the constant substrates) at O(8 + numBehaviors) cost.
 func (f *SubstrateField) applyTo(ctx *PerceptionContext, idx, perceiver, x, y int) {
 	base := f.cellBase(perceiver, x, y)
 	if base < 0 {
@@ -131,6 +161,19 @@ func (f *SubstrateField) applyTo(ctx *PerceptionContext, idx, perceiver, x, y in
 		relAngle := (absAngle - angAgent + 8) % 8
 		slot := angleRelTable[relAngle]
 		a.Tendencies[tendBase+slot] += w
+	}
+
+	// Fold the constant interaction contributions into the running behavior
+	// average. The field stored the SUM per behavior and the count of
+	// contributing substrate cells; adding both to the tick accumulators lets
+	// applyInteractionAverages divide by the total (legacy PromediaProbaDecision).
+	cnt := f.interCount[base]
+	if cnt != 0 {
+		iOff := base * f.numBehaviors
+		for b := 0; b < cfg.NumBehaviors && b < f.numBehaviors; b++ {
+			ctx.interSum[b] += f.interSum[iOff+b]
+			ctx.interCount[b] += cnt
+		}
 	}
 
 	// Mark substrate perception memory for every substrate that was in range

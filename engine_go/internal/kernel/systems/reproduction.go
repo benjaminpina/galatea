@@ -11,8 +11,8 @@ type ReproductionConfig struct {
 	PacksTransferred   int32   // Sperm packs transferred per copulation.
 	MaxStoredPacks     int32   // Max sperm packs a female can store.
 	FractionFertilized float64 // Fraction of eggs fertilized after copulation.
-	PackFraction       float64 // Fraction of gamete reserves in each sperm pack.
-	EggFraction        float64 // Fraction of gamete reserves allocated to egg.
+	PackFraction       float64 // Legacy FraccPaquete: sperm pack reserve = male gamete endowment × PackFraction.
+	EggFraction        float64 // Legacy FraccHuevo: mother's KEPT share; the egg gets ovum × (1 − EggFraction).
 	EggsPerCycle       int32   // Eggs oviposited per cycle.
 	Paternity          int32   // Initial paternity weight for sperm packs.
 	ConsumptionRate    float64 // Rate at which females consume stored sperm packs.
@@ -60,9 +60,16 @@ func Gametogenesis(w *world.World, idx int, cfg ReproductionConfig) {
 		return
 	}
 
-	// Deduct costs.
+	// Deduct the production cost from the agent's reserves and record the
+	// per-gamete endowment: in the legacy each gamete is stored WITH a copy of
+	// its production cost as its own reserve (Gonada.Agrega(CostosGameto)), and
+	// that reserve is exactly what later flows into the egg or sperm pack. Since
+	// every gamete in a batch shares the same cost, we store one endowment
+	// vector for the gonad; it reflects the batch just produced.
+	gameteBase := idx * numNut
 	for n := 0; n < numNut; n++ {
 		a.Reserves[reserveBase+n] -= cfg.GameteCosts[n] * produced
+		a.GameteReserve[gameteBase+n] = cfg.GameteCosts[n]
 	}
 	a.GametesCount[idx] += produced
 }
@@ -97,15 +104,16 @@ func Copulate(w *world.World, maleIdx, femaleIdx int, cfg ReproductionConfig, ge
 		return
 	}
 
-	// Package reserves per pack: a fraction of the male's current reserves.
-	// The engine models the gonad as a count (GametesCount) rather than
-	// per-gamete reserves, so we approximate the packaged reserves as a
-	// fraction of the donor's reserves (legacy scales gonad reserves by
-	// FraccPaquete). This keeps a meaningful nutrient payload on each pack.
+	// Package reserves per pack from the male's per-gamete endowment, scaled by
+	// PackFraction (legacy Copula: Paquete.Reservas := male_ovum × FraccPaquete,
+	// where male_ovum is Gonada.Elementos[1], the endowment set at gametogenesis).
+	// This carries the donor gamete's own reserve — the payload the female later
+	// reabsorbs via SpermConsumption — rather than an ad-hoc slice of the male's
+	// whole reserves.
 	packReserves := make([]int32, numNut)
-	maleResBase := maleIdx * numNut
+	maleGameteBase := maleIdx * numNut
 	for n := 0; n < numNut; n++ {
-		packReserves[n] = int32(float64(a.Reserves[maleResBase+n]) * cfg.PackFraction)
+		packReserves[n] = int32(float64(a.GameteReserve[maleGameteBase+n]) * cfg.PackFraction)
 	}
 
 	donor := donorID(maleIdx)
@@ -158,6 +166,7 @@ func donorID(maleIdx int) string {
 func FertilizeGametes(w *world.World, femaleIdx int, count int32, cfg ReproductionConfig, genCfg GeneticsConfig) int32 {
 	a := w.Agents
 	numLoci := w.Config.NumLoci
+	numNut := w.Config.NumNutrients
 
 	packs := a.SpermPacks[femaleIdx]
 	if count <= 0 || len(packs) == 0 || a.GametesCount[femaleIdx] <= 0 {
@@ -207,11 +216,25 @@ func FertilizeGametes(w *world.World, femaleIdx int, count int32, cfg Reproducti
 			MutateDisc(childDisc, childDiscDom, numLoci, genCfg.LociDisc)
 		}
 
+		// The egg's nutrient endowment comes from the maternal ovum's per-gamete
+		// reserve, scaled by (1 − EggFraction) (legacy: Reservas := ovum ×
+		// (1 − FraccHuevo); FraccHuevo is the share the mother keeps). This
+		// energy was already deducted from the mother at gametogenesis, so no
+		// extra maternal reserve is spent here — the earlier oviposition-time
+		// synthesis (mother × EggFraction, which never debited the mother) is
+		// gone, closing the energy leak.
+		eggReserves := make([]int32, numNut)
+		motherGameteBase := femaleIdx * numNut
+		for n := 0; n < numNut; n++ {
+			eggReserves[n] = int32(float64(a.GameteReserve[motherGameteBase+n]) * (1 - cfg.EggFraction))
+		}
+
 		egg := world.FertilizedEgg{
 			GenotypeCont:  childCont,
 			GenotypeDisc:  childDisc,
 			DominanceCont: childContDom,
 			DominanceDisc: childDiscDom,
+			Reserves:      eggReserves,
 			Sex:           DetermineSex(cfg.MaleRatio, cfg.FemaleRatio),
 			Donor:         pack.Donor,
 		}
@@ -315,12 +338,18 @@ func Oviposit(w *world.World, femaleIdx int, cfg ReproductionConfig, genCfg Gene
 		copy(eggs.GenotypeDisc[eggDiscBase:eggDiscBase+genoSize], fEgg.GenotypeDisc)
 		copy(eggs.DominanceDisc[eggDiscBase:eggDiscBase+genoSize], fEgg.DominanceDisc)
 
-		// Allocate fraction of mother's reserves to egg.
+		// Carry over the reserve the egg received at fertilization (from the
+		// maternal ovum). It is NOT re-synthesized from the mother here: that
+		// old path read the mother's whole reserves without debiting them,
+		// which leaked energy. The endowment was already paid for during
+		// gametogenesis (legacy Oviposita just copies Huevo.Reservas as-is).
 		eggResBase := eggIdx * numNut
-		motherResBase := femaleIdx * numNut
 		for n := 0; n < numNut; n++ {
-			eggReserve := int32(float64(a.Reserves[motherResBase+n]) * cfg.EggFraction / float64(eggsToLay))
-			eggs.Reserves[eggResBase+n] = eggReserve
+			var v int32
+			if n < len(fEgg.Reserves) {
+				v = fEgg.Reserves[n]
+			}
+			eggs.Reserves[eggResBase+n] = v
 		}
 
 		// Record parentage and wire the egg to its carrier, updating the

@@ -154,6 +154,7 @@ func (w *World) growAgents() {
 	a.Tendencies = growI32(a.Tendencies, newCap*8)
 	a.VDecision = growI32(a.VDecision, newCap*numBehaviors)
 	a.GametesCount = growI32(a.GametesCount, newCap)
+	a.GameteReserve = growI32(a.GameteReserve, newCap*numNutrients)
 	a.SpermPacks = growSpermPacks(a.SpermPacks, newCap)
 	a.FertilizedEggs = growFertilizedEggs(a.FertilizedEggs, newCap)
 	a.OvipositCarrierIsAgent = growBool(a.OvipositCarrierIsAgent, newCap)

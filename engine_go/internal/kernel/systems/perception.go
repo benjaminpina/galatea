@@ -84,6 +84,43 @@ func CourtshipStrategyKey(protoIdx, action, oppAction int) string {
 	return fmt.Sprintf("courtship.%d.%d.%d", protoIdx, action, oppAction)
 }
 
+// SubstrateAttractKey builds the registry key for a substrate's (dynamic)
+// attractiveness formula for a given perceiver.
+func SubstrateAttractKey(substrateIdx, perceiverIdx int) string {
+	return fmt.Sprintf("substrate_attract.%d.%d", substrateIdx, perceiverIdx)
+}
+
+// SubstrateRadiusKey builds the registry key for a substrate's (dynamic)
+// perception-radius formula for a given perceiver.
+func SubstrateRadiusKey(substrateIdx, perceiverIdx int) string {
+	return fmt.Sprintf("substrate_radius.%d.%d", substrateIdx, perceiverIdx)
+}
+
+// DynamicSubstrate flags, per (substrate, perceiver), which parts of that
+// substrate's perception must be evaluated per-agent (enfoque B dynamic case)
+// because their formulas depend on state or are stochastic. The constant parts
+// are already folded into the SubstrateField; the dynamic sweep contributes
+// ONLY the flagged parts to avoid double counting.
+type DynamicSubstrate struct {
+	// AttrDynamic is true when the attractiveness formula is dynamic (its
+	// tendency must be swept per-agent). Its formula is registered under
+	// SubstrateAttractKey.
+	AttrDynamic bool
+	// InterDynamic is true when any interaction formula is dynamic (the whole
+	// interaction vector is evaluated per-agent from InteractionKeySubstrate).
+	InterDynamic bool
+	// Radius is the constant perception radius when RadiusDynamic is false;
+	// when RadiusDynamic is true, the radius is evaluated per-agent from
+	// SubstrateRadiusKey and this value is ignored.
+	Radius        float64
+	RadiusDynamic bool
+}
+
+// DynamicSubstrateSpec is the per-perceiver set of substrates needing a
+// per-agent sweep. Layout: [perceiverIdx][substrateIdx] -> spec (nil when that
+// substrate is fully constant for the perceiver and handled by the field).
+type DynamicSubstrateSpec [][]*DynamicSubstrate
+
 // Lookup tables for direction conversions (replace switch statements).
 // dirAngleTable maps direction code (1-8) to clockwise angular index (0-7 from N).
 var dirAngleTable = [9]int{0, 7, 0, 1, 6, 2, 5, 4, 3} // index 0 unused
@@ -124,6 +161,11 @@ type PerceptionContext struct {
 	// (tendencies + interaction) per (perceiver, cell). Nil when no constant
 	// substrate attractiveness is configured. See enfoque B / SubstrateField.
 	SubstrateField *SubstrateField
+
+	// DynamicSubstrates flags substrates whose attractiveness/radius/interaction
+	// depend on state and must be swept per-agent. Nil/empty when every
+	// configured substrate is constant (the common case).
+	DynamicSubstrates DynamicSubstrateSpec
 
 	// Per-agent reference values (set before each agent's perception).
 	Ref *AgentRef
@@ -311,11 +353,19 @@ func applyInteractionAverages(ctx *PerceptionContext, idx int) {
 	}
 }
 
-// perceiveSubstrate accumulates interaction weights from the substrate the
-// agent currently stands on. The legacy also perceives nearby substrates within
-// a radius; here we contribute the current cell's substrate (the dominant
-// signal) so substrate interaction formulas take effect. Tendency/attraction of
-// substrates is handled separately by the attractiveness matrices.
+// perceiveSubstrate accumulates the substrate contribution to tendencies and
+// behavior probabilities from the substrates within perception radius (legacy
+// ProveePercepcionesSustratos). It is split by the enfoque B optimization:
+//
+//   - CONSTANT substrates (attractiveness/radius/interaction independent of
+//     state) are folded in via the precomputed SubstrateField in O(8) instead of
+//     an O(radius²) per-agent sweep.
+//   - DYNAMIC substrates (formulas depend on agent/world state or are
+//     stochastic) are swept per-agent here, contributing ONLY their dynamic
+//     parts so nothing the field already added is double counted.
+//
+// When neither a field nor a dynamic spec exists (nothing configured), the
+// agent's current cell still contributes its interaction so simple setups work.
 func perceiveSubstrate(ctx *PerceptionContext, idx int) {
 	w := ctx.World
 	a := w.Agents
@@ -329,33 +379,137 @@ func perceiveSubstrate(ctx *PerceptionContext, idx int) {
 	substrateIdx := int(w.Substrates.Get(sx, sy))
 	perceiverIdx := getPerceiverIndex(a, idx, cfg)
 
-	// The agent stands on this substrate → it perceives it (memory tracks the
-	// substrate cell, mixed or simple, by its own index).
+	hasField := ctx.SubstrateField.HasSubstrateField()
+	hasDynamic := ctx.hasDynamicSubstrates(perceiverIdx)
+
+	// The agent stands on this substrate → it perceives it.
 	markPerceived(ctx, cfg.MemSlotSubstrate(substrateIdx))
 
-	// Enfoque B, constant case: when a precomputed substrate field exists, fold
-	// in the radius-swept attractiveness→tendency contribution (rotated by the
-	// agent's heading) and mark perception memory for the substrates in range.
-	// This replaces the legacy per-agent O(radius²) tendency sweep with an O(8)
-	// lookup. The interaction contribution below still runs for the agent's own
-	// cell (surrounding-cell interaction is a later entry).
-	if ctx.SubstrateField.HasSubstrateField() {
+	// Constant case: fold the precomputed field (tendency + interaction +
+	// memory of surrounding constant substrates).
+	if hasField {
 		ctx.SubstrateField.applyTo(ctx, idx, perceiverIdx, sx, sy)
 	}
 
+	// Dynamic case: per-agent sweep for the flagged substrates only.
+	if hasDynamic {
+		perceiveSubstrateDynamic(ctx, idx, perceiverIdx, sx, sy)
+	}
+
+	// Fallback: nothing precomputed and no dynamic spec → contribute the
+	// current cell's interaction (simple or mixed) so basic configs still work.
+	if !hasField && !hasDynamic {
+		accumulateSubstrateInteractionAt(ctx, substrateIdx, perceiverIdx)
+	}
+}
+
+// hasDynamicSubstrates reports whether any substrate needs a per-agent sweep for
+// the given perceiver.
+func (ctx *PerceptionContext) hasDynamicSubstrates(perceiverIdx int) bool {
+	if perceiverIdx < 0 || perceiverIdx >= len(ctx.DynamicSubstrates) {
+		return false
+	}
+	for _, spec := range ctx.DynamicSubstrates[perceiverIdx] {
+		if spec != nil {
+			return true
+		}
+	}
+	return false
+}
+
+// perceiveSubstrateDynamic sweeps the cells within the largest dynamic radius
+// around the agent and, for each cell whose substrate is flagged dynamic for
+// this perceiver, contributes the dynamic parts (attractiveness tendency and/or
+// interaction) exactly as the legacy per-cell sweep would, evaluating the
+// per-agent formulas. Parts already handled by the constant field are skipped.
+func perceiveSubstrateDynamic(ctx *PerceptionContext, idx, perceiverIdx, sx, sy int) {
+	w := ctx.World
+	a := w.Agents
+	cfg := w.Config
+	specs := ctx.DynamicSubstrates[perceiverIdx]
+
+	// Determine the sweep radius: the max over dynamic substrates, evaluating
+	// per-agent radii where needed. The agent env is already set by Perceive.
+	maxR := 0.0
+	radiusOf := make([]float64, len(specs))
+	for s, spec := range specs {
+		if spec == nil {
+			continue
+		}
+		r := spec.Radius
+		if spec.RadiusDynamic {
+			r = float64(evalIntFormula(ctx.Formulas, ctx.Eval, SubstrateRadiusKey(s, perceiverIdx), 0))
+		}
+		radiusOf[s] = r
+		if r > maxR {
+			maxR = r
+		}
+	}
+	if maxR <= 0 {
+		return
+	}
+
+	aDir := a.Direction[idx]
+	tendBase := idx * 8
+	rInt := int(maxR + 0.999)
+	for cy := sy - rInt; cy <= sy+rInt; cy++ {
+		for cx := sx - rInt; cx <= sx+rInt; cx++ {
+			if cx < 0 || cx >= cfg.GridWidth || cy < 0 || cy >= cfg.GridHeight {
+				continue
+			}
+			cellSub := int(w.Substrates.Get(cx, cy))
+			if cellSub < 0 || cellSub >= len(specs) {
+				continue
+			}
+			spec := specs[cellSub]
+			if spec == nil {
+				continue // constant substrate, already in the field
+			}
+			dist := distance(float64(sx), float64(sy), float64(cx), float64(cy))
+			if dist > radiusOf[cellSub] {
+				continue
+			}
+			// This dynamic substrate is perceived from here.
+			markPerceived(ctx, cfg.MemSlotSubstrate(cellSub))
+
+			// Dynamic attractiveness → directional tendency (attr/dist).
+			if spec.AttrDynamic && dist > 0 {
+				attr := evalIntFormula(ctx.Formulas, ctx.Eval, SubstrateAttractKey(cellSub, perceiverIdx), 0)
+				if attr != 0 {
+					wgt := int32(attr) / int32(math.Max(1, dist))
+					accumulateTendency(a, tendBase, aDir, float64(sx), float64(sy), float64(cx), float64(cy), wgt)
+				}
+			}
+
+			// Dynamic interaction → one PromediaProbaDecision contribution,
+			// composed the SAME way everywhere: simple substrate reads its own
+			// cell; mixed substrate combines its components by fraction (legacy
+			// GetInteraccionSustratos).
+			if spec.InterDynamic {
+				accumulateSubstrateInteractionAt(ctx, cellSub, perceiverIdx)
+			}
+		}
+	}
+}
+
+// accumulateSubstrateInteractionAt contributes one substrate cell's interaction
+// to the behavior-probability average, using the unified legacy criterion:
+//   - Simple substrate → its own interaction formulas (one contribution).
+//   - Mixed substrate → the fraction-weighted combination of its simple
+//     components' formulas (legacy GetInteraccionSustratos for X>7), counting as
+//     ONE perceived element overall.
+//
+// This is the single hot-path interaction rule, shared by the per-agent dynamic
+// sweep and the no-precompute fallback, and it matches the Cold Path's
+// composeMixedSubstrateInteraction so constant and dynamic paths agree.
+func accumulateSubstrateInteractionAt(ctx *PerceptionContext, substrateIdx, perceiverIdx int) {
+	cfg := ctx.World.Config
 	if !cfg.IsMixedSubstrate(substrateIdx) {
-		// Simple substrate: one interaction contribution.
 		accumulateInteraction(ctx, func(b int) string {
 			return InteractionKeySubstrate(substrateIdx, perceiverIdx, b)
 		}, cfg.NumBehaviors)
 		return
 	}
-
-	// Mixed substrate: its interaction contribution is the weighted combination
-	// of its simple components (legacy GetInteraccionSustratos for X>7). For
-	// each behavior, sum the components' formula results scaled by their
-	// fractions; the mixed cell counts as ONE perceived element overall (a
-	// single PromediaProbaDecision contribution), not one per component.
 	comps := cfg.SubstrateComposition[substrateIdx]
 	for b := 0; b < cfg.NumBehaviors; b++ {
 		combined := 0.0

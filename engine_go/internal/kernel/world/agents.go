@@ -83,6 +83,17 @@ type AgentArrays struct {
 	GametesCount []int32 // Number of gametes in gonad.
 	CarriedEggs  []int32 // Number of eggs being carried.
 
+	// GameteReserve holds, per agent, the per-gamete nutrient endowment of the
+	// gametes currently in the gonad: layout [i*NumNutrients + n]. In the legacy
+	// (DinamicaGametos) every gamete is stored WITH a copy of its production cost
+	// as its own reserve, and that same reserve later flows into the egg (ovum ×
+	// (1−FraccHuevo)) or sperm pack (ovum × FraccPaquete). Since all gametes in a
+	// batch are made with the same per-gamete cost, we store one endowment vector
+	// per agent (the current batch's) instead of a full per-gamete list; this is
+	// faithful because the legacy always draws Gonada.Elementos[1], which shares
+	// that endowment. Set during Gametogenesis, consumed at fertilization/copula.
+	GameteReserve []int32
+
 	// SpermPacks holds, per female agent, the list of stored spermatophores.
 	// Each pack carries the donor male's genotype so paternal inheritance is
 	// possible (mirrors the legacy TEspermateca). SpermPacks[i] is the list
@@ -171,6 +182,7 @@ func NewAgentArrays(cap int, cfg Config) *AgentArrays {
 
 		GametesCount:           make([]int32, cap),
 		CarriedEggs:            make([]int32, cap),
+		GameteReserve:          make([]int32, cap*numNutrients),
 		SpermPacks:             make([][]SpermPack, cap),
 		FertilizedEggs:         make([][]FertilizedEgg, cap),
 		OvipositCarrierIsAgent: make([]bool, cap),

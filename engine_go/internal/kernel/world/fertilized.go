@@ -15,6 +15,14 @@ type FertilizedEgg struct {
 	DominanceCont []uint8
 	DominanceDisc []uint8
 
+	// Reserves is the nutrient endowment the egg carries, per nutrient. It is
+	// set at fertilization from the maternal ovum's per-gamete reserve (legacy
+	// FertilizaFraccion/FertilizaCantidad: egg reserve = ovum × (1 − FraccHuevo)),
+	// NOT synthesized later from the mother's whole reserves. This is what makes
+	// the egg's endowment come from the ovum that was already paid for during
+	// gametogenesis, so no extra maternal energy leaks at oviposition.
+	Reserves []int32
+
 	// Sex determined at fertilization (via the offspring sex ratio).
 	Sex uint8
 
