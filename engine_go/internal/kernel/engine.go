@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"math/rand/v2"
+	"sort"
 	"strings"
 
 	"galatea/engine/internal/adapters/storage"
@@ -418,18 +419,21 @@ func Build(db *storage.DB, cfg EngineConfig) (*Engine, error) {
 
 	// Ontogeny config: load real stages from the DB (falls back to sensible
 	// defaults only when the stages table is empty).
-	stageConfigs := buildStagesFromDB(db, w.Config, numNut, eval)
+	stageConfigs := buildStagesFromDB(db, w.Config, numNut, eval, registry)
+	priorityM, criteriaM := buildAssignmentCriteria(db, registry, "M", w.Config.NumPrototypesM)
+	priorityF, criteriaF := buildAssignmentCriteria(db, registry, "F", w.Config.NumPrototypesF)
 	ontCfg := systems.OntogenyConfig{
-		NumStages:            w.Config.NumStages,
-		NumPrototypesM:       w.Config.NumPrototypesM,
-		NumPrototypesF:       w.Config.NumPrototypesF,
-		Stages:               stageConfigs,
-		AssignmentPriorityM:  buildPriorityList(w.Config.NumPrototypesM),
-		AssignmentPriorityF:  buildPriorityList(w.Config.NumPrototypesF),
-		AssignmentThresholds: make([]float64, max(w.Config.NumPrototypesM, w.Config.NumPrototypesF)),
-		Registry:             registry,
-		Eval:                 eval,
-		EnvBuilder:           envBuilder,
+		NumStages:           w.Config.NumStages,
+		NumPrototypesM:      w.Config.NumPrototypesM,
+		NumPrototypesF:      w.Config.NumPrototypesF,
+		Stages:              stageConfigs,
+		AssignmentPriorityM: priorityM,
+		AssignmentPriorityF: priorityF,
+		AssignmentCriteriaM: criteriaM,
+		AssignmentCriteriaF: criteriaF,
+		Registry:            registry,
+		Eval:                eval,
+		EnvBuilder:          envBuilder,
 	}
 
 	// Genetics config (defaults: no mutation).
@@ -498,7 +502,10 @@ func (e *Engine) Tick() {
 	ctx.Ref = e.agentRef
 	for _, idx := range perm {
 		if a.Situation[idx] == world.SituationCombat || a.Situation[idx] == world.SituationCourtship {
-			continue // Combat/courtship agents skip perception.
+			// Combat/courtship agents skip perception, but their memory must
+			// keep aging (legacy ActualizaMemoria runs for every agent).
+			systems.AgeMemory(w, idx)
+			continue
 		}
 		// Evaluate reference values for this agent (needed by filters + speed).
 		systems.EvalRefValues(w, idx, e.Registry, e.Eval, e.EnvBuilder, e.agentRef)
@@ -1128,7 +1135,8 @@ func behaviorNameToIndex(name string, nIdx int, cfg world.Config) int {
 // slice is ordered by sort_order so its index matches the agent StageID.
 // Falls back to buildDefaultStages when the stages table is empty.
 func buildStagesFromDB(
-	db *storage.DB, cfg world.Config, numNut int, eval *formulas.Evaluator,
+	db *storage.DB, cfg world.Config, numNut int,
+	eval *formulas.Evaluator, registry *formulas.Registry,
 ) []systems.StageConfig {
 	stageRepo := storage.NewStageRepo(db)
 	stages, err := stageRepo.List() // Ordered by sort_order.
@@ -1185,11 +1193,30 @@ func buildStagesFromDB(
 			}
 		}
 
+		// Compile the two custom-condition formulas. A "0" formula (the schema
+		// default) is treated as unconfigured (empty key → neutral condition).
+		cond1Key := fmt.Sprintf("stage.%d.cond1", i)
+		cond2Key := fmt.Sprintf("stage.%d.cond2", i)
+		if !isNeutralFormula(s.Condition1Formula) {
+			_ = registry.Compile(cond1Key, s.Condition1Formula)
+		} else {
+			cond1Key = ""
+		}
+		if !isNeutralFormula(s.Condition2Formula) {
+			_ = registry.Compile(cond2Key, s.Condition2Formula)
+		} else {
+			cond2Key = ""
+		}
+
 		result[i] = systems.StageConfig{
 			CyclesRequired:  evalConstFormula(eval, s.CyclesFormula, 0),
 			NutrientReqs:    reqs,
 			NutrientCosts:   costs,
+			Condition1Key:   cond1Key,
+			Condition1Op:    s.Condition1Op,
 			Condition1Value: s.Condition1Value,
+			Condition2Key:   cond2Key,
+			Condition2Op:    s.Condition2Op,
 			Condition2Value: s.Condition2Value,
 			LogicCyclesReqs: logicIsAnd(s.LogicCyclesReqs),
 			LogicReqsConds:  logicIsAnd(s.LogicReqsConds),
@@ -1204,6 +1231,13 @@ func buildStagesFromDB(
 // convention (true = AND).
 func logicIsAnd(s string) bool {
 	return s != "OR"
+}
+
+// isNeutralFormula reports whether a condition formula is the schema default
+// ("0") or empty, meaning the condition is effectively unconfigured.
+func isNeutralFormula(s string) bool {
+	t := strings.TrimSpace(s)
+	return t == "" || t == "0"
 }
 
 // --- Interaction matrices (behavior-probability) ------------------------------
@@ -1406,4 +1440,92 @@ func compileCourtshipMatrices(db *storage.DB, registry *formulas.Registry) {
 		}
 		_ = registry.Compile(systems.CourtshipStrategyKey(pIdx, action, oppAction), formula)
 	}
+}
+
+// buildAssignmentCriteria loads prototype_assignment_criteria for one sex and
+// builds (priority, criteria) for the OntogenyConfig, mirroring the legacy
+// JerarquiaM/H + CriteriosM/H:
+//   - priority: prototype indices (0-based within the sex) in evaluation order,
+//     ordered by the `priority` column ascending.
+//   - criteria: indexed by the 0-based prototype index within the sex; each is
+//     the compiled criterion formula key, operator and threshold.
+//
+// Prototype DB ids are mapped to their 0-based index within the sex by
+// sort_order (matching the loader's ordering). Criterion formulas are compiled
+// under "assign.<M|F>.<protoIdx>".
+func buildAssignmentCriteria(
+	db *storage.DB, registry *formulas.Registry, sex string, numProtos int,
+) ([]int, []systems.AssignmentCriterion) {
+	if numProtos <= 0 {
+		return nil, nil
+	}
+
+	// Map prototype DB id -> 0-based index within the sex (by sort_order).
+	idToIdx := make(map[int64]int)
+	idxRows, err := db.Conn.Query(
+		"SELECT id FROM prototypes WHERE sex = ? ORDER BY sort_order", sex)
+	if err == nil {
+		i := 0
+		for idxRows.Next() {
+			var id int64
+			if err := idxRows.Scan(&id); err == nil {
+				idToIdx[id] = i
+				i++
+			}
+		}
+		idxRows.Close()
+	}
+
+	criteria := make([]systems.AssignmentCriterion, numProtos)
+
+	// priorityByProto[protoIdx] = priority value; default large so unconfigured
+	// prototypes sort last but remain present.
+	priorityByProto := make([]int, numProtos)
+	for i := range priorityByProto {
+		priorityByProto[i] = 1 << 30
+	}
+
+	rows, err := db.Conn.Query(
+		`SELECT prototype_id, priority, formula, operator, threshold
+		 FROM prototype_assignment_criteria`)
+	if err == nil {
+		defer rows.Close()
+		for rows.Next() {
+			var protoID int64
+			var priority int
+			var formula, operator string
+			var threshold float64
+			if err := rows.Scan(&protoID, &priority, &formula, &operator, &threshold); err != nil {
+				continue
+			}
+			pIdx, ok := idToIdx[protoID]
+			if !ok {
+				continue
+			}
+			key := fmt.Sprintf("assign.%s.%d", sex, pIdx)
+			if isNeutralFormula(formula) {
+				key = "" // Unconfigured criterion: never passes, relies on default.
+			} else {
+				_ = registry.Compile(key, formula)
+			}
+			criteria[pIdx] = systems.AssignmentCriterion{
+				Key:       key,
+				Op:        operator,
+				Threshold: threshold,
+			}
+			priorityByProto[pIdx] = priority
+		}
+	}
+
+	// Build the priority-ordered list of prototype indices (stable by priority,
+	// then by index).
+	priority := make([]int, numProtos)
+	for i := range priority {
+		priority[i] = i
+	}
+	sort.SliceStable(priority, func(a, b int) bool {
+		return priorityByProto[priority[a]] < priorityByProto[priority[b]]
+	})
+
+	return priority, criteria
 }

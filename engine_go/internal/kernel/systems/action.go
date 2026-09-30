@@ -107,6 +107,25 @@ func actFeed(w *world.World, idx int) {
 
 	// Deplete resource.
 	r.Level[interactant] -= amount
+
+	// Record the interaction with this source type in the agent's memory.
+	if resourceType < cfg.NumResourceTypes {
+		markInteracted(a, idx, cfg.MemSlotSource(resourceType), cfg)
+	}
+}
+
+// markInteracted records an interaction with the element at the given memory
+// slot for the agent at idx: resets MemoryLastInteracted to 0 and increments
+// MemoryNumInteracted (legacy ActualizaMemoria interaction update). Aging of
+// the "last" counter happens in the perception phase.
+func markInteracted(a *world.AgentArrays, idx, slot int, cfg world.Config) {
+	slots := cfg.MemPerceptionSlots()
+	if slot < 0 || slot >= slots {
+		return
+	}
+	mi := idx*slots + slot
+	a.MemoryLastInteracted[mi] = 0
+	a.MemoryNumInteracted[mi]++
 }
 
 // actCombatSignal signals the opponent with the chosen combat action.
@@ -136,6 +155,9 @@ func actCombatSignal(w *world.World, idx int) {
 	// Signal display or escalate to opponent (stored as LastOpponentAction).
 	action := uint8(decision - fightDisplayIdx + 1) // 1=display, 2=escalate
 	a.LastOpponentAction[interactant] = action
+
+	// Record the interaction with the opponent's prototype in memory.
+	markInteracted(a, idx, cfg.MemSlotPrototype(getPerceiverIndex(a, int(interactant), cfg)), cfg)
 }
 
 // actCourtshipSignal signals the partner with the chosen courtship action.
@@ -166,6 +188,9 @@ func actCourtshipSignal(w *world.World, idx int) {
 		action := uint8(relativeDecision + 1) // 1=display, 2=escalate
 		a.LastOpponentAction[interactant] = action
 	}
+
+	// Record the interaction with the partner's prototype in memory.
+	markInteracted(a, idx, cfg.MemSlotPrototype(getPerceiverIndex(a, int(interactant), cfg)), cfg)
 }
 
 // actOviposit records the oviposition decision; the actual egg deposit is

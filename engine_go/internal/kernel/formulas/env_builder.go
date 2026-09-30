@@ -23,6 +23,42 @@ func (b *EnvBuilder) SetWorldVars(w *world.World) {
 	b.eval.Set("Cycles", int(w.Tick))
 }
 
+// SetEggVars populates the env with the variables available to an egg (for
+// eclosion condition formulas): its age, its per-nutrient reserves, and its
+// expressed loci. Eggs are not adults, so identity/morphology adult vars are
+// left unset (they evaluate to zero via AllowUndefinedVariables).
+func (b *EnvBuilder) SetEggVars(w *world.World, eggIdx int) {
+	e := w.Eggs
+	cfg := b.cfg
+	names := cfg.Names
+
+	b.eval.SetInt("Age", int(e.Age[eggIdx]))
+	b.eval.SetInt("NumLifeStage", 0) // 0 = egg (pre-eclosion).
+
+	for n := 0; n < cfg.NumNutrients; n++ {
+		reserveIdx := eggIdx*cfg.NumNutrients + n
+		name := nutrientVarName("Reserve", n, names.NutrientNames)
+		b.eval.SetInt(name, int(e.Reserves[reserveIdx]))
+	}
+
+	for l := 0; l < cfg.NumLoci; l++ {
+		locusBase := eggIdx*cfg.NumLoci*2 + l*2
+		expressed := expressLocusCont(
+			e.GenotypeCont[locusBase], e.GenotypeCont[locusBase+1],
+			e.DominanceCont[locusBase], e.DominanceCont[locusBase+1],
+		)
+		clName := locusVarName("CL", l, names.LocusNames)
+		b.eval.SetFloat(clName, expressed)
+
+		expressedDisc := expressLocusDisc(
+			e.GenotypeDisc[locusBase], e.GenotypeDisc[locusBase+1],
+			e.DominanceDisc[locusBase], e.DominanceDisc[locusBase+1],
+		)
+		dlName := locusVarName("DL", l, names.LocusNames)
+		b.eval.SetInt(dlName, expressedDisc)
+	}
+}
+
 // SetAgentVars populates the env with all variables for agent at index idx.
 func (b *EnvBuilder) SetAgentVars(w *world.World, idx int) {
 	a := w.Agents

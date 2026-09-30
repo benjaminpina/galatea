@@ -32,12 +32,11 @@ func testOntogenyCfg() OntogenyConfig {
 				LinkedPrototype: -1,
 			},
 		},
-		AssignmentPriorityM:  []int{0},
-		AssignmentPriorityF:  []int{0},
-		AssignmentThresholds: []float64{0.5},
-		Registry:             formulas.NewRegistry(),
-		Eval:                 formulas.NewEvaluator(16),
-		EnvBuilder:           formulas.NewEnvBuilder(formulas.NewEvaluator(16), testCfg()),
+		AssignmentPriorityM: []int{0},
+		AssignmentPriorityF: []int{0},
+		Registry:            formulas.NewRegistry(),
+		Eval:                formulas.NewEvaluator(16),
+		EnvBuilder:          formulas.NewEnvBuilder(formulas.NewEvaluator(16), testCfg()),
 	}
 }
 
@@ -203,9 +202,8 @@ func TestEvaluateStageTransition_NotReady(t *testing.T) {
 			{CyclesRequired: 10, NutrientReqs: []int32{5, 5}, NutrientCosts: []int32{2, 2}, LogicCyclesReqs: true, LogicReqsConds: true},
 			{CyclesRequired: 20, NutrientReqs: []int32{10, 10}, NutrientCosts: []int32{3, 3}, LogicCyclesReqs: true, LogicReqsConds: true},
 		},
-		AssignmentPriorityM:  []int{0},
-		AssignmentPriorityF:  []int{0},
-		AssignmentThresholds: []float64{0.5},
+		AssignmentPriorityM: []int{0},
+		AssignmentPriorityF: []int{0},
 	}
 
 	idx := w.AddAgent()
@@ -239,12 +237,11 @@ func TestEvaluateStageTransition_AdvancesToNextStage(t *testing.T) {
 			{CyclesRequired: 10, NutrientReqs: []int32{0, 0}, NutrientCosts: []int32{1, 1}, LogicCyclesReqs: true, LogicReqsConds: false},
 			{CyclesRequired: 15, NutrientReqs: []int32{0, 0}, NutrientCosts: []int32{1, 1}, LogicCyclesReqs: true, LogicReqsConds: false},
 		},
-		AssignmentPriorityM:  []int{0},
-		AssignmentPriorityF:  []int{0},
-		AssignmentThresholds: []float64{0},
-		Registry:             formulas.NewRegistry(),
-		Eval:                 formulas.NewEvaluator(16),
-		EnvBuilder:           formulas.NewEnvBuilder(formulas.NewEvaluator(16), testCfg()),
+		AssignmentPriorityM: []int{0},
+		AssignmentPriorityF: []int{0},
+		Registry:            formulas.NewRegistry(),
+		Eval:                formulas.NewEvaluator(16),
+		EnvBuilder:          formulas.NewEnvBuilder(formulas.NewEvaluator(16), testCfg()),
 	}
 
 	idx := w.AddAgent()
@@ -534,5 +531,166 @@ func TestEggViabilitySiteSurvivesByDefault(t *testing.T) {
 	}
 	if w.Eggs.Count != 1 {
 		t.Fatalf("expected 1 egg remaining, got %d", w.Eggs.Count)
+	}
+}
+
+// TestCombineLogicPascalPrecedence verifies the four legacy combinations,
+// respecting Pascal's and > or precedence.
+func TestCombineLogicPascalPrecedence(t *testing.T) {
+	// cases: cycles, reqs, conds, Y_O, Y_OR → want
+	cases := []struct {
+		cycles, reqs, conds bool
+		yo, yor             bool
+		want                bool
+	}{
+		// Y_O=T Y_OR=T : cycles AND reqs AND conds
+		{true, true, true, true, true, true},
+		{true, false, true, true, true, false},
+		// Y_O=F Y_OR=T : cycles OR (reqs AND conds)
+		{false, true, true, false, true, true},
+		{false, true, false, false, true, false}, // reqs&&conds=false, cycles=false → false
+		{true, false, false, false, true, true},  // cycles=true → true
+		// Y_O=T Y_OR=F : (cycles AND reqs) OR conds
+		{false, false, true, true, false, true},  // conds=true → true
+		{true, true, false, true, false, true},   // cycles&&reqs=true → true
+		{true, false, false, true, false, false}, // both branches false
+		// Y_O=F Y_OR=F : cycles OR reqs OR conds
+		{false, false, false, false, false, false},
+		{false, false, true, false, false, true},
+	}
+	for i, c := range cases {
+		got := combineLogic(c.cycles, c.reqs, c.conds, c.yo, c.yor)
+		if got != c.want {
+			t.Errorf("case %d: combineLogic(%v,%v,%v, yo=%v yor=%v) = %v, want %v",
+				i, c.cycles, c.reqs, c.conds, c.yo, c.yor, got, c.want)
+		}
+	}
+}
+
+// TestEvalLogicOperators verifies the legacy comparison operators, including
+// the unknown-operator fallback to equality.
+func TestEvalLogicOperators(t *testing.T) {
+	cases := []struct {
+		v1   float64
+		op   string
+		v2   float64
+		want bool
+	}{
+		{5, "=", 5, true}, {5, "=", 6, false},
+		{5, "<>", 6, true}, {5, "<>", 5, false},
+		{4, "<", 5, true}, {5, "<", 5, false},
+		{6, ">", 5, true}, {5, ">", 5, false},
+		{5, "<=", 5, true}, {6, "<=", 5, false},
+		{5, ">=", 5, true}, {4, ">=", 5, false},
+		{5, "=<", 5, true}, {5, "=>", 5, true},
+		{5, "??", 5, true}, {5, "??", 6, false}, // unknown → equality
+	}
+	for i, c := range cases {
+		if got := evalLogic(c.v1, c.op, c.v2); got != c.want {
+			t.Errorf("case %d: evalLogic(%v,%q,%v) = %v, want %v", i, c.v1, c.op, c.v2, got, c.want)
+		}
+	}
+}
+
+// TestStageTransitionCustomConditionBlocks verifies a custom condition can
+// gate a stage transition: with cycles+reqs met but the condition failing
+// (combined via AND), the agent does not transition; when it passes, it does.
+func TestStageTransitionCustomConditionBlocks(t *testing.T) {
+	cfg := testCfg()
+	w := world.New(cfg)
+
+	reg := formulas.NewRegistry()
+	eval := formulas.NewEvaluator(32)
+	env := formulas.NewEnvBuilder(eval, cfg)
+	// Condition formula: the agent's Age. We'll compare Age > 100.
+	_ = reg.Compile("stage.0.cond1", "Age")
+
+	ontCfg := OntogenyConfig{
+		NumStages:      2,
+		NumPrototypesM: 1,
+		NumPrototypesF: 1,
+		Stages: []StageConfig{
+			{
+				CyclesRequired:  5,
+				NutrientReqs:    []int32{0, 0},
+				NutrientCosts:   []int32{0, 0},
+				Condition1Key:   "stage.0.cond1",
+				Condition1Op:    ">",
+				Condition1Value: 100,
+				LogicCyclesReqs: true, // cycles AND reqs
+				LogicReqsConds:  true, // ... AND conds
+				LogicCond1Cond2: true,
+				LinkedPrototype: -1,
+			},
+			{LinkedPrototype: -1},
+		},
+		AssignmentPriorityM: []int{0},
+		AssignmentPriorityF: []int{0},
+		Registry:            reg,
+		Eval:                eval,
+		EnvBuilder:          env,
+	}
+
+	idx := w.AddAgent()
+	a := w.Agents
+	a.StageID[idx] = 0
+	a.TimeInStage[idx] = 10 // cycles met
+	a.Age[idx] = 50         // condition Age > 100 → FALSE
+
+	if EvaluateStageTransition(w, idx, ontCfg) {
+		t.Fatal("should not transition: custom condition (Age>100) fails and logic is AND")
+	}
+
+	// Now make the condition pass.
+	a.Age[idx] = 150
+	if !EvaluateStageTransition(w, idx, ontCfg) {
+		t.Fatal("should transition: custom condition (Age>100) now passes")
+	}
+}
+
+// TestAssignPrototypeUsesCriteria verifies prototype assignment evaluates the
+// criteria in priority order and picks the first prototype whose criterion
+// passes, mirroring the legacy PrototipoAsignado.
+func TestAssignPrototypeUsesCriteria(t *testing.T) {
+	cfg := testCfg()
+	cfg.NumPrototypesM = 2 // Two male prototypes so criteria are evaluated.
+	w := world.New(cfg)
+
+	reg := formulas.NewRegistry()
+	eval := formulas.NewEvaluator(32)
+	env := formulas.NewEnvBuilder(eval, cfg)
+	// Prototype 0 criterion: Age > 100. Prototype 1 criterion: Age > 0.
+	_ = reg.Compile("assign.M.0", "Age")
+	_ = reg.Compile("assign.M.1", "Age")
+
+	ontCfg := OntogenyConfig{
+		NumStages:           1,
+		NumPrototypesM:      2,
+		NumPrototypesF:      1,
+		AssignmentPriorityM: []int{0, 1}, // evaluate proto 0 first, then 1
+		AssignmentCriteriaM: []AssignmentCriterion{
+			{Key: "assign.M.0", Op: ">", Threshold: 100},
+			{Key: "assign.M.1", Op: ">", Threshold: 0},
+		},
+		AssignmentPriorityF: []int{0},
+		Registry:            reg,
+		Eval:                eval,
+		EnvBuilder:          env,
+	}
+
+	idx := w.AddAgent()
+	a := w.Agents
+	a.Sex[idx] = world.SexMale
+
+	// Age 50: proto 0 (Age>100) fails, proto 1 (Age>0) passes → expect 1.
+	a.Age[idx] = 50
+	if got := AssignPrototype(w, idx, ontCfg); got != 1 {
+		t.Fatalf("Age=50: expected prototype 1, got %d", got)
+	}
+
+	// Age 150: proto 0 (Age>100) passes first → expect 0 (short-circuit).
+	a.Age[idx] = 150
+	if got := AssignPrototype(w, idx, ontCfg); got != 0 {
+		t.Fatalf("Age=150: expected prototype 0, got %d", got)
 	}
 }

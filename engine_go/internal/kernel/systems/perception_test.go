@@ -603,3 +603,136 @@ func TestCourtshipRefractoryTriggeredByCopulation(t *testing.T) {
 		t.Fatal("agent past the refractory period should court again")
 	}
 }
+
+// TestPerceptionMemoryUpdates verifies the legacy ActualizaMemoria behavior for
+// perception: a perceived source resets its "last" counter to 0 and increments
+// its "num" counter; unperceived elements age.
+func TestPerceptionMemoryUpdates(t *testing.T) {
+	cfg := testCfg()
+	w := world.New(cfg)
+
+	// One resource of type 0 near the agent.
+	w.Resources.PosX[0] = 25
+	w.Resources.PosY[0] = 20
+	w.Resources.TypeID[0] = 0
+	w.Resources.Level[0] = 50
+	w.Resources.Count = 1
+
+	idx := w.AddAgent()
+	w.Agents.PosX[idx] = 25
+	w.Agents.PosY[idx] = 25
+	w.Agents.StageID[idx] = 0
+	w.Agents.Reserves[idx*cfg.NumNutrients+0] = 50
+	w.Agents.Reserves[idx*cfg.NumNutrients+1] = 50
+
+	ctx := setupPerceptionContext(w)
+
+	sourceSlot := cfg.MemSlotSource(0)
+	slots := cfg.MemPerceptionSlots()
+	base := idx * slots
+
+	// Tick 1: perceives source 0.
+	Perceive(ctx, idx)
+	if w.Agents.MemoryLastPerceived[base+sourceSlot] != 0 {
+		t.Fatalf("expected last-perceived 0 after perceiving, got %d", w.Agents.MemoryLastPerceived[base+sourceSlot])
+	}
+	if w.Agents.MemoryNumPerceived[base+sourceSlot] != 1 {
+		t.Fatalf("expected num-perceived 1, got %d", w.Agents.MemoryNumPerceived[base+sourceSlot])
+	}
+
+	// Move the agent far away so it no longer perceives the source, then tick.
+	w.Agents.PosX[idx] = 5
+	w.Agents.PosY[idx] = 5
+	Perceive(ctx, idx)
+	if w.Agents.MemoryLastPerceived[base+sourceSlot] != 1 {
+		t.Fatalf("expected last-perceived to age to 1, got %d", w.Agents.MemoryLastPerceived[base+sourceSlot])
+	}
+	if w.Agents.MemoryNumPerceived[base+sourceSlot] != 1 {
+		t.Fatalf("num-perceived should stay 1, got %d", w.Agents.MemoryNumPerceived[base+sourceSlot])
+	}
+}
+
+// TestInteractionMemoryRecorded verifies feeding records an interaction with
+// the source type in the agent's memory (legacy UltIntDin/NumIntDin).
+func TestInteractionMemoryRecorded(t *testing.T) {
+	cfg := testCfg()
+	w := world.New(cfg)
+
+	// Contiguous resource of type 1 to feed from.
+	w.Resources.PosX[0] = 10
+	w.Resources.PosY[0] = 10
+	w.Resources.TypeID[0] = 1
+	w.Resources.Level[0] = 100
+	w.Resources.Count = 1
+
+	idx := w.AddAgent()
+	w.Agents.PosX[idx] = 10
+	w.Agents.PosY[idx] = 10
+	w.Agents.Speed[idx] = 3
+	w.Agents.Decision[idx] = uint8(behaviorOffsetFeed + 1) // Feed from type 1.
+	w.Agents.InteractantIdx[idx] = 0
+
+	Act(w, idx)
+
+	slot := cfg.MemSlotSource(1)
+	slots := cfg.MemPerceptionSlots()
+	mi := idx*slots + slot
+	if w.Agents.MemoryLastInteracted[mi] != 0 {
+		t.Fatalf("expected last-interacted 0 after feeding, got %d", w.Agents.MemoryLastInteracted[mi])
+	}
+	if w.Agents.MemoryNumInteracted[mi] != 1 {
+		t.Fatalf("expected num-interacted 1, got %d", w.Agents.MemoryNumInteracted[mi])
+	}
+}
+
+// TestMemoryModulatesBehaviorViaFormula is the end-to-end guarantee: a memory
+// counter fed into an interaction formula changes a behavior weight — the
+// mechanism the user relies on (e.g. attraction dropping after a recent
+// interaction). Here a source's Feed weight equals MemoryNumPerSource1, so it
+// grows as the source is perceived over successive ticks.
+func TestMemoryModulatesBehaviorViaFormula(t *testing.T) {
+	cfg := testCfg()
+	// Give nutrient 0 a name so the memory variable is stable and explicit.
+	cfg.Names.NutrientNames = []string{"Grass", "Water"}
+	w := world.New(cfg)
+
+	w.Resources.PosX[0] = 25
+	w.Resources.PosY[0] = 20
+	w.Resources.TypeID[0] = 0
+	w.Resources.Level[0] = 50
+	w.Resources.Count = 1
+
+	idx := w.AddAgent()
+	w.Agents.PosX[idx] = 25
+	w.Agents.PosY[idx] = 25
+	w.Agents.StageID[idx] = 0
+	w.Agents.Reserves[idx*cfg.NumNutrients+0] = 50
+	w.Agents.Reserves[idx*cfg.NumNutrients+1] = 50
+
+	ctx := setupPerceptionContext(w)
+	// Feed weight for source 0 scales with how many times this source has been
+	// perceived. Multiply by 100 so the legacy averaging (integer division over
+	// the perceived elements) doesn't crush small counts to zero.
+	feedBehavior := behaviorOffsetFeed + 0
+	// env_builder names source memory vars "MemoryNumPer" + "Source" + <name>.
+	if err := ctx.Formulas.Compile(
+		InteractionKeySource(0, 0, feedBehavior), "MemoryNumPerSourceGrass * 100"); err != nil {
+		t.Fatalf("compile: %v", err)
+	}
+
+	vdBase := idx * cfg.NumBehaviors
+
+	// The formula is evaluated during perception using the memory value from
+	// the PREVIOUS tick (this tick's memory update happens after). So the weight
+	// rises across ticks as the perceived count grows.
+	Perceive(ctx, idx) // memory num 0→1; formula read 0
+	w1 := w.Agents.VDecision[vdBase+feedBehavior]
+	Perceive(ctx, idx) // memory num 1→2; formula read 1
+	w2 := w.Agents.VDecision[vdBase+feedBehavior]
+	Perceive(ctx, idx) // formula read 2
+	w3 := w.Agents.VDecision[vdBase+feedBehavior]
+
+	if !(w3 > w2 && w2 > w1) {
+		t.Fatalf("expected feed weight to grow with perception memory (w1=%d, w2=%d, w3=%d)", w1, w2, w3)
+	}
+}

@@ -241,3 +241,36 @@ func (a *AgentArrays) RemoveSpermPack(idx, p int) {
 func (a *AgentArrays) ClearSpermPacks(idx int) {
 	a.SpermPacks[idx] = nil
 }
+
+// --- Perception/interaction memory slot layout ---
+//
+// The per-agent perception memory arrays (MemoryLast/NumPerceived,
+// MemoryLast/NumInteracted) are laid out per element in this order:
+//
+//	[substrates: NumSubstrates] [sources: NumResourceTypes] [prototypes: NumPrototypes]
+//
+// This matches how env_builder exposes the Memory* formula variables. The
+// helpers below compute a memory slot index for each element kind, so the
+// runtime memory update and the formula variables agree.
+
+// MemPerceptionSlots returns the number of memory slots per agent (one per
+// trackable element: substrates + resource sources + prototypes).
+func (cfg Config) MemPerceptionSlots() int {
+	return cfg.NumSubstrates + cfg.NumResourceTypes + cfg.NumPrototypes
+}
+
+// MemSlotSubstrate returns the memory slot for a substrate index (0-based).
+func (cfg Config) MemSlotSubstrate(substrateIdx int) int {
+	return substrateIdx
+}
+
+// MemSlotSource returns the memory slot for a resource/source type (0-based).
+func (cfg Config) MemSlotSource(resourceType int) int {
+	return cfg.NumSubstrates + resourceType
+}
+
+// MemSlotPrototype returns the memory slot for a unified prototype index
+// (stages, then males, then females; the same index getPerceiverIndex yields).
+func (cfg Config) MemSlotPrototype(protoIdx int) int {
+	return cfg.NumSubstrates + cfg.NumResourceTypes + protoIdx
+}

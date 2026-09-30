@@ -130,6 +130,11 @@ type PerceptionContext struct {
 	// VDecision[b] is later set to interSum[b] / interCount[b].
 	interSum   []int32
 	interCount []int32
+
+	// perceivedThisTick marks, per memory slot, whether the current agent
+	// perceived that element this tick (reused across agents, reset per agent).
+	// It feeds the per-tick perception-memory update (legacy ActualizaMemoria).
+	perceivedThisTick []bool
 }
 
 // Perceive runs the full perception pipeline for agent at idx.
@@ -143,6 +148,7 @@ func Perceive(ctx *PerceptionContext, idx int) {
 
 	resetVectors(a, idx, cfg.NumBehaviors)
 	resetInteractionAccumulators(ctx, cfg.NumBehaviors)
+	resetPerceivedThisTick(ctx, cfg.MemPerceptionSlots())
 
 	ctx.EnvBuilder.SetWorldVars(w)
 	ctx.EnvBuilder.SetAgentVars(w, idx)
@@ -165,6 +171,76 @@ func Perceive(ctx *PerceptionContext, idx int) {
 	applyFilters(ctx, idx)
 	applyBoundaryAvoidance(ctx, idx)
 	ensureNonZeroDecision(ctx, idx)
+
+	// Update the agent's perception memory from what it perceived this tick
+	// (legacy ActualizaMemoria): perceived elements reset their "last" counter
+	// to 0 and increment their "num" counter; the rest age by one tick.
+	updatePerceptionMemory(ctx, idx)
+}
+
+// AgeMemory ages the perception/interaction memory of an agent by one tick
+// (all "last" counters that are not -1 are incremented), WITHOUT recording any
+// new perception. It is used for agents that skip the perception phase this
+// tick (those in combat/courtship), so their memory keeps aging consistently,
+// mirroring the legacy where ActualizaMemoria runs for every agent each tick.
+func AgeMemory(w *world.World, idx int) {
+	a := w.Agents
+	cfg := w.Config
+	slots := cfg.MemPerceptionSlots()
+	base := idx * slots
+	for s := 0; s < slots; s++ {
+		mi := base + s
+		if a.MemoryLastPerceived[mi] >= 0 {
+			a.MemoryLastPerceived[mi]++
+		}
+		if a.MemoryLastInteracted[mi] >= 0 {
+			a.MemoryLastInteracted[mi]++
+		}
+	}
+}
+
+// resetPerceivedThisTick (re)allocates and clears the per-slot "perceived this
+// tick" buffer for the current agent.
+func resetPerceivedThisTick(ctx *PerceptionContext, slots int) {
+	if len(ctx.perceivedThisTick) < slots {
+		ctx.perceivedThisTick = make([]bool, slots)
+	}
+	for s := 0; s < slots; s++ {
+		ctx.perceivedThisTick[s] = false
+	}
+}
+
+// markPerceived records that the current agent perceived the element at the
+// given memory slot this tick.
+func markPerceived(ctx *PerceptionContext, slot int) {
+	if slot >= 0 && slot < len(ctx.perceivedThisTick) {
+		ctx.perceivedThisTick[slot] = true
+	}
+}
+
+// updatePerceptionMemory applies the legacy ActualizaMemoria perception update:
+// for each memory slot, if perceived this tick set MemoryLastPerceived=0 and
+// increment MemoryNumPerceived; otherwise age MemoryLastPerceived (when not -1).
+// Interaction memory is updated separately, at interaction/action time.
+func updatePerceptionMemory(ctx *PerceptionContext, idx int) {
+	a := ctx.World.Agents
+	cfg := ctx.World.Config
+	slots := cfg.MemPerceptionSlots()
+	base := idx * slots
+	for s := 0; s < slots; s++ {
+		mi := base + s
+		if ctx.perceivedThisTick[s] {
+			a.MemoryLastPerceived[mi] = 0
+			a.MemoryNumPerceived[mi]++
+		} else if a.MemoryLastPerceived[mi] >= 0 {
+			a.MemoryLastPerceived[mi]++
+		}
+		// Age interaction memory too (interactions set their slot to 0 when
+		// they happen, in the action phase).
+		if a.MemoryLastInteracted[mi] >= 0 {
+			a.MemoryLastInteracted[mi]++
+		}
+	}
 }
 
 // resetVectors zeroes out tendencies and VDecision for an agent.
@@ -248,6 +324,9 @@ func perceiveSubstrate(ctx *PerceptionContext, idx int) {
 	substrateIdx := int(w.Substrates.Get(sx, sy))
 	perceiverIdx := getPerceiverIndex(a, idx, cfg)
 
+	// The agent stands on this substrate → it perceives it.
+	markPerceived(ctx, cfg.MemSlotSubstrate(substrateIdx))
+
 	accumulateInteraction(ctx, func(b int) string {
 		return InteractionKeySubstrate(substrateIdx, perceiverIdx, b)
 	}, cfg.NumBehaviors)
@@ -292,6 +371,11 @@ func perceiveResources(ctx *PerceptionContext, idx int) {
 		// behavior (legacy PromediaProbaDecision). Expose the element's
 		// variables so formulas can reference DynamicElementLevel/Quality.
 		if resourceType >= 0 {
+			// Perceived this source type this tick (only real nutrient
+			// sources have a memory slot; oviposition sites do not).
+			if resourceType < cfg.NumResourceTypes {
+				markPerceived(ctx, cfg.MemSlotSource(resourceType))
+			}
 			ctx.EnvBuilder.SetResourceVars(w, int(rIdx))
 			accumulateInteraction(ctx, func(b int) string {
 				return InteractionKeySource(resourceType, perceiverIdx, b)
@@ -340,6 +424,9 @@ func perceiveAgents(ctx *PerceptionContext, idx int) (hasContender, hasMate bool
 
 		attractiveness := getAgentAttractiveness(ctx, radiusKey, dist)
 		accumulateTendency(a, tendBase, aDir, ax, ay, cx, cy, attractiveness)
+
+		// Perceived this observed prototype this tick.
+		markPerceived(ctx, cfg.MemSlotPrototype(observedIdx))
 
 		// Accumulate this observed agent's interaction-matrix contribution to
 		// every behavior (legacy PromediaProbaDecision). Expose the observed

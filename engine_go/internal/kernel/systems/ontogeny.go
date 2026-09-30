@@ -8,15 +8,34 @@ import (
 
 // StageConfig holds transition parameters for a single life stage.
 type StageConfig struct {
-	CyclesRequired  int32   // Minimum cycles in stage before transition.
-	NutrientReqs    []int32 // Required reserve level per nutrient.
-	NutrientCosts   []int32 // Cost deducted on transition per nutrient.
-	Condition1Value float64 // Custom condition 1 threshold.
-	Condition2Value float64 // Custom condition 2 threshold.
-	LogicCyclesReqs bool    // true=AND, false=OR between cycles and requirements.
-	LogicReqsConds  bool    // true=AND, false=OR between requirements and conditions.
-	LogicCond1Cond2 bool    // true=AND, false=OR between condition1 and condition2.
-	LinkedPrototype int     // Linked prototype index (-1 = unlinked).
+	CyclesRequired int32   // Minimum cycles in stage before transition.
+	NutrientReqs   []int32 // Required reserve level per nutrient.
+	NutrientCosts  []int32 // Cost deducted on transition per nutrient.
+
+	// Custom conditions: each is `<formula> <op> <value>`. The formula is
+	// compiled in the registry under Condition1Key/Condition2Key; its evaluated
+	// result is compared against the threshold with the operator. An empty key
+	// means the condition is absent (treated as neutral for its logic).
+	Condition1Key   string
+	Condition1Op    string
+	Condition1Value float64
+	Condition2Key   string
+	Condition2Op    string
+	Condition2Value float64
+
+	LogicCyclesReqs bool // Legacy Y_O:    cycles vs reqs   (true=AND, false=OR).
+	LogicReqsConds  bool // Legacy Y_OR:   reqs vs conds    (true=AND, false=OR).
+	LogicCond1Cond2 bool // Legacy Y_OC1C2: cond1 vs cond2  (true=AND, false=OR).
+	LinkedPrototype int  // Linked prototype index (-1 = unlinked).
+}
+
+// AssignmentCriterion is one prototype-assignment rule: a formula (compiled in
+// the registry under Key), an operator and a threshold. The prototype is chosen
+// when evalLogic(eval(Key), Op, Threshold) is true.
+type AssignmentCriterion struct {
+	Key       string // Registry key of the criterion formula.
+	Op        string
+	Threshold float64
 }
 
 // OntogenyConfig holds all stage configurations and prototype assignment criteria.
@@ -25,11 +44,15 @@ type OntogenyConfig struct {
 	NumStages      int
 	NumPrototypesM int
 	NumPrototypesF int
-	// AssignmentCriteria: indexed [prototypeIdx] = threshold value.
-	// Evaluated in priority order; first match wins.
-	AssignmentPriorityM  []int     // Prototype indices in evaluation order (males).
-	AssignmentPriorityF  []int     // Prototype indices in evaluation order (females).
-	AssignmentThresholds []float64 // Threshold per prototype index.
+
+	// Prototype assignment (legacy PrototipoAsignado). Priority lists give the
+	// order in which prototypes are evaluated (per sex); the first prototype
+	// whose criterion passes wins, else the first in the list is the default.
+	// Criteria are indexed by the 0-based prototype index within the sex.
+	AssignmentPriorityM []int
+	AssignmentPriorityF []int
+	AssignmentCriteriaM []AssignmentCriterion
+	AssignmentCriteriaF []AssignmentCriterion
 
 	// Formula engine references for morphology evaluation.
 	Registry   *formulas.Registry
@@ -141,7 +164,7 @@ func EvaluateEggs(w *world.World, ontCfg OntogenyConfig, genCfg GeneticsConfig) 
 
 	// Process in reverse to safely remove during iteration.
 	for i := eggs.Count - 1; i >= 0; i-- {
-		if shouldEclose(eggs, i, ontCfg, w.Config) {
+		if shouldEclose(w, i, ontCfg) {
 			ecloseEgg(w, i, ontCfg, genCfg)
 			removeEgg(w, i)
 			eclosed++
@@ -151,11 +174,13 @@ func EvaluateEggs(w *world.World, ontCfg OntogenyConfig, genCfg GeneticsConfig) 
 }
 
 // shouldEclose evaluates whether an egg meets the first stage's transition conditions.
-func shouldEclose(eggs *world.EggArrays, idx int, ontCfg OntogenyConfig, cfg world.Config) bool {
+func shouldEclose(w *world.World, idx int, ontCfg OntogenyConfig) bool {
 	if ontCfg.NumStages == 0 || len(ontCfg.Stages) == 0 {
 		return false
 	}
 
+	eggs := w.Eggs
+	cfg := w.Config
 	stage := ontCfg.Stages[0] // Eclosion uses the first stage's conditions.
 	age := eggs.Age[idx]
 
@@ -173,11 +198,10 @@ func shouldEclose(eggs *world.EggArrays, idx int, ontCfg OntogenyConfig, cfg wor
 		}
 	}
 
-	// Combine with logic operators (simplified: conditions always true for eggs).
-	if stage.LogicCyclesReqs {
-		return cyclesMet && reqsMet
-	}
-	return cyclesMet || reqsMet
+	// Custom conditions of the eclosion stage, combined per its cond logic.
+	condsMet := evalStageConditionsEgg(w, idx, stage, ontCfg)
+
+	return combineLogic(cyclesMet, reqsMet, condsMet, stage.LogicCyclesReqs, stage.LogicReqsConds)
 }
 
 // ecloseEgg converts an egg into a new agent (immature, first stage).
@@ -329,8 +353,9 @@ func EvaluateStageTransition(w *world.World, idx int, ontCfg OntogenyConfig) boo
 		}
 	}
 
-	// Conditions (simplified: always met for now; full formula eval in engine).
-	condsMet := true
+	// Evaluate the custom conditions (formula op value), combined per the
+	// stage's cond1/cond2 logic.
+	condsMet := evalStageConditionsAgent(w, idx, stage, ontCfg)
 
 	shouldTransition := combineLogic(cyclesMet, reqsMet, condsMet, stage.LogicCyclesReqs, stage.LogicReqsConds)
 	if !shouldTransition {
@@ -373,40 +398,63 @@ func becomeAdult(w *world.World, idx int, ontCfg OntogenyConfig) {
 	FixMorphology(w, idx, ontCfg.Registry, ontCfg.Eval, ontCfg.EnvBuilder)
 }
 
-// AssignPrototype determines which adult prototype an agent receives based on
-// hierarchical criteria evaluation. Returns the 0-based prototype index.
+// AssignPrototype determines which adult prototype an agent receives, mirroring
+// the legacy PrototipoAsignado: prototypes are evaluated in priority order and
+// the first whose criterion (formula op threshold) passes wins; if none pass,
+// the first prototype in the priority list is the default. With a single
+// prototype for the sex, that prototype is returned directly. Returns the
+// 0-based prototype index within the sex.
 func AssignPrototype(w *world.World, idx int, ontCfg OntogenyConfig) int {
 	a := w.Agents
 	sex := a.Sex[idx]
 
 	var priorities []int
+	var criteria []AssignmentCriterion
 	if sex == world.SexMale {
 		priorities = ontCfg.AssignmentPriorityM
+		criteria = ontCfg.AssignmentCriteriaM
 	} else {
 		priorities = ontCfg.AssignmentPriorityF
+		criteria = ontCfg.AssignmentCriteriaF
 	}
 
-	// If no priorities defined, assign first available prototype.
+	// No priorities, or a single prototype: assign the first available.
 	if len(priorities) == 0 {
 		return 0
 	}
+	if len(priorities) == 1 {
+		return priorities[0]
+	}
 
-	// Evaluate criteria in priority order (simplified: use genetic expression as criteria).
-	// In full implementation, this evaluates formula from AssignmentCriteria table.
-	// For now, assign based on the first locus expressed value vs threshold.
-	numLoci := w.Config.NumLoci
-	if numLoci > 0 && len(ontCfg.AssignmentThresholds) > 0 {
-		expressed := ExpressLocusCont(a.GenotypeCont, a.DominanceCont, idx, 0, numLoci)
+	// Set up the evaluator with this agent's variables so criterion formulas
+	// can reference its morphology/genetics/physiology.
+	if ontCfg.Registry != nil && ontCfg.Eval != nil && ontCfg.EnvBuilder != nil {
+		ontCfg.EnvBuilder.SetWorldVars(w)
+		ontCfg.EnvBuilder.SetAgentVars(w, idx)
+
 		for _, protoIdx := range priorities {
-			if protoIdx < len(ontCfg.AssignmentThresholds) {
-				if expressed >= ontCfg.AssignmentThresholds[protoIdx] {
-					return protoIdx
-				}
+			if protoIdx < 0 || protoIdx >= len(criteria) {
+				continue
+			}
+			c := criteria[protoIdx]
+			if c.Key == "" {
+				continue
+			}
+			p := ontCfg.Registry.Get(c.Key)
+			if p == nil {
+				continue
+			}
+			val, err := ontCfg.Eval.RunProgramFloat(p)
+			if err != nil {
+				continue
+			}
+			if evalLogic(val, c.Op, c.Threshold) {
+				return protoIdx
 			}
 		}
 	}
 
-	// Default: first in priority list.
+	// Default: first in priority order.
 	return priorities[0]
 }
 
@@ -566,16 +614,115 @@ func ResolveCourtshipDynamics(
 
 // combineLogic applies the legacy 3-level boolean logic:
 // result = logic1(cycles, reqs) logic2(prev_result, conditions)
+// combineLogic combines the three transition predicates exactly as the legacy
+// EvaluaPasoEstadio/EvaluaHuevo does, respecting Pascal operator precedence
+// (and > or). logicCyclesReqs is the legacy Y_O flag (cycles vs reqs) and
+// logicReqsConds is Y_OR (reqs vs conds). The four cases are:
+//
+//	Y_O=T Y_OR=T : cycles AND reqs AND conds
+//	Y_O=F Y_OR=T : cycles OR (reqs AND conds)
+//	Y_O=T Y_OR=F : (cycles AND reqs) OR conds
+//	Y_O=F Y_OR=F : cycles OR reqs OR conds
 func combineLogic(cycles, reqs, conds bool, logicCyclesReqs, logicReqsConds bool) bool {
-	var first bool
-	if logicCyclesReqs {
-		first = cycles && reqs
-	} else {
-		first = cycles || reqs
+	switch {
+	case logicCyclesReqs && logicReqsConds:
+		return cycles && reqs && conds
+	case !logicCyclesReqs && logicReqsConds:
+		return cycles || (reqs && conds)
+	case logicCyclesReqs && !logicReqsConds:
+		return (cycles && reqs) || conds
+	default: // !logicCyclesReqs && !logicReqsConds
+		return cycles || reqs || conds
+	}
+}
+
+// evalStageConditionsAgent evaluates a stage's custom conditions for an AGENT
+// (exposing the agent's variables), combined per the stage's cond1/cond2 logic.
+func evalStageConditionsAgent(w *world.World, idx int, stage StageConfig, ontCfg OntogenyConfig) bool {
+	return evalStageConditions(stage, ontCfg, func() {
+		ontCfg.EnvBuilder.SetWorldVars(w)
+		ontCfg.EnvBuilder.SetAgentVars(w, idx)
+	})
+}
+
+// evalStageConditionsEgg evaluates the eclosion stage's custom conditions for an
+// EGG (exposing the egg's variables), combined per the stage's cond1/cond2 logic.
+func evalStageConditionsEgg(w *world.World, eggIdx int, stage StageConfig, ontCfg OntogenyConfig) bool {
+	return evalStageConditions(stage, ontCfg, func() {
+		ontCfg.EnvBuilder.SetWorldVars(w)
+		ontCfg.EnvBuilder.SetEggVars(w, eggIdx)
+	})
+}
+
+// evalStageConditions evaluates a stage's two custom conditions (each a
+// compiled formula compared to a threshold via an operator) and combines them
+// with the stage's cond1/cond2 logic (LogicCond1Cond2: true=AND, false=OR),
+// mirroring the legacy EvaluaPasoEstadio condition block. A condition with an
+// empty formula key is treated as neutral for the combining operator (AND→true,
+// OR→false) so it doesn't distort the result. setupVars exposes the evaluating
+// entity's variables (agent or egg) before the formulas are evaluated.
+func evalStageConditions(stage StageConfig, ontCfg OntogenyConfig, setupVars func()) bool {
+	reg, eval, env := ontCfg.Registry, ontCfg.Eval, ontCfg.EnvBuilder
+
+	has1 := stage.Condition1Key != ""
+	has2 := stage.Condition2Key != ""
+
+	// When NO custom condition is configured, conditions must not influence the
+	// stage transition. The "conds" predicate is combined with the rest via
+	// LogicReqsConds (Y_OR): the neutral element there is true for AND and false
+	// for OR. Returning that neutral keeps unconfigured conditions inert.
+	if !has1 && !has2 {
+		return stage.LogicReqsConds
+	}
+	if reg == nil || eval == nil || env == nil {
+		return stage.LogicReqsConds
+	}
+	setupVars()
+
+	// Evaluate a single condition; an unconfigured one is neutral for the
+	// cond1/cond2 combining operator (AND→true, OR→false).
+	evalCond := func(key, op string, threshold float64) bool {
+		if key == "" {
+			return stage.LogicCond1Cond2
+		}
+		p := reg.Get(key)
+		if p == nil {
+			return stage.LogicCond1Cond2
+		}
+		v, err := eval.RunProgramFloat(p)
+		if err != nil {
+			return stage.LogicCond1Cond2
+		}
+		return evalLogic(v, op, threshold)
 	}
 
-	if logicReqsConds {
-		return first && conds
+	c1 := evalCond(stage.Condition1Key, stage.Condition1Op, stage.Condition1Value)
+	c2 := evalCond(stage.Condition2Key, stage.Condition2Op, stage.Condition2Value)
+
+	if stage.LogicCond1Cond2 {
+		return c1 && c2
 	}
-	return first || conds
+	return c1 || c2
+}
+
+// evalLogic implements the legacy Logica(v1, op, v2): compares two reals with
+// the given string operator. Unknown operators fall back to equality, matching
+// the legacy OpLogico default.
+func evalLogic(v1 float64, op string, v2 float64) bool {
+	switch op {
+	case "=":
+		return v1 == v2
+	case "<>":
+		return v1 != v2
+	case "<":
+		return v1 < v2
+	case ">":
+		return v1 > v2
+	case "<=", "=<":
+		return v1 <= v2
+	case ">=", "=>":
+		return v1 >= v2
+	default:
+		return v1 == v2
+	}
 }
