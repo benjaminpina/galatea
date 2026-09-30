@@ -121,6 +121,11 @@ func loadConfig(db *storage.DB, environmentID int64) (Config, error) {
 	}
 	cfg.NumSubstrates = len(substrates)
 
+	// Mixed-substrate compositions: resolve each mixed substrate into its
+	// simple-substrate components (as 0-based indices + fractions), so the
+	// kernel can combine their velocity and interaction contributions.
+	cfg.SubstrateComposition = loadSubstrateCompositions(subRepo, substrates)
+
 	// Environment dimensions.
 	envRepo := storage.NewEnvironmentRepo(db)
 	env, err := envRepo.GetByID(environmentID)
@@ -425,4 +430,38 @@ func parseInt32(s string, defaultVal int32) int32 {
 		return defaultVal
 	}
 	return v
+}
+
+// loadSubstrateCompositions builds, per substrate index, the simple-substrate
+// components of each mixed substrate. `substrates` is the sort_order-ordered
+// list (so its position is the 0-based substrate index used by SubstrateMap).
+// Percentages are converted to fractions in [0,1].
+func loadSubstrateCompositions(subRepo *storage.SubstrateRepo, substrates []storage.Substrate) [][]SubstrateComponent {
+	// Map substrate DB id -> 0-based index (position in the ordered list).
+	idToIdx := make(map[int64]int, len(substrates))
+	for i, s := range substrates {
+		idToIdx[s.ID] = i
+	}
+
+	comp := make([][]SubstrateComponent, len(substrates))
+	for i, s := range substrates {
+		if !s.IsMixed {
+			continue
+		}
+		rows, err := subRepo.GetCompositions(s.ID)
+		if err != nil {
+			continue
+		}
+		for _, c := range rows {
+			simpleIdx, ok := idToIdx[c.SimpleSubstrateID]
+			if !ok {
+				continue
+			}
+			comp[i] = append(comp[i], SubstrateComponent{
+				SimpleIdx: simpleIdx,
+				Fraction:  float64(c.Percentage) / 100.0,
+			})
+		}
+	}
+	return comp
 }

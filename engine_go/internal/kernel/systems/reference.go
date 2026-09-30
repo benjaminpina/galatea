@@ -123,14 +123,33 @@ func EvalRefValues(
 		}
 	}
 
-	// Substrate velocity (based on current substrate).
+	// Substrate velocity (based on the current substrate). For a MIXED
+	// substrate, the velocity is the weighted combination of its component
+	// simple substrates' velocities (legacy VelocidadSustrato mixto).
 	subX := int(a.PosX[idx])
 	subY := int(a.PosY[idx])
 	if subX >= 0 && subX < cfg.GridWidth && subY >= 0 && subY < cfg.GridHeight {
-		subID := w.Substrates.Get(subX, subY)
-		velKey := "substrate_velocity." + itoa(int(subID))
-		ref.Speed = evalIntFormula(reg, eval, velKey, 1)
+		subIdx := int(w.Substrates.Get(subX, subY))
+		ref.Speed = substrateVelocity(reg, eval, cfg, subIdx)
 	}
+}
+
+// substrateVelocity returns the velocity for a substrate index, resolving mixed
+// substrates as the weighted sum of their components' velocities (rounded).
+func substrateVelocity(reg *formulas.Registry, eval *formulas.Evaluator, cfg world.Config, subIdx int) int32 {
+	if !cfg.IsMixedSubstrate(subIdx) {
+		return evalIntFormula(reg, eval, "substrate_velocity."+itoa(subIdx), 1)
+	}
+	total := 0.0
+	for _, comp := range cfg.SubstrateComposition[subIdx] {
+		v := evalIntFormula(reg, eval, "substrate_velocity."+itoa(comp.SimpleIdx), 1)
+		total += float64(v) * comp.Fraction
+	}
+	speed := int32(total + 0.5) // round
+	if speed < 1 {
+		speed = 1 // A stationary agent would never move; keep a floor of 1.
+	}
+	return speed
 }
 
 // evalIntFormula evaluates a formula by key, returning defaultVal if not found or on error.

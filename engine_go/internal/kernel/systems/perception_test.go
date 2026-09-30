@@ -736,3 +736,75 @@ func TestMemoryModulatesBehaviorViaFormula(t *testing.T) {
 		t.Fatalf("expected feed weight to grow with perception memory (w1=%d, w2=%d, w3=%d)", w1, w2, w3)
 	}
 }
+
+// TestSubstrateVelocityMixed verifies a mixed substrate's velocity is the
+// weighted combination of its components' velocities.
+func TestSubstrateVelocityMixed(t *testing.T) {
+	cfg := testCfg()
+	// Substrate 2 is mixed: 50% of substrate 0 + 50% of substrate 1.
+	cfg.SubstrateComposition = [][]world.SubstrateComponent{
+		nil,
+		nil,
+		{{SimpleIdx: 0, Fraction: 0.5}, {SimpleIdx: 1, Fraction: 0.5}},
+	}
+
+	reg := formulas.NewRegistry()
+	eval := formulas.NewEvaluator(16)
+	_ = reg.Compile("substrate_velocity.0", "2")
+	_ = reg.Compile("substrate_velocity.1", "4")
+
+	// Simple substrate 0 → 2, substrate 1 → 4.
+	if v := substrateVelocity(reg, eval, cfg, 0); v != 2 {
+		t.Fatalf("simple substrate 0: expected velocity 2, got %d", v)
+	}
+	if v := substrateVelocity(reg, eval, cfg, 1); v != 4 {
+		t.Fatalf("simple substrate 1: expected velocity 4, got %d", v)
+	}
+	// Mixed substrate 2 → 2*0.5 + 4*0.5 = 3.
+	if v := substrateVelocity(reg, eval, cfg, 2); v != 3 {
+		t.Fatalf("mixed substrate 2: expected velocity 3, got %d", v)
+	}
+}
+
+// TestPerceiveSubstrateMixedInteraction verifies a mixed substrate's interaction
+// contribution to VDecision is the weighted combination of its components'
+// interaction formulas, counting as a single perceived element.
+func TestPerceiveSubstrateMixedInteraction(t *testing.T) {
+	cfg := testCfg()
+	// Substrate 2 is mixed: 50% of 0 + 50% of 1.
+	cfg.SubstrateComposition = [][]world.SubstrateComponent{
+		nil,
+		nil,
+		{{SimpleIdx: 0, Fraction: 0.5}, {SimpleIdx: 1, Fraction: 0.5}},
+	}
+	w := world.New(cfg)
+
+	// Make the whole map substrate 2 (mixed), so the agent stands on it.
+	for y := 0; y < cfg.GridHeight; y++ {
+		for x := 0; x < cfg.GridWidth; x++ {
+			w.Substrates.Set(x, y, 2)
+		}
+	}
+
+	idx := w.AddAgent()
+	w.Agents.PosX[idx] = 10
+	w.Agents.PosY[idx] = 10
+	w.Agents.StageID[idx] = 0
+	w.Agents.Reserves[idx*cfg.NumNutrients+0] = 50
+	w.Agents.Reserves[idx*cfg.NumNutrients+1] = 50
+
+	ctx := setupPerceptionContext(w)
+	// Rest behavior (index 1) weight: component 0 gives 10, component 1 gives 20.
+	restIdx := behaviorRest
+	_ = ctx.Formulas.Compile(InteractionKeySubstrate(0, 0, restIdx), "10")
+	_ = ctx.Formulas.Compile(InteractionKeySubstrate(1, 0, restIdx), "20")
+
+	Perceive(ctx, idx)
+
+	// Only the mixed substrate is perceived (one element), so the averaged
+	// weight equals the weighted combination: 10*0.5 + 20*0.5 = 15.
+	vdBase := idx * cfg.NumBehaviors
+	if got := w.Agents.VDecision[vdBase+restIdx]; got != 15 {
+		t.Fatalf("expected mixed substrate Rest weight 15, got %d", got)
+	}
+}

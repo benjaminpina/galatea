@@ -324,12 +324,38 @@ func perceiveSubstrate(ctx *PerceptionContext, idx int) {
 	substrateIdx := int(w.Substrates.Get(sx, sy))
 	perceiverIdx := getPerceiverIndex(a, idx, cfg)
 
-	// The agent stands on this substrate → it perceives it.
+	// The agent stands on this substrate → it perceives it (memory tracks the
+	// substrate cell, mixed or simple, by its own index).
 	markPerceived(ctx, cfg.MemSlotSubstrate(substrateIdx))
 
-	accumulateInteraction(ctx, func(b int) string {
-		return InteractionKeySubstrate(substrateIdx, perceiverIdx, b)
-	}, cfg.NumBehaviors)
+	if !cfg.IsMixedSubstrate(substrateIdx) {
+		// Simple substrate: one interaction contribution.
+		accumulateInteraction(ctx, func(b int) string {
+			return InteractionKeySubstrate(substrateIdx, perceiverIdx, b)
+		}, cfg.NumBehaviors)
+		return
+	}
+
+	// Mixed substrate: its interaction contribution is the weighted combination
+	// of its simple components (legacy GetInteraccionSustratos for X>7). For
+	// each behavior, sum the components' formula results scaled by their
+	// fractions; the mixed cell counts as ONE perceived element overall (a
+	// single PromediaProbaDecision contribution), not one per component.
+	comps := cfg.SubstrateComposition[substrateIdx]
+	for b := 0; b < cfg.NumBehaviors; b++ {
+		combined := 0.0
+		for _, comp := range comps {
+			p := ctx.Formulas.Get(InteractionKeySubstrate(comp.SimpleIdx, perceiverIdx, b))
+			if p == nil {
+				continue
+			}
+			if val, err := ctx.Eval.RunProgramInt(p); err == nil {
+				combined += float64(val) * comp.Fraction
+			}
+		}
+		ctx.interSum[b] += int32(combined + 0.5) // round
+		ctx.interCount[b]++                      // one contribution for the whole mixed cell
+	}
 }
 
 // perceiveResources queries the resource grid and accumulates tendencies + VDecision.

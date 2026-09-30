@@ -59,6 +59,28 @@ type Config struct {
 	// Names holds user-defined names for entities (nutrients, loci, substrates, etc.).
 	// Loaded from the DB during the Cold Path.
 	Names Names
+
+	// SubstrateComposition holds, per substrate index, the simple-substrate
+	// components of a MIXED substrate (empty for simple substrates). A mixed
+	// substrate's velocity and interaction contributions are the weighted
+	// combination of its components (legacy Entorno.Mixtos), so the kernel
+	// resolves a mixed cell into its components at runtime instead of treating
+	// it as an opaque id. Indexed by 0-based substrate index.
+	SubstrateComposition [][]SubstrateComponent
+}
+
+// SubstrateComponent is one simple-substrate share of a mixed substrate:
+// SimpleIdx is the 0-based index of the simple substrate, Fraction is its
+// weight in [0,1] (the DB percentage / 100).
+type SubstrateComponent struct {
+	SimpleIdx int
+	Fraction  float64
+}
+
+// IsMixedSubstrate reports whether the substrate at index i is mixed (has
+// components).
+func (cfg Config) IsMixedSubstrate(i int) bool {
+	return i >= 0 && i < len(cfg.SubstrateComposition) && len(cfg.SubstrateComposition[i]) > 0
 }
 
 // DefaultConfig returns a Config with sensible defaults for unset fields.
